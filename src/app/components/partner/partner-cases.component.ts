@@ -1493,16 +1493,6 @@ export class PartnerCasesComponent implements OnInit {
     this.selectedCase = null;
   }
 
-  viewCaseDetails(case_: DebtCase) {
-    this.selectedCase = case_;
-    this.showDetailsModal = true;
-  }
-
-  closeDetailsModal() {
-    this.showDetailsModal = false;
-    this.selectedCase = null;
-  }
-
   getActivityClass(type: string): string {
     const typeMap: { [key: string]: string } = {
       'payment_received': 'payment',
@@ -1524,17 +1514,5 @@ export class PartnerCasesComponent implements OnInit {
   viewDocument(doc: any) {
     console.log('Visualiser document:', doc.name);
     // TODO: Implémenter la visualisation
-  }
-
-  getDocumentTypeLabel(type: string): string {
-    const labels: { [key: string]: string } = {
-      'invoice': 'Facture',
-      'contract': 'Contrat',
-      'correspondence': 'Correspondance',
-      'legal_notice': 'Mise en demeure',
-      'payment_proof': 'Preuve de paiement',
-      'court_document': 'Document judiciaire'
-    };
-    return labels[type] || type;
   }
 }
