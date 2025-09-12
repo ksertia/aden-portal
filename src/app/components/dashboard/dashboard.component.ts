@@ -606,6 +606,10 @@ export class DashboardComponent implements OnInit {
     return this.authService.hasRole(UserRole.CREDITOR);
   }
 
+  get isCedantUser(): boolean {
+    return this.authService.hasRole(UserRole.CEDANT);
+  }
+
   loadDashboardData() {
     if (!this.currentUser) return;
 
