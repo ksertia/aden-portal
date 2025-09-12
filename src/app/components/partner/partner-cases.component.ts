@@ -96,7 +96,7 @@ import { DebtCase, CaseStatus, Priority, CaseFilter, PartnerUpdate } from '../..
                 <div class="case-info">
                   <h3>{{ case.caseNumber }}</h3>
                   <p class="debtor-name">{{ case.debtor.firstName }} {{ case.debtor.lastName }}</p>
-                  <p class="cedant-name">Cédé par {{ case.creditor.name }}</p>
+                  <p class="cedant-name">Cédé par {{ case.creditor.name }} le {{ formatDate(case.cededAt!) }}</p>
                 </div>
                 <div class="case-badges">
                   <span class="status-badge" [ngClass]="'status-' + case.status">

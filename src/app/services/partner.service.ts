@@ -70,7 +70,6 @@ export class PartnerService {
         priority: Priority.HIGH,
         createdAt: new Date('2024-01-15'),
         dueDate: new Date('2024-03-15'),
-        assignedPartner: '6',
         partnerCommission: 25,
         cededBy: '5',
         cededAt: new Date('2024-01-20'),
@@ -83,6 +82,65 @@ export class PartnerService {
             date: new Date('2024-01-20'),
             userId: '5',
             userName: 'Thomas Moreau'
+          }
+        ]
+      },
+      {
+        id: 'partner-case-2',
+        caseNumber: 'REC-P-2024-002',
+        debtor: {
+          firstName: 'Claire',
+          lastName: 'Dubois',
+          email: 'claire.dubois@email.com',
+          phone: '+33 1 23 45 67 87',
+          type: 'individual',
+          address: {
+            street: '42 Avenue des Champs',
+            city: 'Nice',
+            postalCode: '06000',
+            country: 'France'
+          }
+        },
+        creditor: {
+          name: 'ABC Services',
+          contactPerson: 'Sophie Lambert',
+          email: 'sophie.lambert@abc-services.fr',
+          phone: '+33 1 23 45 67 92',
+          address: {
+            street: '456 Avenue des Affaires',
+            city: 'Lyon',
+            postalCode: '69000',
+            country: 'France'
+          }
+        },
+        amount: 3200,
+        amountPaid: 800,
+        debtBreakdown: {
+          principalAmount: 2800,
+          interests: [],
+          penalties: [],
+          fees: [],
+          totalInterests: 200,
+          totalPenalties: 150,
+          totalFees: 50,
+          totalAmount: 3200
+        },
+        status: CaseStatus.NEGOTIATION,
+        priority: Priority.MEDIUM,
+        createdAt: new Date('2024-01-10'),
+        dueDate: new Date('2024-03-10'),
+        partnerCommission: 30,
+        cededBy: '4',
+        cededAt: new Date('2024-01-18'),
+        documents: [],
+        history: [
+          {
+            id: '2',
+            type: ActivityType.CASE_CEDED,
+            description: 'Dossier cédé au partenaire Recouvrement Solutions',
+            date: new Date('2024-01-18'),
+            userId: '4',
+            userName: 'Sophie Lambert'
           }
         ]
       }
@@ -99,6 +157,16 @@ export class PartnerService {
         description: 'Paiement partiel reçu de 1500€',
         amount: 1500,
         createdAt: new Date('2024-01-25')
+      },
+      {
+        id: '2',
+        caseId: 'partner-case-2',
+        partnerId: '6',
+        partnerName: 'Laurent Rousseau',
+        updateType: 'status_change',
+        description: 'Dossier passé en négociation suite à contact avec le débiteur',
+        newStatus: CaseStatus.NEGOTIATION,
+        createdAt: new Date('2024-01-22')
       }
     ];
 
@@ -114,14 +182,25 @@ export class PartnerService {
         commission: 25,
         terms: 'Commission de 25% sur les montants recouvrés',
         status: 'active'
+      },
+      {
+        id: '2',
+        caseId: 'partner-case-2',
+        partnerId: '6',
+        partnerName: 'Recouvrement Solutions',
+        cededBy: '4',
+        cededAt: new Date('2024-01-18'),
+        commission: 30,
+        terms: 'Commission de 30% sur les montants recouvrés',
+        status: 'active'
       }
     ];
   }
 
   // Méthodes pour les partenaires
   getAssignedCases(partnerId: string): Observable<DebtCase[]> {
-    const assignedCases = this.mockCededCases.filter(c => c.assignedPartner === partnerId);
-    return of(assignedCases).pipe(delay(300));
+    // Les partenaires peuvent accéder à tous les dossiers cédés
+    return of(this.mockCededCases).pipe(delay(300));
   }
 
   updateCaseStatus(caseId: string, newStatus: CaseStatus, description: string): Observable<DebtCase> {
@@ -256,7 +335,6 @@ export class PartnerService {
     this.mockCessionContracts.push(contract);
 
     // Mettre à jour le dossier
-    case_.assignedPartner = partnerId;
     case_.partnerCommission = commission;
     case_.cededAt = new Date();
 
@@ -264,7 +342,8 @@ export class PartnerService {
   }
 
   getPartnerStatistics(partnerId: string): Observable<any> {
-    const assignedCases = this.mockCededCases.filter(c => c.assignedPartner === partnerId);
+    // Statistiques basées sur tous les dossiers cédés accessibles
+    const assignedCases = this.mockCededCases;
     const totalRecovered = assignedCases.reduce((sum, c) => sum + c.amountPaid, 0);
     const totalCommission = assignedCases.reduce((sum, c) => sum + (c.amountPaid * (c.partnerCommission || 0) / 100), 0);
 
