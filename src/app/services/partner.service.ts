@@ -8,7 +8,8 @@ import {
   PartnerUpdate, 
   CessionContract,
   ActivityType,
-  CaseActivity 
+  CaseActivity,
+  DocumentType
 } from '../models/case.model';
 
 @Injectable({
@@ -124,7 +125,7 @@ export class PartnerService {
           {
             id: '1',
             name: 'Contrat de service TechCorp.pdf',
-            type: 'contract',
+            type: DocumentType.CONTRACT,
             url: '#',
             uploadedAt: new Date('2024-01-15'),
             uploadedBy: 'Thomas Moreau'
@@ -132,7 +133,7 @@ export class PartnerService {
           {
             id: '2',
             name: 'Facture impayée F-2024-001.pdf',
-            type: 'invoice',
+            type: DocumentType.INVOICE,
             url: '#',
             uploadedAt: new Date('2024-01-16'),
             uploadedBy: 'Thomas Moreau'
@@ -140,7 +141,7 @@ export class PartnerService {
           {
             id: '3',
             name: 'Correspondance client.pdf',
-            type: 'correspondence',
+            type: DocumentType.CORRESPONDENCE,
             url: '#',
             uploadedAt: new Date('2024-01-18'),
             uploadedBy: 'Thomas Moreau'
@@ -249,7 +250,7 @@ export class PartnerService {
           {
             id: '4',
             name: 'Contrat ABC Services.pdf',
-            type: 'contract',
+            type: DocumentType.CONTRACT,
             url: '#',
             uploadedAt: new Date('2024-01-10'),
             uploadedBy: 'Sophie Lambert'
@@ -257,7 +258,7 @@ export class PartnerService {
           {
             id: '5',
             name: 'Mise en demeure préalable.pdf',
-            type: 'legal_notice',
+            type: DocumentType.LEGAL_NOTICE,
             url: '#',
             uploadedAt: new Date('2024-01-12'),
             uploadedBy: 'Sophie Lambert'
