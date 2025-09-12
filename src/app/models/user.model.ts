@@ -23,7 +23,8 @@ export enum UserRole {
   BAILIFF = 'bailiff',
   LAWYER = 'lawyer',
   CREDITOR = 'creditor',
-  CEDANT = 'cedant'
+  CEDANT = 'cedant',
+  RECOVERY_PARTNER = 'recovery_partner'
 }
 
 export interface LoginRequest {

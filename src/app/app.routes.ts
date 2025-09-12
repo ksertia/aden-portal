@@ -105,6 +105,22 @@ export const routes: Routes = [
           }
         ]
       },
+      // Routes spécifiques aux partenaires de recouvrement
+      {
+        path: 'partner',
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [UserRole.RECOVERY_PARTNER] },
+        children: [
+          {
+            path: 'cases',
+            loadComponent: () => import('./components/partner/partner-cases.component').then(c => c.PartnerCasesComponent)
+          },
+          {
+            path: 'tracking',
+            loadComponent: () => import('./components/partner/partner-tracking.component').then(c => c.PartnerTrackingComponent)
+          }
+        ]
+      },
       // Routes spécifiques au cédant
       {
         path: 'cedant',
@@ -122,6 +138,10 @@ export const routes: Routes = [
           {
             path: 'sales',
             loadComponent: () => import('./components/cedant/cedant-sales.component').then(c => c.CedantSalesComponent)
+          },
+          {
+            path: 'ceded-cases',
+            loadComponent: () => import('./components/cedant/cedant-ceded-cases.component').then(c => c.CedantCededCasesComponent)
           }
         ]
       },
@@ -129,7 +149,7 @@ export const routes: Routes = [
       {
         path: 'professional',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [UserRole.BAILIFF, UserRole.LAWYER, UserRole.CREDITOR, UserRole.CEDANT] },
+        data: { roles: [UserRole.BAILIFF, UserRole.LAWYER, UserRole.CREDITOR, UserRole.CEDANT, UserRole.RECOVERY_PARTNER] },
         children: [
           {
             path: 'reports',

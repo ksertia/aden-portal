@@ -297,6 +297,7 @@ import { LoginRequest } from '../../models/user.model';
     .demo-icon.lawyer { background: #7c3aed; }
     .demo-icon.creditor { background: #2563eb; }
     .demo-icon.cedant { background: #059669; }
+    .demo-icon.partner { background: #7c3aed; }
 
     .demo-info {
       flex: 1;

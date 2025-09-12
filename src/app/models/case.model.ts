@@ -12,6 +12,10 @@ export interface DebtCase {
   dueDate: Date;
   assignedBailiff?: string;
   assignedLawyer?: string;
+  assignedPartner?: string;
+  partnerCommission?: number;
+  cededBy?: string;
+  cededAt?: Date;
   documents: CaseDocument[];
   paymentPlan?: PaymentPlan;
   history: CaseActivity[];
@@ -173,7 +177,9 @@ export enum ActivityType {
   CORRESPONDENCE_SENT = 'correspondence_sent',
   LEGAL_ACTION_INITIATED = 'legal_action_initiated',
   REMINDER_SENT = 'reminder_sent',
-  FORMAL_NOTICE_SENT = 'formal_notice_sent'
+  FORMAL_NOTICE_SENT = 'formal_notice_sent',
+  CASE_CEDED = 'case_ceded',
+  PARTNER_UPDATE = 'partner_update'
 }
 
 export interface Address {
@@ -255,4 +261,29 @@ export enum PortfolioDocumentType {
   LEGAL_DOCUMENTS = 'legal_documents',
   CONTRACTS = 'contracts',
   OTHER = 'other'
+}
+
+export interface PartnerUpdate {
+  id: string;
+  caseId: string;
+  partnerId: string;
+  partnerName: string;
+  updateType: 'status_change' | 'payment_received' | 'action_taken' | 'note_added';
+  description: string;
+  amount?: number;
+  newStatus?: CaseStatus;
+  createdAt: Date;
+  documents?: CaseDocument[];
+}
+
+export interface CessionContract {
+  id: string;
+  caseId: string;
+  partnerId: string;
+  partnerName: string;
+  cededBy: string;
+  cededAt: Date;
+  commission: number;
+  terms: string;
+  status: 'active' | 'completed' | 'terminated';
 }

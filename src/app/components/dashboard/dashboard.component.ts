@@ -610,6 +610,10 @@ export class DashboardComponent implements OnInit {
     return this.authService.hasRole(UserRole.CEDANT);
   }
 
+  get isRecoveryPartnerUser(): boolean {
+    return this.authService.hasRole(UserRole.RECOVERY_PARTNER);
+  }
+
   loadDashboardData() {
     if (!this.currentUser) return;
 

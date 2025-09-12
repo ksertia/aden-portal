@@ -86,6 +86,22 @@ export class AuthService {
         postalCode: '13000',
         country: 'France'
       }
+    },
+    {
+      id: '6',
+      email: 'partenaire@example.com',
+      firstName: 'Laurent',
+      lastName: 'Rousseau',
+      role: UserRole.RECOVERY_PARTNER,
+      phone: '+33 1 23 45 67 94',
+      companyName: 'Recouvrement Solutions',
+      licenseNumber: 'RP75003',
+      address: {
+        street: '321 Avenue du Commerce',
+        city: 'Toulouse',
+        postalCode: '31000',
+        country: 'France'
+      }
     }
   ];
 
