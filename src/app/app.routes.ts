@@ -105,11 +105,31 @@ export const routes: Routes = [
           }
         ]
       },
+      // Routes spécifiques au cédant
+      {
+        path: 'cedant',
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [UserRole.CEDANT] },
+        children: [
+          {
+            path: 'portfolios',
+            loadComponent: () => import('./components/cedant/cedant-portfolios.component').then(c => c.CedantPortfoliosComponent)
+          },
+          {
+            path: 'invoices',
+            loadComponent: () => import('./components/cedant/cedant-invoices.component').then(c => c.CedantInvoicesComponent)
+          },
+          {
+            path: 'sales',
+            loadComponent: () => import('./components/cedant/cedant-sales.component').then(c => c.CedantSalesComponent)
+          }
+        ]
+      },
       // Routes communes aux professionnels (huissier et avocat)
       {
         path: 'professional',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [UserRole.BAILIFF, UserRole.LAWYER, UserRole.CREDITOR] },
+        data: { roles: [UserRole.BAILIFF, UserRole.LAWYER, UserRole.CREDITOR, UserRole.CEDANT] },
         children: [
           {
             path: 'reports',

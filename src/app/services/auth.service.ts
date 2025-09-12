@@ -71,6 +71,21 @@ export class AuthService {
         postalCode: '69000',
         country: 'France'
       }
+    },
+    {
+      id: '5',
+      email: 'cedant@example.com',
+      firstName: 'Thomas',
+      lastName: 'Moreau',
+      role: UserRole.CEDANT,
+      phone: '+33 1 23 45 67 93',
+      companyName: 'TechCorp Solutions',
+      address: {
+        street: '789 Rue de l\'Innovation',
+        city: 'Marseille',
+        postalCode: '13000',
+        country: 'France'
+      }
     }
   ];
 

@@ -182,3 +182,77 @@ export interface Address {
   postalCode: string;
   country: string;
 }
+
+export interface CedantPortfolio {
+  id: string;
+  cedantId: string;
+  name: string;
+  description: string;
+  totalAmount: number;
+  invoicesCount: number;
+  status: PortfolioStatus;
+  createdAt: Date;
+  submittedAt?: Date;
+  evaluatedAt?: Date;
+  soldAt?: Date;
+  salePrice?: number;
+  buyerId?: string;
+  documents: PortfolioDocument[];
+  invoices: CedantInvoice[];
+}
+
+export interface CedantInvoice {
+  id: string;
+  portfolioId: string;
+  invoiceNumber: string;
+  debtorName: string;
+  debtorEmail: string;
+  amount: number;
+  issueDate: Date;
+  dueDate: Date;
+  status: InvoiceStatus;
+  description: string;
+  attachments: InvoiceDocument[];
+}
+
+export interface PortfolioDocument {
+  id: string;
+  name: string;
+  type: PortfolioDocumentType;
+  url: string;
+  uploadedAt: Date;
+  uploadedBy: string;
+}
+
+export interface InvoiceDocument {
+  id: string;
+  name: string;
+  url: string;
+  uploadedAt: Date;
+}
+
+export enum PortfolioStatus {
+  DRAFT = 'draft',
+  SUBMITTED = 'submitted',
+  UNDER_EVALUATION = 'under_evaluation',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  SOLD = 'sold'
+}
+
+export enum InvoiceStatus {
+  UNPAID = 'unpaid',
+  PARTIALLY_PAID = 'partially_paid',
+  PAID = 'paid',
+  OVERDUE = 'overdue',
+  DISPUTED = 'disputed'
+}
+
+export enum PortfolioDocumentType {
+  PORTFOLIO_SUMMARY = 'portfolio_summary',
+  AGING_REPORT = 'aging_report',
+  DEBTOR_ANALYSIS = 'debtor_analysis',
+  LEGAL_DOCUMENTS = 'legal_documents',
+  CONTRACTS = 'contracts',
+  OTHER = 'other'
+}

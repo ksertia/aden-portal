@@ -22,7 +22,8 @@ export enum UserRole {
   DEBTOR = 'debtor',
   BAILIFF = 'bailiff',
   LAWYER = 'lawyer',
-  CREDITOR = 'creditor'
+  CREDITOR = 'creditor',
+  CEDANT = 'cedant'
 }
 
 export interface LoginRequest {

@@ -102,6 +102,13 @@ import { LoginRequest } from '../../models/user.model';
                 <div class="demo-email">creancier&#64;example.com</div>
               </div>
             </div>
+            <div class="demo-account" (click)="loginAsDemo('cedant@example.com')">
+              <div class="demo-icon cedant">Cd</div>
+              <div class="demo-info">
+                <div class="demo-name">Cédant</div>
+                <div class="demo-email">cedant&#64;example.com</div>
+              </div>
+            </div>
           </div>
           <p class="demo-note">Mot de passe pour tous les comptes : <code>password123</code></p>
         </div>
@@ -289,6 +296,7 @@ import { LoginRequest } from '../../models/user.model';
     .demo-icon.bailiff { background: #ea580c; }
     .demo-icon.lawyer { background: #7c3aed; }
     .demo-icon.creditor { background: #2563eb; }
+    .demo-icon.cedant { background: #059669; }
 
     .demo-info {
       flex: 1;
