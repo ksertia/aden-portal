@@ -154,6 +154,27 @@ import { RouterModule } from '@angular/router';
                 <li>Notifications de paiements et actions</li>
               </ul>
             </div>
+            
+            <div class="service-card fade-in-up">
+              <div class="service-icon cedant">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                  <path d="M3 3v5h5"/>
+                  <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                  <path d="M16 16h5v5"/>
+                </svg>
+              </div>
+              <h3>Pour les cédants</h3>
+              <p>Cédez vos créances clients en toute simplicité et suivez le processus de vente de bout en bout.</p>
+              <ul class="service-features">
+                <li>Création et gestion de portefeuilles de créances</li>
+                <li>Upload de documentation complète (contrats, factures, analyses)</li>
+                <li>Suivi du processus d'évaluation et de vente</li>
+                <li>Gestion détaillée de vos factures clients</li>
+                <li>Acceptation/refus des offres d'achat</li>
+                <li>Historique complet des transactions</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -607,6 +628,7 @@ import { RouterModule } from '@angular/router';
     .service-icon.bailiff { background: var(--warning); }
     .service-icon.lawyer { background: var(--primary); }
     .service-icon.creditor { background: #2563eb; }
+    .service-icon.cedant { background: #059669; }
 
     .service-card h3 {
       font-size: 24px;
