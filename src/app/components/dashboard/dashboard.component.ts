@@ -535,6 +535,48 @@ import { DebtCase } from '../../models/case.model';
       color: white;
     }
 
+    .dashboard-tabs {
+      margin-top: 32px;
+    }
+
+    .tab-buttons {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 24px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .case-commission {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .commission {
+      font-weight: 600;
+      color: var(--warning);
+    }
+
     @media (max-width: 1024px) {
       .dashboard-container {
         padding: 24px;
@@ -608,10 +650,6 @@ export class DashboardComponent implements OnInit {
 
   get isCedantUser(): boolean {
     return this.authService.hasRole(UserRole.CEDANT);
-  }
-
-  get isRecoveryPartnerUser(): boolean {
-    return this.authService.hasRole(UserRole.RECOVERY_PARTNER);
   }
 
   loadDashboardData() {

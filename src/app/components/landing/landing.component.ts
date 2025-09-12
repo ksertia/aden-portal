@@ -629,6 +629,7 @@ import { RouterModule } from '@angular/router';
     .service-icon.lawyer { background: var(--primary); }
     .service-icon.creditor { background: #2563eb; }
     .service-icon.cedant { background: #059669; }
+    .service-icon.partner { background: #7c3aed; }
 
     .service-card h3 {
       font-size: 24px;
