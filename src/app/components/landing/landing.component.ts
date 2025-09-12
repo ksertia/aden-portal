@@ -607,7 +607,6 @@ import { RouterModule } from '@angular/router';
     .service-icon.bailiff { background: var(--warning); }
     .service-icon.lawyer { background: var(--primary); }
     .service-icon.creditor { background: #2563eb; }
-    .service-icon.cedant { background: var(--success); }
 
     .service-card h3 {
       font-size: 24px;
