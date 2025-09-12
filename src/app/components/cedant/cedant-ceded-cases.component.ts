@@ -746,7 +746,7 @@ export class CedantCededCasesComponent implements OnInit {
     return Math.round((case_.amountPaid / case_.amount) * 100);
   }
 
-  getPartnerName(partnerId: string): string {
+  getPartnerName(): string {
     // TODO: Récupérer depuis un service
     return 'Recouvrement Solutions';
   }

@@ -36,7 +36,7 @@ import { PartnerUpdate, DebtCase } from '../../models/case.model';
                 <label>Dossier</label>
                 <select [(ngModel)]="selectedCaseId" (change)="filterUpdates()">
                   <option value="">Tous les dossiers</option>
-                  <option *ngFor="let case of assignedCases" [value]="case.id">
+                  <option *ngFor="let case of allCededCases" [value]="case.id">
                     {{ case.caseNumber }}
                   </option>
                 </select>

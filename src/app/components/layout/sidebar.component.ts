@@ -421,6 +421,8 @@ export class SidebarComponent implements OnInit {
         return 'Cédant';
       case UserRole.RECOVERY_PARTNER:
         return 'Partenaire';
+      case UserRole.RECOVERY_PARTNER:
+        return 'Partenaire';
       default:
         return '';
     }
