@@ -1,0 +1,552 @@
+<div class="cases-container">
+  <div class="cases-header fade-in-up">
+    <div class="header-content">
+      <div>
+        <h1>Dossiers Assignés</h1>
+        <p>Gérez les dossiers qui vous ont été confiés par vos partenaires</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" (click)="generatePartnerReport()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Rapport d'activité
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="stats-section fade-in-up" *ngIf="statistics">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ statistics.totalCases }}</div>
+          <div class="stat-label">Dossiers assignés</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon warning">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12,6 12,12 16,14"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ statistics.activeCases }}</div>
+          <div class="stat-label">Dossiers actifs</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon success">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatCurrency(statistics.totalRecovered) }}</div>
+          <div class="stat-label">Montant recouvré</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon info">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatCurrency(statistics.totalCommission) }}</div>
+          <div class="stat-label">Commissions gagnées</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des dossiers -->
+  <div class="cases-content fade-in-up">
+    <div class="cases-list" *ngIf="assignedCases.length > 0; else noCases">
+      <div class="cases-grid">
+        <div class="case-card partner" *ngFor="let case of assignedCases">
+          <div class="case-header">
+            <div class="case-info">
+              <h3>{{ case.caseNumber }}</h3>
+              <p class="debtor-name">{{ case.debtor.firstName }} {{ case.debtor.lastName }}</p>
+              <p class="cedant-name">Cédé par {{ case.creditor.name }} le {{ formatDate(case.cededAt!) }}</p>
+            </div>
+            <div class="case-badges">
+              <span class="status-badge" [ngClass]="'status-' + case.status">
+                {{ getStatusLabel(case.status) }}
+              </span>
+              <span class="commission-badge">
+                {{ case.partnerCommission }}% commission
+              </span>
+            </div>
+          </div>
+          
+          <div class="case-body">
+            <div class="case-amounts">
+              <div class="amount-item">
+                <span class="amount-label">Montant total</span>
+                <span class="amount-value">{{ formatCurrency(case.amount) }}</span>
+              </div>
+              <div class="amount-item">
+                <span class="amount-label">Recouvré</span>
+                <span class="amount-value recovered">{{ formatCurrency(case.amountPaid) }}</span>
+              </div>
+              <div class="amount-item">
+                <span class="amount-label">Commission</span>
+                <span class="amount-value commission">{{ formatCurrency(case.amountPaid * (case.partnerCommission || 0) / 100) }}</span>
+              </div>
+            </div>
+            
+            <div class="case-progress">
+              <div class="progress-info">
+                <span class="progress-label">Progression</span>
+                <span class="progress-percentage">{{ getPaymentPercentage(case) }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="getPaymentPercentage(case)"></div>
+              </div>
+            </div>
+            
+            <div class="case-meta">
+              <div class="meta-item">
+                <span class="meta-label">Cédé le :</span>
+                <span class="meta-value">{{ formatDate(case.cededAt!) }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Échéance :</span>
+                <span class="meta-value">{{ formatDate(case.dueDate) }}</span>
+              </div>
+            </div>
+            
+            <div class="case-actions">
+              <button class="btn btn-primary small" (click)="updateCaseStatus(case)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v6l3-3 3 3"/>
+                  <path d="M12 8v8"/>
+                  <path d="m8 14 4 4 4-4"/>
+                </svg>
+                Mettre à jour
+              </button>
+              <button class="btn btn-success small" (click)="recordPayment(case)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+                Paiement
+              </button>
+              <button class="btn btn-secondary small" (click)="addNote(case)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Ajouter note
+              </button>
+              <button class="btn btn-secondary small" (click)="viewCaseDetails(case)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Voir détails
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noCases>
+      <div class="no-cases">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <h3>Aucun dossier cédé</h3>
+        <p>Aucun dossier n'a encore été cédé par les cédants partenaires.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal mise à jour de statut -->
+  <div class="modal-overlay" *ngIf="showStatusModal" (click)="closeStatusModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Mettre à jour le statut</h3>
+        <button class="modal-close" (click)="closeStatusModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" *ngIf="selectedCase">
+        <div class="status-form">
+          <div class="form-group">
+            <label>Nouveau statut</label>
+            <select [(ngModel)]="statusUpdate.newStatus">
+              <option value="active">Actif</option>
+              <option value="negotiation">Négociation</option>
+              <option value="legal_action">Action légale</option>
+              <option value="payment_plan">Plan de paiement</option>
+              <option value="completed">Terminé</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Description de la mise à jour</label>
+            <textarea
+              [(ngModel)]="statusUpdate.description"
+              rows="4"
+              placeholder="Décrivez les actions entreprises et la raison du changement de statut..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeStatusModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="saveStatusUpdate()">Mettre à jour</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal enregistrement de paiement -->
+  <div class="modal-overlay" *ngIf="showPaymentModal" (click)="closePaymentModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Enregistrer un paiement</h3>
+        <button class="modal-close" (click)="closePaymentModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" *ngIf="selectedCase">
+        <div class="payment-summary">
+          <h4>Dossier {{ selectedCase.caseNumber }}</h4>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="label">Montant total</span>
+              <span class="value">{{ formatCurrency(selectedCase.amount) }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Déjà recouvré</span>
+              <span class="value">{{ formatCurrency(selectedCase.amountPaid) }}</span>
+            </div>
+            <div class="summary-item highlight">
+              <span class="label">Reste à recouvrer</span>
+              <span class="value">{{ formatCurrency(selectedCase.amount - selectedCase.amountPaid) }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="payment-form">
+          <div class="form-group">
+            <label>Montant du paiement reçu</label>
+            <input
+              type="number"
+              [(ngModel)]="paymentUpdate.amount"
+              [max]="selectedCase.amount - selectedCase.amountPaid"
+              min="1"
+              step="0.01"
+              placeholder="Montant en euros"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label>Description du paiement</label>
+            <textarea
+              [(ngModel)]="paymentUpdate.description"
+              rows="3"
+              placeholder="Décrivez les modalités du paiement reçu..."
+            ></textarea>
+          </div>
+          
+          <div class="commission-info">
+            <div class="commission-item">
+              <span class="label">Votre commission ({{ selectedCase.partnerCommission }}%)</span>
+              <span class="value">{{ formatCurrency((paymentUpdate.amount || 0) * (selectedCase.partnerCommission || 0) / 100) }}</span>
+            </div>
+            <div class="commission-item">
+              <span class="label">Montant net pour le cédant</span>
+              <span class="value">{{ formatCurrency((paymentUpdate.amount || 0) * (100 - (selectedCase.partnerCommission || 0)) / 100) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closePaymentModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="savePayment()" [disabled]="!paymentUpdate.amount || paymentUpdate.amount <= 0">
+          Enregistrer le paiement
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal ajout de note -->
+  <div class="modal-overlay" *ngIf="showNoteModal" (click)="closeNoteModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Ajouter une note</h3>
+        <button class="modal-close" (click)="closeNoteModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="note-form">
+          <div class="form-group">
+            <label>Type d'action</label>
+            <select [(ngModel)]="noteUpdate.type">
+              <option value="action_taken">Action entreprise</option>
+              <option value="note_added">Note d'information</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Contenu de la note</label>
+            <textarea
+              [(ngModel)]="noteUpdate.content"
+              rows="5"
+              placeholder="Décrivez l'action entreprise ou l'information à communiquer..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeNoteModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="saveNote()">Ajouter la note</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal détails du dossier -->
+  <div class="modal-overlay" *ngIf="showDetailsModal" (click)="closeDetailsModal()">
+    <div class="modal-content extra-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Détails du dossier {{ selectedCase?.caseNumber }}</h3>
+        <button class="modal-close" (click)="closeDetailsModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" *ngIf="selectedCase">
+        <div class="case-details">
+          <!-- Informations générales -->
+          <div class="details-section">
+            <h4>Informations générales</h4>
+            <div class="details-grid">
+              <div class="detail-item">
+                <span class="detail-label">Numéro de dossier</span>
+                <span class="detail-value">{{ selectedCase.caseNumber }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Cédé le</span>
+                <span class="detail-value">{{ formatDate(selectedCase.cededAt!) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Commission</span>
+                <span class="detail-value">{{ selectedCase.partnerCommission }}%</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Statut</span>
+                <span class="status-badge" [ngClass]="'status-' + selectedCase.status">
+                  {{ getStatusLabel(selectedCase.status) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informations débiteur -->
+          <div class="details-section">
+            <h4>Débiteur</h4>
+            <div class="debtor-profile">
+              <div class="debtor-avatar">
+                {{ selectedCase.debtor.firstName.charAt(0) }}{{ selectedCase.debtor.lastName.charAt(0) }}
+              </div>
+              <div class="debtor-info">
+                <div class="debtor-name">{{ selectedCase.debtor.firstName }} {{ selectedCase.debtor.lastName }}</div>
+                <div class="debtor-details">
+                  <div class="detail-row">
+                    <span class="label">Email :</span>
+                    <span class="value">{{ selectedCase.debtor.email }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Téléphone :</span>
+                    <span class="value">{{ selectedCase.debtor.phone }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Type :</span>
+                    <span class="value">{{ selectedCase.debtor.type === 'company' ? 'Entreprise' : 'Particulier' }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Adresse :</span>
+                    <span class="value">{{ selectedCase.debtor.address.street }}, {{ selectedCase.debtor.address.city }} {{ selectedCase.debtor.address.postalCode }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informations créancier/cédant -->
+          <div class="details-section">
+            <h4>Créancier (Cédant)</h4>
+            <div class="creditor-info">
+              <div class="detail-row">
+                <span class="label">Nom :</span>
+                <span class="value">{{ selectedCase.creditor.name }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Contact :</span>
+                <span class="value">{{ selectedCase.creditor.contactPerson }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Email :</span>
+                <span class="value">{{ selectedCase.creditor.email }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Téléphone :</span>
+                <span class="value">{{ selectedCase.creditor.phone }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analyse financière détaillée -->
+          <div class="details-section">
+            <h4>Analyse financière</h4>
+            <div class="financial-breakdown">
+              <div class="breakdown-card">
+                <h5>Composition de la créance</h5>
+                <div class="breakdown-items">
+                  <div class="breakdown-item">
+                    <span class="item-label">Montant principal</span>
+                    <span class="item-value">{{ formatCurrency(selectedCase.debtBreakdown.principalAmount) }}</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <span class="item-label">Intérêts totaux</span>
+                    <span class="item-value">{{ formatCurrency(selectedCase.debtBreakdown.totalInterests) }}</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <span class="item-label">Pénalités totales</span>
+                    <span class="item-value">{{ formatCurrency(selectedCase.debtBreakdown.totalPenalties) }}</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <span class="item-label">Frais totaux</span>
+                    <span class="item-value">{{ formatCurrency(selectedCase.debtBreakdown.totalFees) }}</span>
+                  </div>
+                  <div class="breakdown-item total">
+                    <span class="item-label">Total dû</span>
+                    <span class="item-value">{{ formatCurrency(selectedCase.amount) }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="commission-breakdown">
+                <h5>Répartition des recouvrements</h5>
+                <div class="commission-items">
+                  <div class="commission-item">
+                    <span class="item-label">Montant recouvré</span>
+                    <span class="item-value recovered">{{ formatCurrency(selectedCase.amountPaid) }}</span>
+                  </div>
+                  <div class="commission-item">
+                    <span class="item-label">Votre commission ({{ selectedCase.partnerCommission }}%)</span>
+                    <span class="item-value commission">{{ formatCurrency(selectedCase.amountPaid * (selectedCase.partnerCommission || 0) / 100) }}</span>
+                  </div>
+                  <div class="commission-item">
+                    <span class="item-label">Montant net cédant</span>
+                    <span class="item-value net">{{ formatCurrency(selectedCase.amountPaid * (100 - (selectedCase.partnerCommission || 0)) / 100) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Documents joints -->
+          <div class="details-section">
+            <h4>Documents joints ({{ selectedCase.documents.length }})</h4>
+            <div class="documents-grid" *ngIf="selectedCase.documents.length > 0; else noDocuments">
+              <div class="document-card" *ngFor="let doc of selectedCase.documents">
+                <div class="document-icon" [ngClass]="'icon-' + doc.type">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14,2 14,8 20,8"/>
+                  </svg>
+                </div>
+                <div class="document-info">
+                  <div class="document-name">{{ doc.name }}</div>
+                  <div class="document-meta">{{ getDocumentTypeLabel(doc.type) }}</div>
+                  <div class="document-date">{{ formatDate(doc.uploadedAt) }}</div>
+                </div>
+                <div class="document-actions">
+                  <button class="btn btn-primary small" (click)="downloadDocument(doc)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7,10 12,15 17,10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                  </button>
+                  <button class="btn btn-secondary small" (click)="viewDocument(doc)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <ng-template #noDocuments>
+              <div class="no-documents">
+                <p>Aucun document joint à ce dossier</p>
+              </div>
+            </ng-template>
+          </div>
+
+          <!-- Historique complet -->
+          <div class="details-section">
+            <h4>Historique des activités</h4>
+            <div class="activity-timeline">
+              <div class="timeline-item" *ngFor="let activity of selectedCase.history">
+                <div class="timeline-dot" [ngClass]="getActivityClass(activity.type)"></div>
+                <div class="timeline-content">
+                  <div class="timeline-description">{{ activity.description }}</div>
+                  <div class="timeline-meta">
+                    <span class="timeline-date">{{ formatDate(activity.date) }}</span>
+                    <span class="timeline-user">par {{ activity.userName }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeDetailsModal()">Fermer</button>
+        <button class="btn btn-primary" (click)="updateCaseStatus(selectedCase!)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v6l3-3 3 3"/>
+            <path d="M12 8v8"/>
+            <path d="m8 14 4 4 4-4"/>
+          </svg>
+          Mettre à jour le statut
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
