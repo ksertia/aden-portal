@@ -109,6 +109,13 @@ import { LoginRequest } from '../../models/user.model';
                 <div class="demo-email">cedant&#64;example.com</div>
               </div>
             </div>
+            <div class="demo-account" (click)="loginAsDemo('partenaire@example.com')">
+              <div class="demo-icon partner">P</div>
+              <div class="demo-info">
+                <div class="demo-name">Partenaire</div>
+                <div class="demo-email">partenaire&#64;example.com</div>
+              </div>
+            </div>
           </div>
           <p class="demo-note">Mot de passe pour tous les comptes : <code>password123</code></p>
         </div>
