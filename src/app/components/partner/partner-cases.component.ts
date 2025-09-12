@@ -167,6 +167,13 @@ import { DebtCase, CaseStatus, Priority, CaseFilter, PartnerUpdate } from '../..
                     </svg>
                     Ajouter note
                   </button>
+                  <button class="btn btn-secondary small" (click)="viewCaseDetails(case)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    Voir détails
+                  </button>
                 </div>
               </div>
             </div>
@@ -336,6 +343,221 @@ import { DebtCase, CaseStatus, Priority, CaseFilter, PartnerUpdate } from '../..
           <div class="modal-footer">
             <button class="btn btn-secondary" (click)="closeNoteModal()">Annuler</button>
             <button class="btn btn-primary" (click)="saveNote()">Ajouter la note</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal détails du dossier -->
+      <div class="modal-overlay" *ngIf="showDetailsModal" (click)="closeDetailsModal()">
+        <div class="modal-content extra-large" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>Détails du dossier {{ selectedCase?.caseNumber }}</h3>
+            <button class="modal-close" (click)="closeDetailsModal()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body" *ngIf="selectedCase">
+            <div class="case-details">
+              <!-- Informations générales -->
+              <div class="details-section">
+                <h4>Informations générales</h4>
+                <div class="details-grid">
+                  <div class="detail-item">
+                    <span class="detail-label">Numéro de dossier</span>
+                    <span class="detail-value">{{ selectedCase.caseNumber }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Cédé le</span>
+                    <span class="detail-value">{{ formatDate(selectedCase.cededAt!) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Commission</span>
+                    <span class="detail-value">{{ selectedCase.partnerCommission }}%</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Statut</span>
+                    <span class="status-badge" [ngClass]="'status-' + selectedCase.status">
+                      {{ getStatusLabel(selectedCase.status) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Informations débiteur -->
+              <div class="details-section">
+                <h4>Débiteur</h4>
+                <div class="debtor-profile">
+                  <div class="debtor-avatar">
+                    {{ selectedCase.debtor.firstName.charAt(0) }}{{ selectedCase.debtor.lastName.charAt(0) }}
+                  </div>
+                  <div class="debtor-info">
+                    <div class="debtor-name">{{ selectedCase.debtor.firstName }} {{ selectedCase.debtor.lastName }}</div>
+                    <div class="debtor-details">
+                      <div class="detail-row">
+                        <span class="label">Email :</span>
+                        <span class="value">{{ selectedCase.debtor.email }}</span>
+                      </div>
+                      <div class="detail-row">
+                        <span class="label">Téléphone :</span>
+                        <span class="value">{{ selectedCase.debtor.phone }}</span>
+                      </div>
+                      <div class="detail-row">
+                        <span class="label">Type :</span>
+                        <span class="value">{{ selectedCase.debtor.type === 'company' ? 'Entreprise' : 'Particulier' }}</span>
+                      </div>
+                      <div class="detail-row">
+                        <span class="label">Adresse :</span>
+                        <span class="value">{{ selectedCase.debtor.address.street }}, {{ selectedCase.debtor.address.city }} {{ selectedCase.debtor.address.postalCode }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Informations créancier/cédant -->
+              <div class="details-section">
+                <h4>Créancier (Cédant)</h4>
+                <div class="creditor-info">
+                  <div class="detail-row">
+                    <span class="label">Nom :</span>
+                    <span class="value">{{ selectedCase.creditor.name }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Contact :</span>
+                    <span class="value">{{ selectedCase.creditor.contactPerson }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Email :</span>
+                    <span class="value">{{ selectedCase.creditor.email }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Téléphone :</span>
+                    <span class="value">{{ selectedCase.creditor.phone }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Analyse financière détaillée -->
+              <div class="details-section">
+                <h4>Analyse financière</h4>
+                <div class="financial-breakdown">
+                  <div class="breakdown-card">
+                    <h5>Composition de la créance</h5>
+                    <div class="breakdown-items">
+                      <div class="breakdown-item">
+                        <span class="item-label">Montant principal</span>
+                        <span class="item-value">{{ formatCurrency(selectedCase.debtBreakdown.principalAmount) }}</span>
+                      </div>
+                      <div class="breakdown-item">
+                        <span class="item-label">Intérêts totaux</span>
+                        <span class="item-value">{{ formatCurrency(selectedCase.debtBreakdown.totalInterests) }}</span>
+                      </div>
+                      <div class="breakdown-item">
+                        <span class="item-label">Pénalités totales</span>
+                        <span class="item-value">{{ formatCurrency(selectedCase.debtBreakdown.totalPenalties) }}</span>
+                      </div>
+                      <div class="breakdown-item">
+                        <span class="item-label">Frais totaux</span>
+                        <span class="item-value">{{ formatCurrency(selectedCase.debtBreakdown.totalFees) }}</span>
+                      </div>
+                      <div class="breakdown-item total">
+                        <span class="item-label">Total dû</span>
+                        <span class="item-value">{{ formatCurrency(selectedCase.amount) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="commission-breakdown">
+                    <h5>Répartition des recouvrements</h5>
+                    <div class="commission-items">
+                      <div class="commission-item">
+                        <span class="item-label">Montant recouvré</span>
+                        <span class="item-value recovered">{{ formatCurrency(selectedCase.amountPaid) }}</span>
+                      </div>
+                      <div class="commission-item">
+                        <span class="item-label">Votre commission ({{ selectedCase.partnerCommission }}%)</span>
+                        <span class="item-value commission">{{ formatCurrency(selectedCase.amountPaid * (selectedCase.partnerCommission || 0) / 100) }}</span>
+                      </div>
+                      <div class="commission-item">
+                        <span class="item-label">Montant net cédant</span>
+                        <span class="item-value net">{{ formatCurrency(selectedCase.amountPaid * (100 - (selectedCase.partnerCommission || 0)) / 100) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Documents joints -->
+              <div class="details-section">
+                <h4>Documents joints ({{ selectedCase.documents.length }})</h4>
+                <div class="documents-grid" *ngIf="selectedCase.documents.length > 0; else noDocuments">
+                  <div class="document-card" *ngFor="let doc of selectedCase.documents">
+                    <div class="document-icon" [ngClass]="'icon-' + doc.type">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                      </svg>
+                    </div>
+                    <div class="document-info">
+                      <div class="document-name">{{ doc.name }}</div>
+                      <div class="document-meta">{{ getDocumentTypeLabel(doc.type) }}</div>
+                      <div class="document-date">{{ formatDate(doc.uploadedAt) }}</div>
+                    </div>
+                    <div class="document-actions">
+                      <button class="btn btn-primary small" (click)="downloadDocument(doc)">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                          <polyline points="7,10 12,15 17,10"/>
+                          <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                      </button>
+                      <button class="btn btn-secondary small" (click)="viewDocument(doc)">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #noDocuments>
+                  <div class="no-documents">
+                    <p>Aucun document joint à ce dossier</p>
+                  </div>
+                </ng-template>
+              </div>
+
+              <!-- Historique complet -->
+              <div class="details-section">
+                <h4>Historique des activités</h4>
+                <div class="activity-timeline">
+                  <div class="timeline-item" *ngFor="let activity of selectedCase.history">
+                    <div class="timeline-dot" [ngClass]="getActivityClass(activity.type)"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-description">{{ activity.description }}</div>
+                      <div class="timeline-meta">
+                        <span class="timeline-date">{{ formatDate(activity.date) }}</span>
+                        <span class="timeline-user">par {{ activity.userName }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeDetailsModal()">Fermer</button>
+            <button class="btn btn-primary" (click)="updateCaseStatus(selectedCase!)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v6l3-3 3 3"/>
+                <path d="M12 8v8"/>
+                <path d="m8 14 4 4 4-4"/>
+              </svg>
+              Mettre à jour le statut
+            </button>
           </div>
         </div>
       </div>
@@ -633,6 +855,10 @@ import { DebtCase, CaseStatus, Priority, CaseFilter, PartnerUpdate } from '../..
       animation: slideInUp 0.3s ease;
     }
 
+    .modal-content.extra-large {
+      max-width: 1200px;
+    }
+
     .modal-header {
       display: flex;
       justify-content: space-between;
@@ -757,6 +983,272 @@ import { DebtCase, CaseStatus, Priority, CaseFilter, PartnerUpdate } from '../..
       border-top: 1px solid var(--border);
     }
 
+    .details-section {
+      margin-bottom: 32px;
+    }
+
+    .details-section h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .detail-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .debtor-profile {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .debtor-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .debtor-info {
+      flex: 1;
+    }
+
+    .debtor-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .debtor-details, .creditor-info {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .financial-breakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .breakdown-card {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .breakdown-card h5 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    .breakdown-items, .commission-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .breakdown-item, .commission-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+    }
+
+    .breakdown-item.total {
+      border-top: 2px solid var(--border);
+      padding-top: 12px;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    .item-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .item-value {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .item-value.recovered {
+      color: var(--success);
+    }
+
+    .item-value.commission {
+      color: var(--primary);
+    }
+
+    .item-value.net {
+      color: #059669;
+    }
+
+    .documents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .document-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+    }
+
+    .document-card:hover {
+      border-color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .document-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .document-icon.icon-invoice { background: var(--primary); }
+    .document-icon.icon-contract { background: #3b82f6; }
+    .document-icon.icon-correspondence { background: #6366f1; }
+    .document-icon.icon-legal_notice { background: var(--warning); }
+    .document-icon.icon-payment_proof { background: var(--success); }
+    .document-icon.icon-court_document { background: #7c3aed; }
+
+    .document-info {
+      flex: 1;
+    }
+
+    .document-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .document-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+    }
+
+    .document-date {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .document-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .no-documents {
+      text-align: center;
+      padding: 32px;
+      color: var(--text-secondary);
+    }
+
+    .activity-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .timeline-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .timeline-dot.payment { background: var(--success); }
+    .timeline-dot.reminder { background: var(--warning); }
+    .timeline-dot.legal { background: var(--error); }
+    .timeline-dot.status { background: var(--primary); }
+    .timeline-dot.cession { background: #059669; }
+    .timeline-dot.partner { background: #7c3aed; }
+
+    .timeline-description {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .timeline-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -809,6 +1301,7 @@ export class PartnerCasesComponent implements OnInit {
   showStatusModal = false;
   showPaymentModal = false;
   showNoteModal = false;
+  showDetailsModal = false;
   selectedCase: DebtCase | null = null;
   
   statusUpdate = {
@@ -913,6 +1406,11 @@ export class PartnerCasesComponent implements OnInit {
     this.showNoteModal = true;
   }
 
+  viewCaseDetails(case_: DebtCase) {
+    this.selectedCase = case_;
+    this.showDetailsModal = true;
+  }
+
   saveStatusUpdate() {
     if (!this.selectedCase || !this.statusUpdate.description.trim()) return;
 
@@ -993,5 +1491,45 @@ export class PartnerCasesComponent implements OnInit {
   closeNoteModal() {
     this.showNoteModal = false;
     this.selectedCase = null;
+  }
+
+  closeDetailsModal() {
+    this.showDetailsModal = false;
+    this.selectedCase = null;
+  }
+
+  getDocumentTypeLabel(type: string): string {
+    const labels: { [key: string]: string } = {
+      'invoice': 'Facture',
+      'contract': 'Contrat',
+      'correspondence': 'Correspondance',
+      'legal_notice': 'Mise en demeure',
+      'payment_proof': 'Preuve de paiement',
+      'court_document': 'Document judiciaire'
+    };
+    return labels[type] || type;
+  }
+
+  getActivityClass(type: string): string {
+    const typeMap: { [key: string]: string } = {
+      'payment_received': 'payment',
+      'reminder_sent': 'reminder',
+      'status_changed': 'status',
+      'formal_notice_sent': 'legal',
+      'legal_action_initiated': 'legal',
+      'case_ceded': 'cession',
+      'partner_update': 'partner'
+    };
+    return typeMap[type] || 'status';
+  }
+
+  downloadDocument(doc: any) {
+    console.log('Télécharger document:', doc.name);
+    // TODO: Implémenter le téléchargement
+  }
+
+  viewDocument(doc: any) {
+    console.log('Visualiser document:', doc.name);
+    // TODO: Implémenter la visualisation
   }
 }
