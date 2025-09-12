@@ -1,0 +1,304 @@
+<div class="cases-container">
+  <div class="cases-header fade-in-up">
+    <div class="header-content">
+      <div>
+        <h1>Gestion des Dossiers</h1>
+        <p>Gérez vos dossiers de recouvrement assignés</p>
+      </div>
+      <button class="btn btn-primary" (click)="showCreateModal = true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Nouveau dossier
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section fade-in-up">
+    <div class="filters-card">
+      <div class="filters-header">
+        <h3>Filtres</h3>
+        <button class="btn btn-secondary small" (click)="resetFilters()">Réinitialiser</button>
+      </div>
+      
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Recherche</label>
+          <input
+            type="text"
+            [(ngModel)]="filters.searchTerm"
+            placeholder="Numéro, nom du débiteur..."
+            (input)="applyFilters()"
+          >
+        </div>
+        
+        <div class="filter-group">
+          <label>Statut</label>
+          <select [(ngModel)]="selectedStatus" (change)="updateStatusFilter()">
+            <option value="">Tous les statuts</option>
+            <option value="pending">En attente</option>
+            <option value="active">Actif</option>
+            <option value="negotiation">Négociation</option>
+            <option value="legal_action">Action légale</option>
+            <option value="completed">Terminé</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label>Priorité</label>
+          <select [(ngModel)]="selectedPriority" (change)="updatePriorityFilter()">
+            <option value="">Toutes les priorités</option>
+            <option value="low">Faible</option>
+            <option value="medium">Moyenne</option>
+            <option value="high">Élevée</option>
+            <option value="urgent">Urgente</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="stats-section fade-in-up" *ngIf="statistics">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-label">Dossiers assignés</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon success">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4"/>
+            <circle cx="12" cy="12" r="9"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ getSuccessRate() }}%</div>
+          <div class="stat-label">Taux de succès</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon warning">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatCurrency(getTotalRecovered()) }}</div>
+          <div class="stat-label">Montant recouvré</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des dossiers -->
+  <div class="cases-content fade-in-up">
+    <div class="cases-table" *ngIf="filteredCases.length > 0; else noCases">
+      <div class="table-header">
+        <div class="table-actions">
+          <button class="btn btn-secondary" (click)="generateReport()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Exporter rapport
+          </button>
+        </div>
+      </div>
+      
+      <div class="cases-grid">
+        <div class="case-card professional" *ngFor="let case of filteredCases">
+          <div class="case-header">
+            <div class="case-info">
+              <h3>{{ case.caseNumber }}</h3>
+              <p class="debtor-name">{{ case.debtor.firstName }} {{ case.debtor.lastName }}</p>
+              <p class="creditor-name">{{ case.creditor.name }}</p>
+            </div>
+            <div class="case-badges">
+              <span class="status-badge" [ngClass]="'status-' + case.status">
+                {{ getStatusLabel(case.status) }}
+              </span>
+              <span class="priority-badge" [ngClass]="'priority-' + case.priority">
+                {{ getPriorityLabel(case.priority) }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="case-body">
+            <div class="case-amounts">
+              <div class="amount-item">
+                <span class="amount-label">Montant total</span>
+                <span class="amount-value">{{ formatCurrency(case.amount) }}</span>
+              </div>
+              <div class="amount-item">
+                <span class="amount-label">Recouvré</span>
+                <span class="amount-value recovered">{{ formatCurrency(case.amountPaid) }}</span>
+              </div>
+              <div class="amount-item">
+                <span class="amount-label">Restant</span>
+                <span class="amount-value remaining">{{ formatCurrency(case.amount - case.amountPaid) }}</span>
+              </div>
+            </div>
+            
+            <div class="case-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="getPaymentPercentage(case)"></div>
+              </div>
+              <span class="progress-text">{{ getPaymentPercentage(case) }}% recouvré</span>
+            </div>
+            
+            <div class="case-actions">
+              <button class="btn btn-primary small" (click)="editCase(case)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Modifier
+              </button>
+              <button class="btn btn-secondary small" (click)="addNote(case)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Ajouter note
+              </button>
+              <button class="btn btn-secondary small" (click)="viewCaseDetails(case)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Détails
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noCases>
+      <div class="no-cases">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <h3>Aucun dossier trouvé</h3>
+        <p>Aucun dossier ne correspond aux critères sélectionnés.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal création de dossier -->
+  <div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Créer un nouveau dossier</h3>
+        <button class="modal-close" (click)="closeCreateModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="create-form">
+          <div class="form-section">
+            <h4>Informations du débiteur</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Prénom</label>
+                <input type="text" [(ngModel)]="newCase.debtor.firstName">
+              </div>
+              <div class="form-group">
+                <label>Nom</label>
+                <input type="text" [(ngModel)]="newCase.debtor.lastName">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" [(ngModel)]="newCase.debtor.email">
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <h4>Informations du créancier</h4>
+            <div class="form-group">
+              <label>Nom de l'entreprise</label>
+              <input type="text" [(ngModel)]="newCase.creditor.name">
+            </div>
+            <div class="form-group">
+              <label>Montant de la créance</label>
+              <input type="number" [(ngModel)]="newCase.amount" min="1" step="0.01">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeCreateModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="createCase()">Créer le dossier</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal ajout de note -->
+  <div class="modal-overlay" *ngIf="showNoteModal" (click)="closeNoteModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Ajouter une note</h3>
+        <button class="modal-close" (click)="closeNoteModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="note-form">
+          <div class="form-group">
+            <label>Type d'interaction</label>
+            <select [(ngModel)]="newNote.type">
+              <option value="call">Appel téléphonique</option>
+              <option value="email">Email</option>
+              <option value="meeting">Rendez-vous</option>
+              <option value="legal">Action légale</option>
+              <option value="payment">Paiement</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Contenu de la note</label>
+            <textarea
+              [(ngModel)]="newNote.content"
+              rows="4"
+              placeholder="Décrivez l'interaction ou l'action effectuée..."
+            ></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="newNote.isPrivate">
+              <span class="checkmark"></span>
+              Note privée (visible uniquement par les professionnels)
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeNoteModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="saveNote()">Ajouter la note</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,45 @@
+.actions-container {
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.actions-header {
+  margin-bottom: 32px;
+}
+
+.actions-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.actions-header p {
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.coming-soon {
+  text-align: center;
+  padding: 64px 32px;
+  color: var(--text-secondary);
+}
+
+.coming-soon svg {
+  margin-bottom: 24px;
+  color: var(--success);
+}
+
+.coming-soon h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .actions-container {
+    padding: 16px;
+  }
+}
