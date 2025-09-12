@@ -1506,6 +1506,11 @@ export class PartnerCasesComponent implements OnInit {
     return typeMap[type] || 'status';
   }
 
+  closeDetailsModal() {
+    this.showDetailsModal = false;
+    this.selectedCase = null;
+  }
+
   downloadDocument(doc: any) {
     console.log('Télécharger document:', doc.name);
     // TODO: Implémenter le téléchargement
