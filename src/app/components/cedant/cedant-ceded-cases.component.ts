@@ -747,7 +747,10 @@ export class CedantCededCasesComponent implements OnInit {
   }
 
   getPartnerName(): string {
-    // TODO: Récupérer depuis un service
+    return 'Recouvrement Solutions';
+  }
+
+  getPartnerName(partnerId: string): string {
     return 'Recouvrement Solutions';
   }
 

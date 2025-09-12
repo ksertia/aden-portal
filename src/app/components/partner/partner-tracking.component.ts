@@ -309,7 +309,7 @@ import { PartnerUpdate, DebtCase } from '../../models/case.model';
   `]
 })
 export class PartnerTrackingComponent implements OnInit {
-  assignedCases: DebtCase[] = [];
+  allCededCases: DebtCase[] = [];
   allUpdates: PartnerUpdate[] = [];
   filteredUpdates: PartnerUpdate[] = [];
   
@@ -331,7 +331,7 @@ export class PartnerTrackingComponent implements OnInit {
     if (!currentUser) return;
 
     this.partnerService.getAssignedCases(currentUser.id).subscribe(cases => {
-      this.assignedCases = cases;
+      this.allCededCases = cases;
     });
 
     this.partnerService.getPartnerUpdates().subscribe(updates => {
@@ -370,7 +370,7 @@ export class PartnerTrackingComponent implements OnInit {
   }
 
   getCaseNumber(caseId: string): string {
-    const case_ = this.assignedCases.find(c => c.id === caseId);
+    const case_ = this.allCededCases.find(c => c.id === caseId);
     return case_?.caseNumber || 'N/A';
   }
 
