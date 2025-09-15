@@ -3,8 +3,8 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { RouterOutlet, provideRouter } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
 import { routes } from './app/app.routes';
-import '@angular/localize/init';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +18,7 @@ export class App {}
 
 bootstrapApplication(App, {
   providers: [
-    provideRouter(routes)
+    provideRouter(routes),
+    provideHttpClient()
   ]
 }).catch(err => console.error(err));

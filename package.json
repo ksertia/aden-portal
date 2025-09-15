@@ -5,15 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "extract-i18n": "ng extract-i18n",
-    "serve:fr": "ng serve --configuration=fr",
-    "serve:en": "ng serve --configuration=en",
-    "build:fr": "ng build --configuration=fr",
-    "build:en": "ng build --configuration=en",
-    "serve:fr": "ng serve --configuration=fr",
-    "serve:en": "ng serve --configuration=en",
-    "build:fr": "ng build --configuration=fr",
-    "build:en": "ng build --configuration=en"
+    "dev": "ng serve"
   },
   "dependencies": {
     "@angular/animations": "^20.0.0",

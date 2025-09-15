@@ -1,0 +1,142 @@
+{
+  "nav": {
+    "services": "Services",
+    "advantages": "Benefits",
+    "contact": "Contact",
+    "login": "Sign in"
+  },
+  "hero": {
+    "title": "Simplify your debt collection",
+    "subtitle": "RecouvrePro is the digital platform that revolutionizes collection management. Debtors, bailiffs and lawyers collaborate efficiently to resolve unpaid debts.",
+    "cta": {
+      "portal": "Access portal",
+      "learn": "Learn more"
+    }
+  },
+  "services": {
+    "title": "A solution for every stakeholder",
+    "subtitle": "RecouvrePro adapts to the specific needs of each collection professional",
+    "debtor": {
+      "title": "For debtors",
+      "description": "View your cases, propose payment plans and make payments with complete transparency.",
+      "feature1": "View amount due, deadlines, interest and penalties",
+      "feature2": "Ability to submit payment receipts or other documents",
+      "feature3": "View reminder history",
+      "feature4": "Request payment plan or file dispute"
+    },
+    "bailiff": {
+      "title": "For bailiffs",
+      "description": "Efficiently manage your collection cases with advanced professional tools.",
+      "feature1": "Complete case management",
+      "feature2": "Process automation",
+      "feature3": "Detailed activity reports",
+      "feature4": "Centralized communication"
+    },
+    "lawyer": {
+      "title": "For lawyers",
+      "description": "Support your clients with specialized legal tools and personalized follow-up.",
+      "feature1": "In-depth legal analysis",
+      "feature2": "Online consultations",
+      "feature3": "Secure document management",
+      "feature4": "Integrated legal expertise"
+    },
+    "creditor": {
+      "title": "For creditors",
+      "description": "Track your receivables in real time and optimize your collection rate.",
+      "feature1": "Real-time progress tracking",
+      "feature2": "Document and evidence consultation",
+      "feature3": "Detailed periodic reports",
+      "feature4": "Payment and action notifications"
+    },
+    "cedant": {
+      "title": "For assignors",
+      "description": "Assign your customer receivables with ease and track the sales process end-to-end.",
+      "feature1": "Creation and management of receivables portfolios",
+      "feature2": "Upload complete documentation (contracts, invoices, analyses)",
+      "feature3": "Track evaluation and sales process",
+      "feature4": "Detailed management of your customer invoices",
+      "feature5": "Accept/reject purchase offers",
+      "feature6": "Complete transaction history"
+    }
+  },
+  "benefits": {
+    "title": "Why choose RecouvrePro?",
+    "subtitle": "A modern platform that transforms collection management",
+    "security": {
+      "title": "Maximum security",
+      "description": "Your data is protected by bank-level encryption and advanced security protocols."
+    },
+    "time": {
+      "title": "Time savings",
+      "description": "Automate your processes and reduce case processing time by 60%."
+    },
+    "reports": {
+      "title": "Smart reports",
+      "description": "Generate detailed reports and analytics to optimize your performance."
+    },
+    "communication": {
+      "title": "Smooth communication",
+      "description": "Facilitate exchanges between all stakeholders with integrated communication tools."
+    },
+    "compliance": {
+      "title": "Legal compliance",
+      "description": "Automatically comply with all current regulations with our continuous updates."
+    },
+    "support": {
+      "title": "Expert support",
+      "description": "Benefit from personalized support from our collection experts."
+    }
+  },
+  "stats": {
+    "satisfaction": "Satisfaction rate",
+    "time_saving": "Average time savings",
+    "cases_processed": "Cases processed",
+    "support_available": "Support available"
+  },
+  "cta": {
+    "title": "Ready to revolutionize your collection?",
+    "subtitle": "Join thousands of professionals who trust RecouvrePro",
+    "start": "Get started now",
+    "contact": "Contact us"
+  },
+  "contact": {
+    "title": "Contact us",
+    "subtitle": "Our team of experts is at your disposal",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "form": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "profile": "Profile",
+      "message": "Message",
+      "send": "Send message",
+      "selectProfile": "Select your profile",
+      "debtor": "Debtor",
+      "bailiff": "Bailiff",
+      "lawyer": "Lawyer",
+      "creditor": "Creditor",
+      "firstNamePlaceholder": "Your first name",
+      "lastNamePlaceholder": "Your last name",
+      "emailPlaceholder": "your.email@example.com",
+      "messagePlaceholder": "Describe your needs..."
+    }
+  },
+  "footer": {
+    "services": "Services",
+    "support": "Support",
+    "legal": "Legal",
+    "contact": "Contact us",
+    "documentation": "Documentation",
+    "faq": "FAQ",
+    "terms": "Legal notices",
+    "privacy": "Privacy policy",
+    "cgu": "Terms of use",
+    "copyright": "© 2024 RecouvrePro. All rights reserved."
+  },
+  "common": {
+    "digital_management": "Digital management",
+    "centralized_files": "All your files centralized"
+  }
+}

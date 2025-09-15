@@ -1,0 +1,142 @@
+{
+  "nav": {
+    "services": "Services",
+    "advantages": "Avantages",
+    "contact": "Contact",
+    "login": "Se connecter"
+  },
+  "hero": {
+    "title": "Simplifiez votre recouvrement de créances",
+    "subtitle": "RecouvrePro est la plateforme digitale qui révolutionne la gestion du recouvrement. Débiteurs, huissiers et avocats collaborent efficacement pour résoudre les impayés.",
+    "cta": {
+      "portal": "Accéder au portail",
+      "learn": "En savoir plus"
+    }
+  },
+  "services": {
+    "title": "Une solution pour chaque acteur",
+    "subtitle": "RecouvrePro s'adapte aux besoins spécifiques de chaque professionnel du recouvrement",
+    "debtor": {
+      "title": "Pour les débiteurs",
+      "description": "Consultez vos dossiers, proposez des échéanciers et effectuez vos paiements en toute transparence.",
+      "feature1": "Consultation du montant dû, échéances, intérêts et pénalités",
+      "feature2": "Possibilité de soumettre des justificatifs de paiement ou autres documents",
+      "feature3": "Consultation de l'historique des relances",
+      "feature4": "Demander un échelonnement ou formuler une contestation"
+    },
+    "bailiff": {
+      "title": "Pour les huissiers",
+      "description": "Gérez efficacement vos dossiers de recouvrement avec des outils professionnels avancés.",
+      "feature1": "Gestion complète des dossiers",
+      "feature2": "Automatisation des procédures",
+      "feature3": "Rapports d'activité détaillés",
+      "feature4": "Communication centralisée"
+    },
+    "lawyer": {
+      "title": "Pour les avocats",
+      "description": "Accompagnez vos clients avec des outils juridiques spécialisés et un suivi personnalisé.",
+      "feature1": "Analyse juridique approfondie",
+      "feature2": "Consultations en ligne",
+      "feature3": "Gestion documentaire sécurisée",
+      "feature4": "Expertise légale intégrée"
+    },
+    "creditor": {
+      "title": "Pour les créanciers",
+      "description": "Suivez en temps réel l'évolution de vos créances et optimisez votre taux de recouvrement.",
+      "feature1": "Suivi temps réel de l'avancement",
+      "feature2": "Consultation des documents et preuves",
+      "feature3": "Rapports périodiques détaillés",
+      "feature4": "Notifications de paiements et actions"
+    },
+    "cedant": {
+      "title": "Pour les cédants",
+      "description": "Cédez vos créances clients en toute simplicité et suivez le processus de vente de bout en bout.",
+      "feature1": "Création et gestion de portefeuilles de créances",
+      "feature2": "Upload de documentation complète (contrats, factures, analyses)",
+      "feature3": "Suivi du processus d'évaluation et de vente",
+      "feature4": "Gestion détaillée de vos factures clients",
+      "feature5": "Acceptation/refus des offres d'achat",
+      "feature6": "Historique complet des transactions"
+    }
+  },
+  "benefits": {
+    "title": "Pourquoi choisir RecouvrePro ?",
+    "subtitle": "Une plateforme moderne qui transforme la gestion du recouvrement",
+    "security": {
+      "title": "Sécurité maximale",
+      "description": "Vos données sont protégées par un chiffrement de niveau bancaire et des protocoles de sécurité avancés."
+    },
+    "time": {
+      "title": "Gain de temps",
+      "description": "Automatisez vos processus et réduisez le temps de traitement de vos dossiers de 60%."
+    },
+    "reports": {
+      "title": "Rapports intelligents",
+      "description": "Générez des rapports détaillés et des analyses pour optimiser vos performances."
+    },
+    "communication": {
+      "title": "Communication fluide",
+      "description": "Facilitez les échanges entre toutes les parties prenantes avec des outils de communication intégrés."
+    },
+    "compliance": {
+      "title": "Conformité légale",
+      "description": "Respectez automatiquement toutes les réglementations en vigueur avec nos mises à jour continues."
+    },
+    "support": {
+      "title": "Support expert",
+      "description": "Bénéficiez d'un accompagnement personnalisé par nos experts du recouvrement."
+    }
+  },
+  "stats": {
+    "satisfaction": "Taux de satisfaction",
+    "time_saving": "Gain de temps moyen",
+    "cases_processed": "Dossiers traités",
+    "support_available": "Support disponible"
+  },
+  "cta": {
+    "title": "Prêt à révolutionner votre recouvrement ?",
+    "subtitle": "Rejoignez des milliers de professionnels qui font confiance à RecouvrePro",
+    "start": "Commencer maintenant",
+    "contact": "Nous contacter"
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Notre équipe d'experts est à votre disposition",
+    "address": "Adresse",
+    "phone": "Téléphone",
+    "email": "Email",
+    "form": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "profile": "Profil",
+      "message": "Message",
+      "send": "Envoyer le message",
+      "selectProfile": "Sélectionnez votre profil",
+      "debtor": "Débiteur",
+      "bailiff": "Huissier de justice",
+      "lawyer": "Avocat",
+      "creditor": "Créancier",
+      "firstNamePlaceholder": "Votre prénom",
+      "lastNamePlaceholder": "Votre nom",
+      "emailPlaceholder": "votre.email@exemple.fr",
+      "messagePlaceholder": "Décrivez votre besoin..."
+    }
+  },
+  "footer": {
+    "services": "Services",
+    "support": "Support",
+    "legal": "Légal",
+    "contact": "Nous contacter",
+    "documentation": "Documentation",
+    "faq": "FAQ",
+    "terms": "Mentions légales",
+    "privacy": "Politique de confidentialité",
+    "cgu": "CGU",
+    "copyright": "© 2024 RecouvrePro. Tous droits réservés."
+  },
+  "common": {
+    "digital_management": "Gestion digitale",
+    "centralized_files": "Tous vos dossiers centralisés"
+  }
+}
