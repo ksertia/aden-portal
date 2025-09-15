@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { I18nService, SupportedLocale } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-language-switcher',
@@ -55,22 +54,24 @@ import { I18nService, SupportedLocale } from '../../services/i18n.service';
   `]
 })
 export class LanguageSwitcherComponent {
-  currentLocale: SupportedLocale = 'fr';
-  supportedLocales: SupportedLocale[] = ['fr', 'en'];
+  currentLocale: string = 'fr';
+  supportedLocales: string[] = ['fr', 'en'];
 
-  constructor(private i18nService: I18nService) {
-    this.i18nService.currentLocale$.subscribe(locale => {
-      this.currentLocale = locale;
-    });
-    this.supportedLocales = this.i18nService.getSupportedLocales();
+  constructor() {
+    // Détecter la langue du navigateur
+    const browserLang = navigator.language.split('-')[0];
+    this.currentLocale = ['fr', 'en'].includes(browserLang) ? browserLang : 'fr';
   }
 
-  switchLanguage(locale: SupportedLocale): void {
-    this.i18nService.setLocale(locale);
+  switchLanguage(locale: string): void {
+    this.currentLocale = locale;
+    // Recharger la page avec la nouvelle locale
+    const currentUrl = window.location.pathname;
+    window.location.href = `/${locale}${currentUrl}`;
   }
 
-  getLanguageLabel(locale: SupportedLocale): string {
-    const labels: Record<SupportedLocale, string> = {
+  getLanguageLabel(locale: string): string {
+    const labels: { [key: string]: string } = {
       'fr': 'FR',
       'en': 'EN'
     };

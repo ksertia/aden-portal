@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en-US" target-language="en" datatype="plaintext" original="ng2.template">
+    <body>
+      <!-- Navigation -->
+      <trans-unit id="nav.services" datatype="html">
+        <source>Services</source>
+        <target>Services</target>
+      </trans-unit>
+      <trans-unit id="nav.advantages" datatype="html">
+        <source>Advantages</source>
+        <target>Benefits</target>
+      </trans-unit>
+      <trans-unit id="nav.contact" datatype="html">
+        <source>Contact</source>
+        <target>Contact</target>
+      </trans-unit>
+      <trans-unit id="nav.login" datatype="html">
+        <source>Sign in</source>
+        <target>Sign in</target>
+      </trans-unit>
+      
+      <!-- Hero Section -->
+      <trans-unit id="hero.title" datatype="html">
+        <source>Simplify your debt collection</source>
+        <target>Simplify your debt collection</target>
+      </trans-unit>
+      <trans-unit id="hero.subtitle" datatype="html">
+        <source>RecouvrePro is the digital platform that revolutionizes collection management. Debtors, bailiffs and lawyers collaborate efficiently to resolve unpaid debts.</source>
+        <target>RecouvrePro is the digital platform that revolutionizes collection management. Debtors, bailiffs and lawyers collaborate efficiently to resolve unpaid debts.</target>
+      </trans-unit>
+      <trans-unit id="hero.cta.portal" datatype="html">
+        <source>Access portal</source>
+        <target>Access portal</target>
+      </trans-unit>
+      <trans-unit id="hero.cta.learn" datatype="html">
+        <source>Learn more</source>
+        <target>Learn more</target>
+      </trans-unit>
+      
+      <!-- Services Section -->
+      <trans-unit id="services.title" datatype="html">
+        <source>A solution for every stakeholder</source>
+        <target>A solution for every stakeholder</target>
+      </trans-unit>
+      <trans-unit id="services.subtitle" datatype="html">
+        <source>RecouvrePro adapts to the specific needs of each collection professional</source>
+        <target>RecouvrePro adapts to the specific needs of each collection professional</target>
+      </trans-unit>
+      
+      <!-- Debtor Services -->
+      <trans-unit id="services.debtor.title" datatype="html">
+        <source>For debtors</source>
+        <target>For debtors</target>
+      </trans-unit>
+      <trans-unit id="services.debtor.description" datatype="html">
+        <source>View your cases, propose payment plans and make payments with complete transparency.</source>
+        <target>View your cases, propose payment plans and make payments with complete transparency.</target>
+      </trans-unit>
+      <trans-unit id="services.debtor.feature1" datatype="html">
+        <source>View amount due, deadlines, interest and penalties</source>
+        <target>View amount due, deadlines, interest and penalties</target>
+      </trans-unit>
+      <trans-unit id="services.debtor.feature2" datatype="html">
+        <source>Ability to submit payment receipts or other documents</source>
+        <target>Ability to submit payment receipts or other documents</target>
+      </trans-unit>
+      <trans-unit id="services.debtor.feature3" datatype="html">
+        <source>View reminder history</source>
+        <target>View reminder history</target>
+      </trans-unit>
+      <trans-unit id="services.debtor.feature4" datatype="html">
+        <source>Request payment plan or file dispute</source>
+        <target>Request payment plan or file dispute</target>
+      </trans-unit>
+      
+      <!-- Bailiff Services -->
+      <trans-unit id="services.bailiff.title" datatype="html">
+        <source>For bailiffs</source>
+        <target>For bailiffs</target>
+      </trans-unit>
+      <trans-unit id="services.bailiff.description" datatype="html">
+        <source>Efficiently manage your collection cases with advanced professional tools.</source>
+        <target>Efficiently manage your collection cases with advanced professional tools.</target>
+      </trans-unit>
+      <trans-unit id="services.bailiff.feature1" datatype="html">
+        <source>Complete case management</source>
+        <target>Complete case management</target>
+      </trans-unit>
+      <trans-unit id="services.bailiff.feature2" datatype="html">
+        <source>Process automation</source>
+        <target>Process automation</target>
+      </trans-unit>
+      <trans-unit id="services.bailiff.feature3" datatype="html">
+        <source>Detailed activity reports</source>
+        <target>Detailed activity reports</target>
+      </trans-unit>
+      <trans-unit id="services.bailiff.feature4" datatype="html">
+        <source>Centralized communication</source>
+        <target>Centralized communication</target>
+      </trans-unit>
+      
+      <!-- Lawyer Services -->
+      <trans-unit id="services.lawyer.title" datatype="html">
+        <source>For lawyers</source>
+        <target>For lawyers</target>
+      </trans-unit>
+      <trans-unit id="services.lawyer.description" datatype="html">
+        <source>Support your clients with specialized legal tools and personalized follow-up.</source>
+        <target>Support your clients with specialized legal tools and personalized follow-up.</target>
+      </trans-unit>
+      <trans-unit id="services.lawyer.feature1" datatype="html">
+        <source>In-depth legal analysis</source>
+        <target>In-depth legal analysis</target>
+      </trans-unit>
+      <trans-unit id="services.lawyer.feature2" datatype="html">
+        <source>Online consultations</source>
+        <target>Online consultations</target>
+      </trans-unit>
+      <trans-unit id="services.lawyer.feature3" datatype="html">
+        <source>Secure document management</source>
+        <target>Secure document management</target>
+      </trans-unit>
+      <trans-unit id="services.lawyer.feature4" datatype="html">
+        <source>Integrated legal expertise</source>
+        <target>Integrated legal expertise</target>
+      </trans-unit>
+      
+      <!-- Creditor Services -->
+      <trans-unit id="services.creditor.title" datatype="html">
+        <source>For creditors</source>
+        <target>For creditors</target>
+      </trans-unit>
+      <trans-unit id="services.creditor.description" datatype="html">
+        <source>Track your receivables in real time and optimize your collection rate.</source>
+        <target>Track your receivables in real time and optimize your collection rate.</target>
+      </trans-unit>
+      <trans-unit id="services.creditor.feature1" datatype="html">
+        <source>Real-time progress tracking</source>
+        <target>Real-time progress tracking</target>
+      </trans-unit>
+      <trans-unit id="services.creditor.feature2" datatype="html">
+        <source>Document and evidence consultation</source>
+        <target>Document and evidence consultation</target>
+      </trans-unit>
+      <trans-unit id="services.creditor.feature3" datatype="html">
+        <source>Detailed periodic reports</source>
+        <target>Detailed periodic reports</target>
+      </trans-unit>
+      <trans-unit id="services.creditor.feature4" datatype="html">
+        <source>Payment and action notifications</source>
+        <target>Payment and action notifications</target>
+      </trans-unit>
+      
+      <!-- Benefits Section -->
+      <trans-unit id="benefits.title" datatype="html">
+        <source>Why choose RecouvrePro?</source>
+        <target>Why choose RecouvrePro?</target>
+      </trans-unit>
+      <trans-unit id="benefits.subtitle" datatype="html">
+        <source>A modern platform that transforms collection management</source>
+        <target>A modern platform that transforms collection management</target>
+      </trans-unit>
+      <trans-unit id="benefits.security.title" datatype="html">
+        <source>Maximum security</source>
+        <target>Maximum security</target>
+      </trans-unit>
+      <trans-unit id="benefits.security.description" datatype="html">
+        <source>Your data is protected by bank-level encryption and advanced security protocols.</source>
+        <target>Your data is protected by bank-level encryption and advanced security protocols.</target>
+      </trans-unit>
+      <trans-unit id="benefits.time.title" datatype="html">
+        <source>Time savings</source>
+        <target>Time savings</target>
+      </trans-unit>
+      <trans-unit id="benefits.time.description" datatype="html">
+        <source>Automate your processes and reduce case processing time by 60%.</source>
+        <target>Automate your processes and reduce case processing time by 60%.</target>
+      </trans-unit>
+      <trans-unit id="benefits.reports.title" datatype="html">
+        <source>Smart reports</source>
+        <target>Smart reports</target>
+      </trans-unit>
+      <trans-unit id="benefits.reports.description" datatype="html">
+        <source>Generate detailed reports and analytics to optimize your performance.</source>
+        <target>Generate detailed reports and analytics to optimize your performance.</target>
+      </trans-unit>
+      <trans-unit id="benefits.communication.title" datatype="html">
+        <source>Smooth communication</source>
+        <target>Smooth communication</target>
+      </trans-unit>
+      <trans-unit id="benefits.communication.description" datatype="html">
+        <source>Facilitate exchanges between all stakeholders with integrated communication tools.</source>
+        <target>Facilitate exchanges between all stakeholders with integrated communication tools.</target>
+      </trans-unit>
+      <trans-unit id="benefits.compliance.title" datatype="html">
+        <source>Legal compliance</source>
+        <target>Legal compliance</target>
+      </trans-unit>
+      <trans-unit id="benefits.compliance.description" datatype="html">
+        <source>Automatically comply with all current regulations with our continuous updates.</source>
+        <target>Automatically comply with all current regulations with our continuous updates.</target>
+      </trans-unit>
+      <trans-unit id="benefits.support.title" datatype="html">
+        <source>Expert support</source>
+        <target>Expert support</target>
+      </trans-unit>
+      <trans-unit id="benefits.support.description" datatype="html">
+        <source>Benefit from personalized support from our collection experts.</source>
+        <target>Benefit from personalized support from our collection experts.</target>
+      </trans-unit>
+      
+      <!-- Stats Section -->
+      <trans-unit id="stats.satisfaction" datatype="html">
+        <source>Satisfaction rate</source>
+        <target>Satisfaction rate</target>
+      </trans-unit>
+      <trans-unit id="stats.time_saving" datatype="html">
+        <source>Average time savings</source>
+        <target>Average time savings</target>
+      </trans-unit>
+      <trans-unit id="stats.cases_processed" datatype="html">
+        <source>Cases processed</source>
+        <target>Cases processed</target>
+      </trans-unit>
+      <trans-unit id="stats.support_available" datatype="html">
+        <source>Support available</source>
+        <target>Support available</target>
+      </trans-unit>
+      
+      <!-- CTA Section -->
+      <trans-unit id="cta.title" datatype="html">
+        <source>Ready to revolutionize your collection?</source>
+        <target>Ready to revolutionize your collection?</target>
+      </trans-unit>
+      <trans-unit id="cta.subtitle" datatype="html">
+        <source>Join thousands of professionals who trust RecouvrePro</source>
+        <target>Join thousands of professionals who trust RecouvrePro</target>
+      </trans-unit>
+      <trans-unit id="cta.start" datatype="html">
+        <source>Get started now</source>
+        <target>Get started now</target>
+      </trans-unit>
+      <trans-unit id="cta.contact" datatype="html">
+        <source>Contact us</source>
+        <target>Contact us</target>
+      </trans-unit>
+      
+      <!-- Contact Section -->
+      <trans-unit id="contact.title" datatype="html">
+        <source>Contact us</source>
+        <target>Contact us</target>
+      </trans-unit>
+      <trans-unit id="contact.subtitle" datatype="html">
+        <source>Our team of experts is at your disposal</source>
+        <target>Our team of experts is at your disposal</target>
+      </trans-unit>
+      <trans-unit id="contact.address" datatype="html">
+        <source>Address</source>
+        <target>Address</target>
+      </trans-unit>
+      <trans-unit id="contact.phone" datatype="html">
+        <source>Phone</source>
+        <target>Phone</target>
+      </trans-unit>
+      <trans-unit id="contact.email" datatype="html">
+        <source>Email</source>
+        <target>Email</target>
+      </trans-unit>
+      <trans-unit id="contact.form.firstName" datatype="html">
+        <source>First name</source>
+        <target>First name</target>
+      </trans-unit>
+      <trans-unit id="contact.form.lastName" datatype="html">
+        <source>Last name</source>
+        <target>Last name</target>
+      </trans-unit>
+      <trans-unit id="contact.form.email" datatype="html">
+        <source>Email</source>
+        <target>Email</target>
+      </trans-unit>
+      <trans-unit id="contact.form.profile" datatype="html">
+        <source>Profile</source>
+        <target>Profile</target>
+      </trans-unit>
+      <trans-unit id="contact.form.message" datatype="html">
+        <source>Message</source>
+        <target>Message</target>
+      </trans-unit>
+      <trans-unit id="contact.form.send" datatype="html">
+        <source>Send message</source>
+        <target>Send message</target>
+      </trans-unit>
+      <trans-unit id="contact.form.selectProfile" datatype="html">
+        <source>Select your profile</source>
+        <target>Select your profile</target>
+      </trans-unit>
+      <trans-unit id="contact.form.debtor" datatype="html">
+        <source>Debtor</source>
+        <target>Debtor</target>
+      </trans-unit>
+      <trans-unit id="contact.form.bailiff" datatype="html">
+        <source>Bailiff</source>
+        <target>Bailiff</target>
+      </trans-unit>
+      <trans-unit id="contact.form.lawyer" datatype="html">
+        <source>Lawyer</source>
+        <target>Lawyer</target>
+      </trans-unit>
+      <trans-unit id="contact.form.creditor" datatype="html">
+        <source>Creditor</source>
+        <target>Creditor</target>
+      </trans-unit>
+      <trans-unit id="contact.form.firstNamePlaceholder" datatype="html">
+        <source>Your first name</source>
+        <target>Your first name</target>
+      </trans-unit>
+      <trans-unit id="contact.form.lastNamePlaceholder" datatype="html">
+        <source>Your last name</source>
+        <target>Your last name</target>
+      </trans-unit>
+      <trans-unit id="contact.form.emailPlaceholder" datatype="html">
+        <source>your.email@example.com</source>
+        <target>your.email@example.com</target>
+      </trans-unit>
+      <trans-unit id="contact.form.messagePlaceholder" datatype="html">
+        <source>Describe your needs...</source>
+        <target>Describe your needs...</target>
+      </trans-unit>
+      
+      <!-- Footer -->
+      <trans-unit id="footer.services" datatype="html">
+        <source>Services</source>
+        <target>Services</target>
+      </trans-unit>
+      <trans-unit id="footer.support" datatype="html">
+        <source>Support</source>
+        <target>Support</target>
+      </trans-unit>
+      <trans-unit id="footer.legal" datatype="html">
+        <source>Legal</source>
+        <target>Legal</target>
+      </trans-unit>
+      <trans-unit id="footer.contact" datatype="html">
+        <source>Contact us</source>
+        <target>Contact us</target>
+      </trans-unit>
+      <trans-unit id="footer.documentation" datatype="html">
+        <source>Documentation</source>
+        <target>Documentation</target>
+      </trans-unit>
+      <trans-unit id="footer.faq" datatype="html">
+        <source>FAQ</source>
+        <target>FAQ</target>
+      </trans-unit>
+      <trans-unit id="footer.terms" datatype="html">
+        <source>Legal notices</source>
+        <target>Legal notices</target>
+      </trans-unit>
+      <trans-unit id="footer.privacy" datatype="html">
+        <source>Privacy policy</source>
+        <target>Privacy policy</target>
+      </trans-unit>
+      <trans-unit id="footer.cgu" datatype="html">
+        <source>Terms of use</source>
+        <target>Terms of use</target>
+      </trans-unit>
+      <trans-unit id="footer.copyright" datatype="html">
+        <source>© 2024 RecouvrePro. All rights reserved.</source>
+        <target>© 2024 RecouvrePro. All rights reserved.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
