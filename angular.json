@@ -16,6 +16,20 @@
               "optimization": false,
               "sourceMap": true
             },
+            "fr": {
+              "aot": true,
+              "outputPath": "dist/demo/fr",
+              "i18nFile": "src/locale/messages.fr.xlf",
+              "i18nFormat": "xlf",
+              "i18nLocale": "fr"
+            },
+            "en": {
+              "aot": true,
+              "outputPath": "dist/demo/en",
+              "i18nFile": "src/locale/messages.en.xlf",
+              "i18nFormat": "xlf",
+              "i18nLocale": "en"
+            },
             "production": {
               "aot": true,
               "extractLicenses": true,
@@ -44,6 +58,12 @@
           "configurations": {
             "development": {
               "buildTarget": "demo:build:development"
+            },
+            "fr": {
+              "buildTarget": "demo:build:fr"
+            },
+            "en": {
+              "buildTarget": "demo:build:en"
             },
             "production": {
               "buildTarget": "demo:build:production"

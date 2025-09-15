@@ -4,6 +4,7 @@ import { RouterOutlet, provideRouter } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { routes } from './app/app.routes';
+import '@angular/localize/init';
 
 @Component({
   selector: 'app-root',
