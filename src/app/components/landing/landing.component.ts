@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { LanguageSwitcherComponent } from '../shared/language-switcher.component';
+import { LanguageSwitcherComponent } from '../shared/language-switcher/language-switcher.component';
 import { I18nService } from '../../services/i18n.service';
 
 @Component({

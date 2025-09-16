@@ -14,7 +14,7 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    loadComponent: () => import('./components/auth/login.component').then(c => c.LoginComponent)
+    loadComponent: () => import('./components/auth/login/login.component').then(c => c.LoginComponent)
   },
   {
     path: 'unauthorized',
@@ -22,7 +22,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    loadComponent: () => import('./components/layout/main-layout.component').then(c => c.MainLayoutComponent),
+    loadComponent: () => import('./components/layout/main-layout/main-layout.component').then(c => c.MainLayoutComponent),
     canActivate: [AuthGuard],
     children: [
       {
@@ -41,15 +41,15 @@ export const routes: Routes = [
         children: [
           {
             path: 'cases',
-            loadComponent: () => import('./components/debtor/debtor-cases.component').then(c => c.DebtorCasesComponent)
+            loadComponent: () => import('./components/debtor/debtor-cases/debtor-cases.component').then(c => c.DebtorCasesComponent)
           },
           {
             path: 'payments',
-            loadComponent: () => import('./components/debtor/debtor-payments.component').then(c => c.DebtorPaymentsComponent)
+            loadComponent: () => import('./components/debtor/debtor-payments/debtor-payments.component').then(c => c.DebtorPaymentsComponent)
           },
           {
             path: 'documents',
-            loadComponent: () => import('./components/debtor/debtor-documents.component').then(c => c.DebtorDocumentsComponent)
+            loadComponent: () => import('./components/debtor/debtor-documents/debtor-documents.component').then(c => c.DebtorDocumentsComponent)
           }
         ]
       },
@@ -61,11 +61,11 @@ export const routes: Routes = [
         children: [
           {
             path: 'cases',
-            loadComponent: () => import('./components/bailiff/bailiff-cases.component').then(c => c.BailiffCasesComponent)
+            loadComponent: () => import('./components/bailiff/bailiff-cases/bailiff-cases.component').then(c => c.BailiffCasesComponent)
           },
           {
             path: 'actions',
-            loadComponent: () => import('./components/bailiff/bailiff-actions.component').then(c => c.BailiffActionsComponent)
+            loadComponent: () => import('./components/bailiff/bailiff-actions/bailiff-actions.component').then(c => c.BailiffActionsComponent)
           }
         ]
       },
@@ -77,11 +77,11 @@ export const routes: Routes = [
         children: [
           {
             path: 'cases',
-            loadComponent: () => import('./components/lawyer/lawyer-cases.component').then(c => c.LawyerCasesComponent)
+            loadComponent: () => import('./components/lawyer/lawyer-cases/lawyer-cases.component').then(c => c.LawyerCasesComponent)
           },
           {
             path: 'consultations',
-            loadComponent: () => import('./components/lawyer/lawyer-consultations.component').then(c => c.LawyerConsultationsComponent)
+            loadComponent: () => import('./components/lawyer/lawyer-consultations/lawyer-consultations.component').then(c => c.LawyerConsultationsComponent)
           }
         ]
       },
@@ -93,15 +93,15 @@ export const routes: Routes = [
         children: [
           {
             path: 'cases',
-            loadComponent: () => import('./components/creditor/creditor-cases.component').then(c => c.CreditorCasesComponent)
+            loadComponent: () => import('./components/creditor/creditor-cases/creditor-cases.component').then(c => c.CreditorCasesComponent)
           },
           {
             path: 'tracking',
-            loadComponent: () => import('./components/creditor/creditor-tracking.component').then(c => c.CreditorTrackingComponent)
+            loadComponent: () => import('./components/creditor/creditor-tracking/creditor-tracking.component').then(c => c.CreditorTrackingComponent)
           },
           {
             path: 'notifications',
-            loadComponent: () => import('./components/creditor/creditor-notifications.component').then(c => c.CreditorNotificationsComponent)
+            loadComponent: () => import('./components/creditor/creditor-notifications/creditor-notifications.component').then(c => c.CreditorNotificationsComponent)
           }
         ]
       },
@@ -113,11 +113,11 @@ export const routes: Routes = [
         children: [
           {
             path: 'cases',
-            loadComponent: () => import('./components/partner/partner-cases.component').then(c => c.PartnerCasesComponent)
+            loadComponent: () => import('./components/partner/partner-cases/partner-cases.component').then(c => c.PartnerCasesComponent)
           },
           {
             path: 'tracking',
-            loadComponent: () => import('./components/partner/partner-tracking.component').then(c => c.PartnerTrackingComponent)
+            loadComponent: () => import('./components/partner/partner-tracking/partner-tracking.component').then(c => c.PartnerTrackingComponent)
           }
         ]
       },
@@ -129,19 +129,19 @@ export const routes: Routes = [
         children: [
           {
             path: 'portfolios',
-            loadComponent: () => import('./components/cedant/cedant-portfolios.component').then(c => c.CedantPortfoliosComponent)
+            loadComponent: () => import('./components/cedant/cedant-portfolios/cedant-portfolios.component').then(c => c.CedantPortfoliosComponent)
           },
           {
             path: 'invoices',
-            loadComponent: () => import('./components/cedant/cedant-invoices.component').then(c => c.CedantInvoicesComponent)
+            loadComponent: () => import('./components/cedant/cedant-invoices/cedant-invoices.component').then(c => c.CedantInvoicesComponent)
           },
           {
             path: 'sales',
-            loadComponent: () => import('./components/cedant/cedant-sales.component').then(c => c.CedantSalesComponent)
+            loadComponent: () => import('./components/cedant/cedant-sales/cedant-sales.component').then(c => c.CedantSalesComponent)
           },
           {
             path: 'ceded-cases',
-            loadComponent: () => import('./components/cedant/cedant-ceded-cases.component').then(c => c.CedantCededCasesComponent)
+            loadComponent: () => import('./components/cedant/cedant-ceded-cases/cedant-ceded-cases.component').then(c => c.CedantCededCasesComponent)
           }
         ]
       },
@@ -153,11 +153,11 @@ export const routes: Routes = [
         children: [
           {
             path: 'reports',
-            loadComponent: () => import('./components/professional/reports.component').then(c => c.ReportsComponent)
+            loadComponent: () => import('./components/professional/reports/reports.component').then(c => c.ReportsComponent)
           },
           {
             path: 'documents',
-            loadComponent: () => import('./components/professional/documents.component').then(c => c.DocumentsComponent)
+            loadComponent: () => import('./components/professional/documents/documents.component').then(c => c.DocumentsComponent)
           }
         ]
       }
