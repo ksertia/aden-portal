@@ -1,0 +1,227 @@
+<div class="sales-container">
+      <div class="sales-header fade-in-up">
+        <h1>Processus de Vente</h1>
+        <p>Suivez le processus de vente de vos portefeuilles de créances</p>
+      </div>
+
+      <div class="sales-content fade-in-up">
+        <!-- Vue d'ensemble du processus -->
+        <div class="process-overview">
+          <div class="process-card">
+            <h3>Processus de vente de créances</h3>
+            <div class="process-steps">
+              <div class="process-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <h4>Préparation du portefeuille</h4>
+                  <p>Rassemblez vos créances et documents justificatifs</p>
+                </div>
+              </div>
+              
+              <div class="step-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9,18 15,12 9,6"/>
+                </svg>
+              </div>
+              
+              <div class="process-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <h4>Soumission pour évaluation</h4>
+                  <p>Envoyez votre portefeuille pour analyse par nos experts</p>
+                </div>
+              </div>
+              
+              <div class="step-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9,18 15,12 9,6"/>
+                </svg>
+              </div>
+              
+              <div class="process-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <h4>Évaluation et négociation</h4>
+                  <p>Nos experts évaluent votre portefeuille et proposent un prix</p>
+                </div>
+              </div>
+              
+              <div class="step-arrow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9,18 15,12 9,6"/>
+                </svg>
+              </div>
+              
+              <div class="process-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                  <h4>Finalisation de la vente</h4>
+                  <p>Signature des contrats et transfert des créances</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Portefeuilles en cours de vente -->
+        <div class="active-sales">
+          <div class="section-header">
+            <h2>Ventes en cours</h2>
+            <button class="btn btn-secondary" (click)="refreshData()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23,4 23,10 17,10"/>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+              </svg>
+              Actualiser
+            </button>
+          </div>
+
+          <div class="sales-grid" *ngIf="activeSales.length > 0; else noActiveSales">
+            <div class="sale-card" *ngFor="let portfolio of activeSales">
+              <div class="sale-header">
+                <div class="sale-info">
+                  <h3>{{ portfolio.name }}</h3>
+                  <p>{{ portfolio.invoicesCount }} factures • {{ formatCurrency(portfolio.totalAmount) }}</p>
+                </div>
+                <span class="status-badge" [ngClass]="'status-' + portfolio.status">
+                  {{ getStatusLabel(portfolio.status) }}
+                </span>
+              </div>
+              
+              <div class="sale-progress">
+                <div class="progress-timeline">
+                  <div class="timeline-item" [ngClass]="{'completed': portfolio.createdAt, 'current': portfolio.status === 'draft'}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">Création</div>
+                  </div>
+                  
+                  <div class="timeline-item" [ngClass]="{'completed': portfolio.submittedAt, 'current': portfolio.status === 'submitted'}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">Soumission</div>
+                  </div>
+                  
+                  <div class="timeline-item" [ngClass]="{'completed': portfolio.evaluatedAt, 'current': portfolio.status === 'under_evaluation'}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">Évaluation</div>
+                  </div>
+                  
+                  <div class="timeline-item" [ngClass]="{'completed': portfolio.soldAt, 'current': portfolio.status === 'approved'}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-label">Vente</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="sale-details">
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <span class="label">Soumis le</span>
+                    <span class="value">{{ portfolio.submittedAt ? formatDate(portfolio.submittedAt) : 'Non soumis' }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="portfolio.evaluatedAt">
+                    <span class="label">Évalué le</span>
+                    <span class="value">{{ formatDate(portfolio.evaluatedAt) }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="portfolio.salePrice">
+                    <span class="label">Prix proposé</span>
+                    <span class="value success">{{ formatCurrency(portfolio.salePrice) }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="portfolio.salePrice">
+                    <span class="label">Taux de rachat</span>
+                    <span class="value">{{ getBuybackRate(portfolio) }}%</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="sale-actions">
+                <button class="btn btn-primary small" (click)="viewSaleDetails(portfolio)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                  Voir détails
+                </button>
+                <button class="btn btn-success small" (click)="acceptOffer(portfolio)" *ngIf="portfolio.status === 'approved'">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 12l2 2 4-4"/>
+                    <circle cx="12" cy="12" r="9"/>
+                  </svg>
+                  Accepter l'offre
+                </button>
+                <button class="btn btn-warning small" (click)="rejectOffer(portfolio)" *ngIf="portfolio.status === 'approved'">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                  Refuser
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noActiveSales>
+            <div class="no-sales">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12,6 12,12 16,14"/>
+              </svg>
+              <h3>Aucune vente en cours</h3>
+              <p>Vous n'avez actuellement aucun portefeuille en cours de vente.</p>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Historique des ventes -->
+        <div class="sales-history">
+          <div class="section-header">
+            <h2>Historique des ventes</h2>
+          </div>
+
+          <div class="history-grid" *ngIf="soldPortfolios.length > 0; else noHistory">
+            <div class="history-card" *ngFor="let portfolio of soldPortfolios">
+              <div class="history-header">
+                <div class="history-info">
+                  <h3>{{ portfolio.name }}</h3>
+                  <p>Vendu le {{ formatDate(portfolio.soldAt!) }}</p>
+                </div>
+                <div class="sale-result success">
+                  <div class="result-amount">{{ formatCurrency(portfolio.salePrice!) }}</div>
+                  <div class="result-rate">{{ getBuybackRate(portfolio) }}% du nominal</div>
+                </div>
+              </div>
+              
+              <div class="history-details">
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <span class="label">Montant nominal</span>
+                    <span class="value">{{ formatCurrency(portfolio.totalAmount) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Prix de vente</span>
+                    <span class="value success">{{ formatCurrency(portfolio.salePrice!) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Factures</span>
+                    <span class="value">{{ portfolio.invoicesCount }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Durée du processus</span>
+                    <span class="value">{{ getSaleDuration(portfolio) }} jours</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noHistory>
+            <div class="no-history">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M9 12l2 2 4-4"/>
+                <circle cx="12" cy="12" r="9"/>
+              </svg>
+              <p>Aucune vente finalisée pour le moment</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>

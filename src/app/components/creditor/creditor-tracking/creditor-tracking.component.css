@@ -1,0 +1,356 @@
+.tracking-container {
+    padding: 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.tracking-header {
+    margin-bottom: 32px;
+}
+
+.tracking-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.tracking-header p {
+    font-size: 16px;
+    color: var(--text-secondary);
+}
+
+.realtime-dashboard {
+    margin-bottom: 48px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 24px;
+}
+
+.dashboard-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--success);
+}
+
+.pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.activity-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.activity-icon.payment { background: var(--success); }
+.activity-icon.reminder { background: var(--warning); }
+.activity-icon.legal { background: var(--error); }
+.activity-icon.status { background: var(--primary); }
+
+.activity-description {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.activity-time {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.status-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-bar {
+    flex: 1;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.status-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.status-fill.status-pending { background: #fbbf24; }
+.status-fill.status-active { background: var(--primary); }
+.status-fill.status-completed { background: var(--success); }
+.status-fill.status-legal_action { background: var(--error); }
+
+.status-info {
+    display: flex;
+    justify-content: space-between;
+    min-width: 120px;
+}
+
+.status-label {
+    font-size: 12px;
+    color: var(--text);
+}
+
+.status-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.performance-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.metric-item {
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.metric-trend {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.metric-trend.positive { color: var(--success); }
+.metric-trend.negative { color: var(--error); }
+
+.tracking-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.tracking-header-section h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.tracking-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+}
+
+.tracking-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+.tracking-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.case-info h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.case-info p {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.progress-section {
+    margin-bottom: 24px;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.progress-percentage {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.progress-bar {
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--success);
+    transition: width 0.3s ease;
+}
+
+.amount-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.timeline-section, .next-actions {
+    margin-bottom: 20px;
+}
+
+.timeline-section h4, .next-actions h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 12px;
+}
+
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.timeline-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.timeline-dot.payment { background: var(--success); }
+.timeline-dot.reminder { background: var(--warning); }
+.timeline-dot.legal { background: var(--error); }
+.timeline-dot.status { background: var(--primary); }
+
+.timeline-description {
+    font-size: 13px;
+    color: var(--text);
+}
+
+.timeline-date {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.action-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text);
+}
+
+.action-icon {
+    color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .tracking-container {
+    padding: 16px;
+    }
+
+    .dashboard-grid {
+    grid-template-columns: 1fr;
+    }
+
+    .tracking-grid {
+    grid-template-columns: 1fr;
+    }
+
+    .tracking-header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    }
+}

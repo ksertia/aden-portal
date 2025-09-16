@@ -1,0 +1,461 @@
+    .invoices-container {
+    padding: 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+    }
+
+    .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    }
+
+    .invoices-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    }
+
+    .invoices-header p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    }
+
+    .filters-section {
+    margin-bottom: 32px;
+    }
+
+    .filters-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    }
+
+    .filter-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 8px;
+    font-size: 14px;
+    }
+
+    .filter-group input,
+    .filter-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    }
+
+    .stats-section {
+    margin-bottom: 32px;
+    }
+
+    .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    }
+
+    .stat-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    }
+
+    .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    }
+
+    .stat-icon.primary { background: var(--primary); }
+    .stat-icon.success { background: var(--success); }
+    .stat-icon.warning { background: var(--warning); }
+    .stat-icon.info { background: #3b82f6; }
+
+    .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    }
+
+    .stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    }
+
+    .list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    }
+
+    .list-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    }
+
+    .invoices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+    }
+
+    .invoice-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    transition: all 0.2s ease;
+    }
+
+    .invoice-card:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    }
+
+    .invoice-info h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    }
+
+    .debtor-name {
+    font-size: 14px;
+    color: var(--text-secondary);
+    }
+
+    .invoice-details {
+    margin-bottom: 20px;
+    }
+
+    .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+    }
+
+    .detail-row:last-child {
+    border-bottom: none;
+    }
+
+    .label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    }
+
+    .value {
+    font-size: 14px;
+    color: var(--text);
+    }
+
+    .value.amount {
+    font-weight: 600;
+    color: var(--primary);
+    }
+
+    .value.overdue {
+    color: var(--error);
+    font-weight: 600;
+    }
+
+    .invoice-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    }
+
+    .btn.small {
+    padding: 6px 12px;
+    font-size: 12px;
+    }
+
+    .invoices-table-container {
+    background: var(--surface);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    .invoices-table {
+    width: 100%;
+    border-collapse: collapse;
+    }
+
+    .invoices-table th {
+    background: #f8fafc;
+    padding: 16px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    }
+
+    .invoices-table td {
+    padding: 16px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+    }
+
+    .invoice-row:hover {
+    background: #f8fafc;
+    }
+
+    .invoice-cell, .debtor-cell, .amount-cell {
+    display: flex;
+    flex-direction: column;
+    }
+
+    .invoice-number, .debtor-name {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 14px;
+    margin-bottom: 2px;
+    }
+
+    .invoice-description, .debtor-email {
+    font-size: 12px;
+    color: var(--text-secondary);
+    }
+
+    .amount-cell .amount-value {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--primary);
+    }
+
+    .date-cell {
+    font-size: 14px;
+    color: var(--text);
+    }
+
+    .date-cell.overdue {
+    color: var(--error);
+    font-weight: 600;
+    }
+
+    .table-actions {
+    display: flex;
+    gap: 4px;
+    }
+
+    .status-unpaid { background: #fee2e2; color: #991b1b; }
+    .status-partially_paid { background: #fef3c7; color: #92400e; }
+    .status-paid { background: #d1fae5; color: #065f46; }
+    .status-overdue { background: #fecaca; color: #7f1d1d; }
+    .status-disputed { background: #fdf2f8; color: #be185d; }
+
+    .no-invoices {
+    text-align: center;
+    padding: 64px 32px;
+    color: var(--text-secondary);
+    }
+
+    .no-invoices svg {
+    margin-bottom: 24px;
+    color: var(--text-secondary);
+    }
+
+    .no-invoices h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    }
+
+    .no-invoices p {
+    margin-bottom: 24px;
+    }
+
+    .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+    }
+
+    .modal-content {
+    background: var(--surface);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: slideInUp 0.3s ease;
+    }
+
+    .modal-content.large {
+    max-width: 800px;
+    }
+
+    .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    }
+
+    .modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    }
+
+    .modal-body {
+    padding: 24px;
+    max-height: 70vh;
+    overflow-y: auto;
+    }
+
+    .form-section {
+    margin-bottom: 24px;
+    }
+
+    .form-section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    }
+
+    .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    }
+
+    .form-group {
+    margin-bottom: 16px;
+    }
+
+    .form-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+    font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    }
+
+    .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 24px;
+    border-top: 1px solid var(--border);
+    }
+
+    @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+    }
+
+    @keyframes slideInUp {
+    from {
+    opacity: 0;
+    transform: translateY(20px);
+    }
+    to {
+    opacity: 1;
+    transform: translateY(0);
+    }
+    }
+
+    @media (max-width: 1024px) {
+    .invoices-grid {
+    grid-template-columns: 1fr;
+    }
+    }
+
+    @media (max-width: 768px) {
+    .invoices-container {
+    padding: 16px;
+    }
+
+    .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    }
+
+    .filters-grid {
+    grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-row {
+    grid-template-columns: 1fr;
+    }
+
+    .invoices-table-container {
+    overflow-x: auto;
+    }
+
+    .invoices-table {
+    min-width: 700px;
+    }
+    }

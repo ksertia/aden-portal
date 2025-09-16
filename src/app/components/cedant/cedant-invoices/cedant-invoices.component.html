@@ -1,0 +1,362 @@
+<div class="invoices-container">
+      <div class="invoices-header fade-in-up">
+        <div class="header-content">
+          <div>
+            <h1>Suivi des Factures</h1>
+            <p>Gérez et suivez toutes vos factures clients</p>
+          </div>
+          <button class="btn btn-primary" (click)="showCreateModal = true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Nouvelle facture
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtres -->
+      <div class="filters-section fade-in-up">
+        <div class="filters-card">
+          <div class="filters-grid">
+            <div class="filter-group">
+              <label>Recherche</label>
+              <input
+                type="text"
+                [(ngModel)]="searchTerm"
+                placeholder="Numéro, débiteur..."
+                (input)="filterInvoices()"
+              >
+            </div>
+            
+            <div class="filter-group">
+              <label>Statut</label>
+              <select [(ngModel)]="selectedStatus" (change)="filterInvoices()">
+                <option value="">Tous les statuts</option>
+                <option value="unpaid">Impayée</option>
+                <option value="partially_paid">Partiellement payée</option>
+                <option value="paid">Payée</option>
+                <option value="overdue">En retard</option>
+                <option value="disputed">Contestée</option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label>Portefeuille</label>
+              <select [(ngModel)]="selectedPortfolioId" (change)="filterInvoices()">
+                <option value="">Tous les portefeuilles</option>
+                <option *ngFor="let portfolio of portfolios" [value]="portfolio.id">
+                  {{ portfolio.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiques -->
+      <div class="stats-section fade-in-up">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon primary">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ filteredInvoices.length }}</div>
+              <div class="stat-label">Factures totales</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon warning">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ getOverdueCount() }}</div>
+              <div class="stat-label">Factures en retard</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon success">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ formatCurrency(getTotalAmount()) }}</div>
+              <div class="stat-label">Montant total</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon info">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4"/>
+                <circle cx="12" cy="12" r="9"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ getPaymentRate() }}%</div>
+              <div class="stat-label">Taux de paiement</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste des factures -->
+      <div class="invoices-content fade-in-up">
+        <div class="invoices-list" *ngIf="filteredInvoices.length > 0; else noInvoices">
+          <div class="list-header">
+            <h3>Factures ({{ filteredInvoices.length }})</h3>
+            <app-view-toggle 
+              [currentView]="currentView" 
+              (viewChange)="currentView = $event">
+            </app-view-toggle>
+          </div>
+          
+          <!-- Vue grille -->
+          <div class="invoices-grid" *ngIf="currentView === 'grid'">
+            <div class="invoice-card" *ngFor="let invoice of filteredInvoices">
+              <div class="invoice-header">
+                <div class="invoice-info">
+                  <h3>{{ invoice.invoiceNumber }}</h3>
+                  <p class="debtor-name">{{ invoice.debtorName }}</p>
+                </div>
+                <span class="status-badge" [ngClass]="'status-' + invoice.status">
+                  {{ getStatusLabel(invoice.status) }}
+                </span>
+              </div>
+              
+              <div class="invoice-body">
+                <div class="invoice-details">
+                  <div class="detail-row">
+                    <span class="label">Montant :</span>
+                    <span class="value amount">{{ formatCurrency(invoice.amount) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Date d'émission :</span>
+                    <span class="value">{{ formatDate(invoice.issueDate) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Date d'échéance :</span>
+                    <span class="value" [ngClass]="{'overdue': isOverdue(invoice)}">{{ formatDate(invoice.dueDate) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Description :</span>
+                    <span class="value">{{ invoice.description }}</span>
+                  </div>
+                </div>
+                
+                <div class="invoice-actions">
+                  <button class="btn btn-primary small" (click)="viewInvoiceDetails(invoice)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    Détails
+                  </button>
+                  <button class="btn btn-secondary small" (click)="editInvoice(invoice)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                    Modifier
+                  </button>
+                  <button class="btn btn-warning small" (click)="deleteInvoice(invoice)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3,6 5,6 21,6"/>
+                      <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
+                    </svg>
+                    Supprimer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Vue tableau -->
+          <div class="invoices-table-container" *ngIf="currentView === 'table'">
+            <table class="invoices-table">
+              <thead>
+                <tr>
+                  <th>Facture</th>
+                  <th>Débiteur</th>
+                  <th>Montant</th>
+                  <th>Émission</th>
+                  <th>Échéance</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let invoice of filteredInvoices" class="invoice-row">
+                  <td>
+                    <div class="invoice-cell">
+                      <div class="invoice-number">{{ invoice.invoiceNumber }}</div>
+                      <div class="invoice-description">{{ invoice.description }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="debtor-cell">
+                      <div class="debtor-name">{{ invoice.debtorName }}</div>
+                      <div class="debtor-email">{{ invoice.debtorEmail }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="amount-cell">
+                      <div class="amount-value">{{ formatCurrency(invoice.amount) }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="date-cell">{{ formatDate(invoice.issueDate) }}</div>
+                  </td>
+                  <td>
+                    <div class="date-cell" [ngClass]="{'overdue': isOverdue(invoice)}">
+                      {{ formatDate(invoice.dueDate) }}
+                    </div>
+                  </td>
+                  <td>
+                    <span class="status-badge" [ngClass]="'status-' + invoice.status">
+                      {{ getStatusLabel(invoice.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="table-actions">
+                      <button class="btn btn-primary small" (click)="viewInvoiceDetails(invoice)" title="Voir détails">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                      </button>
+                      <button class="btn btn-secondary small" (click)="editInvoice(invoice)" title="Modifier">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <ng-template #noInvoices>
+          <div class="no-invoices">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+            </svg>
+            <h3>Aucune facture trouvée</h3>
+            <p>Commencez par ajouter vos factures clients pour les suivre.</p>
+            <button class="btn btn-primary" (click)="showCreateModal = true">
+              Ajouter une facture
+            </button>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Modal création de facture -->
+      <div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
+        <div class="modal-content large" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>Ajouter une nouvelle facture</h3>
+            <button class="modal-close" (click)="closeCreateModal()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="create-form">
+              <div class="form-section">
+                <h4>Informations de la facture</h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Numéro de facture</label>
+                    <input type="text" [(ngModel)]="newInvoice.invoiceNumber" placeholder="INV-2024-001">
+                  </div>
+                  <div class="form-group">
+                    <label>Portefeuille</label>
+                    <select [(ngModel)]="newInvoice.portfolioId">
+                      <option value="">Sélectionner un portefeuille</option>
+                      <option *ngFor="let portfolio of portfolios" [value]="portfolio.id">
+                        {{ portfolio.name }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Montant</label>
+                    <input type="number" [(ngModel)]="newInvoice.amount" min="1" step="0.01">
+                  </div>
+                  <div class="form-group">
+                    <label>Statut</label>
+                    <select [(ngModel)]="newInvoice.status">
+                      <option value="unpaid">Impayée</option>
+                      <option value="partially_paid">Partiellement payée</option>
+                      <option value="paid">Payée</option>
+                      <option value="overdue">En retard</option>
+                      <option value="disputed">Contestée</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Date d'émission</label>
+                    <input type="date" [(ngModel)]="newInvoice.issueDate">
+                  </div>
+                  <div class="form-group">
+                    <label>Date d'échéance</label>
+                    <input type="date" [(ngModel)]="newInvoice.dueDate">
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label>Description</label>
+                  <textarea
+                    [(ngModel)]="newInvoice.description"
+                    rows="3"
+                    placeholder="Description des services ou produits facturés..."
+                  ></textarea>
+                </div>
+              </div>
+              
+              <div class="form-section">
+                <h4>Informations du débiteur</h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Nom du débiteur</label>
+                    <input type="text" [(ngModel)]="newInvoice.debtorName" placeholder="Nom de l'entreprise ou du client">
+                  </div>
+                  <div class="form-group">
+                    <label>Email du débiteur</label>
+                    <input type="email" [(ngModel)]="newInvoice.debtorEmail" placeholder="contact@client.fr">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeCreateModal()">Annuler</button>
+            <button class="btn btn-primary" (click)="createInvoice()" [disabled]="!isCreateFormValid()">
+              Ajouter la facture
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
