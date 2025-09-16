@@ -1,0 +1,199 @@
+ .tracking-container {
+      padding: 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .tracking-header {
+      margin-bottom: 32px;
+    }
+
+    .tracking-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .tracking-header p {
+      font-size: 16px;
+      color: var(--text-secondary);
+    }
+
+    .filters-section {
+      margin-bottom: 32px;
+    }
+
+    .filters-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .filter-group label {
+      display: block;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .filter-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .updates-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .update-item {
+      display: flex;
+      gap: 16px;
+      padding: 24px;
+      background: var(--surface);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .update-item:hover {
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .update-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .update-icon.icon-payment_received { background: var(--success); }
+    .update-icon.icon-status_change { background: var(--primary); }
+    .update-icon.icon-action_taken { background: var(--warning); }
+    .update-icon.icon-note_added { background: #6366f1; }
+
+    .update-content {
+      flex: 1;
+    }
+
+    .update-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .update-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .update-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .update-time {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .case-number {
+      font-size: 11px;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .update-description {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .update-details {
+      display: flex;
+      gap: 16px;
+    }
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .value {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .value.amount {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .no-updates {
+      text-align: center;
+      padding: 64px 32px;
+      color: var(--text-secondary);
+    }
+
+    .no-updates svg {
+      margin-bottom: 24px;
+      color: var(--text-secondary);
+    }
+
+    .no-updates h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .tracking-container {
+        padding: 16px;
+      }
+
+      .filters-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .update-item {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .update-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
