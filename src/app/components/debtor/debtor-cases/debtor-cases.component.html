@@ -1,0 +1,515 @@
+<div class="cases-container">
+  <div class="cases-header fade-in-up">
+    <h1>Mes Dossiers</h1>
+    <p>Consultez et gérez vos dossiers de recouvrement</p>
+  </div>
+
+  <div class="cases-content fade-in-up">
+    <!-- Statistiques -->
+    <div class="stats-section" *ngIf="statistics">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ userCases.length }}</div>
+            <div class="stat-label">Dossiers actifs</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon warning">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div>
+            <div class="stat-label">Montant total dû</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon success">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4"/>
+              <circle cx="12" cy="12" r="9"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ formatCurrency(getTotalPaid()) }}</div>
+            <div class="stat-label">Montant payé</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste des dossiers -->
+    <div class="cases-list" *ngIf="userCases.length > 0; else noCases">
+      <div class="cases-grid">
+        <div class="case-card" *ngFor="let case of userCases">
+          <div class="case-header">
+            <div class="case-info">
+              <h3>{{ case.caseNumber }}</h3>
+              <p class="creditor-name">{{ case.creditor.name }}</p>
+            </div>
+            <span class="status-badge" [ngClass]="'status-' + case.status">
+              {{ getStatusLabel(case.status) }}
+            </span>
+          </div>
+          
+          <div class="case-body">
+            <!-- Détail de la dette -->
+            <div class="debt-breakdown">
+              <h4>Détail de la créance</h4>
+              <div class="breakdown-grid">
+                <div class="breakdown-item">
+                  <span class="label">Montant principal</span>
+                  <span class="value">{{ formatCurrency(case.debtBreakdown.principalAmount) }}</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="label">Intérêts</span>
+                  <span class="value">{{ formatCurrency(case.debtBreakdown.totalInterests) }}</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="label">Pénalités</span>
+                  <span class="value">{{ formatCurrency(case.debtBreakdown.totalPenalties) }}</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="label">Frais</span>
+                  <span class="value">{{ formatCurrency(case.debtBreakdown.totalFees) }}</span>
+                </div>
+                <div class="breakdown-item total">
+                  <span class="label">Total dû</span>
+                  <span class="value">{{ formatCurrency(case.amount) }}</span>
+                </div>
+                <div class="breakdown-item paid">
+                  <span class="label">Déjà payé</span>
+                  <span class="value">{{ formatCurrency(case.amountPaid) }}</span>
+                </div>
+                <div class="breakdown-item remaining">
+                  <span class="label">Reste à payer</span>
+                  <span class="value">{{ formatCurrency(case.amount - case.amountPaid) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Détail des intérêts -->
+            <div class="interests-detail" *ngIf="case.debtBreakdown.interests.length > 0">
+              <h5>Détail des intérêts</h5>
+              <div class="interests-list">
+                <div class="interest-item" *ngFor="let interest of case.debtBreakdown.interests">
+                  <div class="interest-info">
+                    <span class="interest-type">{{ getInterestTypeLabel(interest.type) }}</span>
+                    <span class="interest-rate">{{ interest.rate }}% par an</span>
+                  </div>
+                  <div class="interest-amount">{{ formatCurrency(interest.amount) }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Détail des pénalités -->
+            <div class="penalties-detail" *ngIf="case.debtBreakdown.penalties.length > 0">
+              <h5>Détail des pénalités</h5>
+              <div class="penalties-list">
+                <div class="penalty-item" *ngFor="let penalty of case.debtBreakdown.penalties">
+                  <div class="penalty-info">
+                    <span class="penalty-type">{{ getPenaltyTypeLabel(penalty.type) }}</span>
+                    <span class="penalty-date">{{ formatDate(penalty.appliedDate) }}</span>
+                  </div>
+                  <div class="penalty-amount">{{ formatCurrency(penalty.amount) }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Barre de progression -->
+            <div class="payment-progress">
+              <div class="progress-info">
+                <span class="progress-label">Progression du paiement</span>
+                <span class="progress-percentage">{{ getPaymentPercentage(case) }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="getPaymentPercentage(case)"></div>
+              </div>
+            </div>
+
+            <!-- Historique des relances -->
+            <div class="reminder-history" *ngIf="getReminderHistory(case).length > 0">
+              <h5>Historique des relances</h5>
+              <div class="reminder-list">
+                <div class="reminder-item" *ngFor="let reminder of getReminderHistory(case)">
+                  <div class="reminder-icon" [ngClass]="getReminderIconClass(reminder.type)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                  </div>
+                  <div class="reminder-content">
+                    <div class="reminder-type">{{ getReminderTypeLabel(reminder.type) }}</div>
+                    <div class="reminder-description">{{ reminder.description }}</div>
+                    <div class="reminder-date">{{ formatDate(reminder.date) }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="case-actions">
+              <button class="btn btn-primary" (click)="makePayment(case)" *ngIf="case.amount > case.amountPaid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+                Effectuer un paiement
+              </button>
+              <button class="btn btn-secondary" (click)="proposePaymentPlan(case)" *ngIf="case.amount > case.amountPaid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+                </svg>
+                Proposer échéancier
+              </button>
+              <button class="btn btn-warning" (click)="fileDispute(case)" *ngIf="case.status !== 'completed'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="15" y1="9" x2="9" y2="15"/>
+                  <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                Contester
+              </button>
+              <button class="btn btn-secondary" (click)="viewCaseDetails(case)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Voir détails
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noCases>
+      <div class="no-cases">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <h3>Aucun dossier trouvé</h3>
+        <p>Vous n'avez actuellement aucun dossier de recouvrement.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal de paiement -->
+  <div class="modal-overlay" *ngIf="showPaymentModal" (click)="closePaymentModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Effectuer un paiement</h3>
+        <button class="modal-close" (click)="closePaymentModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" *ngIf="selectedCase">
+        <div class="payment-summary">
+          <h4>Dossier {{ selectedCase.caseNumber }}</h4>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="label">Montant total dû</span>
+              <span class="value">{{ formatCurrency(selectedCase.amount) }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Déjà payé</span>
+              <span class="value">{{ formatCurrency(selectedCase.amountPaid) }}</span>
+            </div>
+            <div class="summary-item highlight">
+              <span class="label">Reste à payer</span>
+              <span class="value">{{ formatCurrency(selectedCase.amount - selectedCase.amountPaid) }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="payment-form">
+          <div class="form-group">
+            <label>Montant du paiement</label>
+            <input
+              type="number"
+              [(ngModel)]="paymentAmount"
+              [max]="selectedCase.amount - selectedCase.amountPaid"
+              min="1"
+              step="0.01"
+              placeholder="Montant en euros"
+            >
+          </div>
+          
+          <div class="quick-amounts">
+            <button
+              type="button"
+              class="quick-amount-btn"
+              (click)="setPaymentAmount(selectedCase.amount - selectedCase.amountPaid)"
+            >
+              Solde complet
+            </button>
+            <button
+              type="button"
+              class="quick-amount-btn"
+              (click)="setPaymentAmount((selectedCase.amount - selectedCase.amountPaid) / 2)"
+            >
+              50% du solde
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closePaymentModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="processPayment()" [disabled]="!paymentAmount || paymentAmount <= 0 || isProcessingPayment">
+          <span *ngIf="!isProcessingPayment">Confirmer le paiement</span>
+          <span *ngIf="isProcessingPayment">Traitement...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal proposition d'échéancier -->
+  <div class="modal-overlay" *ngIf="showPaymentPlanModal" (click)="closePaymentPlanModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Proposer un échéancier de paiement</h3>
+        <button class="modal-close" (click)="closePaymentPlanModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" *ngIf="selectedCase">
+        <div class="payment-plan-form">
+          <div class="form-section">
+            <h4>Informations du dossier</h4>
+            <div class="case-summary">
+              <div class="summary-item">
+                <span class="label">Dossier</span>
+                <span class="value">{{ selectedCase.caseNumber }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">Montant restant</span>
+                <span class="value">{{ formatCurrency(selectedCase.amount - selectedCase.amountPaid) }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <h4>Proposition d'échéancier</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Montant mensuel proposé</label>
+                <input
+                  type="number"
+                  [(ngModel)]="paymentPlanProposal.monthlyAmount"
+                  min="1"
+                  step="0.01"
+                  (input)="calculatePaymentPlan()"
+                >
+              </div>
+              <div class="form-group">
+                <label>Durée (mois)</label>
+                <input
+                  type="number"
+                  [(ngModel)]="paymentPlanProposal.duration"
+                  min="1"
+                  max="60"
+                  (input)="calculatePaymentPlan()"
+                >
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Date de début</label>
+              <input
+                type="date"
+                [(ngModel)]="paymentPlanProposal.startDate"
+                [min]="getTomorrowDate()"
+              >
+            </div>
+            
+            <div class="form-group">
+              <label>Justification de la demande</label>
+              <textarea
+                [(ngModel)]="paymentPlanProposal.notes"
+                rows="3"
+                placeholder="Expliquez votre situation et les raisons de cette demande d'échéancier..."
+              ></textarea>
+            </div>
+          </div>
+          
+          <div class="payment-plan-preview" *ngIf="paymentPlanProposal.monthlyAmount && paymentPlanProposal.duration">
+            <h4>Aperçu de l'échéancier</h4>
+            <div class="preview-summary">
+              <div class="preview-item">
+                <span class="label">Montant mensuel</span>
+                <span class="value">{{ formatCurrency(paymentPlanProposal.monthlyAmount) }}</span>
+              </div>
+              <div class="preview-item">
+                <span class="label">Durée</span>
+                <span class="value">{{ paymentPlanProposal.duration }} mois</span>
+              </div>
+              <div class="preview-item">
+                <span class="label">Total à payer</span>
+                <span class="value">{{ formatCurrency(paymentPlanProposal.monthlyAmount * paymentPlanProposal.duration) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closePaymentPlanModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="submitPaymentPlan()" [disabled]="!isPaymentPlanValid()">
+          Soumettre la proposition
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de contestation -->
+  <div class="modal-overlay" *ngIf="showDisputeModal" (click)="closeDisputeModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Contester le dossier</h3>
+        <button class="modal-close" (click)="closeDisputeModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" *ngIf="selectedCase">
+        <div class="dispute-form">
+          <div class="form-section">
+            <h4>Informations du dossier</h4>
+            <div class="case-summary">
+              <div class="summary-item">
+                <span class="label">Dossier</span>
+                <span class="value">{{ selectedCase.caseNumber }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">Créancier</span>
+                <span class="value">{{ selectedCase.creditor.name }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">Montant contesté</span>
+                <span class="value">{{ formatCurrency(selectedCase.amount) }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <h4>Motif de la contestation</h4>
+            <div class="form-group">
+              <label>Sélectionnez le motif principal</label>
+              <select [(ngModel)]="disputeForm.reason" required>
+                <option value="">Choisir un motif</option>
+                <option value="amount_error">Erreur sur le montant</option>
+                <option value="already_paid">Déjà payé</option>
+                <option value="prescription">Prescription</option>
+                <option value="no_contract">Absence de contrat</option>
+                <option value="service_not_received">Service non reçu ou défaillant</option>
+                <option value="interest_calculation_error">Erreur de calcul des intérêts</option>
+                <option value="other">Autre motif</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Description détaillée de la contestation</label>
+              <textarea
+                [(ngModel)]="disputeForm.description"
+                rows="5"
+                placeholder="Expliquez en détail les raisons de votre contestation..."
+                required
+              ></textarea>
+              <small class="form-help">Soyez précis et détaillé dans votre explication</small>
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <h4>Pièces justificatives</h4>
+            <div class="file-upload-area">
+              <input
+                type="file"
+                #fileInput
+                (change)="onFileSelected($event)"
+                multiple
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                style="display: none"
+              >
+              <div class="file-upload-button" (click)="fileInput.click()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17,8 12,3 7,8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Ajouter des documents
+              </div>
+              <small class="form-help">Formats acceptés : PDF, JPG, PNG, DOC, DOCX (max 10MB par fichier)</small>
+            </div>
+            
+            <div class="uploaded-files" *ngIf="disputeForm.attachments.length > 0">
+              <h5>Documents joints</h5>
+              <div class="file-list">
+                <div class="file-item" *ngFor="let file of disputeForm.attachments; let i = index">
+                  <div class="file-info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14,2 14,8 20,8"/>
+                    </svg>
+                    <div>
+                      <div class="file-name">{{ file.name }}</div>
+                      <div class="file-size">{{ formatFileSize(file.size) }}</div>
+                    </div>
+                  </div>
+                  <button class="remove-file-btn" (click)="removeFile(i)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="dispute-warning">
+            <div class="warning-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+            <div class="warning-content">
+              <h5>Information importante</h5>
+              <p>
+                La contestation suspendra temporairement les procédures de recouvrement. 
+                Assurez-vous de fournir tous les éléments justificatifs nécessaires. 
+                Une contestation abusive peut entraîner des frais supplémentaires.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeDisputeModal()">Annuler</button>
+        <button class="btn btn-warning" (click)="submitDispute()" [disabled]="!isDisputeValid() || isSubmittingDispute">
+          <span *ngIf="!isSubmittingDispute">Soumettre la contestation</span>
+          <span *ngIf="isSubmittingDispute">Envoi en cours...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,180 @@
+<div class="dashboard-container">
+  <div class="dashboard-header fade-in-up">
+    <h1>Tableau de bord</h1>
+    <p *ngIf="currentUser">
+      Bienvenue, {{ currentUser.firstName }} {{ currentUser.lastName }}
+    </p>
+  </div>
+
+  <!-- Statistiques générales -->
+  <div class="stats-grid fade-in-up" *ngIf="statistics">
+    <div class="stat-card">
+      <div class="stat-icon primary">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics.totalCases }}</div>
+        <div class="stat-label">Dossiers totaux</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon success">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 12l2 2 4-4"/>
+          <circle cx="12" cy="12" r="9"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics.activeCases }}</div>
+        <div class="stat-label">Dossiers actifs</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon warning">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics.pendingCases }}</div>
+        <div class="stat-label">En attente</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon info">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ formatCurrency(statistics.totalAmount) }}</div>
+        <div class="stat-label">Montant total</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vue spécifique par rôle -->
+  <div class="role-content fade-in-up">
+    <!-- Vue Débiteur -->
+    <div *ngIf="isDebtorUser" class="debtor-dashboard">
+      <div class="section-header">
+        <h2>Mes Dossiers en Cours</h2>
+        <a routerLink="/debtor/cases" class="btn btn-primary">Voir tous les dossiers</a>
+      </div>
+      
+      <div class="cases-grid" *ngIf="userCases.length > 0">
+        <div class="case-card" *ngFor="let case of userCases.slice(0, 3)">
+          <div class="case-header">
+            <h3>{{ case.caseNumber }}</h3>
+            <span class="status-badge" [ngClass]="'status-' + case.status">
+              {{ getStatusLabel(case.status) }}
+            </span>
+          </div>
+          <div class="case-details">
+            <div class="case-amount">
+              <span class="label">Montant dû :</span>
+              <span class="amount">{{ formatCurrency(case.amount - case.amountPaid) }}</span>
+            </div>
+            <div class="case-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="(case.amountPaid / case.amount) * 100"></div>
+              </div>
+              <span class="progress-text">{{ ((case.amountPaid / case.amount) * 100).toFixed(0) }}% payé</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <h3>Actions Rapides</h3>
+        <div class="actions-grid">
+          <a routerLink="/debtor/payments" class="action-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+              <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+            <span>Effectuer un paiement</span>
+          </a>
+          <a routerLink="/debtor/payment-plan" class="action-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+            </svg>
+            <span>Proposer échéancier</span>
+          </a>
+          <a routerLink="/debtor/documents" class="action-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+            </svg>
+            <span>Mes documents</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vue Huissier -->
+    <div *ngIf="isBailiffUser" class="bailiff-dashboard">
+      <div class="section-header">
+        <h2>Dossiers Assignés</h2>
+        <a routerLink="/bailiff/cases" class="btn btn-primary">Gérer les dossiers</a>
+      </div>
+
+      <div class="cases-grid" *ngIf="userCases.length > 0">
+        <div class="case-card" *ngFor="let case of userCases.slice(0, 3)">
+          <div class="case-header">
+            <h3>{{ case.caseNumber }}</h3>
+            <span class="status-badge" [ngClass]="'status-' + case.status">
+              {{ getStatusLabel(case.status) }}
+            </span>
+          </div>
+          <div class="case-details">
+            <div class="case-info">
+              <span class="label">Débiteur :</span>
+              <span>{{ case.debtor.firstName }} {{ case.debtor.lastName }}</span>
+            </div>
+            <div class="case-amount">
+              <span class="label">Montant :</span>
+              <span class="amount">{{ formatCurrency(case.amount) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <h3>Actions Rapides</h3>
+        <div class="actions-grid">
+          <a routerLink="/bailiff/actions" class="action-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+            </svg>
+            <span>Nouvelle action légale</span>
+          </a>
+          <a routerLink="/bailiff/cases" class="action-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+            </svg>
+            <span>Générer un rapport</span>
+          </a>
+          <a routerLink="/professional/documents" class="action-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+            </svg>
+            <span>Gestion documents</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
