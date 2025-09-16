@@ -8,8 +8,8 @@ import { User } from '../../models/user.model';
   selector: 'app-profile',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `  `,
-  styles: [` `]
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
   user: User | null = null;

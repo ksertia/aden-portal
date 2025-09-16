@@ -7,8 +7,8 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-unauthorized',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  template: ` `,
-  styles: [` `]
+  templateUrl: './unauthorized.component.html',
+  styleUrls: ['./unauthorized.component.css']
 })
 export class UnauthorizedComponent {
   constructor(private authService: AuthService) {}

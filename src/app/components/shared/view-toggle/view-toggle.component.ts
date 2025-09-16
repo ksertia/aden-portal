@@ -5,8 +5,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-view-toggle',
   standalone: true,
   imports: [CommonModule],
-  template: ` `,
-  styles: [``]
+  templateUrl: './view-toggle.component.html',
+  styleUrls: ['./view-toggle.component.css']
 })
 export class ViewToggleComponent {
   @Input() currentView: 'grid' | 'table' = 'grid';

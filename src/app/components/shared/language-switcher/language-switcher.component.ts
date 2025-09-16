@@ -6,8 +6,8 @@ import { I18nService, SupportedLocale } from '../../../services/i18n.service';
   selector: 'app-language-switcher',
   standalone: true,
   imports: [CommonModule],
-  template: ` `,
-  styles: [` `]
+  templateUrl: './language-switcher.component.html',
+  styleUrls: ['./language-switcher.component.css']
 })
 export class LanguageSwitcherComponent implements OnInit {
   currentLocale: SupportedLocale = 'fr';
