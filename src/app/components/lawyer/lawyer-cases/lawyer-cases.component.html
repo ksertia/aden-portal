@@ -1,0 +1,204 @@
+<div class="cases-container">
+  <div class="cases-header fade-in-up">
+    <div class="header-content">
+      <div>
+        <h1>Dossiers Juridiques</h1>
+        <p>Consultez et gérez vos dossiers juridiques</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" (click)="generateReport()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Rapport d'activité
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section fade-in-up">
+    <div class="filters-card">
+      <div class="filters-header">
+        <h3>Filtres et recherche</h3>
+        <button class="btn btn-secondary small" (click)="resetFilters()">Réinitialiser</button>
+      </div>
+      
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Recherche</label>
+          <input
+            type="text"
+            [(ngModel)]="filters.searchTerm"
+            placeholder="Numéro, créancier, débiteur..."
+            (input)="applyFilters()"
+          >
+        </div>
+        
+        <div class="filter-group">
+          <label>Statut</label>
+          <select [(ngModel)]="selectedStatus" (change)="updateStatusFilter()">
+            <option value="">Tous les statuts</option>
+            <option value="pending">En attente</option>
+            <option value="active">Actif</option>
+            <option value="negotiation">Négociation</option>
+            <option value="legal_action">Action légale</option>
+            <option value="completed">Terminé</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label>Date de création</label>
+          <div class="date-range">
+            <input
+              type="date"
+              [(ngModel)]="dateFrom"
+              (change)="updateDateFilter()"
+              placeholder="Du"
+            >
+            <input
+              type="date"
+              [(ngModel)]="dateTo"
+              (change)="updateDateFilter()"
+              placeholder="Au"
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="stats-section fade-in-up" *ngIf="statistics">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-label">Dossiers juridiques</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon warning">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4"/>
+            <circle cx="12" cy="12" r="9"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ getLegalActionCases() }}</div>
+          <div class="stat-label">Actions légales</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon success">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ getSuccessRate() }}%</div>
+          <div class="stat-label">Taux de résolution</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des dossiers -->
+  <div class="cases-content fade-in-up">
+    <div class="cases-table" *ngIf="filteredCases.length > 0; else noCases">
+      <div class="table-container">
+        <table class="cases-table-view">
+          <thead>
+            <tr>
+              <th>Dossier</th>
+              <th>Créancier</th>
+              <th>Débiteur</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th>Priorité</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let case of filteredCases" class="case-row">
+              <td>
+                <div class="case-cell">
+                  <div class="case-number">{{ case.caseNumber }}</div>
+                  <div class="case-date">{{ formatDate(case.createdAt) }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="creditor-cell">
+                  <div class="creditor-name">{{ case.creditor.name }}</div>
+                  <div class="creditor-contact">{{ case.creditor.contactPerson }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="debtor-cell">
+                  <div class="debtor-name">{{ case.debtor.firstName }} {{ case.debtor.lastName }}</div>
+                  <div class="debtor-type">{{ case.debtor.type === 'company' ? 'Entreprise' : 'Particulier' }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="amount-cell">
+                  <div class="total-amount">{{ formatCurrency(case.amount) }}</div>
+                  <div class="recovered-amount">{{ formatCurrency(case.amountPaid) }} recouvré</div>
+                </div>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="'status-' + case.status">
+                  {{ getStatusLabel(case.status) }}
+                </span>
+              </td>
+              <td>
+                <span class="priority-badge" [ngClass]="'priority-' + case.priority">
+                  {{ getPriorityLabel(case.priority) }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-primary small" (click)="reviewCase(case)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    Réviser
+                  </button>
+                  <button class="btn btn-secondary small" (click)="addLegalNote(case)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                    Note
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <ng-template #noCases>
+      <div class="no-cases">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <h3>Aucun dossier trouvé</h3>
+        <p>Aucun dossier ne correspond aux critères sélectionnés.</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

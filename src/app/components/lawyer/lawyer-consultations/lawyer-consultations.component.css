@@ -1,0 +1,46 @@
+.consultations-container {
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.consultations-header {
+  margin-bottom: 32px;
+}
+
+.consultations-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.consultations-header p {
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.coming-soon {
+  text-align: center;
+  padding: 64px 32px;
+  color: var(--text-secondary);
+}
+
+.coming-soon svg {
+  margin-bottom: 24px;
+  color: #3b82f6;
+}
+
+.coming-soon h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+
+}
+
+@media (max-width: 768px) {
+  .consultations-container {
+    padding: 16px;
+  }
+}
