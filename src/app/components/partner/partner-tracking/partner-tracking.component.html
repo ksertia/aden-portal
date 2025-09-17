@@ -1,0 +1,95 @@
+ <div class="tracking-container">
+      <div class="tracking-header fade-in-up">
+        <h1>Suivi des Mises à Jour</h1>
+        <p>Consultez l'historique de vos actions et mises à jour envoyées aux cédants</p>
+      </div>
+
+      <div class="tracking-content fade-in-up">
+        <!-- Filtres -->
+        <div class="filters-section">
+          <div class="filters-card">
+            <div class="filters-grid">
+              <div class="filter-group">
+                <label>Type de mise à jour</label>
+                <select [(ngModel)]="selectedUpdateType" (change)="filterUpdates()">
+                  <option value="">Tous les types</option>
+                  <option value="payment_received">Paiements reçus</option>
+                  <option value="action_taken">Actions entreprises</option>
+                  <option value="status_change">Changements de statut</option>
+                  <option value="note_added">Notes ajoutées</option>
+                </select>
+              </div>
+              
+              <div class="filter-group">
+                <label>Dossier</label>
+                <select [(ngModel)]="selectedCaseId" (change)="filterUpdates()">
+                  <option value="">Tous les dossiers</option>
+                  <option *ngFor="let case of allCededCases" [value]="case.id">
+                    {{ case.caseNumber }}
+                  </option>
+                </select>
+              </div>
+              
+              <div class="filter-group">
+                <label>Période</label>
+                <select [(ngModel)]="selectedPeriod" (change)="filterUpdates()">
+                  <option value="all">Toutes</option>
+                  <option value="today">Aujourd'hui</option>
+                  <option value="week">Cette semaine</option>
+                  <option value="month">Ce mois</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Liste des mises à jour -->
+        <div class="updates-list" *ngIf="filteredUpdates.length > 0; else noUpdates">
+          <div class="updates-timeline">
+            <div class="update-item" *ngFor="let update of filteredUpdates">
+              <div class="update-icon" [ngClass]="'icon-' + update.updateType">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path *ngIf="update.updateType === 'payment_received'" d="M9 12l2 2 4-4"/>
+                  <circle *ngIf="update.updateType === 'payment_received'" cx="12" cy="12" r="9"/>
+                  <path *ngIf="update.updateType === 'status_change'" d="M12 2v6l3-3 3 3"/>
+                  <path *ngIf="update.updateType === 'status_change'" d="M12 8v8"/>
+                  <path *ngIf="update.updateType === 'status_change'" d="m8 14 4 4 4-4"/>
+                  <path *ngIf="update.updateType === 'action_taken'" d="M9 12l2 2 4-4"/>
+                  <circle *ngIf="update.updateType === 'action_taken'" cx="12" cy="12" r="9"/>
+                  <path *ngIf="update.updateType === 'note_added'" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
+              
+              <div class="update-content">
+                <div class="update-header">
+                  <h3>{{ getUpdateTypeLabel(update.updateType) }}</h3>
+                  <div class="update-meta">
+                    <span class="update-time">{{ getTimeAgo(update.createdAt) }}</span>
+                    <span class="case-number">{{ getCaseNumber(update.caseId) }}</span>
+                  </div>
+                </div>
+                <p class="update-description">{{ update.description }}</p>
+                <div class="update-details" *ngIf="update.amount">
+                  <div class="detail-item">
+                    <span class="label">Montant :</span>
+                    <span class="value amount">{{ formatCurrency(update.amount) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noUpdates>
+          <div class="no-updates">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M12 2v6l3-3 3 3"/>
+              <path d="M12 8v8"/>
+              <path d="m8 14 4 4 4-4"/>
+            </svg>
+            <h3>Aucune mise à jour</h3>
+            <p>Aucune mise à jour ne correspond aux critères sélectionnés.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>

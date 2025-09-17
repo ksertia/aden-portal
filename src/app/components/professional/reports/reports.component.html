@@ -1,0 +1,237 @@
+<div class="reports-container">
+      <div class="reports-header fade-in-up">
+        <h1>Rapports d'Activité</h1>
+        <p>Générez et exportez des rapports détaillés sur vos dossiers</p>
+      </div>
+
+      <div class="reports-content fade-in-up">
+        <!-- Configuration du rapport -->
+        <div class="report-config">
+          <div class="config-card">
+            <h3>Configuration du rapport</h3>
+            
+            <div class="config-form">
+              <div class="form-section">
+                <h4>Période</h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Date de début</label>
+                    <input type="date" [(ngModel)]="reportConfig.dateFrom">
+                  </div>
+                  <div class="form-group">
+                    <label>Date de fin</label>
+                    <input type="date" [(ngModel)]="reportConfig.dateTo">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-section">
+                <h4>Filtres</h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Statut des dossiers</label>
+                    <select [(ngModel)]="reportConfig.status" multiple>
+                      <option value="pending">En attente</option>
+                      <option value="active">Actif</option>
+                      <option value="negotiation">Négociation</option>
+                      <option value="legal_action">Action légale</option>
+                      <option value="completed">Terminé</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Priorité</label>
+                    <select [(ngModel)]="reportConfig.priority" multiple>
+                      <option value="low">Faible</option>
+                      <option value="medium">Moyenne</option>
+                      <option value="high">Élevée</option>
+                      <option value="urgent">Urgente</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-section">
+                <h4>Type de rapport</h4>
+                <div class="report-types">
+                  <label class="report-type-option">
+                    <input type="radio" name="reportType" value="summary" [(ngModel)]="reportConfig.type">
+                    <span class="option-content">
+                      <div class="option-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect x="3" y="3" width="7" height="7"/>
+                          <rect x="14" y="3" width="7" height="7"/>
+                          <rect x="14" y="14" width="7" height="7"/>
+                          <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                      </div>
+                      <div class="option-text">
+                        <div class="option-title">Rapport de synthèse</div>
+                        <div class="option-description">Vue d'ensemble avec statistiques clés</div>
+                      </div>
+                    </span>
+                  </label>
+                  
+                  <label class="report-type-option">
+                    <input type="radio" name="reportType" value="detailed" [(ngModel)]="reportConfig.type">
+                    <span class="option-content">
+                      <div class="option-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                          <polyline points="14,2 14,8 20,8"/>
+                        </svg>
+                      </div>
+                      <div class="option-text">
+                        <div class="option-title">Rapport détaillé</div>
+                        <div class="option-description">Liste complète des dossiers avec détails</div>
+                      </div>
+                    </span>
+                  </label>
+                  
+                  <label class="report-type-option">
+                    <input type="radio" name="reportType" value="financial" [(ngModel)]="reportConfig.type">
+                    <span class="option-content">
+                      <div class="option-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="12" y1="1" x2="12" y2="23"/>
+                          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                      </div>
+                      <div class="option-text">
+                        <div class="option-title">Rapport financier</div>
+                        <div class="option-description">Analyse des montants et recouvrements</div>
+                      </div>
+                    </span>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="form-actions">
+                <button class="btn btn-primary" (click)="generateReport()" [disabled]="isGenerating">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  <span *ngIf="!isGenerating">Générer le rapport</span>
+                  <span *ngIf="isGenerating">Génération en cours...</span>
+                </button>
+                <button class="btn btn-secondary" (click)="previewReport()" [disabled]="isGenerating">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                  Aperçu
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historique des rapports -->
+        <div class="reports-history">
+          <div class="history-card">
+            <div class="history-header">
+              <h3>Rapports récents</h3>
+              <button class="btn btn-secondary small" (click)="refreshHistory()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23,4 23,10 17,10"/>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+                Actualiser
+              </button>
+            </div>
+            
+            <div class="history-list" *ngIf="reportHistory.length > 0; else noHistory">
+              <div class="history-item" *ngFor="let report of reportHistory">
+                <div class="report-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14,2 14,8 20,8"/>
+                  </svg>
+                </div>
+                <div class="report-info">
+                  <div class="report-name">{{ report.name }}</div>
+                  <div class="report-meta">
+                    {{ getReportTypeLabel(report.type) }} • 
+                    Généré le {{ formatDate(report.generatedAt) }}
+                  </div>
+                </div>
+                <div class="report-actions">
+                  <button class="btn btn-primary small" (click)="downloadReport(report)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7,10 12,15 17,10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Télécharger
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <ng-template #noHistory>
+              <div class="no-history">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14,2 14,8 20,8"/>
+                </svg>
+                <p>Aucun rapport généré récemment</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal d'aperçu -->
+      <div class="modal-overlay" *ngIf="showPreviewModal" (click)="closePreviewModal()">
+        <div class="modal-content large" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>Aperçu du rapport</h3>
+            <button class="modal-close" (click)="closePreviewModal()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="report-preview" *ngIf="previewData">
+              <div class="preview-header">
+                <h4>{{ getReportTypeLabel(reportConfig.type) }}</h4>
+                <p>Période : {{ formatDate(reportConfig.dateFrom) }} - {{ formatDate(reportConfig.dateTo) }}</p>
+              </div>
+              
+              <div class="preview-stats">
+                <div class="stat-item">
+                  <span class="stat-label">Dossiers traités</span>
+                  <span class="stat-value">{{ previewData.totalCases }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Montant total</span>
+                  <span class="stat-value">{{ formatCurrency(previewData.totalAmount) }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Montant recouvré</span>
+                  <span class="stat-value success">{{ formatCurrency(previewData.recoveredAmount) }}</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Taux de succès</span>
+                  <span class="stat-value">{{ previewData.successRate }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closePreviewModal()">Fermer</button>
+            <button class="btn btn-primary" (click)="generateFromPreview()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7,10 12,15 17,10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Générer et télécharger
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
