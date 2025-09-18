@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { delay, tap } from 'rxjs/operators';
 import { User, UserRole, LoginRequest, LoginResponse } from '../models/user.model';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environment/environment';
+
 
 @Injectable({
   providedIn: 'root'
@@ -11,13 +10,7 @@ import { environment } from '../../environment/environment';
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
-  private apiUrl = environment.apiUrl;
-
-  // constructor ( private http: HttpClient) { }
-
-  //   login(email: string, password: string): Observable<any> {
-  //   return this.http.post(`${this.apiUrl}/login`, { email, password });
-  // }
+ 
 
   private mockUsers: User[] = [
     {
