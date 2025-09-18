@@ -13,28 +13,18 @@ import { LoginRequest } from '../../../models/user.model';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  credentials: LoginRequest = {
+
+    login: LoginRequest = {
     email: '',
     password: ''
   };
-  
-  isLoading = false;
-  errorMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+    constructor(private authService: AuthService, private router: Router) {}
 
-  onSubmit() {
-    if (!this.credentials.email || !this.credentials.password) {
-      this.errorMessage = 'Veuillez remplir tous les champs';
-      return;
-    }
-
-    this.isLoading = true;
-    this.errorMessage = '';
-
-    this.authService.login(this.credentials).subscribe({
-      next: (response) => {
-        this.router.navigate(['/dashboard']);
+     onSubmit() {
+    this.authService.login(this.login.email, this.login.password).subscribe({
+      next: (res) => {
+         this.router.navigate(['/dashboard'])
       },
       error: (error) => {
         this.errorMessage = error.message || 'Erreur de connexion';
@@ -43,9 +33,39 @@ export class LoginComponent {
     });
   }
 
-  loginAsDemo(email: string) {
-    this.credentials.email = email;
-    this.credentials.password = 'password123';
-    this.onSubmit();
-  }
+  // credentials: LoginRequest = {
+  //   email: '',
+  //   password: ''
+  // };
+  
+  isLoading = false;
+  errorMessage = '';
+
+  // constructor(private authService: AuthService, private router: Router) {}
+
+  // onSubmit() {
+  //   if (!this.credentials.email || !this.credentials.password) {
+  //     this.errorMessage = 'Veuillez remplir tous les champs';
+  //     return;
+  //   }
+
+  //   this.isLoading = true;
+  //   this.errorMessage = '';
+
+  //   this.authService.login(this.credentials).subscribe({
+  //     next: (response) => {
+  //       this.router.navigate(['/dashboard']);
+  //     },
+  //     error: (error) => {
+  //       this.errorMessage = error.message || 'Erreur de connexion';
+  //       this.isLoading = false;
+  //     }
+  //   });
+  // }
+
+  // loginAsDemo(email: string) {
+  //   this.credentials.email = email;
+  //   this.credentials.password = 'password123';
+  //   this.onSubmit();
+  // }
 }
