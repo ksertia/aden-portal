@@ -1,12 +1,7 @@
 import { Injectable } from '@angular/core';
-
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { User, UserRole, LoginRequest, LoginResponse } from '../models/user.model';
-
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
 import { User, UserRole, LoginRequest, LoginResponse } from '../models/user.model';
 
 @Injectable({
@@ -17,11 +12,7 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-
-  constructor(private http: HttpClient) {
-    // Charger l’utilisateur depuis le localStorage si dispo
- 
-
+  // ✅ mockUsers bien placé comme propriété de la classe
   private mockUsers: User[] = [
     {
       id: '1',
@@ -117,7 +108,7 @@ export class AuthService {
     }
   ];
 
-  constructor() {
+  constructor(private http: HttpClient) {
     // Récupérer l'utilisateur du localStorage au démarrage
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {

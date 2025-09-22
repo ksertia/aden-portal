@@ -14,8 +14,6 @@ import { LoginRequest } from '../../../models/user.model';
 })
 export class LoginComponent {
 
-   
-
   credentials: LoginRequest = {
     email: '',
     password: ''
@@ -24,14 +22,7 @@ export class LoginComponent {
   isLoading = false;
   errorMessage = '';
 
-  isLoading = false;
-  errorMessage = '';
-
   constructor(private authService: AuthService, private router: Router) {}
-
-
-  constructor(private authService: AuthService, private router: Router) {}
-
 
   onSubmit() {
     if (!this.credentials.email || !this.credentials.password) {
@@ -43,14 +34,9 @@ export class LoginComponent {
     this.errorMessage = '';
 
     this.authService.login(this.credentials).subscribe({
-
       next: () => {
         this.isLoading = false;
         this.router.navigate(['/dashboard']); // redirection si login ok
-
-      next: (response) => {
-        this.router.navigate(['/dashboard']);
-
       },
       error: (error) => {
         console.error('Erreur login:', error);
@@ -66,6 +52,4 @@ export class LoginComponent {
     this.credentials.password = 'password123';
     this.onSubmit();
   }
-
-}
 }
