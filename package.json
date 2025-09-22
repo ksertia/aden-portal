@@ -20,6 +20,7 @@
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
     "lucide-angular": "^0.542.0",
+    "nodemon": "^3.1.10",
     "rxjs": "^7.8.1",
     "tslib": "^2.5.0",
     "zone.js": "~0.15.0"

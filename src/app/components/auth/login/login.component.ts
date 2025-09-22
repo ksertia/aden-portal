@@ -13,7 +13,6 @@ import { LoginRequest } from '../../../models/user.model';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-   
 
   credentials: LoginRequest = {
     email: '',
@@ -35,11 +34,14 @@ export class LoginComponent {
     this.errorMessage = '';
 
     this.authService.login(this.credentials).subscribe({
-      next: (response) => {
-        this.router.navigate(['/dashboard']);
+      next: () => {
+        this.isLoading = false;
+        this.router.navigate(['/dashboard']); // redirection si login ok
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Erreur de connexion';
+        console.error('Erreur login:', error);
+        this.errorMessage =
+          error?.error?.message || error.message || 'Erreur de connexion';
         this.isLoading = false;
       }
     });

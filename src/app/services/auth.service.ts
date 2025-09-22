@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 import { User, UserRole, LoginRequest, LoginResponse } from '../models/user.model';
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private apiUrl = 'http://localhost:3000/auth'; // 👉 Ton BFF Express
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
- 
 
+  // ✅ mockUsers bien placé comme propriété de la classe
   private mockUsers: User[] = [
     {
       id: '1',
@@ -107,7 +108,7 @@ export class AuthService {
     }
   ];
 
-  constructor() {
+  constructor(private http: HttpClient) {
     // Récupérer l'utilisateur du localStorage au démarrage
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
@@ -115,57 +116,50 @@ export class AuthService {
     }
   }
 
+  // ✅ Connexion via le BFF
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    const user = this.mockUsers.find(u => u.email === credentials.email);
-    
-    if (user && credentials.password === 'password123') {
-      const response: LoginResponse = {
-        user,
-        token: 'mock-jwt-token-' + user.id
-      };
-      
-      return of(response).pipe(
-        delay(1000), // Simuler le délai réseau
-        tap(response => {
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
-          localStorage.setItem('authToken', response.token);
-          this.currentUserSubject.next(response.user);
-        })
-      );
-    } else {
-      return throwError(() => new Error('Identifiants invalides'));
-    }
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+      tap(response => {
+        localStorage.setItem('currentUser', JSON.stringify(response.user));
+        localStorage.setItem('authToken', response.token);
+        this.currentUserSubject.next(response.user);
+      })
+    );
   }
 
+  // ✅ Déconnexion
   logout(): void {
     localStorage.removeItem('currentUser');
     localStorage.removeItem('authToken');
     this.currentUserSubject.next(null);
   }
 
+  // ✅ Vérifie si connecté
   isAuthenticated(): boolean {
     return this.currentUserSubject.value !== null;
   }
 
+  // ✅ Vérifie si l’utilisateur a un rôle
   hasRole(role: UserRole): boolean {
     const currentUser = this.currentUserSubject.value;
     return currentUser?.role === role;
   }
 
+  // ✅ Récupère l’utilisateur actuel
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
 
+  // ✅ Exemple : mise à jour du profil (via BFF → Strapi)
   updateProfile(userData: Partial<User>): Observable<User> {
-    const currentUser = this.getCurrentUser();
-    if (!currentUser) {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
       return throwError(() => new Error('Utilisateur non connecté'));
     }
 
-    const updatedUser = { ...currentUser, ...userData };
-    
-    return of(updatedUser).pipe(
-      delay(500),
+    return this.http.put<User>(`${this.apiUrl}/profile`, userData, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).pipe(
       tap(user => {
         localStorage.setItem('currentUser', JSON.stringify(user));
         this.currentUserSubject.next(user);

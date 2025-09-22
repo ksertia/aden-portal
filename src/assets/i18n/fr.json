@@ -1,3 +1,4 @@
+
 {
   "nav": {
     "services": "Services",
@@ -149,15 +150,6 @@
     "comingSoonDescription": "La gestion des paiements et échéanciers sera bientôt disponible."
   },
 
-
-
-
-
-
-
-
-
-
   "sidebar": {
     "logo": "RecouvrePro",
     "dashboard": "Tableau de bord",
@@ -179,6 +171,6 @@
     "RECOVERY_PARTNER": "Partenaire",
     "PROFESSIONAL": "Professionnel"
   }
-
-
 }
+
+
