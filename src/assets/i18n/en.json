@@ -138,5 +138,46 @@
   "common": {
     "digital_management": "Digital management",
     "centralized_files": "All your files centralized"
+  },
+
+
+
+  "payments": {
+    "title": "Payment History",
+    "subtitle": "View the history of your payments and schedules",
+    "comingSoonTitle": "Feature under development",
+    "comingSoonDescription": "Payment and scheduling management will be available soon."
+  },
+
+
+
+
+
+
+
+
+
+  
+  "sidebar": {
+    "logo": "RecouvrePro",
+    "dashboard": "Dashboard",
+    "myCases": "My Cases",
+    "payments": "Payments",
+    "documents": "My Documents",
+    "bailiffCases": "Case Management",
+    "legalActions": "Legal Actions",
+    "lawyerCases": "Legal Cases",
+    "consultations": "Consultations",
+    "logout": "Logout"
+  },
+  "roles": {
+    "DEBTOR": "Debtor",
+    "BAILIFF": "Bailiff",
+    "LAWYER": "Lawyer",
+    "CREDITOR": "Creditor",
+    "CEDANT": "Assignor",
+    "RECOVERY_PARTNER": "Partner",
+    "PROFESSIONAL": "Professional"
   }
+
 }

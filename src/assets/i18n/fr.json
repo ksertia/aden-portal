@@ -138,5 +138,47 @@
   "common": {
     "digital_management": "Gestion digitale",
     "centralized_files": "Tous vos dossiers centralisés"
+  },
+
+  
+
+  "payments": {
+    "title": "Historique des Paiements",
+    "subtitle": "Consultez l'historique de vos paiements et échéanciers",
+    "comingSoonTitle": "Fonctionnalité en cours de développement",
+    "comingSoonDescription": "La gestion des paiements et échéanciers sera bientôt disponible."
+  },
+
+
+
+
+
+
+
+
+
+
+  "sidebar": {
+    "logo": "RecouvrePro",
+    "dashboard": "Tableau de bord",
+    "myCases": "Mes Dossiers",
+    "payments": "Paiements",
+    "documents": "Mes Documents",
+    "bailiffCases": "Gestion Dossiers",
+    "legalActions": "Actions Légales",
+    "lawyerCases": "Dossiers Juridiques",
+    "consultations": "Consultations",
+    "logout": "Déconnexion"
+  },
+  "roles": {
+    "DEBTOR": "Débiteur",
+    "BAILIFF": "Huissier",
+    "LAWYER": "Avocat",
+    "CREDITOR": "Créancier",
+    "CEDANT": "Cédant",
+    "RECOVERY_PARTNER": "Partenaire",
+    "PROFESSIONAL": "Professionnel"
   }
+
+
 }
