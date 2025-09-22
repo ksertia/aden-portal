@@ -141,15 +141,13 @@
     "centralized_files": "Tous vos dossiers centralisés"
   },
 
-  
-
   "payments": {
     "title": "Historique des Paiements",
     "subtitle": "Consultez l'historique de vos paiements et échéanciers",
     "comingSoonTitle": "Fonctionnalité en cours de développement",
     "comingSoonDescription": "La gestion des paiements et échéanciers sera bientôt disponible."
   },
-
+  
   "sidebar": {
     "logo": "RecouvrePro",
     "dashboard": "Tableau de bord",
@@ -160,6 +158,15 @@
     "legalActions": "Actions Légales",
     "lawyerCases": "Dossiers Juridiques",
     "consultations": "Consultations",
+    "reports": "Rapports",
+    "myCredits": "Mes Créances",
+    "realTimeTracking": "Suivi Temps Réel",
+    "notifications": "Notifications",
+    "portfolios": "Mes Portefeuilles",
+    "invoices": "Suivi des Factures",
+    "salesProcess": "Processus de Vente",
+    "documentsProfessional": "Documents",
+    "profile": "Profil",
     "logout": "Déconnexion"
   },
   "roles": {
@@ -172,5 +179,4 @@
     "PROFESSIONAL": "Professionnel"
   }
 }
-
 

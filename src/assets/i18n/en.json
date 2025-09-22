@@ -148,15 +148,6 @@
     "comingSoonTitle": "Feature under development",
     "comingSoonDescription": "Payment and scheduling management will be available soon."
   },
-
-
-
-
-
-
-
-
-
   
   "sidebar": {
     "logo": "RecouvrePro",
@@ -168,6 +159,15 @@
     "legalActions": "Legal Actions",
     "lawyerCases": "Legal Cases",
     "consultations": "Consultations",
+    "reports": "Reports",
+    "myCredits": "My Credits",
+    "realTimeTracking": "Real-Time Tracking",
+    "notifications": "Notifications",
+    "portfolios": "My Portfolios",
+    "invoices": "Invoice Tracking",
+    "salesProcess": "Sales Process",
+    "documentsProfessional": "Documents",
+    "profile": "Profile",
     "logout": "Logout"
   },
   "roles": {
@@ -179,5 +179,4 @@
     "RECOVERY_PARTNER": "Partner",
     "PROFESSIONAL": "Professional"
   }
-
 }
