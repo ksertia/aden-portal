@@ -13,59 +13,42 @@ import { LoginRequest } from '../../../models/user.model';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-
-    login: LoginRequest = {
+  credentials: LoginRequest = {
     email: '',
     password: ''
   };
 
-    constructor(private authService: AuthService, private router: Router) {}
+  isLoading = false;
+  errorMessage = '';
 
-     onSubmit() {
-    this.authService.login(this.login.email, this.login.password).subscribe({
-      next: (res) => {
-         this.router.navigate(['/dashboard'])
+  constructor(private authService: AuthService, private router: Router) {}
+
+  onSubmit() {
+    if (!this.credentials.email || !this.credentials.password) {
+      this.errorMessage = 'Veuillez remplir tous les champs';
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.login(this.credentials).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.router.navigate(['/dashboard']); // redirection si login ok
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Erreur de connexion';
+        console.error('Erreur login:', error);
+        this.errorMessage =
+          error?.error?.message || error.message || 'Erreur de connexion';
         this.isLoading = false;
       }
     });
   }
 
-  // credentials: LoginRequest = {
-  //   email: '',
-  //   password: ''
-  // };
-  
-  isLoading = false;
-  errorMessage = '';
-
-  // constructor(private authService: AuthService, private router: Router) {}
-
-  // onSubmit() {
-  //   if (!this.credentials.email || !this.credentials.password) {
-  //     this.errorMessage = 'Veuillez remplir tous les champs';
-  //     return;
-  //   }
-
-  //   this.isLoading = true;
-  //   this.errorMessage = '';
-
-  //   this.authService.login(this.credentials).subscribe({
-  //     next: (response) => {
-  //       this.router.navigate(['/dashboard']);
-  //     },
-  //     error: (error) => {
-  //       this.errorMessage = error.message || 'Erreur de connexion';
-  //       this.isLoading = false;
-  //     }
-  //   });
-  // }
-
-  // loginAsDemo(email: string) {
-  //   this.credentials.email = email;
-  //   this.credentials.password = 'password123';
-  //   this.onSubmit();
-  // }
+  loginAsDemo(email: string) {
+    this.credentials.email = email;
+    this.credentials.password = 'password123';
+    this.onSubmit();
+  }
 }
