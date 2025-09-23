@@ -12,11 +12,11 @@
           <span>RecouvrePro</span>
         </div>
         <div class="nav-links">
-          <a (click)="scrollToSection('services')">{{ t('nav.services') }}</a>
-          <a (click)="scrollToSection('avantages')">{{ t('nav.advantages') }}</a>
-          <a (click)="scrollToSection('contact')">{{ t('nav.contact') }}</a>
-          <app-language-switcher></app-language-switcher>
-          <a routerLink="/login" class="btn btn-primary">{{ t('nav.login') }}</a>
+                <a (click)="scrollToSection('services')">{{ nav?.services }}</a>
+                <a (click)="scrollToSection('avantages')">{{ nav?.advantages }}</a>
+                <a (click)="scrollToSection('contact')">{{ nav?.contact }}</a>
+                <app-language-switcher></app-language-switcher>
+                <a routerLink="/login" class="btn btn-primary">{{ nav?.login }}</a>
         </div>
       </div>
     </nav>
@@ -24,46 +24,47 @@
 
   <!-- Hero Section -->
   <section class="hero-section">
-    <div class="hero-container">
-      <div class="hero-content fade-in-up">
-        <h1>{{ t('hero.title') }}</h1>
-        <p class="hero-subtitle">{{ t('hero.subtitle') }}</p>
-        <div class="hero-actions">
-          <a routerLink="/login" class="btn btn-primary large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-              <polyline points="10,17 15,12 10,7"/>
-              <line x1="15" y1="12" x2="3" y2="12"/>
-            </svg>
-            <span>{{ t('hero.cta.portal') }}</span>
-          </a>
-          <button class="btn btn-secondary large" (click)="scrollToSection('services')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-            <span>{{ t('hero.cta.learn') }}</span>
-          </button>
-        </div>
+  <div class="hero-container">
+    <div class="hero-content fade-in-up">
+      <h1>{{ hero?.title }}</h1>
+      <p class="hero-subtitle">{{ hero?.subtitle }}</p>
+      <div class="hero-actions">
+        <a routerLink="/login" class="btn btn-primary large">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10,17 15,12 10,7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          <span>{{ hero?.cta?.portal }}</span>
+        </a>
+        <button class="btn btn-secondary large" (click)="scrollToSection('services')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span>{{ hero?.cta?.learn }}</span>
+        </button>
       </div>
-      <div class="hero-image fade-in-up">
-        <div class="hero-illustration">
-          <div class="illustration-card">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14,2 14,8 20,8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10,9 9,9 8,9"/>
-            </svg>
-            <h3>{{ t('common.digital_management') }}</h3>
-            <p>{{ t('common.centralized_files') }}</p>
-          </div>
+    </div>
+    <div class="hero-image fade-in-up">
+      <div class="hero-illustration">
+        <div class="illustration-card">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10,9 9,9 8,9"/>
+          </svg>
+          <h3>{{ t('common.digital_management') }}</h3>
+          <p>{{ t('common.centralized_files') }}</p>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
 
   <!-- Services Section -->
   <section id="services" class="services-section">
