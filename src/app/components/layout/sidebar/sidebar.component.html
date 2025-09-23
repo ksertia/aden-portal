@@ -240,7 +240,8 @@
         </a>
       </li>
 
-      <li *ngIf="isDebtorUser">
+      <li >
+        <!-- *ngIf="isDebtorUser" -->
         <a routerLink="/debtor/cases" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -250,7 +251,8 @@
         </a>
       </li>
 
-      <li *ngIf="isDebtorUser">
+      <li >
+        <!-- *ngIf="isDebtorUser" -->
         <a routerLink="/debtor/payments" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
@@ -260,7 +262,8 @@
         </a>
       </li>
 
-      <li *ngIf="isDebtorUser">
+      <li >
+        <!-- *ngIf="isDebtorUser" -->
         <a routerLink="/debtor/documents" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -271,7 +274,8 @@
       </li>
 
       <!-- Huissier -->
-      <li *ngIf="isBailiffUser">
+      <li >
+        <!-- *ngIf="isBailiffUser" -->
         <a routerLink="/bailiff/cases" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -281,7 +285,8 @@
         </a>
       </li>
 
-      <li *ngIf="isBailiffUser">
+      <li >
+        <!-- *ngIf="isBailiffUser" -->
         <a routerLink="/bailiff/actions" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 12l2 2 4-4"/>
@@ -292,7 +297,8 @@
       </li>
 
       <!-- Avocat -->
-      <li *ngIf="isLawyerUser">
+      <li >
+        <!-- *ngIf="isLawyerUser" -->
         <a routerLink="/lawyer/cases" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -302,7 +308,8 @@
         </a>
       </li>
 
-      <li *ngIf="isLawyerUser">
+      <li >
+        <!-- *ngIf="isLawyerUser" -->
         <a routerLink="/lawyer/consultations" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -311,60 +318,64 @@
         </a>
       </li>
 
-      <!-- Ajoute les autres utilisateurs de la même façon -->
-
-      <li *ngIf="isProfessionalUser">
+      <li >
+        <!-- *ngIf="isProfessionalUser" -->
         <a routerLink="/professional/reports" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 2v6l3-3 3 3-3 3v6"/>
             <path d="M15 8h6"/>
             <path d="M15 16h6"/>
           </svg>
-          <span>Rapports</span>
+          <span>{{ t('sidebar.reports') }}</span>
         </a>
       </li>
 
-      <li *ngIf="isCreditorUser">
+      <li >
+        <!-- *ngIf="isCreditorUser" -->
         <a routerLink="/creditor/cases" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14,2 14,8 20,8"/>
           </svg>
-          <span>Mes Créances</span>
+          <span>{{ t('sidebar.myCredits') }}</span>
         </a>
       </li>
 
-      <li *ngIf="isCreditorUser">
+      <li >
+        <!-- *ngIf="isCreditorUser" -->
         <a routerLink="/creditor/tracking" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 12l2 2 4-4"/>
             <circle cx="12" cy="12" r="9"/>
           </svg>
-          <span>Suivi Temps Réel</span>
+          <span>{{ t('sidebar.realTimeTracking') }}</span>
         </a>
       </li>
 
-      <li *ngIf="isCreditorUser">
+      <li >
+        <!-- *ngIf="isCreditorUser" -->
         <a routerLink="/creditor/notifications" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
             <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
-          <span>Notifications</span>
+          <span>{{ t('sidebar.notifications') }}</span>
         </a>
       </li>
 
-      <li *ngIf="isCedantUser">
+      <li >
+        <!-- *ngIf="isCedantUser" -->
         <a routerLink="/cedant/portfolios" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14,2 14,8 20,8"/>
           </svg>
-          <span>Mes Portefeuilles</span>
+          <span>{{ t('sidebar.portfolios') }}</span>
         </a>
       </li>
 
-      <li *ngIf="isCedantUser">
+      <li >
+        <!-- *ngIf="isCedantUser" -->
         <a routerLink="/cedant/invoices" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -372,27 +383,29 @@
             <line x1="16" y1="13" x2="8" y2="13"/>
             <line x1="16" y1="17" x2="8" y2="17"/>
           </svg>
-          <span>Suivi des Factures</span>
+          <span>{{ t('sidebar.invoices') }}</span>
         </a>
       </li>
 
-      <li *ngIf="isCedantUser">
+      <li >
+        <!-- *ngIf="isCedantUser" -->
         <a routerLink="/cedant/sales" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="1" x2="12" y2="23"/>
             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
           </svg>
-          <span>Processus de Vente</span>
+          <span>{{ t('sidebar.salesProcess') }}</span>
         </a>
       </li>
 
-      <li *ngIf="isProfessionalUser">
+      <li>
+         <!-- *ngIf="isProfessionalUser" -->
         <a routerLink="/professional/documents" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14,2 14,8 20,8"/>
           </svg>
-          <span>Documents</span>
+          <span>{{ t('sidebar.documentsProfessional') }}</span>
         </a>
       </li>
 
@@ -402,7 +415,7 @@
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
           </svg>
-          <span>Profil</span>
+          <span>{{ t('sidebar.profile') }}</span>
         </a>
       </li>
 
@@ -412,12 +425,14 @@
   <div class="sidebar-footer">
     <div class="user-info" *ngIf="currentUser">
       <div class="user-avatar">
-        {{ currentUser.firstName.charAt(0) }}{{ currentUser.lastName.charAt(0) }}
+        <!-- {{ currentUser.firstName.charAt(0) }}{{ currentUser.lastName.charAt(0) }} -->
       </div>
       <div class="user-details">
         <div class="user-name">{{ currentUser.firstName }} {{ currentUser.lastName }}</div>
+        <div class="user-role">{{ getUserRoleLabel() }}</div>
         <div class="user-role">{{ t('roles.' + currentUser.role) }}</div>
       </div>
+
     </div>
     <button (click)="logout()" class="logout-btn">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
