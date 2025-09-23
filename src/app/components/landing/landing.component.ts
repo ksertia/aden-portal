@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { LanguageSwitcherComponent } from '../shared/language-switcher/language-switcher.component';
 import { I18nService } from '../../services/i18n.service';
+import { Hero, Nav, Services, Benefits, Statistiques, CTA, Contact, Footer, Common } from "../../models/landing.model";
+import { LandingService } from '../../services/landing.service';
 
 @Component({
   selector: 'app-landing',
@@ -13,9 +15,20 @@ import { I18nService } from '../../services/i18n.service';
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.css']
 })
-export class LandingComponent {
+export class LandingComponent implements OnInit {
   translations: any = {};
-  
+
+  // Données depuis Strapi
+  nav?: Nav;
+  hero?: Hero;
+  services?: Services;
+  benefits?: Benefits;
+  stats?: Statistiques;
+  cta?: CTA;
+  contact?: Contact;
+  footer?: Footer;
+  common?: Common;
+
   contactForm = {
     firstName: '',
     lastName: '',
@@ -24,13 +37,19 @@ export class LandingComponent {
     message: ''
   };
 
-  constructor(private i18nService: I18nService) {
+  constructor(
+    private i18nService: I18nService,
+    private landingService: LandingService
+  ) {}
+
+  ngOnInit() {
     this.loadTranslations();
-    
-    // Écouter les changements de langue
+
     this.i18nService.currentLocale$.subscribe(() => {
       this.loadTranslations();
     });
+
+    this.loadContent();
   }
 
   private loadTranslations() {
@@ -39,6 +58,49 @@ export class LandingComponent {
       this.translations = translations;
     });
   }
+
+  private loadContent() {
+   this.landingService.getNav().subscribe(res => {
+    if (res.data.length > 0) {
+      this.nav = res.data[0]; // prend le premier élément du tableau
+    }
+  });
+
+  this.landingService.getHero().subscribe(res => {
+    if (res.data.length > 0) {
+      this.hero = res.data[0];
+    } 
+  });
+
+  this.landingService.getServices().subscribe(res => {
+    if (res.data) this.services = res.data[0];
+  });
+
+  this.landingService.getBenefits().subscribe(res => {
+    if (res.data) this.benefits = res.data[0];
+  });
+
+  this.landingService.getStats().subscribe(res => {
+    if (res.data) this.stats = res.data[0];
+  });
+
+  this.landingService.getCTA().subscribe(res => {
+    if (res.data) this.cta = res.data[0];
+  });
+
+  this.landingService.getContact().subscribe(res => {
+    if (res.data) this.contact = res.data[0];
+  });
+
+  this.landingService.getFooter().subscribe(res => {
+    if (res.data) this.footer = res.data[0];
+  });
+
+  this.landingService.getCommon().subscribe(res => {
+    if (res.data) this.common = res.data[0];
+  });
+}
+
 
   t(key: string): string {
     return this.i18nService.translate(key, this.translations);
@@ -53,6 +115,6 @@ export class LandingComponent {
 
   submitContactForm() {
     console.log('Formulaire de contact soumis:', this.contactForm);
-    // TODO: Implémenter l'envoi du formulaire
+    // TODO: Envoyer à Strapi via POST si besoin
   }
 }
