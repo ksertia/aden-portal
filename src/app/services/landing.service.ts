@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { environment } from "../../environment/environment";
-import { Hero, Nav, Services, Benefits, Statistiques, CTA, Contact, Footer, Common } from "../models/landing.model";
+import { Hero, Nav, Services, Benefits, Statistiques, CTA, Contact, Footer, Common, Sidebar } from "../models/landing.model";
 
 @Injectable({
     providedIn: 'root'
@@ -48,6 +48,8 @@ export class LandingService {
     getCommon(): Observable<{ data: Common[] }> {
      return this.http.get<{ data: Common[] }>(`${this.apiUrl}/commons`);
     }
-
-
+    //Sidebar
+    getSidebar(): Observable<{ data: Sidebar[] }> {
+     return this.http.get<{ data: Sidebar[] }>(`${this.apiUrl}/sidebar`);
+    }
 }
