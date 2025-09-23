@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
 import { DebtCase, CaseStatus, Priority, ActivityType, PaymentProposal } from '../../../models/case.model';
+import { I18nService } from '../../../services/i18n.service';
+
 
 @Component({
   selector: 'app-debtor-cases',
@@ -39,14 +41,34 @@ export class DebtorCasesComponent implements OnInit {
 
   isSubmittingDispute = false;
 
+  translations: any = {};
+
   constructor(
     private caseService: CaseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private i18nService: I18nService
   ) {}
 
   ngOnInit() {
     this.loadUserCases();
     this.loadStatistics();
+
+     this.loadTranslations();
+
+    this.i18nService.currentLocale$.subscribe(() => {
+      this.loadTranslations();
+    });
+
+  }
+
+  private loadTranslations() {
+    const locale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(locale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
   }
 
   loadUserCases() {

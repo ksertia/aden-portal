@@ -5,6 +5,8 @@ import { AuthService } from '../../services/auth.service';
 import { CaseService } from '../../services/case.service';
 import { User, UserRole } from '../../models/user.model';
 import { DebtCase } from '../../models/case.model';
+import { I18nService } from '../../services/i18n.service';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -18,14 +20,34 @@ export class DashboardComponent implements OnInit {
   userCases: DebtCase[] = [];
   statistics: any = null;
 
+  translations: any = {};
+
   constructor(
     private authService: AuthService,
-    private caseService: CaseService
+    private caseService: CaseService,
+    private i18nService: I18nService
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
     this.loadDashboardData();
+
+    this.loadTranslations();
+
+    this.i18nService.currentLocale$.subscribe(() => {
+      this.loadTranslations();
+    });
+
+  }
+
+   private loadTranslations() {
+    const locale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(locale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
   }
 
   get isDebtorUser(): boolean {
