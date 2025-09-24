@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { LanguageSwitcherComponent } from '../shared/language-switcher/language-switcher.component';
 import { I18nService } from '../../services/i18n.service';
-import { Hero, Nav, Services, Benefits, Statistiques, CTA, Contact, Footer, Common } from "../../models/landing.model";
+import { Nav, Hero, Services, Benefits, Statistiques, CTA, Contact, Footer, Common } from '../../models/landing.model';
 import { LandingService } from '../../services/landing.service';
 
 @Component({
@@ -45,8 +45,10 @@ export class LandingComponent implements OnInit {
   ngOnInit() {
     this.loadTranslations();
 
+    // Recharge à chaque changement de langue
     this.i18nService.currentLocale$.subscribe(() => {
       this.loadTranslations();
+      this.loadContent(); // recharge aussi depuis Strapi
     });
 
     this.loadContent();
@@ -60,47 +62,60 @@ export class LandingComponent implements OnInit {
   }
 
   private loadContent() {
-   this.landingService.getNav().subscribe(res => {
-    if (res.data.length > 0) {
-      this.nav = res.data[0]; // prend le premier élément du tableau
-    }
-  });
+    this.landingService.getNav().subscribe(res => {
+  if (res.data.length > 0) {
+    this.nav = res.data[0];  // déjà compatible
+  }
+});
 
-  this.landingService.getHero().subscribe(res => {
-    if (res.data.length > 0) {
-      this.hero = res.data[0];
-    } 
-  });
+this.landingService.getHero().subscribe(res => {
+  if (res.data.length > 0) {
+    this.hero = res.data[0];
+  }
+});
 
-  this.landingService.getServices().subscribe(res => {
-    if (res.data) this.services = res.data[0];
-  });
+this.landingService.getServices().subscribe(res => {
+  if (res.data.length > 0) {
+    this.services = res.data[0]; // ⚡ pas de .attributes
+  }
+});
 
-  this.landingService.getBenefits().subscribe(res => {
-    if (res.data) this.benefits = res.data[0];
-  });
+    this.landingService.getBenefits().subscribe(res => {
+      if (res.data.length > 0) {
+        this.benefits = res.data[0];
+      }
+    });
 
-  this.landingService.getStats().subscribe(res => {
-    if (res.data) this.stats = res.data[0];
-  });
+    this.landingService.getStats().subscribe(res => {
+      if (res.data.length > 0) {
+        this.stats = res.data[0];
+      }
+    });
 
-  this.landingService.getCTA().subscribe(res => {
-    if (res.data) this.cta = res.data[0];
-  });
+    this.landingService.getCTA().subscribe(res => {
+      if (res.data.length > 0) {
+        this.cta = res.data[0];
+      }
+    });
 
-  this.landingService.getContact().subscribe(res => {
-    if (res.data) this.contact = res.data[0];
-  });
+    this.landingService.getContact().subscribe(res => {
+      if (res.data.length > 0) {
+        this.contact = res.data[0];
+      }
+    });
 
-  this.landingService.getFooter().subscribe(res => {
-    if (res.data) this.footer = res.data[0];
-  });
+    this.landingService.getFooter().subscribe(res => {
+      if (res.data.length > 0) {
+        this.footer = res.data[0];
+      }
+    });
 
-  this.landingService.getCommon().subscribe(res => {
-    if (res.data) this.common = res.data[0];
-  });
-}
-
+    this.landingService.getCommon().subscribe(res => {
+      if (res.data.length > 0) {
+        this.common = res.data[0];
+      }
+    });
+  }
 
   t(key: string): string {
     return this.i18nService.translate(key, this.translations);

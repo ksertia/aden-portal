@@ -1,5 +1,6 @@
 // models/navigation.model.ts
 export interface Nav {
+    locale: string;
   services: string;
   advantages: string;
   contact: string;
@@ -8,6 +9,7 @@ export interface Nav {
 
 // models/hero.model.ts
 export interface Hero {
+    locale: string;
   title: string;
   subtitle: string;
   cta: {
@@ -20,34 +22,28 @@ export interface Hero {
 export interface ServiceItem {
   title: string;
   description: string;
-  feature1?: string;
-  feature2?: string;
-  feature3?: string;
-  feature4?: string;
-  feature5?: string;
-  feature6?: string;
+  locale: string;
 }
 
 // models/services.model.ts
 export interface Services {
   title: string;
   subtitle: string;
-  debtor: ServiceItem;
-  bailiff: ServiceItem;
-  lawyer: ServiceItem;
-  creditor: ServiceItem;
-  cedant: ServiceItem;
+  locale: string;
+  item: ServiceItem[]; 
 }
 
 // models/benefit.model.ts
 export interface BenefitItem {
   title: string;
   description: string;
+  locale: string;
 }
 
 export interface Benefits {
   title: string;
   subtitle: string;
+  locale: string;
   security: BenefitItem;
   time: BenefitItem;
   reports: BenefitItem;
@@ -62,6 +58,7 @@ export interface Statistiques {
   time_saving: string;
   cases_processed: string;
   support_available: string;
+  locale: string;
 }
 
 // models/cta.model.ts
@@ -70,10 +67,12 @@ export interface CTA {
   subtitle: string;
   start: string;
   contact: string;
+  locale: string;
 }
 
 // models/contact.model.ts
 export interface ContactForm {
+    locale: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -96,6 +95,7 @@ export interface ContactForm {
 }
 
 export interface Contact {
+    locale: string;
   title: string;
   subtitle: string;
   address: string;
@@ -106,6 +106,7 @@ export interface Contact {
 
 // models/footer.model.ts
 export interface Footer {
+    locale: string;
   services: string;
   support: string;
   legal: string;
@@ -120,6 +121,7 @@ export interface Footer {
 
 // models/common.model.ts
 export interface Common {
+    locale: string;
   digital_management: string;
   centralized_files: string;
 }

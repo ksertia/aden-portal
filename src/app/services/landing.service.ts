@@ -12,42 +12,42 @@ export class LandingService {
     private apiUrl = `${environment.apiUrl}`;
     constructor( private http: HttpClient ) {}
 
-    getNav(): Observable<{ data: Nav[] }> {
-    return this.http.get<{ data: Nav[] }>(`${this.apiUrl}/navs`);
-    }
+   getNav(): Observable<{ data: Nav[] }> {
+  return this.http.get<{ data: Nav[] }>(`${this.apiUrl}/navs`);
+}
+
+getHero(): Observable<{ data: Hero[] }> {
+  return this.http.get<{ data: Hero[] }>(`${this.apiUrl}/heroes`);
+}
+
+getServices(): Observable<{ data: Services[] }> {
+  return this.http.get<{ data: Services[] }>(`${this.apiUrl}/services?populate=*`);
+}
 
 
-    getHero(): Observable<{ data: Hero[] }> {
-    return this.http.get<{ data: Hero[] }>(`${this.apiUrl}/heroes`);
-   }
+  getBenefits(): Observable<{ data: Benefits[] }> {
+    return this.http.get<{ data: Benefits[] }> (`${this.apiUrl}/benefits?populate=*`);
+  }
 
-   getServices(): Observable<{ data: Services[]  }> {
-    return this.http.get<{ data: Services[] }>(`${this.apiUrl}/services`);
-   }
-
-   getBenefits(): Observable<{ data: Benefits[] }> {
-    return this.http.get<{ data: Benefits[] }>(`${this.apiUrl}/benefits`);
-   }
-
-   getStats(): Observable<{ data: Statistiques[] }> {
+  getStats(): Observable<{ data: Statistiques[] }> {
     return this.http.get<{ data: Statistiques[] }>(`${this.apiUrl}/statistiques`);
-   }
+  }
 
-   getCTA(): Observable<{ data: CTA[] }> {
+  getCTA(): Observable< { data: CTA[] }> {
     return this.http.get<{ data: CTA[] }>(`${this.apiUrl}/ctas`);
-   }
+  }
 
-    getContact(): Observable<{ data: Contact[] }> {
-     return this.http.get<{ data: Contact[] }>(`${this.apiUrl}/contact`);
-    }
+  getContact(): Observable<{ data: Contact[] }> {
+    return this.http.get<{ data: Contact[] }>(`${this.apiUrl}/contact?populate=*`);
+  }
 
-    getFooter(): Observable<{ data: Footer[] }> {
-     return this.http.get<{ data: Footer[] }>(`${this.apiUrl}/footers`);
-    }
+  getFooter(): Observable<{ data: Footer[] }> {
+    return this.http.get<{ data: Footer[] }>(`${this.apiUrl}/footers`);
+  }
 
-    getCommon(): Observable<{ data: Common[] }> {
-     return this.http.get<{ data: Common[] }>(`${this.apiUrl}/commons`);
-    }
+  getCommon(): Observable<{ data: Common[] }> {
+    return this.http.get<{ data: Common[] }>(`${this.apiUrl}/commons`);
+  }
 
 
 }
