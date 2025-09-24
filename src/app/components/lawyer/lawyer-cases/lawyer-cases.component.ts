@@ -180,7 +180,7 @@ export class LawyerCasesComponent implements OnInit {
       content: noteContent,
       type: 'legal' as const,
       createdBy: currentUser.id,
-      createdByName: `${currentUser.firstName} ${currentUser.lastName}`,
+      createdByName: `${currentUser.firstname} ${currentUser.lastname}`,
       isPrivate: true
     };
 
@@ -205,7 +205,7 @@ export class LawyerCasesComponent implements OnInit {
       content: this.newNote.content!,
       type: this.newNote.type as CaseNote['type'],
       createdBy: currentUser.id,
-      createdByName: `${currentUser.firstName} ${currentUser.lastName}`,
+      createdByName: `${currentUser.firstname} ${currentUser.lastname}`,
       isPrivate: this.newNote.isPrivate || false
     };
 

@@ -36,7 +36,7 @@ export class CreditorTrackingComponent implements OnInit {
     this.caseService.getCases().subscribe(cases => {
       this.trackedCases = cases.filter(c => 
         c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstName} ${currentUser.lastName}`
+        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
       );
       
       this.monthlyRecovered = this.trackedCases.reduce((sum, c) => sum + c.amountPaid, 0);

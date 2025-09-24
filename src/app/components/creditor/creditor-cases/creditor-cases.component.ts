@@ -54,7 +54,7 @@ export class CreditorCasesComponent implements OnInit {
       // Filtrer les dossiers pour ce créancier
       this.cases = cases.filter(c => 
         c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstName} ${currentUser.lastName}`
+        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
       );
       this.applyFilters();
     });
@@ -83,7 +83,7 @@ export class CreditorCasesComponent implements OnInit {
       
       this.filteredCases = cases.filter(c => 
         c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstName} ${currentUser.lastName}`
+        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
       );
     });
   }

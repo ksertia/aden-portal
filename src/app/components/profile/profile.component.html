@@ -1,4 +1,4 @@
-<div class="profile-container">
+<!-- <div class="profile-container">
       <div class="profile-header fade-in-up">
         <h1>Profil Utilisateur</h1>
         <p>Gérez vos informations personnelles</p>
@@ -8,10 +8,10 @@
         <div class="profile-card">
           <div class="profile-avatar">
             <div class="avatar-circle">
-              {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
+              {{ user.firstname.charAt(0) }}{{ user.lastname.charAt(0) }}
             </div>
             <div class="avatar-info">
-              <h2>{{ user.firstName }} {{ user.lastName }}</h2>
+              <h2>{{ user.firstname }} {{ user.lastname }}</h2>
               <p class="role">{{ getUserRoleLabel() }}</p>
             </div>
           </div>
@@ -25,7 +25,7 @@
                   <input
                     type="text"
                     id="firstName"
-                    [(ngModel)]="user.firstName"
+                    [(ngModel)]="user.firstname"
                     name="firstName"
                     required
                   >
@@ -35,7 +35,7 @@
                   <input
                     type="text"
                     id="lastName"
-                    [(ngModel)]="user.lastName"
+                    [(ngModel)]="user.lastname"
                     name="lastName"
                     required
                   >
@@ -151,4 +151,109 @@
         </svg>
         Profil mis à jour avec succès
       </div>
+    </div> -->
+
+
+
+
+
+<div class="profile-container">
+  <div class="profile-header fade-in-up">
+    <h1>{{ t('profile.title') }}</h1>
+    <p>{{ t('profile.subtitle') }}</p>
+  </div>
+
+  <div class="profile-content fade-in-up" *ngIf="user">
+    <div class="profile-card">
+      <div class="profile-avatar">
+        <div class="avatar-circle">
+          <!-- {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }} -->
+        </div>
+        <div class="avatar-info">
+          <h2>{{ user.firstname }} {{ user.lastname }}</h2>
+          <p class="role">{{ getUserRoleLabel() }}</p>
+        </div>
+      </div>
+
+      <form (ngSubmit)="updateProfile()" class="profile-form">
+        <div class="form-section">
+          <h3>{{ t('profile.personal_info') }}</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">{{ t('profile.first_name') }}</label>
+              <input type="text" id="firstName" [(ngModel)]="user.firstname" name="firstName" required>
+            </div>
+            <div class="form-group">
+              <label for="lastName">{{ t('profile.last_name') }}</label>
+              <input type="text" id="lastName" [(ngModel)]="user.lastname" name="lastName" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">{{ t('profile.email') }}</label>
+            <input type="email" id="email" [(ngModel)]="user.email" name="email" required disabled>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">{{ t('profile.phone') }}</label>
+            <input type="tel" id="phone" [(ngModel)]="user.phone" name="phone">
+          </div>
+        </div>
+
+        <div class="form-section" *ngIf="user.companyName || user.licenseNumber">
+          <h3>{{ t('profile.professional_info') }}</h3>
+
+          <div class="form-group" *ngIf="user.companyName">
+            <label for="companyName">{{ t('profile.company_name') }}</label>
+            <input type="text" id="companyName" [(ngModel)]="user.companyName" name="companyName">
+          </div>
+
+          <div class="form-group" *ngIf="user.licenseNumber">
+            <label for="licenseNumber">{{ t('profile.license_number') }}</label>
+            <input type="text" id="licenseNumber" [(ngModel)]="user.licenseNumber" name="licenseNumber">
+          </div>
+        </div>
+
+        <div class="form-section" *ngIf="user.address">
+          <h3>{{ t('profile.address') }}</h3>
+
+          <div class="form-group">
+            <label for="street">{{ t('profile.street') }}</label>
+            <input type="text" id="street" [(ngModel)]="user.address.street" name="street">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">{{ t('profile.city') }}</label>
+              <input type="text" id="city" [(ngModel)]="user.address.city" name="city">
+            </div>
+            <div class="form-group">
+              <label for="postalCode">{{ t('profile.postal_code') }}</label>
+              <input type="text" id="postalCode" [(ngModel)]="user.address.postalCode" name="postalCode">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="country">{{ t('profile.country') }}</label>
+            <input type="text" id="country" [(ngModel)]="user.address.country" name="country">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="isUpdating">
+            <span *ngIf="!isUpdating">{{ t('profile.update') }}</span>
+            <span *ngIf="isUpdating">{{ t('profile.updating') }}</span>
+          </button>
+        </div>
+      </form>
     </div>
+  </div>
+
+  <div class="success-message" *ngIf="updateSuccess">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 12l2 2 4-4"/>
+      <circle cx="12" cy="12" r="9"/>
+    </svg>
+    {{ t('profile.success') }}
+  </div>
+</div>

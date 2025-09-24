@@ -53,7 +53,7 @@ export class BailiffCasesComponent implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.caseService.getCasesByUserId(currentUser.id, currentUser.role)
+    this.caseService.getCasesByUserId(currentUser.id, currentUser.role.name)
       .subscribe(cases => {
         this.cases = cases;
         this.applyFilters();
@@ -188,7 +188,7 @@ export class BailiffCasesComponent implements OnInit {
       content: this.newNote.content!,
       type: this.newNote.type as CaseNote['type'],
       createdBy: currentUser.id,
-      createdByName: `${currentUser.firstName} ${currentUser.lastName}`,
+      createdByName: `${currentUser.firstname} ${currentUser.lastname}`,
       isPrivate: this.newNote.isPrivate || false
     };
 
