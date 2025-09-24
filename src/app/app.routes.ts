@@ -36,8 +36,8 @@ export const routes: Routes = [
       // Routes spécifiques au débiteur
       {
         path: 'debtor',
-        // canActivate: [AuthGuard, RoleGuard],
-        // data: { roles: [UserRole.DEBTOR] },
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [UserRole.DEBTOR] },
         children: [
           {
             path: 'cases',
@@ -56,8 +56,8 @@ export const routes: Routes = [
       // Routes spécifiques à l'huissier
       {
         path: 'bailiff',
-        // canActivate: [AuthGuard, RoleGuard],
-        // data: { roles: [UserRole.BAILIFF] },
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [UserRole.BAILIFF] },
         children: [
           {
             path: 'cases',
@@ -72,8 +72,8 @@ export const routes: Routes = [
       // Routes spécifiques à l'avocat
       {
         path: 'lawyer',
-        // canActivate: [AuthGuard, RoleGuard],
-        // data: { roles: [UserRole.LAWYER] },
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [UserRole.LAWYER] },
         children: [
           {
             path: 'cases',
@@ -88,8 +88,8 @@ export const routes: Routes = [
       // Routes spécifiques au créancier
       {
         path: 'creditor',
-        // canActivate: [AuthGuard, RoleGuard],
-        // data: { roles: [UserRole.CREDITOR] },
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [UserRole.CREDITOR] },
         children: [
           {
             path: 'cases',
@@ -108,8 +108,8 @@ export const routes: Routes = [
       // Routes spécifiques aux partenaires de recouvrement
       {
         path: 'partner',
-        // canActivate: [AuthGuard, RoleGuard],
-        // data: { roles: [UserRole.RECOVERY_PARTNER] },
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [UserRole.RECOVERY_PARTNER] },
         children: [
           {
             path: 'cases',
@@ -124,8 +124,8 @@ export const routes: Routes = [
       // Routes spécifiques au cédant
       {
         path: 'cedant',
-        // canActivate: [AuthGuard, RoleGuard],
-        // data: { roles: [UserRole.CEDANT] },
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [UserRole.CEDANT] },
         children: [
           {
             path: 'portfolios',
@@ -148,8 +148,8 @@ export const routes: Routes = [
       // Routes communes aux professionnels (huissier et avocat)
       {
         path: 'professional',
-        // canActivate: [AuthGuard, RoleGuard],
-        // data: { roles: [UserRole.BAILIFF, UserRole.LAWYER, UserRole.CREDITOR, UserRole.CEDANT, UserRole.RECOVERY_PARTNER] },
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [UserRole.BAILIFF, UserRole.LAWYER, UserRole.CREDITOR, UserRole.CEDANT, UserRole.RECOVERY_PARTNER] },
         children: [
           {
             path: 'reports',

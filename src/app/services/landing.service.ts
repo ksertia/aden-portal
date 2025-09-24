@@ -21,6 +21,7 @@ export class LandingService {
     return this.http.get<{ data: Hero[] }>(`${this.apiUrl}/heroes`);
    }
 
+
    getServices(): Observable<{ data: Services[]  }> {
     return this.http.get<{ data: Services[] }>(`${this.apiUrl}/services`);
    }

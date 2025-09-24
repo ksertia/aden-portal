@@ -17,6 +17,7 @@ import { LandingService } from '../../services/landing.service';
 })
 export class LandingComponent implements OnInit {
   translations: any = {};
+  
 
   // Données depuis Strapi
   nav?: Nav;
@@ -51,7 +52,6 @@ export class LandingComponent implements OnInit {
 
     this.loadContent();
   }
-
   private loadTranslations() {
     const currentLocale = this.i18nService.getCurrentLocale();
     this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
