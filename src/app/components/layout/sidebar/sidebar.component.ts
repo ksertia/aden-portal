@@ -5,6 +5,9 @@ import { AuthService } from '../../../services/auth.service';
 import { User, UserRole } from '../../../models/user.model';
 import { I18nService } from '../../../services/i18n.service';
 import { LanguageSwitcherComponent } from '../../shared/language-switcher/language-switcher.component';
+import { Sidebar } from '../../../models/landing.model';
+import { LandingService } from '../../../services/landing.service';
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -15,6 +18,9 @@ import { LanguageSwitcherComponent } from '../../shared/language-switcher/langua
 export class SidebarComponent implements OnInit {
   currentUser: User | null = null;
   translations: any = {};
+  //declaration des variables pour contenir les données de sidebar
+  sidebarItems:any;  // Tableau pour stocker les objets Sidebar
+  
 
   constructor(private authService: AuthService, private router: Router, private i18nService: I18nService) {}
 
@@ -28,6 +34,10 @@ export class SidebarComponent implements OnInit {
     this.i18nService.currentLocale$.subscribe(() => {
       this.loadTranslations();
     });
+
+  //
+  // Appel du service pour récupérer les données du sidebar
+    
   }
 
   private loadTranslations() {
@@ -84,4 +94,6 @@ export class SidebarComponent implements OnInit {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
+  //
 }
