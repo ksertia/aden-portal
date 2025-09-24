@@ -5,6 +5,7 @@ export enum StrapiRole {
   LAWYER = 'lawyer',
   CREDITOR = 'creditor',
   CEDANT = 'cedant',
+  PARTNER='partner',
   RECOVERY_PARTNER = 'recovery_partner'
 }
 
@@ -68,6 +69,8 @@ export const mapStrapiRoleToEnum = (role: Role): StrapiRole | null => {
       return StrapiRole.CREDITOR;
     case 'cedant':
       return StrapiRole.CEDANT;
+      case 'partner':
+      return StrapiRole.PARTNER;
     case 'recovery_partner':
       return StrapiRole.RECOVERY_PARTNER;
     default:

@@ -65,6 +65,8 @@ export class ProfileComponent implements OnInit {
         return 'Créancier';
       case StrapiRole.CEDANT:
         return 'Cédant';
+      case StrapiRole.PARTNER:
+        return 'Partenaire';
       case StrapiRole.RECOVERY_PARTNER:
         return 'Partenaire de recouvrement';
       default:

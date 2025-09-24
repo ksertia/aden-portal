@@ -2,14 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-<<<<<<< HEAD
+
 import { User, StrapiRole } from '../../../models/user.model';
 
-=======
-import { User, UserRole } from '../../../models/user.model';
 import { I18nService } from '../../../services/i18n.service';
 import { LanguageSwitcherComponent } from '../../shared/language-switcher/language-switcher.component';
->>>>>>> 46c5a20a0d9b9ac18ee54f50e69e413032e318be
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -19,14 +17,13 @@ import { LanguageSwitcherComponent } from '../../shared/language-switcher/langua
 })
 export class SidebarComponent implements OnInit {
   currentUser: User | null = null;
-<<<<<<< HEAD
 
-  constructor(private authService: AuthService, private router: Router) {}
-=======
+
+
   translations: any = {};
 
   constructor(private authService: AuthService, private router: Router, private i18nService: I18nService) {}
->>>>>>> 46c5a20a0d9b9ac18ee54f50e69e413032e318be
+
 
   ngOnInit() {
     // Subscribe to the currentUser$ observable to update the current user state
@@ -41,9 +38,8 @@ export class SidebarComponent implements OnInit {
     });
   }
 
-<<<<<<< HEAD
+
   // Getters to check the user's role
-=======
   private loadTranslations() {
     const locale = this.i18nService.getCurrentLocale();
     this.i18nService.loadTranslations(locale).subscribe(translations => {
@@ -55,7 +51,7 @@ export class SidebarComponent implements OnInit {
     return this.i18nService.translate(key, this.translations);
   }
 
->>>>>>> 46c5a20a0d9b9ac18ee54f50e69e413032e318be
+
   get isDebtorUser(): boolean {
     return this.authService.hasRole(StrapiRole.DEBTOR);
   }
@@ -95,6 +91,8 @@ export class SidebarComponent implements OnInit {
         return 'Créancier';
       case StrapiRole.CEDANT:
         return 'Cédant';
+      case StrapiRole.PARTNER:
+        return 'Partenaire';
       case StrapiRole.RECOVERY_PARTNER:
         return 'Partenaire de recouvrement';
       default:
