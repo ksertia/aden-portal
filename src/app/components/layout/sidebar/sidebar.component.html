@@ -240,8 +240,7 @@
         </a>
       </li>
 
-      <li >
-        <!-- *ngIf="isDebtorUser" -->
+      <li *ngIf="isDebtorUser">
         <a routerLink="/debtor/cases" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -251,8 +250,7 @@
         </a>
       </li>
 
-      <li >
-        <!-- *ngIf="isDebtorUser" -->
+      <li *ngIf="isDebtorUser">
         <a routerLink="/debtor/payments" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
@@ -262,8 +260,7 @@
         </a>
       </li>
 
-      <li >
-        <!-- *ngIf="isDebtorUser" -->
+      <li *ngIf="isDebtorUser">
         <a routerLink="/debtor/documents" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -274,8 +271,7 @@
       </li>
 
       <!-- Huissier -->
-      <li >
-        <!-- *ngIf="isBailiffUser" -->
+      <li *ngIf="isBailiffUser">
         <a routerLink="/bailiff/cases" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -285,8 +281,7 @@
         </a>
       </li>
 
-      <li >
-        <!-- *ngIf="isBailiffUser" -->
+      <li *ngIf="isBailiffUser">
         <a routerLink="/bailiff/actions" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 12l2 2 4-4"/>
@@ -297,8 +292,7 @@
       </li>
 
       <!-- Avocat -->
-      <li >
-        <!-- *ngIf="isLawyerUser" -->
+      <li *ngIf="isLawyerUser">
         <a routerLink="/lawyer/cases" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -308,8 +302,7 @@
         </a>
       </li>
 
-      <li >
-        <!-- *ngIf="isLawyerUser" -->
+      <li *ngIf="isLawyerUser">
         <a routerLink="/lawyer/consultations" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -318,8 +311,7 @@
         </a>
       </li>
 
-      <li >
-        <!-- *ngIf="isProfessionalUser" -->
+      <li *ngIf="isProfessionalUser">
         <a routerLink="/professional/reports" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 2v6l3-3 3 3-3 3v6"/>
@@ -330,8 +322,7 @@
         </a>
       </li>
 
-      <li >
-        <!-- *ngIf="isCreditorUser" -->
+      <li *ngIf="isCreditorUser">
         <a routerLink="/creditor/cases" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -341,8 +332,7 @@
         </a>
       </li>
 
-      <li >
-        <!-- *ngIf="isCreditorUser" -->
+      <li *ngIf="isCreditorUser">
         <a routerLink="/creditor/tracking" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 12l2 2 4-4"/>
@@ -352,8 +342,7 @@
         </a>
       </li>
 
-      <li >
-        <!-- *ngIf="isCreditorUser" -->
+      <li *ngIf="isCreditorUser">
         <a routerLink="/creditor/notifications" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -363,8 +352,7 @@
         </a>
       </li>
 
-      <li >
-        <!-- *ngIf="isCedantUser" -->
+      <li *ngIf="isCedantUser">
         <a routerLink="/cedant/portfolios" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -374,8 +362,7 @@
         </a>
       </li>
 
-      <li >
-        <!-- *ngIf="isCedantUser" -->
+      <li *ngIf="isCedantUser">
         <a routerLink="/cedant/invoices" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -387,8 +374,7 @@
         </a>
       </li>
 
-      <li >
-        <!-- *ngIf="isCedantUser" -->
+      <li *ngIf="isCedantUser" >
         <a routerLink="/cedant/sales" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="1" x2="12" y2="23"/>
@@ -398,8 +384,7 @@
         </a>
       </li>
 
-      <li>
-         <!-- *ngIf="isProfessionalUser" -->
+      <li *ngIf="isProfessionalUser">
         <a routerLink="/professional/documents" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -425,7 +410,7 @@
   <div class="sidebar-footer">
     <div class="user-info" *ngIf="currentUser">
       <div class="user-avatar">
-        <!-- {{ currentUser.firstName.charAt(0) }}{{ currentUser.lastName.charAt(0) }} -->
+        {{ currentUser.firstName.charAt(0) }}{{ currentUser.lastName.charAt(0) }}
       </div>
       <div class="user-details">
         <div class="user-name">{{ currentUser.firstName }} {{ currentUser.lastName }}</div>

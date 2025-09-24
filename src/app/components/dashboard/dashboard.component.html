@@ -65,8 +65,7 @@
   <!-- Vue spécifique par rôle -->
   <div class="role-content fade-in-up">
     <!-- Vue Débiteur -->
-    <div  class="debtor-dashboard"> 
-      <!-- *ngIf="isDebtorUser" -->
+    <div *ngIf="isDebtorUser" class="debtor-dashboard"> 
       <div class="section-header">
         <h2>{{ t('dashboard.my_active_cases') }}</h2>
         <a routerLink="/debtor/cases" class="btn btn-primary">{{ t('dashboard.view_all_cases') }}</a>
@@ -123,8 +122,7 @@
     </div>
 
     <!-- Vue Huissier -->
-    <div  class="bailiff-dashboard">
-      <!-- *ngIf="isBailiffUser" -->
+    <div  *ngIf="isBailiffUser" class="bailiff-dashboard">
       <div class="section-header">
         <h2>{{ t('dashboard.assigned_cases') }}</h2>
         <a routerLink="/bailiff/cases" class="btn btn-primary">{{ t('dashboard.manage_cases') }}</a>
