@@ -139,5 +139,174 @@
   "common": {
     "digital_management": "Gestion digitale",
     "centralized_files": "Tous vos dossiers centralisés"
+  },
+
+  "payments": {
+    "title": "Historique des Paiements",
+    "subtitle": "Consultez l'historique de vos paiements et échéanciers",
+    "comingSoonTitle": "Fonctionnalité en cours de développement",
+    "comingSoonDescription": "La gestion des paiements et échéanciers sera bientôt disponible."
+  },
+
+  "sidebar": {
+    "logo": "RecouvrePro",
+    "dashboard": "Tableau de bord",
+    "myCases": "Mes Dossiers",
+    "payments": "Paiements",
+    "documents": "Mes Documents",
+    "bailiffCases": "Gestion Dossiers",
+    "legalActions": "Actions Légales",
+    "lawyerCases": "Dossiers Juridiques",
+    "consultations": "Consultations",
+    "reports": "Rapports",
+    "myCredits": "Mes Créances",
+    "realTimeTracking": "Suivi Temps Réel",
+    "notifications": "Notifications",
+    "portfolios": "Mes Portefeuilles",
+    "invoices": "Suivi des Factures",
+    "salesProcess": "Processus de Vente",
+    "documentsProfessional": "Documents",
+    "profile": "Profil",
+    "logout": "Déconnexion"
+  },
+  "roles": {
+    "DEBTOR": "Débiteur",
+    "BAILIFF": "Huissier",
+    "LAWYER": "Avocat",
+    "CREDITOR": "Créancier",
+    "CEDANT": "Cédant",
+    "RECOVERY_PARTNER": "Partenaire",
+    "PROFESSIONAL": "Professionnel"
+  },
+
+  "profile": {
+    "title": "Profil Utilisateur",
+    "subtitle": "Gérez vos informations Personnelles",
+    "personal_info": "Informations Personnelles",
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "email": "Adresse e-mail",
+    "phone": "Téléphone",
+    "professional_info": "Informations Professionnelles",
+    "company_name": "Nom de l'entreprise",
+    "license_number": "Numéro de Licence",
+    "address": "Adresse",
+    "street": "Rue",
+    "city": "Ville",
+    "postal_code": "Code Postal",
+    "country": "Pays",
+    "update": "Mettre à jour",
+    "updating": "Mise à jour...",
+    "success": "Profil mis à jour avec succès",
+    "roles": {
+      "debtor": "débiteur",
+      "bailiff": "huissier de justice",
+      "lawyer": "avocat"
+    }
+  },
+
+  "dashboard": {
+    "title": "Tableau de Bord,",
+    "welcome": "Bienvenue",
+    "total_cases": "Dossiers Totaux",
+    "active_cases": "Dossiers Actifs",
+    "pending_cases": "En Attente",
+    "total_amount": "Montant Total",
+    "my_active_cases": "Mes Dossiers en cours, pour le debiteur",
+    "view_all_cases": "voir tous les Dossiers",
+    "amount_due": "Montant Dû",
+    "paid": "Payé",
+    "quick_actions": "Actions Rapides",
+    "make_payment": "Effectuer un Paiement",
+    "propose_schedule": "Proposer échéancier",
+    "my_documents": "Mes Documents",
+    "assigned_cases": "Dossiers Assignés",
+    "manage_cases": "Gérer les Dossiers",
+    "debtor": "Débiteur",
+    "amount": "Montant",
+    "new_legal_action": "Nouvelle Action Légale",
+    "generate_report": "Générer un Rapport",
+    "manage_documents": "Gestion Documents"
+  },
+
+  "cases": {
+    "title": "Me Dossiers",
+    "subtitle": "Consultez et gérez vos dossiers de recouvrement",
+    "stats": {
+      "active": "Dossiers actifs",
+      "totalDue": "Montant total dû",
+      "paid": "Montant payé"
+    },
+    "debt": {
+      "title": "Détail de la créance",
+      "principal": "Montant principal",
+      "interests": "Intérêts",
+      "penalties": "Pénalités",
+      "fees": "Frais",
+      "totalDue": "Total dû",
+      "alreadyPaid": "Déjà payé",
+      "remaining": "Reste à payer"
+    },
+    "interestsDetail": "Détail des intérêts",
+    "penaltiesDetail": "Détail des pénalités",
+    "paymentProgress": "Progression du paiement",
+    "reminderHistory": "Historique des relances",
+    "actions": {
+      "makePayment": "Effectuer un paiement",
+      "paymentPlan": "Proposer échéancier",
+      "dispute": "Contester",
+      "details": "Voir détails"
+    },
+    "noCases": {
+      "title": "Aucun dossier trouvé",
+      "description": "Vous n'avez actuellement aucun dossier de recouvrement."
+    },
+    "paymentModal": {
+      "title": "Effectuer un paiement",
+      "case": "Dossier",
+      "totalDue": "Montant total dû",
+      "alreadyPaid": "Déjà payé",
+      "remaining": "Reste à payer",
+      "paymentAmount": "Montant du paiement",
+      "placeholder": "Montant en euros",
+      "quickAmounts": {
+        "full": "Solde complet",
+        "half": "50% du solde"
+      },
+      "cancel": "Annuler",
+      "confirm": "Confirmer le paiement",
+      "processing": "Traitement..."
+    },
+    "paymentPlanModal": {
+      "title": "Proposer un échéancier de paiement",
+      "caseInfo": "Informations du dossier",
+      "case": "Dossier",
+      "remainingAmount": "Montant restant",
+      "proposal": "Proposition d'échéancier",
+      "monthlyAmount": "Montant mensuel proposé",
+      "duration": "Durée (mois)",
+      "startDate": "Date de début",
+      "justification": "Justification de la demande",
+      "justificationPlaceholder": "Expliquez votre situation et les raisons de cette demande d'échéancier...",
+      "preview": "Aperçu de l'échéancier",
+      "previewMonthly": "Montant mensuel",
+      "previewDuration": "Durée",
+      "previewTotal": "Total à payer",
+      "cancel": "Annuler",
+      "submit": "Soumettre la proposition"
+    },
+    "disputeModal": {
+      "title": "Contester le dossier",
+      "caseInfo": "Informations du dossier"
+    }
   }
+
+
+
+
+
+
+
+
 }
+

@@ -1,7 +1,8 @@
 <div class="payments-container">
   <div class="payments-header fade-in-up">
-    <h1>Historique des Paiements</h1>
-    <p>Consultez l'historique de vos paiements et échéanciers</p>
+    <!-- <app-language-switcher></app-language-switcher> -->
+    <h1>{{ t('payments.title') }}</h1>
+    <p>{{ t('payments.subtitle') }}</p>
   </div>
 
   <div class="payments-content fade-in-up">
@@ -10,8 +11,9 @@
         <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
         <line x1="1" y1="10" x2="23" y2="10"/>
       </svg>
-      <h3>Fonctionnalité en cours de développement</h3>
-      <p>La gestion des paiements et échéanciers sera bientôt disponible.</p>
+      <h3>{{ t('payments.comingSoonTitle') }}</h3>
+      <p>{{ t('payments.comingSoonDescription') }}</p>
     </div>
   </div>
 </div>
+

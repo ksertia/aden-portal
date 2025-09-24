@@ -1,7 +1,8 @@
 <div class="cases-container">
   <div class="cases-header fade-in-up">
-    <h1>Mes Dossiers</h1>
-    <p>Consultez et gérez vos dossiers de recouvrement</p>
+    <h1>{{ t('cases.title') }}</h1>
+    <!-- <p>Consultez et gérez vos dossiers de recouvrement</p> -->
+    <p>{{ t('cases.subtitle') }}</p>
   </div>
 
   <div class="cases-content fade-in-up">
@@ -17,7 +18,7 @@
           </div>
           <div class="stat-content">
             <div class="stat-value">{{ userCases.length }}</div>
-            <div class="stat-label">Dossiers actifs</div>
+            <div class="stat-label">{{ t('cases.stats.active') }}</div>
           </div>
         </div>
         
@@ -30,7 +31,7 @@
           </div>
           <div class="stat-content">
             <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div>
-            <div class="stat-label">Montant total dû</div>
+            <div class="stat-label">{{ t('cases.stats.totalDue') }}</div>
           </div>
         </div>
         
@@ -43,7 +44,7 @@
           </div>
           <div class="stat-content">
             <div class="stat-value">{{ formatCurrency(getTotalPaid()) }}</div>
-            <div class="stat-label">Montant payé</div>
+            <div class="stat-label">{{ t('cases.stats.paid') }}</div>
           </div>
         </div>
       </div>
@@ -66,34 +67,34 @@
           <div class="case-body">
             <!-- Détail de la dette -->
             <div class="debt-breakdown">
-              <h4>Détail de la créance</h4>
+              <h4>{{ t('cases.debt.title') }}</h4>
               <div class="breakdown-grid">
                 <div class="breakdown-item">
-                  <span class="label">Montant principal</span>
+                  <span class="label">{{ t('cases.debt.principal') }}</span>
                   <span class="value">{{ formatCurrency(case.debtBreakdown.principalAmount) }}</span>
                 </div>
                 <div class="breakdown-item">
-                  <span class="label">Intérêts</span>
+                  <span class="label">{{ t('cases.debt.interests') }}</span>
                   <span class="value">{{ formatCurrency(case.debtBreakdown.totalInterests) }}</span>
                 </div>
                 <div class="breakdown-item">
-                  <span class="label">Pénalités</span>
+                  <span class="label">{{ t('cases.debt.penalties') }}</span>
                   <span class="value">{{ formatCurrency(case.debtBreakdown.totalPenalties) }}</span>
                 </div>
                 <div class="breakdown-item">
-                  <span class="label">Frais</span>
+                  <span class="label">{{ t('cases.debt.fees') }}</span>
                   <span class="value">{{ formatCurrency(case.debtBreakdown.totalFees) }}</span>
                 </div>
                 <div class="breakdown-item total">
-                  <span class="label">Total dû</span>
+                  <span class="label">{{ t('cases.debt.totalDue') }}</span>
                   <span class="value">{{ formatCurrency(case.amount) }}</span>
                 </div>
                 <div class="breakdown-item paid">
-                  <span class="label">Déjà payé</span>
+                  <span class="label">{{ t('cases.debt.alreadyPaid') }}</span>
                   <span class="value">{{ formatCurrency(case.amountPaid) }}</span>
                 </div>
                 <div class="breakdown-item remaining">
-                  <span class="label">Reste à payer</span>
+                  <span class="label">{{ t('cases.debt.remaining') }}</span>
                   <span class="value">{{ formatCurrency(case.amount - case.amountPaid) }}</span>
                 </div>
               </div>
@@ -101,7 +102,7 @@
 
             <!-- Détail des intérêts -->
             <div class="interests-detail" *ngIf="case.debtBreakdown.interests.length > 0">
-              <h5>Détail des intérêts</h5>
+              <h5>{{ t('cases.interestsDetail') }}</h5>
               <div class="interests-list">
                 <div class="interest-item" *ngFor="let interest of case.debtBreakdown.interests">
                   <div class="interest-info">
@@ -115,7 +116,7 @@
 
             <!-- Détail des pénalités -->
             <div class="penalties-detail" *ngIf="case.debtBreakdown.penalties.length > 0">
-              <h5>Détail des pénalités</h5>
+              <h5>{{ t('cases.penaltiesDetail') }}</h5>
               <div class="penalties-list">
                 <div class="penalty-item" *ngFor="let penalty of case.debtBreakdown.penalties">
                   <div class="penalty-info">
@@ -130,7 +131,7 @@
             <!-- Barre de progression -->
             <div class="payment-progress">
               <div class="progress-info">
-                <span class="progress-label">Progression du paiement</span>
+                <span class="progress-label">{{ t('cases.paymentProgress') }}</span>
                 <span class="progress-percentage">{{ getPaymentPercentage(case) }}%</span>
               </div>
               <div class="progress-bar">
@@ -140,7 +141,7 @@
 
             <!-- Historique des relances -->
             <div class="reminder-history" *ngIf="getReminderHistory(case).length > 0">
-              <h5>Historique des relances</h5>
+              <h5>{{ t('cases.reminderHistory') }}</h5>
               <div class="reminder-list">
                 <div class="reminder-item" *ngFor="let reminder of getReminderHistory(case)">
                   <div class="reminder-icon" [ngClass]="getReminderIconClass(reminder.type)">
@@ -164,13 +165,13 @@
                   <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
                   <line x1="1" y1="10" x2="23" y2="10"/>
                 </svg>
-                Effectuer un paiement
+                {{ t('cases.actions.makePayment') }}
               </button>
               <button class="btn btn-secondary" (click)="proposePaymentPlan(case)" *ngIf="case.amount > case.amountPaid">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
                 </svg>
-                Proposer échéancier
+                {{ t('cases.actions.paymentPlan') }}
               </button>
               <button class="btn btn-warning" (click)="fileDispute(case)" *ngIf="case.status !== 'completed'">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -178,14 +179,14 @@
                   <line x1="15" y1="9" x2="9" y2="15"/>
                   <line x1="9" y1="9" x2="15" y2="15"/>
                 </svg>
-                Contester
+                {{ t('cases.actions.dispute') }}
               </button>
               <button class="btn btn-secondary" (click)="viewCaseDetails(case)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
-                Voir détails
+                {{ t('cases.actions.details') }}
               </button>
             </div>
           </div>
@@ -199,8 +200,8 @@
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14,2 14,8 20,8"/>
         </svg>
-        <h3>Aucun dossier trouvé</h3>
-        <p>Vous n'avez actuellement aucun dossier de recouvrement.</p>
+        <h3>{{ t('cases.noCases.title') }}</h3>
+        <p>{{ t('cases.noCases.description') }}</p>
       </div>
     </ng-template>
   </div>
@@ -209,7 +210,7 @@
   <div class="modal-overlay" *ngIf="showPaymentModal" (click)="closePaymentModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Effectuer un paiement</h3>
+        <h3>{{ t('cases.paymentModal.title') }}</h3>
         <button class="modal-close" (click)="closePaymentModal()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/>
@@ -219,18 +220,18 @@
       </div>
       <div class="modal-body" *ngIf="selectedCase">
         <div class="payment-summary">
-          <h4>Dossier {{ selectedCase.caseNumber }}</h4>
+          <h4>{{ t('cases.paymentModal.case') }} {{ selectedCase.caseNumber }}</h4>
           <div class="summary-grid">
             <div class="summary-item">
-              <span class="label">Montant total dû</span>
+              <span class="label">{{ t('cases.paymentModal.totalDue') }}</span>
               <span class="value">{{ formatCurrency(selectedCase.amount) }}</span>
             </div>
             <div class="summary-item">
-              <span class="label">Déjà payé</span>
+              <span class="label">{{ t('cases.paymentModal.alreadyPaid') }}</span>
               <span class="value">{{ formatCurrency(selectedCase.amountPaid) }}</span>
             </div>
             <div class="summary-item highlight">
-              <span class="label">Reste à payer</span>
+              <span class="label">{{ t('cases.paymentModal.remaining') }}</span>
               <span class="value">{{ formatCurrency(selectedCase.amount - selectedCase.amountPaid) }}</span>
             </div>
           </div>
@@ -238,14 +239,14 @@
         
         <div class="payment-form">
           <div class="form-group">
-            <label>Montant du paiement</label>
+            <label>{{ t('cases.paymentModal.paymentAmount') }}</label>
             <input
               type="number"
               [(ngModel)]="paymentAmount"
               [max]="selectedCase.amount - selectedCase.amountPaid"
               min="1"
               step="0.01"
-              placeholder="Montant en euros"
+              placeholder="{{ t('cases.paymentModal.placeholder') }}"
             >
           </div>
           
@@ -255,23 +256,23 @@
               class="quick-amount-btn"
               (click)="setPaymentAmount(selectedCase.amount - selectedCase.amountPaid)"
             >
-              Solde complet
+              {{ t('cases.paymentModal.quickAmounts.full') }}
             </button>
             <button
               type="button"
               class="quick-amount-btn"
               (click)="setPaymentAmount((selectedCase.amount - selectedCase.amountPaid) / 2)"
             >
-              50% du solde
+              {{ t('cases.paymentModal.quickAmounts.half') }}
             </button>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closePaymentModal()">Annuler</button>
+        <button class="btn btn-secondary" (click)="closePaymentModal()">{{ t('cases.paymentModal.cancel') }}</button>
         <button class="btn btn-primary" (click)="processPayment()" [disabled]="!paymentAmount || paymentAmount <= 0 || isProcessingPayment">
-          <span *ngIf="!isProcessingPayment">Confirmer le paiement</span>
-          <span *ngIf="isProcessingPayment">Traitement...</span>
+          <span *ngIf="!isProcessingPayment">{{ t('cases.paymentModal.confirm') }}</span>
+          <span *ngIf="isProcessingPayment">{{ t('cases.paymentModal.processing') }}</span>
         </button>
       </div>
     </div>
@@ -281,7 +282,7 @@
   <div class="modal-overlay" *ngIf="showPaymentPlanModal" (click)="closePaymentPlanModal()">
     <div class="modal-content large" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Proposer un échéancier de paiement</h3>
+        <h3>{{ t('cases.paymentPlanModal.title') }}</h3>
         <button class="modal-close" (click)="closePaymentPlanModal()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/>
@@ -292,24 +293,24 @@
       <div class="modal-body" *ngIf="selectedCase">
         <div class="payment-plan-form">
           <div class="form-section">
-            <h4>Informations du dossier</h4>
+            <h4>{{ t('cases.paymentPlanModal.caseInfo') }}</h4>
             <div class="case-summary">
               <div class="summary-item">
-                <span class="label">Dossier</span>
+                <span class="label">{{ t('cases.paymentPlanModal.case') }}</span>
                 <span class="value">{{ selectedCase.caseNumber }}</span>
               </div>
               <div class="summary-item">
-                <span class="label">Montant restant</span>
+                <span class="label">{{ t('cases.paymentPlanModal.remainingAmount') }}</span>
                 <span class="value">{{ formatCurrency(selectedCase.amount - selectedCase.amountPaid) }}</span>
               </div>
             </div>
           </div>
           
           <div class="form-section">
-            <h4>Proposition d'échéancier</h4>
+            <h4> {{ t('cases.paymentPlanModal.proposal') }}</h4>
             <div class="form-row">
               <div class="form-group">
-                <label>Montant mensuel proposé</label>
+                <label>{{ t('cases.paymentPlanModal.monthlyAmount') }}</label>
                 <input
                   type="number"
                   [(ngModel)]="paymentPlanProposal.monthlyAmount"
@@ -319,7 +320,7 @@
                 >
               </div>
               <div class="form-group">
-                <label>Durée (mois)</label>
+                <label>{{ t('cases.paymentPlanModal.duration') }}</label>
                 <input
                   type="number"
                   [(ngModel)]="paymentPlanProposal.duration"
@@ -331,7 +332,7 @@
             </div>
             
             <div class="form-group">
-              <label>Date de début</label>
+              <label>{{ t('cases.paymentPlanModal.startDate') }}</label>
               <input
                 type="date"
                 [(ngModel)]="paymentPlanProposal.startDate"
@@ -340,28 +341,28 @@
             </div>
             
             <div class="form-group">
-              <label>Justification de la demande</label>
+              <label>{{ t('cases.paymentPlanModal.justification') }}</label>
               <textarea
                 [(ngModel)]="paymentPlanProposal.notes"
                 rows="3"
-                placeholder="Expliquez votre situation et les raisons de cette demande d'échéancier..."
+                placeholder="{{ t('cases.paymentPlanModal.justificationPlaceholder') }}"
               ></textarea>
             </div>
           </div>
           
           <div class="payment-plan-preview" *ngIf="paymentPlanProposal.monthlyAmount && paymentPlanProposal.duration">
-            <h4>Aperçu de l'échéancier</h4>
+            <h4>Aperçu de l'échéancier {{ t('cases.paymentPlanModal.preview') }}</h4>
             <div class="preview-summary">
               <div class="preview-item">
-                <span class="label">Montant mensuel</span>
+                <span class="label"> {{ t('cases.paymentPlanModal.previewMonthly') }}</span>
                 <span class="value">{{ formatCurrency(paymentPlanProposal.monthlyAmount) }}</span>
               </div>
               <div class="preview-item">
-                <span class="label">Durée</span>
+                <span class="label"> {{ t('cases.paymentPlanModal.previewDuration') }}</span>
                 <span class="value">{{ paymentPlanProposal.duration }} mois</span>
               </div>
               <div class="preview-item">
-                <span class="label">Total à payer</span>
+                <span class="label">{{ t('cases.paymentPlanModal.previewTotal') }}</span>
                 <span class="value">{{ formatCurrency(paymentPlanProposal.monthlyAmount * paymentPlanProposal.duration) }}</span>
               </div>
             </div>
@@ -369,9 +370,9 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closePaymentPlanModal()">Annuler</button>
+        <button class="btn btn-secondary" (click)="closePaymentPlanModal()">{{ t('cases.paymentPlanModal.cancel') }}</button>
         <button class="btn btn-primary" (click)="submitPaymentPlan()" [disabled]="!isPaymentPlanValid()">
-          Soumettre la proposition
+       {{ t('cases.paymentPlanModal.submit') }}
         </button>
       </div>
     </div>
@@ -381,7 +382,7 @@
   <div class="modal-overlay" *ngIf="showDisputeModal" (click)="closeDisputeModal()">
     <div class="modal-content large" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Contester le dossier</h3>
+        <h3>{{ t('cases.disputeModal.title') }}</h3>
         <button class="modal-close" (click)="closeDisputeModal()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/>
@@ -392,7 +393,7 @@
       <div class="modal-body" *ngIf="selectedCase">
         <div class="dispute-form">
           <div class="form-section">
-            <h4>Informations du dossier</h4>
+            <h4>{{ t('cases.disputeModal.caseInfo') }}</h4>
             <div class="case-summary">
               <div class="summary-item">
                 <span class="label">Dossier</span>

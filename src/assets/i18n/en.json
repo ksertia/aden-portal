@@ -138,5 +138,171 @@
   "common": {
     "digital_management": "Digital management",
     "centralized_files": "All your files centralized"
+  },
+
+
+
+  "payments": {
+    "title": "Payment History",
+    "subtitle": "View the history of your payments and schedules",
+    "comingSoonTitle": "Feature under development",
+    "comingSoonDescription": "Payment and scheduling management will be available soon."
+  },
+  
+  "sidebar": {
+    "logo": "RecouvrePro",
+    "dashboard": "Dashboard",
+    "myCases": "My Cases",
+    "payments": "Payments",
+    "documents": "My Documents",
+    "bailiffCases": "Case Management",
+    "legalActions": "Legal Actions",
+    "lawyerCases": "Legal Cases",
+    "consultations": "Consultations",
+    "reports": "Reports",
+    "myCredits": "My Credits",
+    "realTimeTracking": "Real-Time Tracking",
+    "notifications": "Notifications",
+    "portfolios": "My Portfolios",
+    "invoices": "Invoice Tracking",
+    "salesProcess": "Sales Process",
+    "documentsProfessional": "Documents",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "roles": {
+    "DEBTOR": "Debtor",
+    "BAILIFF": "Bailiff",
+    "LAWYER": "Lawyer",
+    "CREDITOR": "Creditor",
+    "CEDANT": "Assignor",
+    "RECOVERY_PARTNER": "Partner",
+    "PROFESSIONAL": "Professional"
+  },
+
+  "profile": {
+    "title": "User Profile",
+    "subtitle": "Manage your Personal Information",
+    "personal_info": "Personal Information",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "email": "Email Address",
+    "phone": "Phone",
+    "professional_info": "Professional Information",
+    "company_name": "Company Name",
+    "license_number": "License Number",
+    "address": "Address",
+    "street": "Street",
+    "city": "City",
+    "postal_code": "Postal Code",
+    "country": "Country",
+    "update": "Update",
+    "updating": "Updating...",
+    "success": "Profile updated successfully",
+    "roles": {
+      "debtor": "Debtor",
+      "bailiff": "Bailiff",
+      "lawyer": "Lawyer"
+    }
+  },
+  
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome",
+    "total_cases": "Total Cases",
+    "active_cases": "Active Cases",
+    "pending_cases": "Pending",
+    "total_amount": "Total Amount",
+    "my_active_cases": "My Active Cases",
+    "view_all_cases": "view all cases",
+    "amount_due": "Amount Due",
+    "paid": "Paid",
+    "quick_actions": "Quick actions",
+    "make_payment": "Make payment",
+    "propose_schedule": "Propose Schedule",
+    "my_documents": "My Documents",
+    "assigned_cases": "Assigned Cases",
+    "manage_cases": "Manage Cases",
+    "debtor": "Debtor",
+    "amount": "Amount",
+    "new_legal_action": "New Legal Action",
+    "generate_report": "Generate Report",
+    "manage_documents": "Manage Documents"
+  },
+
+  "cases": {
+    "title": "My Cases",
+    "subtitle": "View and manage your recovery cases",
+    "stats": {
+      "active": "Active cases",
+      "totalDue": "Total amount due",
+      "paid": "Amount paid"
+    },
+    "debt": {
+      "title": "Debt details",
+      "principal": "Principal amount",
+      "interests": "Interests",
+      "penalties": "Penalties",
+      "fees": "Fees",
+      "totalDue": "Total due",
+      "alreadyPaid": "Already paid",
+      "remaining": "Remaining"
+    },
+    "interestsDetail": "Interest details",
+    "penaltiesDetail": "Penalty details",
+    "paymentProgress": "Payment progress",
+    "reminderHistory": "Reminder history",
+    "actions": {
+      "makePayment": "Make a payment",
+      "paymentPlan": "Propose payment plan",
+      "dispute": "Dispute",
+      "details": "View details"
+    },
+    "noCases": {
+      "title": "No cases found",
+      "description": "You currently have no recovery cases."
+    },
+    "paymentModal": {
+      "title": "Make a payment",
+      "case": "Case",
+      "totalDue": "Total amount due",
+      "alreadyPaid": "Already paid",
+      "remaining": "Remaining",
+      "paymentAmount": "Payment amount",
+      "placeholder": "Amount in euros",
+      "quickAmounts": {
+        "full": "Full balance",
+        "half": "50% of balance"
+      },
+      "cancel": "Cancel",
+      "confirm": "Confirm payment",
+      "processing": "Processing..."
+    },
+    "paymentPlanModal": {
+      "title": "Propose a payment plan",
+      "caseInfo": "Case information",
+      "case": "Case",
+      "remainingAmount": "Remaining amount",
+      "proposal": "Payment plan proposal",
+      "monthlyAmount": "Proposed monthly amount",
+      "duration": "Duration (months)",
+      "startDate": "Start date",
+      "justification": "Request justification",
+      "justificationPlaceholder": "Explain your situation and the reasons for this payment plan request...",
+      "preview": "Payment plan preview",
+      "previewMonthly": "Monthly amount",
+      "previewDuration": "Duration",
+      "previewTotal": "Total to pay",
+      "cancel": "Cancel",
+      "submit": "Submit proposal"
+    },
+    "disputeModal": {
+      "title": "Dispute case",
+      "caseInfo": "Case information"
+    }
   }
+
+
+
+
 }

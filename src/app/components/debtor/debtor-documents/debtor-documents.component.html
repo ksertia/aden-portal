@@ -45,7 +45,8 @@
     </div>
 
     <!-- Liste des documents -->
-    <div class="documents-list" *ngIf="filteredDocuments.length > 0; else noDocuments">
+    <div class="documents-list" >
+      <!-- *ngIf="filteredDocuments.length > 0; else noDocuments" -->
       <div class="documents-grid">
         <div class="document-card" *ngFor="let doc of filteredDocuments">
           <div class="document-header">
@@ -120,7 +121,8 @@
           </svg>
         </button>
       </div>
-      <div class="modal-body" *ngIf="selectedDocument">
+      <div class="modal-body"  *ngIf="selectedDocument">
+       
         <div class="document-preview">
           <div class="preview-placeholder">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">

@@ -2,7 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+
 import { User, StrapiRole } from '../../models/user.model';
+
+import { I18nService } from '../../services/i18n.service';
+import { LanguageSwitcherComponent } from '../shared/language-switcher/language-switcher.component';
 
 @Component({
   selector: 'app-profile',
@@ -16,7 +20,9 @@ export class ProfileComponent implements OnInit {
   isUpdating = false;
   updateSuccess = false;
 
-  constructor(private authService: AuthService) {}
+  translations: any = {};
+
+  constructor(private authService: AuthService,  private i18nService: I18nService) {}
 
   ngOnInit() {
     this.user = this.authService.getCurrentUser();
@@ -27,6 +33,20 @@ export class ProfileComponent implements OnInit {
         this.user.address = { ...this.user.address };
       }
     }
+
+    this.loadTranslations();
+    this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+
+  }
+
+  private loadTranslations() {
+    const currentLocale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+   t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
   }
 
   // Méthode pour obtenir le libellé du rôle de l'utilisateur
