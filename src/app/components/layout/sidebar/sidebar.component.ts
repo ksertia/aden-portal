@@ -6,12 +6,11 @@ import { AuthService } from '../../../services/auth.service';
 import { User, StrapiRole } from '../../../models/user.model';
 
 import { I18nService } from '../../../services/i18n.service';
-import { LanguageSwitcherComponent } from '../../shared/language-switcher/language-switcher.component';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, LanguageSwitcherComponent],
+  imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
@@ -76,6 +75,10 @@ export class SidebarComponent implements OnInit {
     return this.authService.hasRole(StrapiRole.CEDANT);
   }
 
+  get isAdminUser(): boolean {
+    return this.authService.hasRole(StrapiRole.ADMIN);
+  }
+
   // Method to get the label for the current user's role
   getUserRoleLabel(): string {
     if (!this.currentUser) return '';
@@ -95,6 +98,8 @@ export class SidebarComponent implements OnInit {
         return 'Partenaire';
       case StrapiRole.RECOVERY_PARTNER:
         return 'Partenaire de recouvrement';
+      case StrapiRole.ADMIN:
+        return 'Administrateur';
       default:
         return '';
     }
