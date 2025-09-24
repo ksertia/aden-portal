@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { User } from '../../models/user.model';
+
+import { User, StrapiRole } from '../../models/user.model';
+
 import { I18nService } from '../../services/i18n.service';
 import { LanguageSwitcherComponent } from '../shared/language-switcher/language-switcher.component';
-
 
 @Component({
   selector: 'app-profile',
@@ -48,21 +49,32 @@ export class ProfileComponent implements OnInit {
     return this.i18nService.translate(key, this.translations);
   }
 
+  // Méthode pour obtenir le libellé du rôle de l'utilisateur
   getUserRoleLabel(): string {
     if (!this.user) return '';
-    
-    switch (this.user.role) {
-      case 'debtor':
+
+    // Utilisation de l'énumération StrapiRole pour obtenir le libellé du rôle
+    switch (this.user.role.name) {  // Utilisez "name" pour comparer avec l'énumération
+      case StrapiRole.DEBTOR:
         return 'Débiteur';
-      case 'bailiff':
+      case StrapiRole.BAILIFF:
         return 'Huissier de Justice';
-      case 'lawyer':
+      case StrapiRole.LAWYER:
         return 'Avocat';
+      case StrapiRole.CREDITOR:
+        return 'Créancier';
+      case StrapiRole.CEDANT:
+        return 'Cédant';
+      case StrapiRole.PARTNER:
+        return 'Partenaire';
+      case StrapiRole.RECOVERY_PARTNER:
+        return 'Partenaire de recouvrement';
       default:
-        return '';
+        return 'Rôle inconnu';
     }
   }
 
+  // Méthode pour mettre à jour le profil de l'utilisateur
   updateProfile() {
     if (!this.user) return;
 
@@ -81,6 +93,7 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  // Méthode pour afficher un message de succès
   private showSuccessMessage() {
     this.updateSuccess = true;
     setTimeout(() => {

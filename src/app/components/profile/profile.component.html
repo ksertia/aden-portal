@@ -8,10 +8,10 @@
         <div class="profile-card">
           <div class="profile-avatar">
             <div class="avatar-circle">
-              {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
+              {{ user.firstname.charAt(0) }}{{ user.lastname.charAt(0) }}
             </div>
             <div class="avatar-info">
-              <h2>{{ user.firstName }} {{ user.lastName }}</h2>
+              <h2>{{ user.firstname }} {{ user.lastname }}</h2>
               <p class="role">{{ getUserRoleLabel() }}</p>
             </div>
           </div>
@@ -25,7 +25,7 @@
                   <input
                     type="text"
                     id="firstName"
-                    [(ngModel)]="user.firstName"
+                    [(ngModel)]="user.firstname"
                     name="firstName"
                     required
                   >
@@ -35,7 +35,7 @@
                   <input
                     type="text"
                     id="lastName"
-                    [(ngModel)]="user.lastName"
+                    [(ngModel)]="user.lastname"
                     name="lastName"
                     required
                   >
@@ -170,7 +170,7 @@
           <!-- {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }} -->
         </div>
         <div class="avatar-info">
-          <h2>{{ user.firstName }} {{ user.lastName }}</h2>
+          <h2>{{ user.firstname }} {{ user.lastname }}</h2>
           <p class="role">{{ getUserRoleLabel() }}</p>
         </div>
       </div>
@@ -181,11 +181,11 @@
           <div class="form-row">
             <div class="form-group">
               <label for="firstName">{{ t('profile.first_name') }}</label>
-              <input type="text" id="firstName" [(ngModel)]="user.firstName" name="firstName" required>
+              <input type="text" id="firstName" [(ngModel)]="user.firstname" name="firstName" required>
             </div>
             <div class="form-group">
               <label for="lastName">{{ t('profile.last_name') }}</label>
-              <input type="text" id="lastName" [(ngModel)]="user.lastName" name="lastName" required>
+              <input type="text" id="lastName" [(ngModel)]="user.lastname" name="lastName" required>
             </div>
           </div>
 

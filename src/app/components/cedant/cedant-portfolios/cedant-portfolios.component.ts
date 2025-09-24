@@ -140,7 +140,7 @@ export class CedantPortfoliosComponent implements OnInit {
       name: this.newDocument.name,
       type: this.newDocument.type as PortfolioDocumentType,
       url: '#',
-      uploadedBy: `${currentUser.firstName} ${currentUser.lastName}`
+      uploadedBy: `${currentUser.firstname} ${currentUser.lastname}`
     };
 
     this.cedantService.uploadPortfolioDocument(this.selectedPortfolio.id, documentData).subscribe({

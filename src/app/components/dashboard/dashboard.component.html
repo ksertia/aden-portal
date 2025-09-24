@@ -2,7 +2,11 @@
   <div class="dashboard-header fade-in-up">
     <h1>{{ t('dashboard.title') }}</h1>
     <p *ngIf="currentUser">
-      {{ t('dashboard.welcome') }}, {{ currentUser.firstName }} {{ currentUser.lastName }}
+
+      Bienvenue, {{ currentUser.firstname }} {{ currentUser.lastname }}
+
+      {{ t('dashboard.welcome') }}, {{ currentUser.firstname }} {{ currentUser.lastname }}
+
     </p>
   </div>
 
