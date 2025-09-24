@@ -1,24 +1,5 @@
-export interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: UserRole;
-  avatar?: string;
-  phone?: string;
-  companyName?: string;
-  licenseNumber?: string;
-  address?: Address;
-}
-
-export interface Address {
-  street: string;
-  city: string;
-  postalCode: string;
-  country: string;
-}
-
-export enum UserRole {
+// L'énumération StrapiRole reste la même, en tant qu'énumération.
+export enum StrapiRole {
   DEBTOR = 'debtor',
   BAILIFF = 'bailiff',
   LAWYER = 'lawyer',
@@ -27,12 +8,69 @@ export enum UserRole {
   RECOVERY_PARTNER = 'recovery_partner'
 }
 
+// Interface pour les informations liées au rôle
+export interface Role {
+  id: number;
+  documentId: string;
+  name: string;
+  description: string;
+  type: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+// Interface pour l'adresse de l'utilisateur
+export interface Address {
+  street: string;
+  city: string;
+  postalCode: string;
+  country: string;
+}
+
+// Interface pour l'utilisateur
+export interface User {
+  id: string;
+  email: string;
+  firstname: string;
+  lastname: string;
+  username: string;
+  role: Role;  // Le rôle est un objet qui contient toutes les informations du rôle
+  avatar?: string;
+  phone?: string;
+  companyName?: string;
+  licenseNumber?: string;
+  address?: Address;
+}
+
+// Interface pour la demande de connexion
 export interface LoginRequest {
   email: string;
   password: string;
 }
 
+// Interface pour la réponse de connexion, contenant l'utilisateur et le token JWT
 export interface LoginResponse {
   user: User;
   token: string;
 }
+
+// Fonction pour mapper un rôle de Strapi en une valeur de l'énumération StrapiRole
+export const mapStrapiRoleToEnum = (role: Role): StrapiRole | null => {
+  switch (role.name) {
+    case 'debtor':
+      return StrapiRole.DEBTOR;
+    case 'bailiff':
+      return StrapiRole.BAILIFF;
+    case 'lawyer':
+      return StrapiRole.LAWYER;
+    case 'creditor':
+      return StrapiRole.CREDITOR;
+    case 'cedant':
+      return StrapiRole.CEDANT;
+    case 'recovery_partner':
+      return StrapiRole.RECOVERY_PARTNER;
+    default:
+      return null;  // Si le rôle ne correspond à aucun, retournez null ou gérez autrement
+  }
+};

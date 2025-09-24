@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CaseService } from '../../services/case.service';
-import { User, UserRole } from '../../models/user.model';
+import { User, StrapiRole } from '../../models/user.model';
 import { DebtCase } from '../../models/case.model';
 
 @Component({
@@ -28,31 +28,33 @@ export class DashboardComponent implements OnInit {
     this.loadDashboardData();
   }
 
+  // Getters pour vérifier les rôles de l'utilisateur
   get isDebtorUser(): boolean {
-    return this.authService.hasRole(UserRole.DEBTOR);
+    return this.authService.hasRole(StrapiRole.DEBTOR);
   }
 
   get isBailiffUser(): boolean {
-    return this.authService.hasRole(UserRole.BAILIFF);
+    return this.authService.hasRole(StrapiRole.BAILIFF);
   }
 
   get isLawyerUser(): boolean {
-    return this.authService.hasRole(UserRole.LAWYER);
+    return this.authService.hasRole(StrapiRole.LAWYER);
   }
 
   get isCreditorUser(): boolean {
-    return this.authService.hasRole(UserRole.CREDITOR);
+    return this.authService.hasRole(StrapiRole.CREDITOR);
   }
 
   get isCedantUser(): boolean {
-    return this.authService.hasRole(UserRole.CEDANT);
+    return this.authService.hasRole(StrapiRole.CEDANT);
   }
 
+  // Charger les données du tableau de bord
   loadDashboardData() {
     if (!this.currentUser) return;
 
-    // Charger les dossiers de l'utilisateur
-    this.caseService.getCasesByUserId(this.currentUser.id, this.currentUser.role)
+    // Charger les dossiers de l'utilisateur en fonction de son rôle
+    this.caseService.getCasesByUserId(this.currentUser.id, this.currentUser.role.name) // Utiliser le nom du rôle pour filtrer
       .subscribe(cases => {
         this.userCases = cases;
       });
@@ -64,6 +66,7 @@ export class DashboardComponent implements OnInit {
       });
   }
 
+  // Formatage du montant en devise
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
@@ -71,6 +74,7 @@ export class DashboardComponent implements OnInit {
     }).format(amount);
   }
 
+  // Récupérer l'étiquette pour un statut
   getStatusLabel(status: string): string {
     const labels: { [key: string]: string } = {
       'pending': 'En attente',
@@ -84,6 +88,7 @@ export class DashboardComponent implements OnInit {
     return labels[status] || status;
   }
 
+  // Récupérer la prochaine date d'échéance
   getNextDueDate(): string {
     if (this.userCases.length === 0) return 'Aucune';
     

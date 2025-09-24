@@ -53,7 +53,7 @@ export class DebtorCasesComponent implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.caseService.getCasesByUserId(currentUser.id, currentUser.role)
+    this.caseService.getCasesByUserId(currentUser.id, currentUser.role.name)
       .subscribe(cases => {
         this.userCases = cases;
       });
@@ -312,7 +312,7 @@ export class DebtorCasesComponent implements OnInit {
       content: `Contestation déposée - Motif: ${this.disputeForm.reason} - Description: ${this.disputeForm.description}`,
       type: 'legal' as const,
       createdBy: currentUser.id,
-      createdByName: `${currentUser.firstName} ${currentUser.lastName}`,
+      createdByName: `${currentUser.firstname} ${currentUser.lastname}`,
       isPrivate: false
     };
 

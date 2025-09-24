@@ -190,8 +190,9 @@ export interface Address {
 }
 
 export interface CedantPortfolio {
-  id: string;
   cedantId: string;
+  id: string;
+  // cedantId: number;
   name: string;
   description: string;
   totalAmount: number;

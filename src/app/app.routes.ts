@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { AuthGuard, RoleGuard } from './guards/auth.guard';
-import { UserRole } from './models/user.model';
+import { StrapiRole } from './models/user.model';
+
 
 export const routes: Routes = [
   {
@@ -37,7 +38,8 @@ export const routes: Routes = [
       {
         path: 'debtor',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [UserRole.DEBTOR] },
+        data: { roles: [StrapiRole.DEBTOR] },
+        
         children: [
           {
             path: 'cases',
@@ -57,7 +59,7 @@ export const routes: Routes = [
       {
         path: 'bailiff',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [UserRole.BAILIFF] },
+        data: { roles: [StrapiRole.BAILIFF] },
         children: [
           {
             path: 'cases',
@@ -73,7 +75,7 @@ export const routes: Routes = [
       {
         path: 'lawyer',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [UserRole.LAWYER] },
+        data: { roles: [StrapiRole.LAWYER] },
         children: [
           {
             path: 'cases',
@@ -89,7 +91,7 @@ export const routes: Routes = [
       {
         path: 'creditor',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [UserRole.CREDITOR] },
+        data: { roles: [StrapiRole.CREDITOR] },
         children: [
           {
             path: 'cases',
@@ -109,7 +111,7 @@ export const routes: Routes = [
       {
         path: 'partner',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [UserRole.RECOVERY_PARTNER] },
+        data: { roles: [StrapiRole.RECOVERY_PARTNER] },
         children: [
           {
             path: 'cases',
@@ -125,7 +127,7 @@ export const routes: Routes = [
       {
         path: 'cedant',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [UserRole.CEDANT] },
+        data: { roles: [StrapiRole.CEDANT] },
         children: [
           {
             path: 'portfolios',
@@ -149,7 +151,7 @@ export const routes: Routes = [
       {
         path: 'professional',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [UserRole.BAILIFF, UserRole.LAWYER, UserRole.CREDITOR, UserRole.CEDANT, UserRole.RECOVERY_PARTNER] },
+        data: { roles: [StrapiRole.BAILIFF, StrapiRole.LAWYER, StrapiRole.CREDITOR, StrapiRole.CEDANT, StrapiRole.RECOVERY_PARTNER] },
         children: [
           {
             path: 'reports',

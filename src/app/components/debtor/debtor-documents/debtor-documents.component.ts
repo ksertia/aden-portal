@@ -33,17 +33,20 @@ export class DebtorDocumentsComponent implements OnInit {
     this.loadData();
   }
 
+  // Charger les données initiales
   loadData() {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.caseService.getCasesByUserId(currentUser.id, currentUser.role)
+    // Utilisation du rôle utilisateur pour récupérer les dossiers
+    this.caseService.getCasesByUserId(currentUser.id, currentUser.role.name)  // Utilisation de currentUser.role.name
       .subscribe(cases => {
         this.cases = cases;
         this.extractDocuments();
       });
   }
 
+  // Extraire tous les documents des dossiers
   extractDocuments() {
     this.allDocuments = [];
     this.cases.forEach(case_ => {
@@ -54,6 +57,7 @@ export class DebtorDocumentsComponent implements OnInit {
     this.filteredDocuments = [...this.allDocuments];
   }
 
+  // Filtrer les documents en fonction de la recherche et des filtres
   filterDocuments() {
     this.filteredDocuments = this.allDocuments.filter(doc => {
       const matchesSearch = !this.searchTerm || 
@@ -67,11 +71,13 @@ export class DebtorDocumentsComponent implements OnInit {
     });
   }
 
+  // Récupérer le numéro de dossier
   getCaseNumber(caseId: string): string {
     const case_ = this.cases.find(c => c.id === caseId);
     return case_?.caseNumber || 'N/A';
   }
 
+  // Récupérer l'étiquette pour un type de document
   getDocumentTypeLabel(type: string): string {
     const labels: { [key: string]: string } = {
       'invoice': 'Facture',
@@ -84,6 +90,7 @@ export class DebtorDocumentsComponent implements OnInit {
     return labels[type] || type;
   }
 
+  // Formater la date pour l'affichage
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('fr-FR', {
       year: 'numeric',
@@ -92,17 +99,19 @@ export class DebtorDocumentsComponent implements OnInit {
     });
   }
 
+  // Afficher le document dans un modal
   viewDocument(doc: CaseDocument) {
     this.selectedDocument = doc;
     this.showViewModal = true;
   }
 
+  // Simuler le téléchargement du document
   downloadDocument(doc: CaseDocument) {
-    // Simulation du téléchargement
     console.log('Téléchargement du document:', doc.name);
     // TODO: Implémenter le téléchargement réel
   }
 
+  // Fermer le modal de visualisation
   closeViewModal() {
     this.showViewModal = false;
     this.selectedDocument = null;

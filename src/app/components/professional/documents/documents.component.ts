@@ -45,7 +45,7 @@ export class DocumentsComponent implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.caseService.getCasesByUserId(currentUser.id, currentUser.role)
+    this.caseService.getCasesByUserId(currentUser.id, currentUser.role.name)
       .subscribe(cases => {
         this.cases = cases;
         this.extractDocuments();
@@ -137,7 +137,7 @@ export class DocumentsComponent implements OnInit {
       type: this.newDocument.type as DocumentType,
       url: '#',
       uploadedAt: new Date(),
-      uploadedBy: `${currentUser.firstName} ${currentUser.lastName}`,
+      uploadedBy: `${currentUser.firstname} ${currentUser.lastname}`,
       caseId: this.newDocument.caseId
     };
 
