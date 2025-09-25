@@ -274,7 +274,62 @@
 
     <div>
       <h1>LISTE DES UTILISATEURS</h1>
-      
+
+      <div class="tbl-caption">
+          <div class="header-controls">
+            
+            <!-- Barre de recherche -->
+            <div class="search-container">
+              <input type="text" class="search-input" placeholder="Rechercher...">
+              <span class="search-icon">🔍</span>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="action-buttons-header">
+              <button class="btn btn-primary btn-sm">Ajouter un utilisateur</button>
+            </div>
+          </div>
+      </div>
+
+
+      <table id="empoloyees-tblwrapper" class="table">
+            <thead>
+              <tr>
+                <th>UTILISATEURS ID</th>
+                <th>Nom & Prénom</th>
+                <th>Username</th>
+                <th>Addresse Email</th>
+                <th>Numéro</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <tr>
+                <td><span>1001</span></td>
+                <td>
+                  <div class="products">
+                    <img src="images/contacts/pic2.jpg" class="avatar avatar-md" alt="">
+                    <div>
+                      <h6>Liam Antony</h6>
+                      <span>Web Designer</span>
+                    </div>
+                  </div>
+                </td>
+                <td><span>Computer Science</span></td>
+                <td><span class="text-primary">abc@gmail.com</span></td>
+                <td><span>+91 123 456 7890</span></td>
+                <td><span class="badge badge-success light border-0">Active</span></td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-edit btn-sm">Modifier</button>
+                    <button class="btn btn-delete btn-sm">Supprimer</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+      </table>
+
     </div>
     
      
