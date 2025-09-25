@@ -72,7 +72,7 @@ export class DashboardComponent implements OnInit {
   }
 
   get isAdminUser(): boolean {
-    return this.authService.hasRole(StrapiRole.ADMIN);
+    return this.authService.hasRole(StrapiRole.ADMINISTRATEUR);
   }
 
   // Charger les données du tableau de bord

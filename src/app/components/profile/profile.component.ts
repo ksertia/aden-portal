@@ -69,7 +69,7 @@ export class ProfileComponent implements OnInit {
         return 'Partenaire';
       case StrapiRole.RECOVERY_PARTNER:
         return 'Partenaire de recouvrement';
-      case StrapiRole.ADMIN:
+      case StrapiRole.ADMINISTRATEUR:
         return 'Administrateur';
       default:
         return 'Rôle inconnu';

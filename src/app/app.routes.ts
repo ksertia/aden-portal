@@ -34,6 +34,7 @@ export const routes: Routes = [
         path: 'profile',
         loadComponent: () => import('./components/profile/profile.component').then(c => c.ProfileComponent)
       },
+
       // Routes spécifiques au débiteur
       {
         path: 'debtor',
@@ -55,6 +56,7 @@ export const routes: Routes = [
           }
         ]
       },
+
       // Routes spécifiques à l'huissier
       {
         path: 'bailiff',
@@ -71,6 +73,7 @@ export const routes: Routes = [
           }
         ]
       },
+
       // Routes spécifiques à l'avocat
       {
         path: 'lawyer',
@@ -87,6 +90,7 @@ export const routes: Routes = [
           }
         ]
       },
+
       // Routes spécifiques au créancier
       {
         path: 'creditor',
@@ -107,6 +111,7 @@ export const routes: Routes = [
           }
         ]
       },
+
       // Routes spécifiques aux partenaires de recouvrement
       {
         path: 'partner',
@@ -123,6 +128,7 @@ export const routes: Routes = [
           }
         ]
       },
+
       // Routes spécifiques au cédant
       {
         path: 'cedant',
@@ -147,6 +153,7 @@ export const routes: Routes = [
           }
         ]
       },
+
       // Routes communes aux professionnels (huissier et avocat)
       {
         path: 'professional',
@@ -163,19 +170,44 @@ export const routes: Routes = [
           }
         ]
       },
-      // Route pour les administrateurs
+
+      // Route spécifiques à l'administrateurs
       {
-        path: 'admin',
+        path: 'Administrateur',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [StrapiRole.ADMIN] },
+        data: { roles: [StrapiRole.ADMINISTRATEUR] },
         children: [
           { 
             path: 'user-list',
             loadComponent: () => import('./components/admin/user-list/user-list').then(c => c.UserList)
+          },
+          { 
+            path: 'creancier',
+            loadComponent: () => import('./components/admin/creancier/creancier').then(c => c.Creancier)
+          },
+          { 
+            path: 'debiteur',
+            loadComponent: () => import('./components/admin/debiteur/debiteur').then(c => c.Debiteur)
+          },
+          { 
+            path: 'huissier',
+            loadComponent: () => import('./components/admin/huissier/huissier').then(c => c.Huissier)
+          },
+          { 
+            path: 'avocat',
+            loadComponent: () => import('./components/admin/avocat/avocat').then(c => c.Avocat)
+          },
+          { 
+            path: 'cedant',
+            loadComponent: () => import('./components/admin/cedant/cedant').then(c => c.Cedant)
+          },
+          { 
+            path: 'partenaire',
+            loadComponent: () => import('./components/admin/partenaire/partenaire').then(c => c.Partenaire)
           }
+
         ]
       }
-      
     ]
   },
   {
