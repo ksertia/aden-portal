@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-cedant',
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './cedant.html',
   styleUrl: './cedant.css'
 })

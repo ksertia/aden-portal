@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-avocat',
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './avocat.html',
   styleUrl: './avocat.css'
 })

@@ -36,6 +36,9 @@
   align-items: center;
   gap: 16px;
   transition: all 0.2s ease;
+  text-decoration: none;   
+  color: inherit;         
+  cursor: pointer;
 }
 
 .stat-card:hover {
