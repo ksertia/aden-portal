@@ -9,7 +9,6 @@
       <span>{{ t('sidebar.logo') }}</span>
     </div>
     <!-- Sélecteur de langue -->
-    <!-- <app-language-switcher></app-language-switcher> -->
   </div>
 
   <nav class="sidebar-nav">
@@ -76,17 +75,7 @@
           <span>{{ t('sidebar.legalActions') }}</span>
         </a>
       </li>
-      <!-- Administrateur -->
-      <li *ngIf="isAdminUser">
-        <a routerLink="/administrateur/user-list" routerLinkActive="active" class="nav-item">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 12l2 2 4-4"/>
-            <circle cx="12" cy="12" r="9"/>
-          </svg>
-          <span>{{ t('sidebar.user-list') }}</span>
-           <!-- <app-user-list></app-user-list> -->
-        </a>
-      </li>
+
       <!-- Avocat -->
       <li *ngIf="isLawyerUser">
         <a routerLink="/lawyer/cases" routerLinkActive="active" class="nav-item">
@@ -107,6 +96,7 @@
         </a>
       </li>
 
+      <!-- Professinal -->
       <li *ngIf="isProfessionalUser">
         <a routerLink="/professional/reports" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -118,6 +108,7 @@
         </a>
       </li>
 
+      <!-- Creancier -->
       <li *ngIf="isCreditorUser">
         <a routerLink="/creditor/cases" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -148,6 +139,7 @@
         </a>
       </li>
 
+      <!-- Cedant -->
       <li *ngIf="isCedantUser">
         <a routerLink="/cedant/portfolios" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -190,6 +182,29 @@
         </a>
       </li>
 
+      <!-- Pour l'Administrateur -->
+    <li *ngIf="isAdministrateurUser">
+      <!-- Bouton principal -->
+      <a (click)="toggleUserList()" class="nav-item cursor-pointer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        Liste des utilisateurs
+        <span [ngClass]="{ 'rotate-90': isUserListOpen }" style="margin-left:auto;">▶</span>
+      </a>
+      <!-- Sous-menu dépliable -->
+      <ul *ngIf="isUserListOpen" class="submenu">
+        <li><a routerLink="/Administrateur/creancier" routerLinkActive="active">Créanciers</a></li>
+        <li><a routerLink="/Administrateur/debiteur" routerLinkActive="active">Débiteurs</a></li>
+        <li><a routerLink="/Administrateur/huissier" routerLinkActive="active">Huissiers</a></li>
+        <li><a routerLink="/Administrateur/avocat" routerLinkActive="active">Avocats</a></li>
+        <li><a routerLink="/Administrateur/cedant" routerLinkActive="active">Cédants</a></li>
+        <li><a routerLink="/Administrateur/partenaire" routerLinkActive="active">Partenaires</a></li>
+      </ul>
+    </li>
+
+    <!-- Profile -->
       <li>
         <a routerLink="/profile" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -203,6 +218,7 @@
     </ul>
   </nav>
 
+  <!-- Footer -->
   <div class="sidebar-footer">
     <div class="user-info" *ngIf="currentUser">
       <div class="user-avatar">
@@ -211,7 +227,6 @@
       <div class="user-details">
         <div class="user-name">{{ currentUser.firstname }} {{ currentUser.lastname }}</div>
         <div class="user-role">{{ getUserRoleLabel() }}</div>
-        <!-- <div class="user-role">{{ t('roles.' + currentUser.role) }}</div> -->
       </div>
 
     </div>

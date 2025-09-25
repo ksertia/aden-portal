@@ -72,10 +72,10 @@ export const mapStrapiRoleToEnum = (role: Role): StrapiRole | null => {
       return StrapiRole.CEDANT;
     case 'partner':
       return StrapiRole.PARTNER;
+    case 'Administrateur':
+      return StrapiRole.ADMINISTRATEUR;
     case 'recovery_partner':
       return StrapiRole.RECOVERY_PARTNER;
-    case 'admin':
-      return StrapiRole.ADMINISTRATEUR;
     default:
       return null;  // Si le rôle ne correspond à aucun, retournez null ou gérez autrement
   }
