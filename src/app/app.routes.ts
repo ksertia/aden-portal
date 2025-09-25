@@ -162,7 +162,20 @@ export const routes: Routes = [
             loadComponent: () => import('./components/professional/documents/documents.component').then(c => c.DocumentsComponent)
           }
         ]
+      },
+      // Route pour les administrateurs
+      {
+        path: 'admin',
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [StrapiRole.ADMIN] },
+        children: [
+          { 
+            path: 'user-list',
+            loadComponent: () => import('./components/admin/user-list/user-list').then(c => c.UserList)
+          }
+        ]
       }
+      
     ]
   },
   {
