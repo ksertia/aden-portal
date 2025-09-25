@@ -17,9 +17,9 @@ import { I18nService } from '../../../services/i18n.service';
 export class SidebarComponent implements OnInit {
   currentUser: User | null = null;
 
-
-
   translations: any = {};
+
+  isUserListOpen = false;
 
   constructor(private authService: AuthService, private router: Router, private i18nService: I18nService) {}
 
@@ -37,6 +37,11 @@ export class SidebarComponent implements OnInit {
     });
   }
 
+  // toggle pour gérer l’ouverture du sous-menu 
+  toggleUserList() {
+  this.isUserListOpen = !this.isUserListOpen;
+}
+  
 
   // Getters to check the user's role
   private loadTranslations() {
@@ -75,9 +80,13 @@ export class SidebarComponent implements OnInit {
     return this.authService.hasRole(StrapiRole.CEDANT);
   }
 
-  get isAdminUser(): boolean {
-    return this.authService.hasRole(StrapiRole.ADMIN);
+  get isAdministrateurUser(): boolean {
+    return this.authService.hasRole(StrapiRole.ADMINISTRATEUR);
   }
+  get isRecovery_PartnerUser(): boolean {
+    return this.authService.hasRole(StrapiRole.RECOVERY_PARTNER);
+  }
+  
 
   // Method to get the label for the current user's role
   getUserRoleLabel(): string {
@@ -98,10 +107,10 @@ export class SidebarComponent implements OnInit {
         return 'Partenaire';
       case StrapiRole.RECOVERY_PARTNER:
         return 'Partenaire de recouvrement';
-      case StrapiRole.ADMIN:
+      case StrapiRole.ADMINISTRATEUR:
         return 'Administrateur';
       default:
-        return '';
+        return 'Role Undefined';
     }
   }
 
