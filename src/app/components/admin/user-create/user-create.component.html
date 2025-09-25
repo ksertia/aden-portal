@@ -1,0 +1,73 @@
+<div class="user-create-container">
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="form-card">
+    
+    <!-- Prénom + Nom -->
+    <div class="form-row">
+      <div class="form-group">
+        <label for="firstName">Prénom</label>
+        <input type="text" id="firstName" formControlName="firstName" placeholder="Votre prénom" required>
+      </div>
+
+      <div class="form-group">
+        <label for="lastName">Nom</label>
+        <input type="text" id="lastName" formControlName="lastName" placeholder="Votre nom" required>
+      </div>
+    </div>
+
+    <!-- Email + Téléphone -->
+    <div class="form-row">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" formControlName="email" placeholder="votre.email@exemple.fr" required>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Téléphone</label>
+        <input type="tel" id="phone" formControlName="phone" placeholder="+226 70 00 00 00" required>
+      </div>
+    </div>
+
+    <!-- Adresse -->
+    <fieldset formGroupName="address" class="address-card">
+      <legend>Adresse</legend>
+
+      <div class="form-group">
+        <label for="street">Rue</label>
+        <input type="text" id="street" formControlName="street" placeholder="Ex: Avenue de ..." required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="city">Ville</label>
+          <input type="text" id="city" formControlName="city" placeholder="Ouagadougou" required>
+        </div>
+
+        <div class="form-group">
+          <label for="postalCode">Code postal</label>
+          <input type="text" id="postalCode" formControlName="postalCode" placeholder="0000" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="country">Pays</label>
+        <input type="text" id="country" formControlName="country" placeholder="Burkina Faso" required>
+      </div>
+    </fieldset>
+
+    <!-- Profil -->
+    <div class="form-group">
+      <label for="role">Profil</label>
+      <select id="role" formControlName="role" required>
+        <option value="">Sélectionnez votre profil</option>
+        <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+      </select>
+    </div>
+
+    <button type="submit" [disabled]="!userForm.valid" class="submit-btn">
+      Créer l'utilisateur
+    </button>
+
+    <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  </form>
+</div>

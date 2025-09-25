@@ -38,11 +38,14 @@ export interface User {
   lastname: string;
   username: string;
   role: Role;  // Le rôle est un objet qui contient toutes les informations du rôle
+  statut: string;
   avatar?: string;
   phone?: string;
   companyName?: string;
   licenseNumber?: string;
   address?: Address;
+  firstLogin?: boolean;  // Ajouté pour gestion du premier login
+  businessId?: string;   // Ajouté pour liaison avec profil business
 }
 
 // Interface pour la demande de connexion
