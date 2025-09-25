@@ -165,9 +165,9 @@ export const routes: Routes = [
       },
       // Route pour les administrateurs
       {
-        path: 'admin',
+        path: 'administrateur',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [StrapiRole.ADMIN] },
+        data: { roles: [StrapiRole.ADMINISTRATEUR] },
         children: [
           { 
             path: 'user-list',

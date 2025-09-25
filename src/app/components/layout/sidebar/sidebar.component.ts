@@ -76,7 +76,7 @@ export class SidebarComponent implements OnInit {
   }
 
   get isAdminUser(): boolean {
-    return this.authService.hasRole(StrapiRole.ADMIN);
+    return this.authService.hasRole(StrapiRole.ADMINISTRATEUR);
   }
 
   // Method to get the label for the current user's role
@@ -98,10 +98,10 @@ export class SidebarComponent implements OnInit {
         return 'Partenaire';
       case StrapiRole.RECOVERY_PARTNER:
         return 'Partenaire de recouvrement';
-      case StrapiRole.ADMIN:
-        return 'Administrateur';
+      case StrapiRole.ADMINISTRATEUR:
+        return 'Admin';
       default:
-        return '';
+        return 'Admin';
     }
   }
 

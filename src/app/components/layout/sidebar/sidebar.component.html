@@ -76,7 +76,17 @@
           <span>{{ t('sidebar.legalActions') }}</span>
         </a>
       </li>
-
+      <!-- Administrateur -->
+      <li *ngIf="isAdminUser">
+        <a routerLink="/administrateur/user-list" routerLinkActive="active" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4"/>
+            <circle cx="12" cy="12" r="9"/>
+          </svg>
+          <span>{{ t('sidebar.user-list') }}</span>
+           <!-- <app-user-list></app-user-list> -->
+        </a>
+      </li>
       <!-- Avocat -->
       <li *ngIf="isLawyerUser">
         <a routerLink="/lawyer/cases" routerLinkActive="active" class="nav-item">
