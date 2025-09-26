@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { StrapiRole, User, Address, Role } from '../../../models/user.model';
+import { StrapiRole, User, Role } from '../../../models/user.model';
 
 @Component({
   selector: 'app-user-create',
@@ -13,7 +13,6 @@ import { StrapiRole, User, Address, Role } from '../../../models/user.model';
 export class UserCreateComponent {
   userForm: FormGroup;
   roles = Object.values(StrapiRole); // Liste des rôles disponibles
-  statut = ['Actif', 'Désactivé'];
   successMessage = '';
   errorMessage = '';
 
@@ -21,16 +20,9 @@ export class UserCreateComponent {
     this.userForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
-      address: this.fb.group({
-        street: ['', Validators.required],
-        city: ['', Validators.required],
-        postalCode: ['', Validators.required],
-        country: ['', Validators.required] }),
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       role: ['', Validators.required], // Rôle en string
-      statut: ['Actif', Validators.required], 
     });
   }
 
@@ -43,12 +35,9 @@ export class UserCreateComponent {
       const newUser: Partial<User> = {
         username: formValue.username,
         email: formValue.email,
-        phone: formValue.phone,
         firstname: formValue.firstName,
         lastname: formValue.lastName,
-        address: formValue.address as Address,
         role: { name: formValue.role } as Role, // on mappe string -> objet minimal
-        statut: formValue.statut,
       };
 
       console.log('✅ Formulaire envoyé :', newUser);
