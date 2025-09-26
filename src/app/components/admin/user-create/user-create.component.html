@@ -22,37 +22,10 @@
       </div>
 
       <div class="form-group">
-        <label for="phone">Téléphone</label>
-        <input type="tel" id="phone" formControlName="phone" placeholder="+226 70 00 00 00" required>
+        <label for="username">Nom d'utilisateur</label>
+        <input type="text" id="username" formControlName="username" placeholder="Nom d'utilisateur" required>
       </div>
     </div>
-
-    <!-- Adresse -->
-    <fieldset formGroupName="address" class="address-card">
-      <legend>Adresse</legend>
-
-      <div class="form-group">
-        <label for="street">Rue</label>
-        <input type="text" id="street" formControlName="street" placeholder="Ex: Avenue de ..." required>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="city">Ville</label>
-          <input type="text" id="city" formControlName="city" placeholder="Ouagadougou" required>
-        </div>
-
-        <div class="form-group">
-          <label for="postalCode">Code postal</label>
-          <input type="text" id="postalCode" formControlName="postalCode" placeholder="0000" required>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="country">Pays</label>
-        <input type="text" id="country" formControlName="country" placeholder="Burkina Faso" required>
-      </div>
-    </fieldset>
 
     <!-- Profil -->
     <div class="form-group">
