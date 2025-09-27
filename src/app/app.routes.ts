@@ -177,6 +177,11 @@ export const routes: Routes = [
         canActivate: [AuthGuard, RoleGuard],
         data: { roles: [StrapiRole.ADMINISTRATEUR] },
         children: [
+          
+          {
+            path: 'user-list',
+            loadComponent: () => import('./components/admin/user-list/user-list').then(c => c.UserList)
+          },
           {
             path: 'user-create',
             loadComponent: () => import('./components/admin/user-create/user-create.component').then(c => c.UserCreateComponent)

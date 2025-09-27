@@ -128,4 +128,69 @@ export class DashboardComponent implements OnInit {
     
     return nextDue ? new Date(nextDue).toLocaleDateString('fr-FR') : 'Aucune';
   }
+
+
+
+
+   // données statique
+  filteredCase = [
+    {
+      creditorName: 'SAWADOGO Ahmad Abdoul-Latif',
+      username: 'Computer Science',
+      email: 'Débiteur@gmail.com',
+      phone: '+91 123 456 7890',
+      status: 'Actif',
+      role: 'Débiteur'
+    },
+    {
+      creditorName: 'Kagambega Aboubacar ',
+      username: 'Computer Science',
+      email: 'Créancierr@gmail.com',
+      phone: '+91 123 456 7891',
+      status: 'Inactif',
+      role: 'Créancier'
+    },
+    
+    {
+      creditorName: 'Bikiega Faril ',
+      username: 'Computer Science',
+      email: 'Huissier@gmail.com',
+      phone: '+91 123 456 7891',
+      status: 'Actif',
+      role: 'Huissier'
+    },
+    {
+      creditorName: 'Mr Konate Constant',
+      username: 'Computer Science',
+      email: 'Avocat@gmail.com',
+      phone: '+91 123 456 7891',
+      status: 'Inactif',
+      role: 'Avocat'
+    },
+    {
+      creditorName: 'Mr Wise',
+      username: 'Computer Science',
+      email: 'Cédant@gmail.com',
+      phone: '+91 123 456 7891',
+      status: 'Actif',
+      role: 'Cédant'
+    },
+    {
+      creditorName: 'KABORE FAICAL',
+      username: 'Computer Science',
+      email: 'Partenaire@gmail.com',
+      phone: '+91 123 456 7891',
+      status: 'Inactif',
+      role: 'Partenaire'
+    }
+  ];
+   // retourne une classe CSS (string) à appliquer selon le status
+  statusClass(status: string): string {
+    if (!status) return 'badge badge-secondary';
+    return status.toLowerCase() === 'actif'
+      ? 'badge badge-success light border-0'
+      : 'badge badge-danger light border-0';
+  }
+
+
 }

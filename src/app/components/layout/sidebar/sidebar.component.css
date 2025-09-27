@@ -61,6 +61,7 @@
   background: #eff6ff;
   color: var(--primary);
   border-right-color: var(--primary);
+  font-weight: bold;
 }
 /* ul li a .nav-item.active {
   background: #eff6ff;
@@ -159,11 +160,12 @@
   padding: 6px 12px;
   color: #666;
   text-decoration: none;
+  margin-left: 30px;
 }
 
 .submenu li a.active {
   font-weight: bold;
-  color: #000;
+  color: blue;
 }
 
 .nav-item {

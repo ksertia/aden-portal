@@ -87,12 +87,93 @@
   color: var(--text);
 }
 
-.cases-grid {
+/* .cases-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 24px;
   margin-bottom: 48px;
+} */
+ .cases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
 }
+
+.case-card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  transition: all 0.2s ease;
+}
+
+.case-card:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.case-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.case-info h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.debtor-name {
+  font-size: 18px;
+  /* color: var(--text-secondary); */
+  font-weight: bold;
+}
+.case-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+.case-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.amount-item {
+  text-align: center;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.amount-label {
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.amount-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+.priority-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-left: 0px;
+}
+
 
 .case-card {
   background: var(--surface);
@@ -181,14 +262,68 @@
   gap: 16px;
 }
 
-.action-card {
+/* .action-card {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 20px;
   background: var(--surface);
   border: 1px solid var(--border);
-}
+} */
+ .action-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s ease;
+      font-weight: bold;
+    }
+
+    .action-card:hover {
+      border-color: var(--primary);
+      background: #eff6ff;
+      transform: translateY(-1px);
+    }
+    .action-card svg {
+      color: white;
+      /* color: var(--primary); */
+    }
+
+    .action-card span {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .action-card.highlight1 {
+      background: var(--primary);
+      color: white;
+      border: none;
+    }
+    .action-card.highlight2 {
+      background: var(--warning);
+      /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+      color: white;
+      border: none;
+    }
+    .action-card.highlight3 {
+      background:var(--success);
+      color: white;
+      border: none;
+    }
+
+    .action-card.highlight:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px -5px rgb(0 0 0 / 0.2);
+    }
+
+    .action-card.highlight svg {
+      color: white;
+    }
 
 
 
