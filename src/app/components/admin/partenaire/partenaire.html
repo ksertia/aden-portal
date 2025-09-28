@@ -1,383 +1,238 @@
-<!-- <p>partenaire works!</p> -->
-<!-- <p>avocat works!</p> -->
-
-<div class="content-body">
-    <!-- row -->	
-    <div class="page-titles">
-        <ol class="breadcrumb">
-            <li><h5 class="bc-title">PARTENAIRES</h5></li>
-        </ol>
-        <!-- <a class="text-primary fs-13" data-bs-toggle="offcanvas" href="#offcanvasExample1" role="button" aria-controls="offcanvasExample1">+ Add Task</a> -->
+<div class="cases-container">
+  <div class="cases-header fade-in-up">
+    <div class="header-content">
+      <button class="btn btn-secondary" routerLink="/dashboard">Retour</button>
+      <div>
+        <h1>Partenaires</h1>
+        <p>Gérez et suivez les partenaires en cours de recouvrement</p>
+      </div>
+      <!-- <div class="header-actions">
+        <button class="btn btn-secondary" (click)="generateCustomReport()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 2v6l3-3 3 3-3 3v6"/>
+            <path d="M15 8h6"/>
+            <path d="M15 16h6"/>
+          </svg>
+          Rapport personnalisé
+          Retour
+        </button>
+      </div> -->
     </div>
-    
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-xl-12">
-                <div class="card">
-                    <div class="card-body p-0">
-                        <div class="table-responsive active-projects style-1">
-                            <div class="tbl-caption">
-                                <div class="header-controls">
-                                    <!-- Barre de recherche -->
-                                    <div class="search-container">
-                                        <input type="text" class="search-input" placeholder="Rechercher un partenaire...">
-                                        <span class="search-icon">🔍</span>
-                                    </div>
-                                    <!-- Boutons d'action -->
-                                    <div class="action-buttons-header">
-                                        <a class="btn btn-primary btn-sm"
-                                            routerLink="/Administrateur/user-create">
-                                            + Add partenaire
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <table id="empoloyees-tblwrapper" class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Partenaire ID</th>
-                                        <th>Nom Créancier</th>
-                                        <th>Username</th>
-                                        <th>Addresse Email</th>
-                                        <th>Numéro</th>
-                                        <th>Status</th>
-                                        <th>Actions</th> <!-- Colonne combinée pour les actions -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><span>1001</span></td>
-                                        <td>
-                                            <div class="products">
-                                                <img src="images/contacts/pic2.jpg" class="avatar avatar-md" alt="">
-                                                <div>
-                                                    <h6>Liam Antony</h6>
-                                                    <span>Web Designer</span>	
-                                                </div>	
-                                            </div>
-                                        </td>
-                                        <td><span>Computer Science</span></td>
-                                        <td><span class="text-primary">abc@gmail.com</span></td>
-                                        <td><span>+91 123 456 7890</span></td>
-                                        <td><span class="badge badge-success light border-0">Active</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn btn-edit btn-sm">Modifier</button>
-                                                <button class="btn btn-delete btn-sm">Supprimer</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><span>1002</span></td>
-                                        <td>
-                                            <div class="products">
-                                                <img src="images/contacts/pic1.jpg" class="avatar avatar-md" alt="">
-                                                <div>
-                                                    <h6>Noah Oliver</h6>
-                                                    <span>Web Designer</span>	
-                                                </div>	
-                                            </div>
-                                        </td>
-                                        <td><span>Computer Science</span></td>
-                                        <td><span class="text-primary">noah@gmail.com</span></td>
-                                        <td><span>+91 123 456 7891</span></td>
-                                        <td><span class="badge badge-danger light border-0">Inactive</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn btn-edit btn-sm">Modifier</button>
-                                                <button class="btn btn-delete btn-sm">Supprimer</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><span>1002</span></td>
-                                        <td>
-                                            <div class="products">
-                                                <img src="images/contacts/pic1.jpg" class="avatar avatar-md" alt="">
-                                                <div>
-                                                    <h6>Noah Oliver</h6>
-                                                    <span>Web Designer</span>	
-                                                </div>	
-                                            </div>
-                                        </td>
-                                        <td><span>Computer Science</span></td>
-                                        <td><span class="text-primary">noah@gmail.com</span></td>
-                                        <td><span>+91 123 456 7891</span></td>
-                                        <td><span class="badge badge-danger light border-0">Inactive</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn btn-edit btn-sm">Modifier</button>
-                                                <button class="btn btn-delete btn-sm">Supprimer</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><span>1002</span></td>
-                                        <td>
-                                            <div class="products">
-                                                <img src="images/contacts/pic1.jpg" class="avatar avatar-md" alt="">
-                                                <div>
-                                                    <h6>Noah Oliver</h6>
-                                                    <span>Web Designer</span>	
-                                                </div>	
-                                            </div>
-                                        </td>
-                                        <td><span>Computer Science</span></td>
-                                        <td><span class="text-primary">noah@gmail.com</span></td>
-                                        <td><span>+91 123 456 7891</span></td>
-                                        <td><span class="badge badge-danger light border-0">Inactive</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn btn-edit btn-sm">Modifier</button>
-                                                <button class="btn btn-delete btn-sm">Supprimer</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><span>1002</span></td>
-                                        <td>
-                                            <div class="products">
-                                                <img src="images/contacts/pic1.jpg" class="avatar avatar-md" alt="">
-                                                <div>
-                                                    <h6>Noah Oliver</h6>
-                                                    <span>Web Designer</span>	
-                                                </div>	
-                                            </div>
-                                        </td>
-                                        <td><span>Computer Science</span></td>
-                                        <td><span class="text-primary">noah@gmail.com</span></td>
-                                        <td><span>+91 123 456 7891</span></td>
-                                        <td><span class="badge badge-danger light border-0">Inactive</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn btn-edit btn-sm">Modifier</button>
-                                                <button class="btn btn-delete btn-sm">Supprimer</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><span>1002</span></td>
-                                        <td>
-                                            <div class="products">
-                                                <img src="images/contacts/pic1.jpg" class="avatar avatar-md" alt="">
-                                                <div>
-                                                    <h6>Noah Oliver</h6>
-                                                    <span>Web Designer</span>	
-                                                </div>	
-                                            </div>
-                                        </td>
-                                        <td><span>Computer Science</span></td>
-                                        <td><span class="text-primary">noah@gmail.com</span></td>
-                                        <td><span>+91 123 456 7891</span></td>
-                                        <td><span class="badge badge-danger light border-0">Inactive</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn btn-edit btn-sm">Modifier</button>
-                                                <button class="btn btn-delete btn-sm">Supprimer</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><span>1002</span></td>
-                                        <td>
-                                            <div class="products">
-                                                <img src="images/contacts/pic1.jpg" class="avatar avatar-md" alt="">
-                                                <div>
-                                                    <h6>Noah Oliver</h6>
-                                                    <span>Web Designer</span>	
-                                                </div>	
-                                            </div>
-                                        </td>
-                                        <td><span>Computer Science</span></td>
-                                        <td><span class="text-primary">noah@gmail.com</span></td>
-                                        <td><span>+91 123 456 7891</span></td>
-                                        <td><span class="badge badge-danger light border-0">Inactive</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn btn-edit btn-sm">Modifier</button>
-                                                <button class="btn btn-delete btn-sm">Supprimer</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><span>1002</span></td>
-                                        <td>
-                                            <div class="products">
-                                                <img src="images/contacts/pic1.jpg" class="avatar avatar-md" alt="">
-                                                <div>
-                                                    <h6>Noah Oliver</h6>
-                                                    <span>Web Designer</span>	
-                                                </div>	
-                                            </div>
-                                        </td>
-                                        <td><span>Computer Science</span></td>
-                                        <td><span class="text-primary">noah@gmail.com</span></td>
-                                        <td><span>+91 123 456 7891</span></td>
-                                        <td><span class="badge badge-danger light border-0">Inactive</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn btn-edit btn-sm">Modifier</button>
-                                                <button class="btn btn-delete btn-sm">Supprimer</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><span>1002</span></td>
-                                        <td>
-                                            <div class="products">
-                                                <img src="images/contacts/pic1.jpg" class="avatar avatar-md" alt="">
-                                                <div>
-                                                    <h6>Noah Oliver</h6>
-                                                    <span>Web Designer</span>	
-                                                </div>	
-                                            </div>
-                                        </td>
-                                        <td><span>Computer Science</span></td>
-                                        <td><span class="text-primary">noah@gmail.com</span></td>
-                                        <td><span>+91 123 456 7891</span></td>
-                                        <td><span class="badge badge-danger light border-0">Inactive</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn btn-edit btn-sm">Modifier</button>
-                                                <button class="btn btn-delete btn-sm">Supprimer</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <!-- Les autres lignes suivent le même pattern -->
-                                </tbody>
-                            </table>
-                            <!-- Pagination -->
-                            <div class="pagination-container">
-                                <div class="pagination-info" id="pagination-info">
-                                    Affichage des éléments 1 à 10 sur 20
-                                </div>
-                                <nav aria-label="Page navigation">
-                                    <ul class="pagination" id="pagination">
-                                        <li class="page-item disabled">
-                                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Précédent</a>
-                                        </li>
-                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">Suivant</a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
-                        </div>
-                    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section fade-in-up">
+    <div class="filters-card">
+      <div class="filters-header">
+        <h3>Filtres et recherche</h3>
+        <button class="btn btn-secondary small" (click)="resetFilters()">Réinitialiser</button>
+      </div>
+      
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Recherche</label>
+          <input
+            type="text"
+            [(ngModel)]="filters.searchTerm"
+            placeholder="Entrez le nom, prénom ou email du partenaire ..."
+            (input)="applyFilters()">
+        </div>
+        
+        <!-- <div class="filter-group">
+          <label>Profil</label>
+          <select [(ngModel)]="selectedStatus" (change)="updateStatusFilter()">
+            <option value="">Tous les profils</option>
+            <option value="pending">Créancier</option>
+            <option value="active">Débiteur</option>
+            <option value="negotiation">Huissier</option>
+            <option value="legal_action">Cedant</option>
+            <option value="completed">Avocat</option>
+            <option value="completed">Partenaire</option>
+          </select>
+        </div> -->
+        
+        <!-- <div class="filter-group">
+          <label>Priorité</label>
+          <select [(ngModel)]="selectedPriority" (change)="updatePriorityFilter()">
+            <option value="">Toutes les priorités</option>
+            <option value="low">Faible</option>
+            <option value="medium">Moyenne</option>
+            <option value="high">Élevée</option>
+            <option value="urgent">Urgente</option>
+          </select>
+        </div> -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="stats-section fade-in-up" *ngIf="statistics">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon primary">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12h6l2 4 6-8 4 4"/>
+              <circle cx="5" cy="12" r="2"/>
+              <circle cx="19" cy="16" r="2"/>
+            </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-label">Tous les partenaires</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon success">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12h6l2 4 6-8 4 4"/>
+              <circle cx="5" cy="12" r="2"/>
+              <circle cx="19" cy="16" r="2"/>
+            </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-label">partenaires actifs</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon warning">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12h6l2 4 6-8 4 4"/>
+              <circle cx="5" cy="12" r="2"/>
+              <circle cx="19" cy="16" r="2"/>
+            </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{filteredCases.length }}</div>
+          <div class="stat-label">partenaires inactifs</div>
+        </div>
+      </div>
+      
+      <!-- <div class="stat-card">
+        <div class="stat-icon info">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatCurrency(getTotalRecovered()) }}</div>
+          <div class="stat-label">Montant recouvré</div>
+        </div>
+      </div> -->
+    </div>
+  </div>
+
+  <!-- Liste des créances -->
+    <div class="cases-content fade-in-up">
+    <div class="cases-list" *ngIf="filteredCase.length > 0; else noCases">
+        <div class="list-header">
+        <!-- <h3>Créances ({{ filteredCases.length }})</h3> -->
+        <app-view-toggle 
+            [currentView]="currentView" 
+            (viewChange)="currentView = $event">
+        </app-view-toggle>
+        </div>
+        
+        <!-- Vue grille -->
+        <div class="cases-grid" *ngIf="currentView === 'grid'">
+        <div class="case-card" *ngFor="let item of filteredCase">
+            <div class="case-header">
+            <div class="case-info">
+                <p class="debtor-name">{{ item.creditorName }}</p>
+            </div>
+            <div class="case-badges">
+                <span class="status-badge" [ngClass]="statusClass(item.status)">
+                {{ item.status }}
+                </span>
+            </div>
+            </div>
+            
+            <div class="case-body">
+            <div class="case-amounts">
+                <div class="amount-item">
+                <span class="amount-label">Username</span>
+                <span class="amount-value">{{ item.username }}</span>
+                </div>
+                <div class="amount-item">
+                <span class="amount-label">Email</span>
+                <span class="amount-value">{{ item.email }}</span>
+                </div>
+                <div class="amount-item">
+                <span class="amount-label">Téléphone</span>
+                <span class="amount-value">{{ item.phone }}</span>
                 </div>
             </div>
+            
+            <div class="case-actions">
+                <button class="btn btn-primary small"  title="Voir le profil">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="8" r="4"/>
+                            <path d="M6 20c0-4 12-4 12 0"/>
+                    </svg> voir profil
+                </button>
+                <!-- <button class="btn btn-primary small" (click)="editItem(item)">Modifier</button> -->
+            </div>
+            </div>
+        </div>
+        </div>
+        
+        <!-- Vue table -->
+        <div class="cases-table-container" *ngIf="currentView === 'table'">
+        <table class="cases-table">
+            <thead>
+            <tr>
+                <th>Nom complet</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let item of filteredCase" class="case-row">
+                <td>{{ item.creditorName }}</td>
+                <td>{{ item.username }}</td>
+                <td>{{ item.email }}</td>
+                <td>{{ item.phone }}</td>
+                <td>
+                <span class="status-badge" [ngClass]="statusClass(item.status)" >
+                    {{ item.status }}
+                </span>
+                </td>
+                <td>
+                <div class="table-actions">
+                    <button class="btn btn-primary small"  title="Voir le profil">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="8" r="4"/>
+                            <path d="M6 20c0-4 12-4 12 0"/>
+                    </svg>
+                    </button>
+                </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
         </div>
     </div>
+
+    <ng-template #noCases>
+        <div class="no-cases">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <h3>Aucune créance trouvée</h3>
+        <p>Aucune créance ne correspond aux critères sélectionnés.</p>
+        </div>
+    </ng-template>
+    </div>
+
 </div>
 
-<script>
-// Données d'exemple (remplacez par vos vraies données)
-const creanciersData = [
-    { id: '1001', nom: 'Liam Antony', username: 'Computer Science', email: 'abc@gmail.com', telephone: '+91 123 456 7890', status: 'Active', avatar: 'images/contacts/pic2.jpg' },
-    { id: '1002', nom: 'Noah Oliver', username: 'Computer Science', email: 'noah@gmail.com', telephone: '+91 123 456 7891', status: 'Inactive', avatar: 'images/contacts/pic1.jpg' },
-    { id: '1003', nom: 'Emma Johnson', username: 'IT Department', email: 'emma@email.com', telephone: '+91 123 456 7892', status: 'Active', avatar: 'images/contacts/pic3.jpg' },
-    { id: '1004', nom: 'Lucas Martin', username: 'Finance', email: 'lucas@email.com', telephone: '+91 123 456 7893', status: 'Active', avatar: 'images/contacts/pic1.jpg' },
-    { id: '1005', nom: 'Sophie Bernard', username: 'HR', email: 'sophie@email.com', telephone: '+91 123 456 7894', status: 'Inactive', avatar: 'images/contacts/pic2.jpg' },
-    { id: '1006', nom: 'Thomas Dupont', username: 'Marketing', email: 'thomas@email.com', telephone: '+91 123 456 7895', status: 'Active', avatar: 'images/contacts/pic1.jpg' },
-    { id: '1007', nom: 'Marie Curie', username: 'R&D', email: 'marie@email.com', telephone: '+91 123 456 7896', status: 'Active', avatar: 'images/contacts/pic2.jpg' },
-    { id: '1008', nom: 'Jean Petit', username: 'Sales', email: 'jean@email.com', telephone: '+91 123 456 7897', status: 'Inactive', avatar: 'images/contacts/pic1.jpg' },
-    { id: '1009', nom: 'Alice Roy', username: 'Support', email: 'alice@email.com', telephone: '+91 123 456 7898', status: 'Active', avatar: 'images/contacts/pic2.jpg' },
-    { id: '1010', nom: 'Paul Blanc', username: 'Operations', email: 'paul@email.com', telephone: '+91 123 456 7899', status: 'Active', avatar: 'images/contacts/pic1.jpg' },
-    { id: '1011', nom: 'Julie Vert', username: 'IT Department', email: 'julie@email.com', telephone: '+91 123 456 7800', status: 'Inactive', avatar: 'images/contacts/pic2.jpg' },
-    { id: '1012', nom: 'Marc Rouge', username: 'Finance', email: 'marc@email.com', telephone: '+91 123 456 7801', status: 'Active', avatar: 'images/contacts/pic1.jpg' }
-];
+  
 
-let currentPage = 1;
-const itemsPerPage = 10;
 
-function renderTable(page = 1) {
-    const tableBody = document.getElementById('table-body');
-    const paginationInfo = document.getElementById('pagination-info');
-    const pagination = document.getElementById('pagination');
-    
-    currentPage = page;
-    const startIndex = (page - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentData = creanciersData.slice(startIndex, endIndex);
-    
-    // Vider le tableau
-    tableBody.innerHTML = '';
-    
-    // Remplir le tableau avec les données de la page courante
-    currentData.forEach(creancier => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><span>${creancier.id}</span></td>
-            <td>
-                <div class="products">
-                    <img src="${creancier.avatar}" class="avatar avatar-md" alt="">
-                    <div>
-                        <h6>${creancier.nom}</h6>
-                        <span>Web Designer</span>	
-                    </div>	
-                </div>
-            </td>
-            <td><span>${creancier.username}</span></td>
-            <td><span class="text-primary">${creancier.email}</span></td>
-            <td><span>${creancier.telephone}</span></td>
-            <td><span class="badge ${creancier.status === 'Active' ? 'badge-success' : 'badge-danger'} light border-0">${creancier.status}</span></td>
-            <td>
-                <div class="action-buttons">
-                    <button class="btn btn-edit btn-sm">Modifier</button>
-                    <button class="btn btn-delete btn-sm">Supprimer</button>
-                </div>
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
-    
-    // Mettre à jour les informations de pagination
-    const totalItems = creanciersData.length;
-    const startItem = startIndex + 1;
-    const endItem = Math.min(endIndex, totalItems);
-    paginationInfo.textContent = `Affichage des éléments ${startItem} à ${endItem} sur ${totalItems}`;
-    
-    // Mettre à jour la pagination
-    updatePagination(totalItems);
-}
-
-function updatePagination(totalItems) {
-    const pagination = document.getElementById('pagination');
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    
-    pagination.innerHTML = '';
-    
-    // Bouton Précédent
-    const prevLi = document.createElement('li');
-    prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-    prevLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Précédent</a>`;
-    pagination.appendChild(prevLi);
-    
-    // Pages
-    for (let i = 1; i <= totalPages; i++) {
-        const pageLi = document.createElement('li');
-        pageLi.className = `page-item ${i === currentPage ? 'active' : ''}`;
-        pageLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
-        pagination.appendChild(pageLi);
-    }
-    
-    // Bouton Suivant
-    const nextLi = document.createElement('li');
-    nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
-    nextLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Suivant</a>`;
-    pagination.appendChild(nextLi);
-}
-
-function changePage(page) {
-    if (page < 1 || page > Math.ceil(creanciersData.length / itemsPerPage)) return;
-    renderTable(page);
-}
-
-// Initialiser le tableau
-document.addEventListener('DOMContentLoaded', function() {
-    renderTable(1);
-});
-</script>

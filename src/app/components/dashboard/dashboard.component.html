@@ -3,6 +3,7 @@
     <h1>{{ t('dashboard.title') }}</h1>
     <p *ngIf="currentUser">
       {{ t('dashboard.welcome') }}, {{ currentUser.firstname }} {{ currentUser.lastname }}
+
     </p>
   </div>
 
@@ -178,7 +179,7 @@
     </div>
 
     <!-- ADMINISTRATEUR -->
-    <div *ngIf="isAdminUser">
+    <div *ngIf="statistics && isAdminUser">
       <div class="stats-grid fade-in-up">
           <!-- ADMINISTRATEUR:CREANCIERS -->
           <a class="stat-card" [routerLink]="['/Administrateur/creancier']">
@@ -235,7 +236,7 @@
                 </svg>
               </div>
               <div class="stat-content">
-                <div class="stat-value">{{ formatCurrency(statistics.totalAmount) }}</div>
+                <div class="stat-value">{{ statistics.totalCases}}</div>
                 <div class="stat-label">AVOCATS</div>
               </div>
           </a>
@@ -251,7 +252,7 @@
                 </svg>
               </div>
               <div class="stat-content">
-                <div class="stat-value">{{ formatCurrency(statistics.totalAmount) }}</div>
+                <div class="stat-value">{{ statistics.pendingCases }}</div>
                 <div class="stat-label">CEDANTS</div>
               </div>
           </a>
@@ -270,61 +271,105 @@
               </div>
           </a>
         </div>
-       <!-- TABLEAU DES UTILISATEURS -->
-        <div>
-          <h1>LISTE DES UTILISATEURS</h1>
-          <div class="tbl-caption">
-              <div class="header-controls">
-                <!-- Barre de recherche -->
-                <div class="search-container">
-                  <input type="text" class="search-input" placeholder="Rechercher un u...">
-                  <span class="search-icon">🔍</span>
+       
+        <div class="section-header">
+            <h2>LISTE DES UTILISATEURS</h2>
+            <a routerLink="/Administrateur/user-list" class="btn btn-primary">Voir tout les utilisateurs</a>
+          </div>
+
+          <div class="cases-grid" *ngIf="userCases.length > 0">
+            <!-- <div class="case-card" *ngFor="let case of userCases.slice(0, 3)">
+              <div class="case-header">
+                <h3>{{ case.caseNumber }}</h3>
+                <span class="status-badge" [ngClass]="'status-' + case.status">
+                  {{ getStatusLabel(case.status) }}
+                </span>
+              </div>
+              <div class="case-details">
+                <div class="case-info">
+                  <span class="label">Débiteur :</span>
+                  <span>{{ case.debtor.firstName }} {{ case.debtor.lastName }}</span>
                 </div>
-                <!-- Boutons d'action -->
-                <div class="action-buttons-header">
-                  <button class="btn btn-primary btn-sm" routerLink="/Administrateur/user-create">Ajouter un utilisateur</button>
+                <div class="case-amount">
+                  <span class="label">Montant :</span>
+                  <span class="amount">{{ formatCurrency(case.amount) }}</span>
+                </div>
+                <div class="case-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="(case.amountPaid / case.amount) * 100"></div>
+                  </div>
+                  <span class="progress-text">{{ ((case.amountPaid / case.amount) * 100).toFixed(0) }}% recouvré</span>
                 </div>
               </div>
+            </div> -->
+      <div class="case-card" *ngFor="let item of filteredCase">
+        <div class="case-header">
+          <div class="case-info">
+            <p class="debtor-name">{{ item.creditorName }}</p>
+          </div>
+          <div class="case-badges">
+            <span class="status-badge" [ngClass]="statusClass(item.status)">
+              {{ item.status }}
+            </span>
+          </div>
         </div>
-
-        <table id="empoloyees-tblwrapper" class="table">
-              <thead>
-                <tr>
-                  <th>UTILISATEURS ID</th>
-                  <th>Nom & Prénom</th>
-                  <th>Username</th>
-                  <th>Addresse Email</th>
-                  <th>Numéro</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="table-body">
-                <tr>
-                  <td><span>1001</span></td>
-                  <td>
-                    <div class="products">
-                      <img src="images/contacts/pic2.jpg" class="avatar avatar-md" alt="IN">
-                      <div>
-                        <h6>Liam Antony</h6>
-                        <span>Web Designer</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span>Computer Science</span></td>
-                  <td><span class="text-primary">abc@gmail.com</span></td>
-                  <td><span>+91 123 456 7890</span></td>
-                  <td><span class="badge badge-success light border-0">Active</span></td>
-                  <td>
-                    <div class="action-buttons">
-                      <button class="btn btn-edit btn-sm">Modifier</button>
-                      <button class="btn btn-delete btn-sm">Supprimer</button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-        </table>
+        <span class="priority-badge">{{ item.role }}</span>
+        
+        <div class="case-body">
+          <div class="case-amounts">
+            <div class="amount-item">
+              <span class="amount-label">Username</span>
+              <span class="amount-value">{{ item.username }}</span>
+            </div>
+            <div class="amount-item">
+              <span class="amount-label">Email</span>
+              <span class="amount-value">{{ item.email }}</span>
+            </div>
+            <div class="amount-item">
+              <span class="amount-label">Téléphone</span>
+              <span class="amount-value">{{ item.phone }}</span>
+            </div>
+          </div>
+          
+          <div class="case-actions">
+            <button class="btn btn-primary small"  title="Voir le profil">
+                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="8" r="4"/>
+                        <path d="M6 20c0-4 12-4 12 0"/>
+                   </svg> voir profil
+            </button>
+          </div>
+        </div>
       </div>
+          </div>
+
+          <div class="quick-actions">
+            <h3>Actions Rapides</h3>
+            <div class="actions-grid">
+              <a routerLink="/dashboard" class="action-card highlight1 ">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12,6 12,12 16,14"/>
+                </svg>
+                <span>Tableau de bord</span>
+              </a>
+              <a routerLink="/Administrateur/user-list" class="action-card highlight2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 2v6l3-3 3 3-3 3v6"/>
+                  <path d="M15 8h6"/>
+                  <path d="M15 16h6"/>
+                </svg>
+                <span>Liste des utilisateurs</span>
+              </a>
+              <a routerLink="/profile" class="action-card highlight3">
+                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M6 20c0-4 12-4 12 0"/>
+                  </svg>
+                <span>Profil</span>
+              </a>
+            </div>
+          </div>
     
     </div>
 
