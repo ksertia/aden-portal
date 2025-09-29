@@ -2,9 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-
 import { User, StrapiRole } from '../../../models/user.model';
-
 import { I18nService } from '../../../services/i18n.service';
 
 @Component({

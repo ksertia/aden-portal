@@ -1,88 +1,67 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { CaseService } from '../../services/case.service';
-import { User, StrapiRole } from '../../models/user.model';
-import { DebtCase } from '../../models/case.model';
-import { I18nService } from '../../services/i18n.service';
-
+import { AuthService } from '../../../services/auth.service';
+import { CaseService } from '../../../services/case.service';
+import { User, StrapiRole } from '../../../models/user.model';
+import { DebtCase } from '../../../models/case.model';
+import { I18nService } from '../../../services/i18n.service';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-debtor-dashboard',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  templateUrl: './debtor-dashboard.html',
+  styleUrls: ['./debtor-dashboard.css']
 })
-export class DashboardComponent implements OnInit {
+export class DebtorDashboard implements OnInit {
+
   currentUser: User | null = null;
   userCases: DebtCase[] = [];
   statistics: any = null;
 
-  translations: any = {};
-
-
   constructor(
     private authService: AuthService,
-    private caseService: CaseService,
-    private i18nService: I18nService
+    private caseService: CaseService
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
     this.loadDashboardData();
-
-    this.loadTranslations();
-
-    this.i18nService.currentLocale$.subscribe(() => {
-      this.loadTranslations();
-    });
   }
 
-   private loadTranslations() {
-    const locale = this.i18nService.getCurrentLocale();
-    this.i18nService.loadTranslations(locale).subscribe(translations => {
-      this.translations = translations;
-    });
-  }
-  t(key: string): string {
-    return this.i18nService.translate(key, this.translations);
-  }
+  // get isDebtorUser(): boolean {
+  //   return this.authService.hasRole(StrapiRole.DEBTOR);
+  // }
 
-  // Getters pour vérifier les rôles de l'utilisateur
-  get isDebtorUser(): boolean {
-    return this.authService.hasRole(StrapiRole.DEBTOR);
-  }
+  // get isBailiffUser(): boolean {
+  //   return this.authService.hasRole(StrapiRole.BAILIFF);
+  // }
 
-  get isBailiffUser(): boolean {
-    return this.authService.hasRole(StrapiRole.BAILIFF);
-  }
+  // get isLawyerUser(): boolean {
+  //   return this.authService.hasRole(StrapiRole.LAWYER);
+  // }
 
-  get isLawyerUser(): boolean {
-    return this.authService.hasRole(StrapiRole.LAWYER);
-  }
+  // get isCreditorUser(): boolean {
+  //   return this.authService.hasRole(StrapiRole.CREDITOR);
+  // }
 
-  get isCreditorUser(): boolean {
-    return this.authService.hasRole(StrapiRole.CREDITOR);
-  }
+  // get isCedantUser(): boolean {
+  //   return this.authService.hasRole(StrapiRole.CEDANT);
+  // }
 
-  get isCedantUser(): boolean {
-    return this.authService.hasRole(StrapiRole.CEDANT);
-  }
-
-  get isAdminUser(): boolean {
-    return this.authService.hasRole(StrapiRole.ADMINISTRATEUR);
-  }
-
-  // Charger les données du tableau de bord
   loadDashboardData() {
     if (!this.currentUser) return;
 
-    // Charger les dossiers de l'utilisateur en fonction de son rôle
-    this.caseService.getCasesByUserId(this.currentUser.id, this.currentUser.role.name) // Utiliser le nom du rôle pour filtrer
+    // Charger les dossiers de l'utilisateur
+    this.caseService.getCasesByUserId(this.currentUser.id, this.currentUser!.role.name)
       .subscribe(cases => {
-        this.userCases = cases;
+        this.userCases = cases.length? cases : [
+          // Simulation de données pour tester l'affichage
+          { caseNumber: 'DOS-001', status: 'active', amount: 1000, amountPaid: 200 } as DebtCase,
+          { caseNumber: 'DOS-002', status: 'pending', amount: 500, amountPaid: 0 } as DebtCase,
+          { caseNumber: 'DOS-003', status: 'closed', amount: 800, amountPaid: 800 } as DebtCase,
+        ]
       });
 
     // Charger les statistiques
@@ -92,7 +71,6 @@ export class DashboardComponent implements OnInit {
       });
   }
 
-  // Formatage du montant en devise
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
@@ -100,7 +78,6 @@ export class DashboardComponent implements OnInit {
     }).format(amount);
   }
 
-  // Récupérer l'étiquette pour un statut
   getStatusLabel(status: string): string {
     const labels: { [key: string]: string } = {
       'pending': 'En attente',
@@ -114,7 +91,6 @@ export class DashboardComponent implements OnInit {
     return labels[status] || status;
   }
 
-  // Récupérer la prochaine date d'échéance
   getNextDueDate(): string {
     if (this.userCases.length === 0) return 'Aucune';
     
