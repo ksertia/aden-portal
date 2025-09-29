@@ -14,7 +14,6 @@ import { LoginRequest } from '../../../models/user.model';
 })
 export class LoginComponent {
    
-
   credentials: LoginRequest = {
     email: '',
     password: ''
@@ -36,18 +35,38 @@ export class LoginComponent {
 
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
-        this.router.navigate(['/dashboard']);
+        // this.router.navigate(['/dashboard']);
+        this.redirectBasedOnUserRole(response.user);
       },
       error: (error) => {
         this.errorMessage = error.message || 'Erreur de connexion';
         this.isLoading = false;
       }
     });
+    
   }
+    private redirectBasedOnUserRole(user: any) {
+    // Supposons que l'utilisateur ait une propriété 'role'
+    switch (user.role) {
+      case 'admin':
+        this.router.navigate(['/debtor/dashboard']);
+        break;
+      case 'manager':
+        this.router.navigate(['/manager/dashboard']);
+        break;
+      case 'user':
+        this.router.navigate(['/user/dashboard']);
+        break;
+      default:
+        this.router.navigate(['/dashboard']);
+    }
+  }
+  
 
   loginAsDemo(email: string) {
     this.credentials.email = email;
     this.credentials.password = 'password123';
     this.onSubmit();
   }
+
 }
