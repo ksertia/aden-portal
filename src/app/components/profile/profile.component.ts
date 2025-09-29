@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
@@ -16,7 +16,7 @@ import { LanguageSwitcherComponent } from '../shared/language-switcher/language-
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  user: User | null = null;
+  @Input() user: User | null = null;
   isUpdating = false;
   updateSuccess = false;
 
@@ -25,7 +25,9 @@ export class ProfileComponent implements OnInit {
   constructor(private authService: AuthService,  private i18nService: I18nService) {}
 
   ngOnInit() {
-    this.user = this.authService.getCurrentUser();
+    if (!this.user) {
+      this.user = this.authService.getCurrentUser();
+    }
     if (this.user) {
       // Créer une copie pour éviter la modification directe
       this.user = { ...this.user };
@@ -79,6 +81,12 @@ export class ProfileComponent implements OnInit {
   // Méthode pour mettre à jour le profil de l'utilisateur
   updateProfile() {
     if (!this.user) return;
+
+    // Prevent updating profile of another user (admin view)
+    if (this.user.id !== this.authService.getCurrentUser()?.id) {
+      console.warn('Cannot update profile of another user');
+      return;
+    }
 
     this.isUpdating = true;
 

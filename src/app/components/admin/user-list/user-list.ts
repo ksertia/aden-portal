@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule} from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
-import { CaseService } from '../../../services/case.service';
+import { ProfileComponent } from '../../profile/profile.component';
+import { CaseService} from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
+import { User } from '../../../models/user.model';
 import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case.model';
 
 @Component({
   selector: 'app-user-list',
-  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule],
+  imports: [CommonModule, FormsModule, ViewToggleComponent, ProfileComponent, RouterModule],
   templateUrl: './user-list.html',
   styleUrl: './user-list.css'
 })
@@ -28,6 +29,8 @@ export class UserList implements OnInit {
   
   showCaseDetailsModal = false;
   selectedCase: DebtCase | null = null;
+  showDrawer = false;
+  selectedUser: User | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -267,6 +270,43 @@ export class UserList implements OnInit {
     return status.toLowerCase() === 'actif'
       ? 'badge badge-success light border-0'
       : 'badge badge-danger light border-0';
+  }
+
+  openDrawer(item: any) {
+    // Map static data to User interface for profile component
+    const roleMap: { [key: string]: string } = {
+      'Débiteur': 'debtor',
+      'Créancier': 'creditor',
+      'Huissier': 'bailiff',
+      'Avocat': 'lawyer',
+      'Cédant': 'cedant',
+      'Partenaire': 'partner'
+    };
+
+    const englishRole = roleMap[item.role] || 'debtor'; // default
+
+    const nameParts = item.creditorName.split(' ');
+    this.selectedUser = {
+      id: '', // dummy for static
+      email: item.email,
+      firstname: nameParts[0] || '',
+      lastname: nameParts.slice(1).join(' ') || '',
+      username: item.username,
+      role: { name: englishRole, id: 1, documentId: '', description: '', type: '', createdAt: '', updatedAt: '', publishedAt: '' },
+      statut: item.status,
+      phone: item.phone,
+      companyName: '', // optional
+      address: undefined, // optional
+      firstLogin: false,
+      businessId: ''
+    } as User;
+
+    this.showDrawer = true;
+  }
+
+  closeDrawer() {
+    this.showDrawer = false;
+    this.selectedUser = null;
   }
 
   // handlers d'actions (à compléter selon ta logique)
