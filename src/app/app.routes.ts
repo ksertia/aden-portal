@@ -53,6 +53,10 @@ export const routes: Routes = [
           {
             path: 'documents',
             loadComponent: () => import('./components/debtor/debtor-documents/debtor-documents.component').then(c => c.DebtorDocumentsComponent)
+          },
+          {
+            path: 'dashboard',
+            loadComponent: () => import('./components/debtor/debtor-dashboard/debtor-dashboard').then(c => c.DebtorDashboard)
           }
         ]
       },
