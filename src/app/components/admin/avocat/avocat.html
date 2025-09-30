@@ -66,7 +66,7 @@
   </div>
 
   <!-- Statistiques -->
-  <div class="stats-section fade-in-up" *ngIf="statistics">
+  <div class="stats-section fade-in-up" *ngIf="avocat">
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon primary">
@@ -78,7 +78,7 @@
             </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-value">{{ filteredAvocat.length }}</div>
           <div class="stat-label">Tous les avocats</div>
         </div>
       </div>
@@ -93,7 +93,7 @@
             </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-value">{{ filteredAvocat.length }}</div>
           <div class="stat-label">avocats actifs</div>
         </div>
       </div>
@@ -108,7 +108,7 @@
             </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{filteredCases.length }}</div>
+          <div class="stat-value">{{filteredAvocat.length }}</div>
           <div class="stat-label">avocats inactifs</div>
         </div>
       </div>
@@ -130,7 +130,7 @@
 
   <!-- Liste des créances -->
     <div class="cases-content fade-in-up">
-    <div class="cases-list" *ngIf="filteredCase.length > 0; else noCases">
+    <div class="cases-list" *ngIf="filteredAvocat.length > 0; else noCases">
         <div class="list-header">
         <!-- <h3>Créances ({{ filteredCases.length }})</h3> -->
         <app-view-toggle 
@@ -141,14 +141,14 @@
         
         <!-- Vue grille -->
         <div class="cases-grid" *ngIf="currentView === 'grid'">
-        <div class="case-card" *ngFor="let item of filteredCase">
+        <div class="case-card" *ngFor="let item of filteredAvocat">
             <div class="case-header">
             <div class="case-info">
-                <p class="debtor-name">{{ item.creditorName }}</p>
+                <p class="debtor-name">{{ item.nomAvocat }}</p>
             </div>
             <div class="case-badges">
-                <span class="status-badge" [ngClass]="statusClass(item.status)">
-                {{ item.status }}
+                <span class="status-badge">
+                {{ item.barreau }}
                 </span>
             </div>
             </div>
@@ -157,15 +157,15 @@
             <div class="case-amounts">
                 <div class="amount-item">
                 <span class="amount-label">Username</span>
-                <span class="amount-value">{{ item.username }}</span>
+                <span class="amount-value">{{ item.nomCabinet }}</span>
                 </div>
                 <div class="amount-item">
                 <span class="amount-label">Email</span>
-                <span class="amount-value">{{ item.email }}</span>
+                <span class="amount-value">{{ item.emailProfessionnel }}</span>
                 </div>
                 <div class="amount-item">
                 <span class="amount-label">Téléphone</span>
-                <span class="amount-value">{{ item.phone }}</span>
+                <span class="amount-value">{{ item.telephone }}</span>
                 </div>
             </div>
             
@@ -176,7 +176,6 @@
                             <path d="M6 20c0-4 12-4 12 0"/>
                     </svg> voir profil
                 </button>
-                <!-- <button class="btn btn-primary small" (click)="editItem(item)">Modifier</button> -->
             </div>
             </div>
         </div>
@@ -188,22 +187,22 @@
             <thead>
             <tr>
                 <th>Nom complet</th>
-                <th>Username</th>
+                <th>Barreau</th>
                 <th>Email</th>
                 <th>Téléphone</th>
-                <th>Status</th>
+                <th>Nom du Cabinet</th>
                 <th>Actions</th>
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let item of filteredCase" class="case-row">
-                <td>{{ item.creditorName }}</td>
-                <td>{{ item.username }}</td>
-                <td>{{ item.email }}</td>
-                <td>{{ item.phone }}</td>
+            <tr *ngFor="let item of filteredAvocat" class="case-row">
+                <td>{{ item.nomAvocat }} {{ item.prenomAvocat }}</td>
+                <td>{{ item.barreau }}</td>
+                <td>{{ item.emailProfessionnel }}</td>
+                <td>{{ item.telephone }}</td>
                 <td>
-                <span class="status-badge" [ngClass]="statusClass(item.status)" >
-                    {{ item.status }}
+                <span class="status-badge">
+                    {{ item.nomCabinet }}
                 </span>
                 </td>
                 <td>

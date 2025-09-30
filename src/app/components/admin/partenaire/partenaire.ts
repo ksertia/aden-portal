@@ -6,7 +6,8 @@ import { ActivatedRoute, Router, RouterModule} from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
-import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case.model';
+import { DebtCase, CaseStatus, Priority, CaseFilter, PartenaireInfo } from '../../../models/case.model';
+import { AdminService } from '../../../services/admin.service';
 
 @Component({
   selector: 'app-partenaire',
@@ -16,13 +17,24 @@ import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case
 })
 export class Partenaire implements OnInit {
 
+  partenaire: PartenaireInfo[] = [];
+  filteredPartenaire: PartenaireInfo[] = [];
+
+   // Gestion des filtres
+  filters = {
+    searchTerm: ''
+  };
+
+  // Vue courante : 'grid' ou 'table'
+  currentView: 'grid' | 'table' = 'grid';
+
   cases: DebtCase[] = [];
   filteredCases: DebtCase[] = [];
   // filteredCase: DebtCase[] = [];
   statistics: any = null;
-  currentView: 'grid' | 'table' = 'grid';
+  // currentView: 'grid' | 'table' = 'grid';
   
-  filters: CaseFilter = {};
+  // filters: CaseFilter = {};
   selectedStatus = '';
   selectedPriority = '';
   
@@ -33,34 +45,67 @@ export class Partenaire implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private caseService: CaseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit() {
-    this.loadCases();
-    this.loadStatistics();
+    // this.loadCases();
+    // this.loadStatistics();
     
     // Vérifier si on doit ouvrir un dossier spécifique depuis les notifications
-    this.route.queryParams.subscribe(params => {
-      if (params['caseId']) {
-        this.openCaseFromNotification(params['caseId']);
-      }
+    // this.route.queryParams.subscribe(params => {
+    //   if (params['caseId']) {
+    //     this.openCaseFromNotification(params['caseId']);
+    //   }
+    // });
+    this.loadPartenaire();
+  }
+
+  loadPartenaire() {
+    const sitename = 'portail-recouvrement';
+      
+    this.adminService.getPartenaires(sitename).subscribe({
+      next: (data: PartenaireInfo[]) => {
+        this.partenaire = data;
+        this.filteredPartenaire = [...this.partenaire];
+      },
+      error: (err) => console.error(err)
     });
   }
 
-  loadCases() {
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
-
-    this.caseService.getCases().subscribe(cases => {
-      // Filtrer les dossiers pour ce créancier
-      this.cases = cases.filter(c => 
-        c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
-      );
-      this.applyFilters();
-    });
+  // filtrage par recherche
+  applyFilters() {
+    if (!this.filters.searchTerm) {
+      this.filteredPartenaire = [...this.partenaire];
+      return;
+    }
+    const term = this.filters.searchTerm.toLowerCase();
+    this.filteredPartenaire = this.partenaire.filter(c =>
+      c.contactPrincipal.toLowerCase().includes(term) ||
+      c.typePartenaire.toLowerCase().includes(term) ||
+      c.emailProfessionnel.toLowerCase().includes(term)
+    );
   }
+
+  resetFilters() {
+    this.filters.searchTerm = '';
+    this.filteredPartenaire = [...this.partenaire];
+  }
+
+  // loadCases() {
+  //   const currentUser = this.authService.getCurrentUser();
+  //   if (!currentUser) return;
+
+  //   this.caseService.getCases().subscribe(cases => {
+  //     // Filtrer les dossiers pour ce créancier
+  //     this.cases = cases.filter(c => 
+  //       c.creditor.name === currentUser.companyName || 
+  //       c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
+  //     );
+  //     this.applyFilters();
+  //   });
+  // }
 
   loadStatistics() {
     this.caseService.getStatistics().subscribe(stats => {
@@ -78,34 +123,34 @@ export class Partenaire implements OnInit {
     }, 500);
   }
 
-  applyFilters() {
-    this.caseService.getCasesWithFilter(this.filters).subscribe(cases => {
-      const currentUser = this.authService.getCurrentUser();
-      if (!currentUser) return;
+  // applyFilters() {
+  //   this.caseService.getCasesWithFilter(this.filters).subscribe(cases => {
+  //     const currentUser = this.authService.getCurrentUser();
+  //     if (!currentUser) return;
       
-      this.filteredCases = cases.filter(c => 
-        c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
-      );
-    });
-  }
+  //     this.filteredCases = cases.filter(c => 
+  //       c.creditor.name === currentUser.companyName || 
+  //       c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
+  //     );
+  //   });
+  // }
 
-  updateStatusFilter() {
-    this.filters.status = this.selectedStatus ? [this.selectedStatus as CaseStatus] : undefined;
-    this.applyFilters();
-  }
+  // updateStatusFilter() {
+  //   this.filters.status = this.selectedStatus ? [this.selectedStatus as CaseStatus] : undefined;
+  //   this.applyFilters();
+  // }
 
-  updatePriorityFilter() {
-    this.filters.priority = this.selectedPriority ? [this.selectedPriority as Priority] : undefined;
-    this.applyFilters();
-  }
+  // updatePriorityFilter() {
+  //   this.filters.priority = this.selectedPriority ? [this.selectedPriority as Priority] : undefined;
+  //   this.applyFilters();
+  // }
 
-  resetFilters() {
-    this.filters = {};
-    this.selectedStatus = '';
-    this.selectedPriority = '';
-    this.filteredCases = [...this.cases];
-  }
+  // resetFilters() {
+  //   this.filters = {};
+  //   this.selectedStatus = '';
+  //   this.selectedPriority = '';
+  //   this.filteredCases = [...this.cases];
+  // }
 
   getSuccessRate(): number {
     const completedCases = this.filteredCases.filter(c => c.status === CaseStatus.COMPLETED).length;

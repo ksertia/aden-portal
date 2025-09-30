@@ -6,17 +6,6 @@
         <h1>Débiteurs</h1>
         <p>Gérez et suivez les débiteurs en cours de recouvrement</p>
       </div>
-      <!-- <div class="header-actions">
-        <button class="btn btn-secondary" (click)="generateCustomReport()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 2v6l3-3 3 3-3 3v6"/>
-            <path d="M15 8h6"/>
-            <path d="M15 16h6"/>
-          </svg>
-          Rapport personnalisé
-          Retour
-        </button>
-      </div> -->
     </div>
   </div>
 
@@ -34,54 +23,15 @@
           <input
             type="text"
             [(ngModel)]="filters.searchTerm"
-            placeholder="Entrez le nom, prénom ou email du Débiteurs ..."
+            placeholder="Entrez le nom, prénom, société ou email..."
             (input)="applyFilters()">
         </div>
-        
-        <!-- <div class="filter-group">
-          <label>Profil</label>
-          <select [(ngModel)]="selectedStatus" (change)="updateStatusFilter()">
-            <option value="">Tous les profils</option>
-            <option value="pending">Créancier</option>
-            <option value="active">Débiteur</option>
-            <option value="negotiation">Huissier</option>
-            <option value="legal_action">Cedant</option>
-            <option value="completed">Avocat</option>
-            <option value="completed">Partenaire</option>
-          </select>
-        </div> -->
-        
-        <!-- <div class="filter-group">
-          <label>Priorité</label>
-          <select [(ngModel)]="selectedPriority" (change)="updatePriorityFilter()">
-            <option value="">Toutes les priorités</option>
-            <option value="low">Faible</option>
-            <option value="medium">Moyenne</option>
-            <option value="high">Élevée</option>
-            <option value="urgent">Urgente</option>
-          </select>
-        </div> -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Drawer -->
-  <div class="drawer-overlay" *ngIf="showDrawer" (click)="closeDrawer()">
-    <div class="drawer-content" (click)="$event.stopPropagation()">
-      <div class="drawer-header">
-        <h3>Profil utilisateur</h3>
-        <button class="drawer-close" (click)="closeDrawer()">
-          ✕
-        </button>
-      </div>
-      <div class="drawer-body" *ngIf="selectedUser">
-        <app-profile [user]="selectedUser"></app-profile>
       </div>
     </div>
   </div>
 
   <!-- Statistiques -->
-  <div class="stats-section fade-in-up" *ngIf="statistics">
+  <div class="stats-section fade-in-up" *ngIf="debiteurs.length > 0">
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon primary">
@@ -89,168 +39,127 @@
             <rect x="3" y="6" width="18" height="12" rx="2" ry="2"/>
             <line x1="3" y1="10" x2="21" y2="10"/>
             <line x1="12" y1="12" x2="12" y2="16"/>
-            <line x1="12" y1="18" x2="12.01" y2="18"/>
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-value">{{ filteredDebiteurs.length }}</div>
           <div class="stat-label">Tous les débiteurs</div>
         </div>
       </div>
-      
-      <div class="stat-card">
-        <div class="stat-icon success">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="6" width="18" height="12" rx="2" ry="2"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-            <line x1="12" y1="12" x2="12" y2="16"/>
-            <line x1="12" y1="18" x2="12.01" y2="18"/>
-          </svg>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ filteredCases.length }}</div>
-          <div class="stat-label">débiteurs actifs</div>
-        </div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-icon warning">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="6" width="18" height="12" rx="2" ry="2"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-            <line x1="12" y1="12" x2="12" y2="16"/>
-            <line x1="12" y1="18" x2="12.01" y2="18"/>
-          </svg>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">{{filteredCases.length }}</div>
-          <div class="stat-label">débiteurs inactifs</div>
-        </div>
-      </div>
-      
-      <!-- <div class="stat-card">
-        <div class="stat-icon info">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="1" x2="12" y2="23"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ formatCurrency(getTotalRecovered()) }}</div>
-          <div class="stat-label">Montant recouvré</div>
-        </div>
-      </div> -->
     </div>
   </div>
 
-  <!-- Liste des créances -->
-    <div class="cases-content fade-in-up">
-    <div class="cases-list" *ngIf="filteredCase.length > 0; else noCases">
-        <div class="list-header">
-        <!-- <h3>Créances ({{ filteredCases.length }})</h3> -->
+  <!-- Liste des débiteurs -->
+  <div class="cases-content fade-in-up">
+    <div class="cases-list" *ngIf="filteredDebiteurs.length > 0; else noDebtors">
+      <div class="list-header">
         <app-view-toggle 
-            [currentView]="currentView" 
-            (viewChange)="currentView = $event">
+          [currentView]="currentView" 
+          (viewChange)="currentView = $event">
         </app-view-toggle>
-        </div>
-        
-        <!-- Vue grille -->
-        <div class="cases-grid" *ngIf="currentView === 'grid'">
-        <div class="case-card" *ngFor="let item of filteredCase">
-            <div class="case-header">
+      </div>
+      
+      <!-- Vue grille -->
+      <div class="cases-grid" *ngIf="currentView === 'grid'">
+        <div class="case-card" *ngFor="let item of filteredDebiteurs">
+          <div class="case-header">
             <div class="case-info">
-                <p class="debtor-name">{{ item.creditorName }}</p>
+              <p class="debtor-name">
+                {{ item.firstName }} {{ item.lastName }}
+              </p>
+               <!-- <span >{{ item.type }}</span> -->
             </div>
             <div class="case-badges">
-                <span class="status-badge" [ngClass]="statusClass(item.status)">
-                {{ item.status }}
-                </span>
+              <span class="status-badge" [ngClass]="item.type">
+                 {{ item.companyName }}
+              </span>
             </div>
-            </div>
-            
-            <div class="case-body">
+          </div>
+          
+          <div class="case-body">
             <div class="case-amounts">
-                <div class="amount-item">
-                <span class="amount-label">Username</span>
-                <span class="amount-value">{{ item.username }}</span>
-                </div>
-                <div class="amount-item">
+              <div class="amount-item">
                 <span class="amount-label">Email</span>
                 <span class="amount-value">{{ item.email }}</span>
-                </div>
-                <div class="amount-item">
+              </div>
+              <div class="amount-item">
                 <span class="amount-label">Téléphone</span>
                 <span class="amount-value">{{ item.phone }}</span>
-                </div>
+              </div>
+              <div class="amount-item">
+                <span class="amount-label">Adresse</span>
+                <span class="amount-value">
+                  {{ item.address.street }}, {{ item.address.postalCode }} {{ item.address.city }}
+                </span>
+              </div>
             </div>
             
             <div class="case-actions">
-                <button class="btn btn-primary small"  title="Voir le profil" (click)="openDrawer(item)">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="8" r="4"/>
-                            <path d="M6 20c0-4 12-4 12 0"/>
-                    </svg> voir profil
-                </button>
-                <!-- <button class="btn btn-primary small" (click)="editItem(item)">Modifier</button> -->
+              <button class="btn btn-primary small" title="Voir le profil">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="8" r="4"/>
+                  <path d="M6 20c0-4 12-4 12 0"/>
+                </svg> 
+                Voir profil
+              </button>
             </div>
-            </div>
+          </div>
         </div>
-        </div>
-        
-        <!-- Vue table -->
-        <div class="cases-table-container" *ngIf="currentView === 'table'">
+      </div>
+      
+      <!-- Vue table -->
+      <div class="cases-table-container" *ngIf="currentView === 'table'">
         <table class="cases-table">
-            <thead>
+          <thead>
             <tr>
-                <th>Nom complet</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Téléphone</th>
-                <th>Status</th>
-                <th>Actions</th>
+              <th>Nom complet</th>
+              <th>Société</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Type</th>
+              <th>Situation Financiere</th>
+              <th>Montant Dette</th>
+              <th>Actions</th>
             </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let item of filteredCase" class="case-row">
-                <td>{{ item.creditorName }}</td>
-                <td>{{ item.username }}</td>
-                <td>{{ item.email }}</td>
-                <td>{{ item.phone }}</td>
-                <td>
-                <span class="status-badge" [ngClass]="statusClass(item.status)" >
-                    {{ item.status }}
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of filteredDebiteurs" class="case-row">
+              <td>{{ item.firstName }} {{ item.lastName }}</td>
+              <td>{{ item.companyName || '-' }}</td>
+              <td>{{ item.email }}</td>
+              <td>{{ item.phone }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="item.type">
+                  {{ item.type === 'company' ? 'Entreprise' : 'Particulier' }}
                 </span>
-                </td>
-                <td>
+              </td>
+              <td>{{ item.situation }}</td>
+              <td>{{ item.dette }}</td>
+              <td>
                 <div class="table-actions">
-                    <button class="btn btn-primary small"  title="Voir le profil" (click)="openDrawer(item)">
+                  <button class="btn btn-primary small" title="Voir le profil">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="8" r="4"/>
-                            <path d="M6 20c0-4 12-4 12 0"/>
+                      <circle cx="12" cy="8" r="4"/>
+                      <path d="M6 20c0-4 12-4 12 0"/>
                     </svg>
-                    </button>
+                  </button>
                 </div>
-                </td>
+              </td>
             </tr>
-            </tbody>
+          </tbody>
         </table>
-        </div>
+      </div>
     </div>
 
-    <ng-template #noCases>
-        <div class="no-cases">
+    <ng-template #noDebtors>
+      <div class="no-cases">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14,2 14,8 20,8"/>
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
         </svg>
-        <h3>Aucune créance trouvée</h3>
-        <p>Aucune créance ne correspond aux critères sélectionnés.</p>
-        </div>
+        <h3>Aucun débiteur trouvé</h3>
+        <p>Aucun débiteur ne correspond aux critères sélectionnés.</p>
+      </div>
     </ng-template>
-    </div>
-
+  </div>
 </div>
-
-  
-
-

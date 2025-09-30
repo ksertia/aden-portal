@@ -1,50 +1,80 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
-import { User, Avocats } from '../models/user.model';
+import { Observable } from 'rxjs';
+import { environment } from '../../environment/environment';
+import { Debiteurs } from '../models/user.model';
+import { map } from 'rxjs/operators';
+import { DebtorInfo } from '../models/case.model';
+import { ApiDebtorResponse,CreditorDetail, ApiCreditorResponse, HuissierInfo, ApiHuissierResponse,
+   PartenaireInfo, ApiPartenaireResponse, AvocatInfo, ApiResponseAvocat  } from '../models/case.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = 'http://localhost:3000/api'; // ton backend Strapi
+
+  private apiUrl = `${environment.baseUrl}/debiteurs`;
+  private creancierUrl = `${environment.baseUrl}/creanciers`;
+  private huissierUrl = `${environment.baseUrl}/huissiers`;
+  private partenaireUrl = `${environment.baseUrl}/partenaires`;
+  private avocatUrl = `${environment.baseUrl}/avocats`;
+
 
   constructor(private http: HttpClient) {}
 
-    // Récupération d'un avocat
-  getLawyers(): Observable<Avocats[]> {
-    return this.http.get<any>(`${this.apiUrl}`).pipe(
-      map((res) => {
-        if (res?.data?.map) {
-          const lawyer = res.data.map;
-          return [ // on retourne un tableau pour s’adapter au composant
-            {
-              objetId: lawyer.objetId,
-              nomAvocat: lawyer.nomAvocat,
-              prenomAvocat: lawyer.prenomAvocat,
-              nomCabinet: lawyer.nomCabinet,
-              emailProfessionnel: lawyer.emailProfessionnel,
-              telephone: lawyer.telephone,
-              barreau: lawyer.barreau,
-              specialites: lawyer.specialites || [],
-              languesParles: lawyer.languesParles || [],
-              tarifHoraire: lawyer.tarifHoraire,
-              tarifForfaitaire: lawyer.tarifForfaitaire,
-              disponibilite: lawyer.disponibilite,
-              statutGlobal: lawyer.statutGlobal,
-              commentaires: lawyer.commentaires,
-              dateCreation: lawyer.dateCreation
-            } as Avocats
-          ];
-        }
-        return [];
-      })
+ // récupérer la liste des débiteurs
+  getDebiteurs(sitename: string): Observable<DebtorInfo[]> {
+    return this.http.get<ApiDebtorResponse>(`${this.apiUrl}/${sitename}`).pipe(
+      map(res => res.data.map(item => ({
+        firstName: item.map.prenomDebiteur,
+        lastName: item.map.nomDebiteur,
+        companyName: item.map.raisonSociale,
+        email: item.map.emailDebiteur,
+        phone: item.map.telephone,
+        situation:item.map.situationFinanciere,
+        dette:item.map.montantDette,
+        address: {
+          street: item.map.adresse,
+          postalCode: item.map.codePostal,
+          city: '', // si tu as la ville, tu peux la mettre ici
+          country: '' // obligatoire pour respecter le type Address
+        },
+        type: item.map.typeDebiteur 
+      })))
     );
   }
 
-  deleteLawyer(objetId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${objetId}`);
+  // récupérer un débiteur par ID
+  getDebiteurById(sitename: string, debiteurId: string): Observable<Debiteurs> {
+    return this.http.get<Debiteurs>(`${this.apiUrl}/${sitename}/${debiteurId}`);
   }
 
+// récupérer la liste des créanciers
+  getCreanciers(sitename: string): Observable<CreditorDetail[]> {
+    return this.http.get<ApiCreditorResponse>(`${this.creancierUrl}/${sitename}`).pipe(
+      map(res => res.data.map(item => item.map))
+    );
+  }
 
+  // récupérer la liste des huissiers
+  getHuissiers(sitename: string): Observable<HuissierInfo[]> {
+  return this.http.get<ApiHuissierResponse>(`${this.huissierUrl}/${sitename}`).pipe(
+    map(res => res.data.map(item => item.map))
+  );
+}
+
+// récupérer la liste des partenaires
+getPartenaires(sitename: string): Observable<PartenaireInfo[]> {
+  return this.http.get<ApiPartenaireResponse>(`${this.partenaireUrl}/${sitename}`).pipe(
+    map(res => res.data.map(item => item.map))
+  );
+}
+
+  // Récupérer les avocats 
+  getAvocats(sitename: string): Observable<AvocatInfo[]> {
+    return this.http.get<ApiResponseAvocat>(`${this.avocatUrl}/${sitename}`).pipe(
+    map(res => res.data.map(item => item.map)))
+  };
+
+  
 }

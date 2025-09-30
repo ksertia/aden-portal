@@ -364,7 +364,7 @@
             </svg>
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ statistics.totalCases }}</div>
+            <div class="stat-value">{{ filteredCreditors.length }}</div>
             <div class="stat-label">CREANCIERS</div>
           </div>
         </a>
@@ -505,7 +505,7 @@
             </div>
             
             <div class="case-actions">
-              <button class="btn btn-primary small"  title="Voir le profil" (click)="openDrawer(item)">
+              <button class="btn btn-primary small"  title="Voir le profil" >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="8" r="4"/>
                   <path d="M6 20c0-4 12-4 12 0"/>
@@ -548,17 +548,5 @@
   </div>
 
   <!-- Drawer -->
-  <div class="drawer-overlay" *ngIf="showDrawer" (click)="closeDrawer()">
-    <div class="drawer-content" (click)="$event.stopPropagation()">
-      <div class="drawer-header">
-        <h3>Profil utilisateur</h3>
-        <button class="drawer-close" (click)="closeDrawer()">
-          ✕
-        </button>
-      </div>
-      <div class="drawer-body" *ngIf="selectedUser">
-        <app-profile [user]="selectedUser"></app-profile>
-      </div>
-    </div>
-  </div>
+ 
 </div>

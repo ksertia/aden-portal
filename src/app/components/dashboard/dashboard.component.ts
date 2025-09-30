@@ -4,33 +4,37 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CaseService } from '../../services/case.service';
 import { User, StrapiRole } from '../../models/user.model';
-import { DebtCase } from '../../models/case.model';
+import { DebtCase, CreditorDetail } from '../../models/case.model';
 import { I18nService } from '../../services/i18n.service';
-import { ProfileComponent } from '../profile/profile.component';
+import { AdminService } from '../../services/admin.service';
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, ProfileComponent],
+  imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+  creditors: CreditorDetail[] = [];
+  filteredCreditors: CreditorDetail[] = [];
+  
+
+
   currentUser: User | null = null;
   userCases: DebtCase[] = [];
   statistics: any = null;
 
   translations: any = {};
 
-  showDrawer = false;
-  selectedUser: User | null = null;
 
 
   constructor(
     private authService: AuthService,
     private caseService: CaseService,
-    private i18nService: I18nService
+    private i18nService: I18nService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit() {
@@ -94,6 +98,16 @@ export class DashboardComponent implements OnInit {
       .subscribe(stats => {
         this.statistics = stats;
       });
+
+      const sitename = 'portail-recouvrement';
+  
+    this.adminService.getCreanciers(sitename).subscribe({
+      next: (data: CreditorDetail[]) => {
+        this.creditors = data;
+        this.filteredCreditors = [...this.creditors];
+      },
+      error: (err) => console.error(err)
+    });
   }
 
   // Formatage du montant en devise
@@ -188,34 +202,8 @@ export class DashboardComponent implements OnInit {
       role: 'Partenaire'
     }
   ];
-  openDrawer(item: any) {
-    // Transform the static data into a User object
-    this.selectedUser = {
-      id: item.creditorName.replace(/\s+/g, '').toLowerCase(), // Generate a simple ID
-      email: item.email,
-      firstname: item.creditorName.split(' ')[0] || '',
-      lastname: item.creditorName.split(' ').slice(1).join(' ') || '',
-      username: item.username,
-      phone: item.phone,
-      role: {
-        id: 1,
-        documentId: '1',
-        name: item.role.toLowerCase(),
-        description: '',
-        type: 'authenticated',
-        createdAt: '',
-        updatedAt: '',
-        publishedAt: ''
-      },
-      statut: item.status
-    };
-    this.showDrawer = true;
-  }
+  
 
-  closeDrawer() {
-    this.showDrawer = false;
-    this.selectedUser = null;
-  }
 
   // retourne une classe CSS (string) à appliquer selon le status
   statusClass(status: string): string {
