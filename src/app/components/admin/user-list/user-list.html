@@ -63,7 +63,12 @@
   <div class="stats-section fade-in-up">
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon primary">👤</div>
+        <div class="stat-icon primary">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M6 20c0-4 12-4 12 0"/>
+          </svg>
+        </div>
         <div class="stat-content">
           <div class="stat-value">{{ allUser.length }}</div>
           <div class="stat-label">Tous les profils</div>
@@ -72,7 +77,12 @@
       
 
       <div class="stat-card">
-        <div class="stat-icon success">✅</div>
+        <div class="stat-icon success">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M6 20c0-4 12-4 12 0"/>
+          </svg>
+        </div>
         <div class="stat-content">
           <div class="stat-value">
             <!-- {{ filteredCase.filter(c => c.status === 'Actif').length }} -->
@@ -82,12 +92,18 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-icon warning">⚠️</div>
+        <div class="stat-icon warning">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M6 20c0-4 12-4 12 0"/>
+          </svg>
+        </div>
         <div class="stat-content">
           <div class="stat-value">
             <!-- {{ filteredCase.filter(c => c.status === 'Inactif').length }} -->
           </div>
-          <div class="stat-label">Profils inactifs</div>
+          <div class="stat-label">
+            Profils inactifs</div>
         </div>
       </div>
     </div>
@@ -102,14 +118,13 @@
       </div>
 
       <!-- Grille -->
-      <!-- Grille -->
 <div class="cases-grid" *ngIf="currentView === 'grid'">
   <div class="case-card" *ngFor="let item of allUser">
     <div class="case-header">
       <p class="debtor-name">{{ item.firstname + ' ' + item.lastname }}</p>
       <div class="case-badges">
         <span class="status-badge">
-          {{ item.role?.name ? item.role.name : item.role || 'Non défini' }}
+          {{ item.role?.name? item.role.name : item.role || 'Non défini' }}
         </span>
         <span class="priority-badge">{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</span>
       </div>
@@ -132,7 +147,12 @@
       </div>
 
       <div class="case-actions">
-        <button class="btn btn-primary small">Voir profil</button>
+        <button class="btn btn-primary small">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M6 20c0-4 12-4 12 0"/>
+          </svg>
+          Voir profil</button>
       </div>
     </div>
   </div>
@@ -162,7 +182,12 @@
       </td>
       <td>{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</td>
       <td>
-        <button class="btn btn-primary small">Voir</button>
+        <button class="btn btn-primary small">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M6 20c0-4 12-4 12 0"/>
+          </svg>
+        </button>
       </td>
     </tr>
   </tbody>
