@@ -71,11 +71,13 @@ export interface DebtorInfo {
   dette:number;
 }
 export interface ApiDebtorResponse {
+  map: any;
   code: number;
   data: { map: any }[];
   details?: string;
   message?: string;
   totalItemCount?: number;
+  debiteurs: any[];
 }
 
 
@@ -301,6 +303,7 @@ export interface CessionContract {
   status: 'active' | 'completed' | 'terminated';
 }
 
+// pour les creanciers
 export interface CreditorDetail {
   dateCreation: string;
   createurUsername: string;
@@ -346,11 +349,13 @@ export interface CreditorDetail {
   nodeId: string;
 }
 export interface ApiCreditorResponse {
+  map: any;
   code: number;
   data: { map: CreditorDetail }[];
   details?: string;
   message?: string;
   totalItemCount?: number;
+  creanciers: any[];
 }
 // pour HUISSIER
 export interface HuissierInfo {
@@ -407,11 +412,13 @@ export interface HuissierInfo {
   nodeId: string;
 }
 export interface ApiHuissierResponse {
+  map(arg0: (u: any) => { firstname: any; lastname: any; username: any; email: any; phone: any; role: any; }): import("./user.model").User[];
   code: number;
   data: { map: HuissierInfo }[];
   details: string;
   message: string;
   totalItemCount: number;
+  huissiers: any[];
 }
 
 
@@ -481,13 +488,14 @@ export interface PartenaireInfo {
   typePartenaire: string;
 }
 
-// Réponse API typée
 export interface ApiPartenaireResponse {
+  map: any;
   code: number;
   data: { map: PartenaireInfo }[];
   details: string;
   message: string;
   totalItemCount: number;
+   partenaires: any[];
 }
 
 // Pour les Avocats
@@ -550,6 +558,7 @@ export interface AvocatInfo {
   nodeId: string;
 }
 export interface ApiResponseAvocat {
+  map: any;
   code: number;
   data: {
     map: AvocatInfo;
@@ -557,14 +566,26 @@ export interface ApiResponseAvocat {
   details: string;
   message: string;
   totalItemCount: number;
+  avocats: any[]; 
+}
+// Pour tout les profils
+
+export interface GlobalApiResponse {
+  debiteurs: ApiDebtorResponse;
+  huissiers: ApiHuissierResponse;
+  avocats: ApiResponseAvocat;
+  creanciers: ApiCreditorResponse;
+  partenaires: ApiPartenaireResponse;
+}
+
+export interface ApiUserResponse {
+  debiteurs: any[];
+  huissiers: any[];
+  avocats: any[];
+  creanciers: any[];
+  cedants: any[];
+  partenaires: any[];
 }
 
 
-
-
-
-
-
-
-// Pour tout les profils
 

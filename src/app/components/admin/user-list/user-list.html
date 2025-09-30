@@ -29,7 +29,8 @@
 
         <div class="filter-group">
           <label>Profil</label>
-          <select [(ngModel)]="selectedStatus" (change)="updateStatusFilter()">
+          <!-- (change)="updateStatusFilter()" -->
+          <select [(ngModel)]="selectedStatus" >
             <option value="">Tous les profils</option>
             <option value="Créancier">Créancier</option>
             <option value="Débiteur">Débiteur</option>
@@ -44,7 +45,7 @@
   </div>
 
   <!-- Drawer -->
-  <div class="drawer-overlay" *ngIf="showDrawer" (click)="closeDrawer()">
+  <!-- <div class="drawer-overlay" *ngIf="showDrawer" (click)="closeDrawer()">
     <div class="drawer-content" (click)="$event.stopPropagation()">
       <div class="drawer-header">
         <h3>Profil utilisateur</h3>
@@ -56,7 +57,7 @@
         <app-profile [user]="selectedUser"></app-profile>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Statistiques -->
   <div class="stats-section fade-in-up">
@@ -64,10 +65,11 @@
       <div class="stat-card">
         <div class="stat-icon primary">👤</div>
         <div class="stat-content">
-          <div class="stat-value">{{ filteredCase.length }}</div>
+          <div class="stat-value">{{ allUser.length }}</div>
           <div class="stat-label">Tous les profils</div>
         </div>
       </div>
+      
 
       <div class="stat-card">
         <div class="stat-icon success">✅</div>
@@ -93,82 +95,79 @@
 
   <!-- Liste -->
   <div class="cases-content fade-in-up">
-    <div class="cases-list" *ngIf="filteredCase.length > 0; else noCases">
+    <div class="cases-list" *ngIf="filteredAllUser.length > 0; else noCases">
       <div class="list-header">
         <app-view-toggle [currentView]="currentView" (viewChange)="currentView = $event">
         </app-view-toggle>
       </div>
 
       <!-- Grille -->
-      <div class="cases-grid" *ngIf="currentView === 'grid'">
-        <div class="case-card" *ngFor="let item of filteredCase">
-          <div class="case-header">
-            <p class="debtor-name">{{ item.creditorName }}</p>
-            <div class="case-badges">
-              <span class="status-badge" [ngClass]="statusClass(item.status)">
-                {{ item.status }}
-              </span>
-              <span class="priority-badge">{{ item.role }}</span>
-            </div>
-          </div>
+      <!-- Grille -->
+<div class="cases-grid" *ngIf="currentView === 'grid'">
+  <div class="case-card" *ngFor="let item of allUser">
+    <div class="case-header">
+      <p class="debtor-name">{{ item.firstname + ' ' + item.lastname }}</p>
+      <div class="case-badges">
+        <span class="status-badge">
+          {{ item.role?.name ? item.role.name : item.role || 'Non défini' }}
+        </span>
+        <span class="priority-badge">{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</span>
+      </div>
+    </div>
 
-          <div class="case-body">
-            <div class="case-amounts">
-              <div class="amount-item">
-                <span class="amount-label">Username</span>
-                <span class="amount-value">{{ item.username }}</span>
-              </div>
-              <div class="amount-item">
-                <span class="amount-label">Email</span>
-                <span class="amount-value">{{ item.email }}</span>
-              </div>
-              <div class="amount-item">
-                <span class="amount-label">Téléphone</span>
-                <span class="amount-value">{{ item.phone }}</span>
-              </div>
-            </div>
-
-            <div class="case-actions">
-              <button class="btn btn-primary small" (click)="openDrawer(item)">Voir profil</button>
-            </div>
-          </div>
+    <div class="case-body">
+      <div class="case-amounts">
+        <div class="amount-item">
+          <span class="amount-label">Username</span>
+          <span class="amount-value">{{ item.username }}</span>
+        </div>
+        <div class="amount-item">
+          <span class="amount-label">Email</span>
+          <span class="amount-value">{{ item.email }}</span>
+        </div>
+        <div class="amount-item">
+          <span class="amount-label">Téléphone</span>
+          <span class="amount-value">{{ item.phone }}</span>
         </div>
       </div>
 
-      <!-- Table -->
-      <div class="cases-table-container" *ngIf="currentView === 'table'">
-        <table class="cases-table">
-          <thead>
-            <tr>
-              <th>Nom complet</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Téléphone</th>
-              <th>Status</th>
-              <th>Rôle</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of filteredCase">
-              <td>{{ item.creditorName }}</td>
-              <td>{{ item.username }}</td>
-              <td>{{ item.email }}</td>
-              <td>{{ item.phone }}</td>
-              <td>
-                <span class="status-badge" [ngClass]="statusClass(item.status)">
-                  {{ item.status }}
-                </span>
-              </td>
-              <td>{{ item.role }}</td>
-              <td>
-                <button class="btn btn-primary small" (click)="openDrawer(item)">
-                  Voir
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="case-actions">
+        <button class="btn btn-primary small">Voir profil</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table -->
+<table class="cases-table" *ngIf="currentView === 'table'">
+  <thead>
+    <tr>
+      <th>Nom complet</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Téléphone</th>
+      <th>Status</th>
+      <th>Rôle</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of allUser">
+      <td>{{ item.firstname + ' ' + item.lastname }}</td>
+      <td>{{ item.username }}</td>
+      <td>{{ item.email }}</td>
+      <td>{{ item.phone }}</td>
+      <td>
+        <span class="status-badge">{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</span>
+      </td>
+      <td>{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</td>
+      <td>
+        <button class="btn btn-primary small">Voir</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
       </div>
     </div>
 
@@ -179,4 +178,4 @@
       </div>
     </ng-template>
   </div>
-</div>
+

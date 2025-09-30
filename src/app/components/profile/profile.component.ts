@@ -13,7 +13,8 @@ import { I18nService } from '../../services/i18n.service';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  @Input() user?: User; // injecté par UserList
+  // @Input() user?: User; // injecté par UserList
+  user: User | null = null;
   isUpdating = false;
   updateSuccess = false;
 
@@ -25,16 +26,17 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.user = this.authService.getCurrentUser();
     // si aucun user injecté, on prend le connecté
-    // if (!this.user) {
-    //   this.user = this.authService.getCurrentUser();
-    //   if (this.user) {
-    //     this.user = { ...this.user };
-    //     if (this.user.address) {
-    //       this.user.address = { ...this.user.address };
-    //     }
-    //   }
-    // }
+    if (!this.user) {
+      this.user = this.authService.getCurrentUser();
+      if (this.user) {
+        this.user = { ...this.user };
+        if (this.user.address) {
+          this.user.address = { ...this.user.address };
+        }
+      }
+    }
 
     this.loadTranslations();
     this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());

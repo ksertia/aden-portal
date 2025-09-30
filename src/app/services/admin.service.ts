@@ -6,7 +6,7 @@ import { Debiteurs } from '../models/user.model';
 import { map } from 'rxjs/operators';
 import { DebtorInfo } from '../models/case.model';
 import { ApiDebtorResponse,CreditorDetail, ApiCreditorResponse, HuissierInfo, ApiHuissierResponse,
-   PartenaireInfo, ApiPartenaireResponse, AvocatInfo, ApiResponseAvocat  } from '../models/case.model';
+   PartenaireInfo, ApiPartenaireResponse, AvocatInfo, ApiResponseAvocat, GlobalApiResponse  } from '../models/case.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class AdminService {
   private huissierUrl = `${environment.baseUrl}/huissiers`;
   private partenaireUrl = `${environment.baseUrl}/partenaires`;
   private avocatUrl = `${environment.baseUrl}/avocats`;
-
+  private allUrl = `${environment.baseUrl}/get_all_users`;
 
   constructor(private http: HttpClient) {}
 
@@ -75,6 +75,14 @@ getPartenaires(sitename: string): Observable<PartenaireInfo[]> {
     return this.http.get<ApiResponseAvocat>(`${this.avocatUrl}/${sitename}`).pipe(
     map(res => res.data.map(item => item.map)))
   };
+
+  // pour tous les utilisateurs
+  getAllUsers(sitename: string): Observable<GlobalApiResponse> {
+    return this.http.get<GlobalApiResponse>(`${this.allUrl}/${sitename}`)
+  }
+
+  
+
 
   
 }

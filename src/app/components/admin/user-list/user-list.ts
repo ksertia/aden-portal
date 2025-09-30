@@ -3,33 +3,48 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
-import { ProfileComponent } from '../../profile/profile.component';
+import { User } from '../../../models/user.model';
+import { DebtCase, GlobalApiResponse } from '../../../models/case.model';
 import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
-import { User } from '../../../models/user.model';
-import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case.model';
+import { AdminService } from '../../../services/admin.service';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ViewToggleComponent, ProfileComponent, RouterModule],
+  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule],
   templateUrl: './user-list.html',
   styleUrls: ['./user-list.css']
 })
 export class UserList implements OnInit {
+
+  // Données utilisateurs
+  users: any; // réponse brute
+  debiteurs: User[] = [];
+  huissiers: User[] = [];
+  partenaires: User[] = [];
+  creanciers: User[] = [];
+  avocats: User[] = [];
+
+  // Tableau combiné pour l'affichage
+  allUser: User[] = [];
+  filteredAllUser: User[] = [];
+
+  // Gestion des filtres
+  filters = {
+    searchTerm: ''
+  };
+  selectedStatus = '';
+
+  // Vue courante : 'grid' ou 'table'
+  currentView: 'grid' | 'table' = 'grid';
+
+  // Cases (non utilisées ici, mais conservées pour référence)
   cases: DebtCase[] = [];
   filteredCases: DebtCase[] = [];
   statistics: any = null;
-  currentView: 'grid' | 'table' = 'grid';
 
-  filters: CaseFilter = {};
-  selectedStatus = '';
-  selectedPriority = '';
-
-  showCaseDetailsModal = false;
-  selectedCase: DebtCase | null = null;
-
-  // ✅ drawer state
+  // Drawer state
   showDrawer = false;
   selectedUser: User | null = null;
 
@@ -37,219 +52,78 @@ export class UserList implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private caseService: CaseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private adminService: AdminService,
   ) {}
 
   ngOnInit() {
-    this.loadCases();
-    this.loadStatistics();
-
-    // Vérifier si on doit ouvrir un dossier spécifique depuis les notifications
-    this.route.queryParams.subscribe(params => {
-      if (params['caseId']) {
-        this.openCaseFromNotification(params['caseId']);
-      }
-    });
+    
+    this.loadAllUsers();
   }
 
-  loadCases() {
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
+  // 🔑 Récupération des utilisateurs
+  loadAllUsers() {
+    this.adminService.getAllUsers('portail-recouvrement').subscribe({
+      next: (res: any) => {
+        this.users = res; // pour debug
+        console.log('Réponse brute:', res);
 
-    this.caseService.getCases().subscribe(cases => {
-      this.cases = cases.filter(
-        c =>
-          c.creditor.name === currentUser.companyName ||
-          c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
-      );
-      this.applyFilters();
-    });
-  }
+        // Mapping des rôles
+        this.debiteurs = res.debiteurs.map((item: any) => item.map);
+        this.huissiers = res.huissiers.map((item: any) => item.map);
+        this.avocats = res.avocats.map((item: any) => item.map);
+        this.creanciers = res.creanciers.map((item: any) => item.map);
+        this.partenaires = res.partenaires.map((item: any) => item.map);
+        console.log('Debiteurs brut:', res.debiteurs);
+        console.log('Debiteurs map:', this.debiteurs);
 
-  loadStatistics() {
-    this.caseService.getStatistics().subscribe(stats => {
-      this.statistics = stats;
-    });
-  }
 
-  openCaseFromNotification(caseId: string) {
-    setTimeout(() => {
-      const case_ = this.cases.find(c => c.id === caseId);
-      if (case_) {
-        this.viewCaseDetails(case_);
-      }
-    }, 500);
-  }
+        // Combiner tous les utilisateurs dans un tableau unique pour l'affichage
+        this.allUser = [
+          ...this.debiteurs,
+          ...this.huissiers,
+          ...this.avocats,
+          ...this.creanciers,
+          ...this.partenaires
+        ];
 
-  applyFilters() {
-    this.caseService.getCasesWithFilter(this.filters).subscribe(cases => {
-      const currentUser = this.authService.getCurrentUser();
-      if (!currentUser) return;
+        // Initialisation du tableau filtré
+        this.filteredAllUser = [...this.allUser];
 
-      this.filteredCases = cases.filter(
-        c =>
-          c.creditor.name === currentUser.companyName ||
-          c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
-      );
-    });
-  }
-
-  updateStatusFilter() {
-    this.filters.status = this.selectedStatus ? [this.selectedStatus as CaseStatus] : undefined;
-    this.applyFilters();
-  }
-
-  updatePriorityFilter() {
-    this.filters.priority = this.selectedPriority ? [this.selectedPriority as Priority] : undefined;
-    this.applyFilters();
-  }
-
-  resetFilters() {
-    this.filters = {};
-    this.selectedStatus = '';
-    this.selectedPriority = '';
-    this.filteredCases = [...this.cases];
-  }
-
-  getSuccessRate(): number {
-    const completedCases = this.filteredCases.filter(c => c.status === CaseStatus.COMPLETED).length;
-    return this.filteredCases.length > 0
-      ? Math.round((completedCases / this.filteredCases.length) * 100)
-      : 0;
-  }
-
-  getTotalAmount(): number {
-    return this.filteredCases.reduce((sum, c) => sum + c.amount, 0);
-  }
-
-  getTotalRecovered(): number {
-    return this.filteredCases.reduce((sum, c) => sum + c.amountPaid, 0);
-  }
-
-  getPaymentPercentage(case_: DebtCase): number {
-    return Math.round((case_.amountPaid / case_.amount) * 100);
-  }
-
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR'
-    }).format(amount);
-  }
-
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
-
-  getStatusLabel(status: string): string {
-    const labels: { [key: string]: string } = {
-      pending: 'En attente',
-      active: 'Actif',
-      negotiation: 'Négociation',
-      legal_action: 'Action légale',
-      payment_plan: 'Plan de paiement',
-      completed: 'Terminé',
-      closed: 'Fermé'
-    };
-    return labels[status] || status;
-  }
-
-  getPriorityLabel(priority: string): string {
-    const labels: { [key: string]: string } = {
-      low: 'Faible',
-      medium: 'Moyenne',
-      high: 'Élevée',
-      urgent: 'Urgente'
-    };
-    return labels[priority] || priority;
-  }
-
-  viewCaseDetails(case_: DebtCase) {
-    this.selectedCase = case_;
-    this.showCaseDetailsModal = true;
-  }
-
-  closeCaseDetailsModal() {
-    this.showCaseDetailsModal = false;
-    this.selectedCase = null;
-
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {},
-      replaceUrl: true
-    });
-  }
-
-  // ✅ données statiques (simulent les users)
-  filteredCase = [
-    {
-      creditorName: 'Débiteur Antony',
-      username: 'antony',
-      email: 'debiteur@gmail.com',
-      phone: '+33 601020304',
-      status: 'Actif',
-      role: 'Débiteur'
-    },
-    {
-      creditorName: 'Créancier Oliver',
-      username: 'oliver',
-      email: 'creancier@gmail.com',
-      phone: '+33 601020305',
-      status: 'Inactif',
-      role: 'Créancier'
-    }
-  ];
-
-  statusClass(status: string): string {
-    if (!status) return 'badge badge-secondary';
-    return status.toLowerCase() === 'actif'
-      ? 'badge badge-success light border-0'
-      : 'badge badge-danger light border-0';
-  }
-
-  // ✅ Ouvre le tiroir avec mapping vers User
-  openDrawer(item: any) {
-    const roleMap: { [key: string]: string } = {
-      Débiteur: 'debtor',
-      Créancier: 'creditor',
-      Huissier: 'bailiff',
-      Avocat: 'lawyer',
-      Cédant: 'cedant',
-      Partenaire: 'partner'
-    };
-
-    const englishRole = roleMap[item.role] || 'debtor';
-
-    const nameParts = item.creditorName.split(' ');
-
-    this.selectedUser = {
-      id: 'static-id', // fake id
-      email: item.email,
-      firstname: nameParts[0] || '',
-      lastname: nameParts.slice(1).join(' ') || '',
-      username: item.username,
-      role: {
-        id: 1,
-        name: englishRole,
-        documentId: '',
-        description: '',
-        type: '',
-        createdAt: '',
-        updatedAt: '',
-        publishedAt: ''
+        console.log('Tous les utilisateurs:', this.allUser);
       },
-      statut: item.status,
-      phone: item.phone,
-      companyName: '',
-      address: undefined,
-      firstLogin: false,
-      businessId: ''
-    } as User;
+      error: (err) => console.error('❌ Erreur lors de la récupération:', err)
+    });
+  }
 
+  // 🔎 Filtrage par recherche
+  applyFilters() {
+    const term = this.filters.searchTerm?.toLowerCase() || '';
+    this.filteredAllUser = this.allUser.filter(user => {
+      const fullName = `${user.firstname || ''} ${user.lastname || ''}`.toLowerCase();
+      const email = user.email?.toLowerCase() || '';
+      return fullName.includes(term) || email.includes(term) || (user.username?.toLowerCase().includes(term));
+    });
+
+    // Filtrage par rôle si sélectionné
+    if (this.selectedStatus) {
+      this.filteredAllUser = this.filteredAllUser.filter(u => {
+        const roleName = u.role?.name || u.role;
+        return roleName === this.selectedStatus;
+      });
+    }
+  }
+
+  // 🔄 Réinitialiser les filtres
+  resetFilters() {
+    this.filters.searchTerm = '';
+    this.selectedStatus = '';
+    this.filteredAllUser = [...this.allUser];
+  }
+
+  // ✅ Ouvre le drawer avec mapping vers User
+  openDrawer(item: User) {
+    this.selectedUser = item;
     this.showDrawer = true;
   }
 
@@ -258,12 +132,4 @@ export class UserList implements OnInit {
     this.selectedUser = null;
   }
 
-  // actions
-  editItem(item: any) {
-    console.log('Edit', item);
-  }
-
-  deleteItem(item: any) {
-    console.log('Delete', item);
-  }
 }
