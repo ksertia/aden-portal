@@ -96,7 +96,7 @@ export class UserList implements OnInit {
     });
   }
 
-  // 🔎 Filtrage par recherche
+  // Filtrage par recherche
   applyFilters() {
     const term = this.filters.searchTerm?.toLowerCase() || '';
     this.filteredAllUser = this.allUser.filter(user => {
@@ -114,7 +114,7 @@ export class UserList implements OnInit {
     }
   }
 
-  // 🔄 Réinitialiser les filtres
+  //Réinitialiser les filtres
   resetFilters() {
     this.filters.searchTerm = '';
     this.selectedStatus = '';

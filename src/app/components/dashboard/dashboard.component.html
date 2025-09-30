@@ -212,33 +212,6 @@
         </div>
       </div>
 
-      <!-- <div class="quick-actions">
-        <h3>Actions Rapides</h3>
-        <div class="actions-grid">
-          <a routerLink="/creditor/tracking" class="action-card">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12,6 12,12 16,14"/>
-            </svg>
-            <span>Suivi temps réel</span>
-          </a>
-          <a routerLink="/professional/reports" class="action-card highlight">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 2v6l3-3 3 3-3 3v6"/>
-              <path d="M15 8h6"/>
-              <path d="M15 16h6"/>
-            </svg>
-            <span>Rapports d'activité</span>
-          </a>
-          <a routerLink="/creditor/notifications" class="action-card">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-            <span>Notifications</span>
-          </a>
-        </div>
-      </div> -->
        <div class="quick-actions">
         <h3>Actions Rapides</h3>
         <div class="actions-grid">
@@ -295,32 +268,6 @@
             </div>
       </div>
 
-      <!-- <div class="quick-actions">
-        <h3>Actions Rapides</h3>
-        <div class="actions-grid">
-          <a routerLink="/lawyer/consultations" class="action-card">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            <span>Nouvelle consultation</span>
-          </a>
-          <a routerLink="/lawyer/cases" class="action-card">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 12l2 2 4-4"/>
-              <circle cx="12" cy="12" r="9"/>
-            </svg>
-            <span>Réviser un dossier</span>
-          </a>
-          <a routerLink="/professional/reports" class="action-card">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 2v6l3-3 3 3-3 3v6"/>
-              <path d="M15 8h6"/>
-              <path d="M15 16h6"/>
-            </svg>
-            <span>Rapports d'activité</span>
-          </a>
-        </div>
-      </div> -->
        <div class="quick-actions">
         <h3>Actions Rapides</h3>
         <div class="actions-grid">
@@ -379,7 +326,7 @@
             </svg>
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ statistics.activeCases }}</div>
+            <div class="stat-value">{{ filteredDebiteurs.length }}</div>
             <div class="stat-label">DEBITEURS</div>
           </div>
         </a>
@@ -394,7 +341,7 @@
             </svg>
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ statistics.pendingCases }}</div>
+            <div class="stat-value">{{ filteredHuisier.length }}</div>
             <div class="stat-label">HUISSIERS</div>
           </div>
         </a>
@@ -409,7 +356,7 @@
             </svg>
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ statistics.totalCases}}</div>
+            <div class="stat-value">{{ filteredAvocat.length}}</div>
             <div class="stat-label">AVOCATS</div>
           </div>
         </a>
@@ -425,7 +372,7 @@
             </svg>
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ statistics.pendingCases }}</div>
+            <div class="stat-value">-</div>
             <div class="stat-label">CEDANTS</div>
           </div>
         </a>
@@ -439,7 +386,7 @@
             </svg>
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ statistics.activeCases }}</div>
+            <div class="stat-value">{{ filteredPartenaire.length }}</div>
             <div class="stat-label">PARTENAIRES</div>
           </div>
         </a>
@@ -451,34 +398,10 @@
       </div>
 
       <div class="cases-grid" *ngIf="userCases.length > 0">
-            <!-- <div class="case-card" *ngFor="let case of userCases.slice(0, 3)">
-              <div class="case-header">
-                <h3>{{ case.caseNumber }}</h3>
-                <span class="status-badge" [ngClass]="'status-' + case.status">
-                  {{ getStatusLabel(case.status) }}
-                </span>
-              </div>
-              <div class="case-details">
-                <div class="case-info">
-                  <span class="label">Débiteur :</span>
-                  <span>{{ case.debtor.firstName }} {{ case.debtor.lastName }}</span>
-                </div>
-                <div class="case-amount">
-                  <span class="label">Montant :</span>
-                  <span class="amount">{{ formatCurrency(case.amount) }}</span>
-                </div>
-                <div class="case-progress">
-                  <div class="progress-bar">
-                    <div class="progress-fill" [style.width.%]="(case.amountPaid / case.amount) * 100"></div>
-                  </div>
-                  <span class="progress-text">{{ ((case.amountPaid / case.amount) * 100).toFixed(0) }}% recouvré</span>
-                </div>
-              </div>
-            </div> -->
         <div class="case-card" *ngFor="let item of filteredCase">
           <div class="case-header">
             <div class="case-info">
-              <!-- <p class="debtor-name">{{ item.creditorName }}</p> -->
+              <p class="debtor-name">{{ item.creditorName }}</p>
             </div>
             <div class="case-badges">
               <span class="status-badge" [ngClass]="statusClass(item.status)">
