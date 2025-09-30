@@ -4,8 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { AdminService } from '../../../services/admin.service';
-import { DebtorInfo} from '../../../models/case.model';
-
+import { DebtorInfo } from '../../../models/case.model';
 
 @Component({
   selector: 'app-debiteur',
@@ -13,8 +12,11 @@ import { DebtorInfo} from '../../../models/case.model';
   templateUrl: './debiteur.html',
   styleUrls: ['./debiteur.css']
 })
-
 export class Debiteur implements OnInit {
+  // État du tiroir
+  showDrawer = false;
+  selectedDebtor: DebtorInfo | null = null;
+
   // Liste brute et filtrée
   debiteurs: DebtorInfo[] = [];
   filteredDebiteurs: DebtorInfo[] = [];
@@ -65,5 +67,16 @@ export class Debiteur implements OnInit {
       case 'inactif': return 'status-inactive';
       default: return 'status-default';
     }
+  }
+
+  // --- Gestion du tiroir ---
+  openDrawer(debtor: DebtorInfo) {
+    this.selectedDebtor = debtor;
+    this.showDrawer = true;
+  }
+
+  closeDrawer() {
+    this.showDrawer = false;
+    this.selectedDebtor = null;
   }
 }

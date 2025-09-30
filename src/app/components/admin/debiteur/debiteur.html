@@ -67,7 +67,6 @@
               <p class="debtor-name">
                 {{ item.firstName }} {{ item.lastName }}
               </p>
-               <!-- <span >{{ item.type }}</span> -->
             </div>
             <div class="case-badges">
               <span class="status-badge" [ngClass]="item.type">
@@ -95,7 +94,7 @@
             </div>
             
             <div class="case-actions">
-              <button class="btn btn-primary small" title="Voir le profil">
+              <button class="btn btn-primary small" (click)="openDrawer(item)">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="8" r="4"/>
                   <path d="M6 20c0-4 12-4 12 0"/>
@@ -137,7 +136,7 @@
               <td>{{ item.dette }}</td>
               <td>
                 <div class="table-actions">
-                  <button class="btn btn-primary small" title="Voir le profil">
+                  <button class="btn btn-primary small" (click)="openDrawer(item)">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <circle cx="12" cy="8" r="4"/>
                       <path d="M6 20c0-4 12-4 12 0"/>
@@ -150,6 +149,70 @@
         </table>
       </div>
     </div>
+
+    <!-- Drawer -->
+<div class="drawer-overlay" *ngIf="showDrawer" (click)="closeDrawer()">
+  <div class="drawer-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="drawer-header">
+      <h3>Détails du debiteur</h3>
+      <button class="drawer-close" (click)="closeDrawer()">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div class="drawer-body" *ngIf="selectedDebtor">
+      <!-- Profil résumé -->
+      <div class="debtor-profile">
+        <div class="debtor-avatar">
+          {{ selectedDebtor.firstName[0] }}{{ selectedDebtor.lastName[0] }}
+        </div>
+        <div class="debtor-info">
+          <p class="debtor-name">
+            {{ selectedDebtor.firstName }} {{ selectedDebtor.lastName }}
+          </p>
+          <p class="debtor-role">Débiteur</p>
+        </div>
+      </div>
+
+      <!-- Section infos perso -->
+      <div class="details-section">
+        <h4>Informations Personnelles</h4>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-label">Prénom</span>
+            <span class="detail-value">{{ selectedDebtor.firstName }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Nom</span>
+            <span class="detail-value">{{ selectedDebtor.lastName }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Adresse e-mail</span>
+            <span class="detail-value">{{ selectedDebtor.email }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Téléphone</span>
+            <span class="detail-value">{{ selectedDebtor.phone }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedDebtor.address">
+            <span class="detail-label">Adresse</span>
+            <span class="detail-value">
+              {{ selectedDebtor.address.street }},
+              {{ selectedDebtor.address.postalCode }}
+              {{ selectedDebtor.address.city }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bouton action -->
+      <div class="drawer-actions">
+        <button class="btn btn-primary">Mettre à jour</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
     <ng-template #noDebtors>
       <div class="no-cases">

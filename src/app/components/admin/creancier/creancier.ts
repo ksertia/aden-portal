@@ -16,6 +16,9 @@ import { AdminService } from '../../../services/admin.service';
 })
 export class Creancier  implements OnInit {
  
+  // drawer
+  showDrawer = false;
+  selectedCreditor: CreditorDetail | null = null;
 
   creditors: CreditorDetail[] = [];
   filteredCreditors: CreditorDetail[] = [];
@@ -67,5 +70,15 @@ export class Creancier  implements OnInit {
     this.filteredCreditors = [...this.creditors];
   }
  
+   // gestion tiroir
+  openDrawer(creditor: CreditorDetail) {
+    this.selectedCreditor = creditor;
+    this.showDrawer = true;
+  }
+
+  closeDrawer() {
+    this.showDrawer = false;
+    this.selectedCreditor = null;
+  }
 
   }
