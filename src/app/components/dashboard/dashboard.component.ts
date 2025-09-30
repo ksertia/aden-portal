@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CaseService } from '../../services/case.service';
 import { User, StrapiRole } from '../../models/user.model';
-import { DebtCase, CreditorDetail } from '../../models/case.model';
+import { DebtCase, CreditorDetail, DebtorInfo, HuissierInfo, AvocatInfo, PartenaireInfo } from '../../models/case.model';
 import { I18nService } from '../../services/i18n.service';
 import { AdminService } from '../../services/admin.service';
 
@@ -19,6 +19,14 @@ import { AdminService } from '../../services/admin.service';
 export class DashboardComponent implements OnInit {
   creditors: CreditorDetail[] = [];
   filteredCreditors: CreditorDetail[] = [];
+  debiteurs: DebtorInfo[] = [];
+  filteredDebiteurs: DebtorInfo[] = [];
+  huisier: HuissierInfo[] = [];
+  filteredHuisier: HuissierInfo[] = [];
+  avocat: AvocatInfo[] = [];
+  filteredAvocat: AvocatInfo[] = [];
+  partenaire: PartenaireInfo[] = [];
+  filteredPartenaire: PartenaireInfo[] = [];
   
 
 
@@ -42,7 +50,6 @@ export class DashboardComponent implements OnInit {
     this.loadDashboardData();
 
     this.loadTranslations();
-
     this.i18nService.currentLocale$.subscribe(() => {
       this.loadTranslations();
     });
@@ -99,12 +106,44 @@ export class DashboardComponent implements OnInit {
         this.statistics = stats;
       });
 
-      const sitename = 'portail-recouvrement';
+    const sitename = 'portail-recouvrement';
   
     this.adminService.getCreanciers(sitename).subscribe({
       next: (data: CreditorDetail[]) => {
         this.creditors = data;
         this.filteredCreditors = [...this.creditors];
+      },
+      error: (err) => console.error(err)
+    });
+
+    this.adminService.getDebiteurs(sitename).subscribe({
+      next: (data: DebtorInfo[]) => {
+        this.debiteurs = data;
+        this.filteredDebiteurs = [...this.debiteurs];
+      },
+      error: (err) => console.error(err)
+    });
+
+    this.adminService.getHuissiers(sitename).subscribe({
+        next: (data: HuissierInfo[]) => {
+          this.huisier = data;
+          this.filteredHuisier = [...this.huisier];
+        },
+        error: (err) => console.error(err)
+    });
+
+    this.adminService.getAvocats(sitename).subscribe({
+        next: (data: AvocatInfo[]) => {
+          this.avocat = data;
+          this.filteredAvocat = [...this.avocat];
+        },
+        error: (err) => console.error(err)
+    });
+
+    this.adminService.getPartenaires(sitename).subscribe({
+      next: (data: PartenaireInfo[]) => {
+        this.partenaire = data;
+        this.filteredPartenaire = [...this.partenaire];
       },
       error: (err) => console.error(err)
     });

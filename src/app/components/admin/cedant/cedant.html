@@ -6,17 +6,6 @@
         <h1>Cédants</h1>
         <p>Gérez et suivez les cédants en cours de recouvrement</p>
       </div>
-      <!-- <div class="header-actions">
-        <button class="btn btn-secondary" (click)="generateCustomReport()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 2v6l3-3 3 3-3 3v6"/>
-            <path d="M15 8h6"/>
-            <path d="M15 16h6"/>
-          </svg>
-          Rapport personnalisé
-          Retour
-        </button>
-      </div> -->
     </div>
   </div>
 
@@ -37,30 +26,6 @@
             placeholder="Entrez le nom, prénom ou email du cédants ..."
             (input)="applyFilters()">
         </div>
-        
-        <!-- <div class="filter-group">
-          <label>Profil</label>
-          <select [(ngModel)]="selectedStatus" (change)="updateStatusFilter()">
-            <option value="">Tous les profils</option>
-            <option value="pending">Créancier</option>
-            <option value="active">Débiteur</option>
-            <option value="negotiation">Huissier</option>
-            <option value="legal_action">Cedant</option>
-            <option value="completed">Avocat</option>
-            <option value="completed">Partenaire</option>
-          </select>
-        </div> -->
-        
-        <!-- <div class="filter-group">
-          <label>Priorité</label>
-          <select [(ngModel)]="selectedPriority" (change)="updatePriorityFilter()">
-            <option value="">Toutes les priorités</option>
-            <option value="low">Faible</option>
-            <option value="medium">Moyenne</option>
-            <option value="high">Élevée</option>
-            <option value="urgent">Urgente</option>
-          </select>
-        </div> -->
       </div>
     </div>
   </div>
@@ -95,7 +60,7 @@
             </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-value">-</div>
           <div class="stat-label">cédants actifs</div>
         </div>
       </div>
@@ -111,23 +76,10 @@
             </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{filteredCases.length }}</div>
+          <div class="stat-value">-</div>
           <div class="stat-label">cédants inactifs</div>
         </div>
       </div>
-      
-      <!-- <div class="stat-card">
-        <div class="stat-icon info">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="1" x2="12" y2="23"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ formatCurrency(getTotalRecovered()) }}</div>
-          <div class="stat-label">Montant recouvré</div>
-        </div>
-      </div> -->
     </div>
   </div>
 
@@ -135,7 +87,6 @@
     <div class="cases-content fade-in-up">
     <div class="cases-list" *ngIf="filteredCase.length > 0; else noCases">
         <div class="list-header">
-        <!-- <h3>Créances ({{ filteredCases.length }})</h3> -->
         <app-view-toggle 
             [currentView]="currentView" 
             (viewChange)="currentView = $event">
@@ -179,7 +130,6 @@
                             <path d="M6 20c0-4 12-4 12 0"/>
                     </svg> voir profil
                 </button>
-                <!-- <button class="btn btn-primary small" (click)="editItem(item)">Modifier</button> -->
             </div>
             </div>
         </div>
@@ -213,8 +163,8 @@
                 <div class="table-actions">
                     <button class="btn btn-primary small"  title="Voir le profil">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="8" r="4"/>
-                            <path d="M6 20c0-4 12-4 12 0"/>
+                      <circle cx="12" cy="8" r="4"/>
+                      <path d="M6 20c0-4 12-4 12 0"/>
                     </svg>
                     </button>
                 </div>
@@ -235,7 +185,7 @@
         <p>Aucune créance ne correspond aux critères sélectionnés.</p>
         </div>
     </ng-template>
-    </div>
+  </div>
 
 </div>
 

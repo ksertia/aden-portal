@@ -6,7 +6,6 @@
 
 .header-content {
   display: flex;
-  /* justify-content: space-between; */
   justify-content: flex-start;
   align-items: center;
   gap: 25px;
@@ -20,13 +19,6 @@
     color: #721c24;
     background-color: #f8d7da;
 }
-
-/* .list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-} */
 
 .cases-header h1 {
   font-size: 32px;
@@ -101,6 +93,7 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
 }
+
 
 .stat-card {
   background: var(--surface);

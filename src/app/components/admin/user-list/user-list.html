@@ -85,8 +85,9 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">
-            <!-- {{ filteredCase.filter(c => c.status === 'Actif').length }} -->
+          
           </div>
+          <div class="stat-value">-</div>
           <div class="stat-label">Profils actifs</div>
         </div>
       </div>
@@ -99,11 +100,10 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">
-            <!-- {{ filteredCase.filter(c => c.status === 'Inactif').length }} -->
+          <div class="stat-value">{{ allUser.length }}</div>
           </div>
-          <div class="stat-label">
-            Profils inactifs</div>
+          
+          <div class="stat-label">Profils inactifs</div>
         </div>
       </div>
     </div>
@@ -118,83 +118,83 @@
       </div>
 
       <!-- Grille -->
-<div class="cases-grid" *ngIf="currentView === 'grid'">
-  <div class="case-card" *ngFor="let item of allUser">
-    <div class="case-header">
-      <p class="debtor-name">{{ item.firstname + ' ' + item.lastname }}</p>
-      <div class="case-badges">
-        <span class="status-badge">
-          {{ item.role?.name? item.role.name : item.role || 'Non défini' }}
-        </span>
-        <span class="priority-badge">{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</span>
-      </div>
-    </div>
+      <div class="cases-grid" *ngIf="currentView === 'grid'">
+        <div class="case-card" *ngFor="let item of allUser">
+          <div class="case-header">
+            <p class="debtor-name">{{ item.firstname + ' ' + item.lastname }}</p>
+            <div class="case-badges">
+              <span class="status-badge">
+                {{ item.role?.name? item.role.name : item.role || 'Non défini' }}
+              </span>
+              <span class="priority-badge">{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</span>
+            </div>
+          </div>
 
-    <div class="case-body">
-      <div class="case-amounts">
-        <div class="amount-item">
-          <span class="amount-label">Username</span>
-          <span class="amount-value">{{ item.username }}</span>
-        </div>
-        <div class="amount-item">
-          <span class="amount-label">Email</span>
-          <span class="amount-value">{{ item.email }}</span>
-        </div>
-        <div class="amount-item">
-          <span class="amount-label">Téléphone</span>
-          <span class="amount-value">{{ item.phone }}</span>
+          <div class="case-body">
+            <div class="case-amounts">
+              <div class="amount-item">
+                <span class="amount-label">Username</span>
+                <span class="amount-value">{{ item.username }}</span>
+              </div>
+              <div class="amount-item">
+                <span class="amount-label">Email</span>
+                <span class="amount-value">{{ item.email }}</span>
+              </div>
+              <div class="amount-item">
+                <span class="amount-label">Téléphone</span>
+                <span class="amount-value">{{ item.phone }}</span>
+              </div>
+            </div>
+
+            <div class="case-actions">
+              <button class="btn btn-primary small">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="8" r="4"/>
+                  <path d="M6 20c0-4 12-4 12 0"/>
+                </svg>
+                Voir profil</button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="case-actions">
-        <button class="btn btn-primary small">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="8" r="4"/>
-            <path d="M6 20c0-4 12-4 12 0"/>
-          </svg>
-          Voir profil</button>
-      </div>
+      <!-- Table -->
+      <table class="cases-table" *ngIf="currentView === 'table'">
+        <thead>
+          <tr>
+            <th>Nom complet</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th>Status</th>
+            <th>Rôle</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of allUser">
+            <td>{{ item.firstname + ' ' + item.lastname }}</td>
+            <td>{{ item.username }}</td>
+            <td>{{ item.email }}</td>
+            <td>{{ item.phone }}</td>
+            <td>
+              <span class="status-badge">{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</span>
+            </td>
+            <td>{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</td>
+            <td>
+              <button class="btn btn-primary small">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="8" r="4"/>
+                  <path d="M6 20c0-4 12-4 12 0"/>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+        </table>
+
     </div>
   </div>
-</div>
-
-<!-- Table -->
-<table class="cases-table" *ngIf="currentView === 'table'">
-  <thead>
-    <tr>
-      <th>Nom complet</th>
-      <th>Username</th>
-      <th>Email</th>
-      <th>Téléphone</th>
-      <th>Status</th>
-      <th>Rôle</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let item of allUser">
-      <td>{{ item.firstname + ' ' + item.lastname }}</td>
-      <td>{{ item.username }}</td>
-      <td>{{ item.email }}</td>
-      <td>{{ item.phone }}</td>
-      <td>
-        <span class="status-badge">{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</span>
-      </td>
-      <td>{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</td>
-      <td>
-        <button class="btn btn-primary small">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="8" r="4"/>
-            <path d="M6 20c0-4 12-4 12 0"/>
-          </svg>
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-      </div>
-    </div>
 
     <ng-template #noCases>
       <div class="no-cases">
@@ -202,5 +202,8 @@
         <p>Essayez de modifier vos filtres.</p>
       </div>
     </ng-template>
-  </div>
+
+
+
+
 
