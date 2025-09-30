@@ -7,15 +7,32 @@ import { User } from '../models/user.model';
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:1337/api/users'; // ton endpoint Strapi ou autre
+  private apiUrl = 'http://localhost:1337/api/users'; // ton backend Strapi ou autre
 
   constructor(private http: HttpClient) {}
 
+  // 🔹 Créer un utilisateur
+  createUser(userData: Partial<User>): Observable<User> {
+    return this.http.post<User>(this.apiUrl, userData);
+  }
+
+  // 🔹 Récupérer tous les utilisateurs
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(this.apiUrl);
   }
 
-  getUserById(id: number): Observable<User> {
+  // 🔹 Récupérer un utilisateur par ID
+  getUserById(id: string): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${id}`);
+  }
+
+  // 🔹 Mettre à jour un utilisateur
+  updateUser(id: string, userData: Partial<User>): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/${id}`, userData);
+  }
+
+  // 🔹 Supprimer un utilisateur
+  deleteUser(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

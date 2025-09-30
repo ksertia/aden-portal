@@ -4,13 +4,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule} from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
+import { ProfileComponent } from '../../profile/profile.component';
 import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
 import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case.model';
+import { User } from '../../../models/user.model';
 
 @Component({
   selector: 'app-creancier',
-  imports: [CommonModule, FormsModule, ViewToggleComponent,RouterModule],
+  imports: [CommonModule, FormsModule, ViewToggleComponent, ProfileComponent, RouterModule],
   templateUrl: './creancier.html',
   styleUrl: './creancier.css'
 })
@@ -31,6 +33,9 @@ export class Creancier  implements OnInit {
   
   showCaseDetailsModal = false;
   selectedCase: DebtCase | null = null;
+
+  showDrawer = false;
+  selectedUser: User | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -173,13 +178,24 @@ export class Creancier  implements OnInit {
   closeCaseDetailsModal() {
     this.showCaseDetailsModal = false;
     this.selectedCase = null;
-    
+
     // Nettoyer l'URL si on vient des notifications
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {},
       replaceUrl: true
     });
+  }
+
+  openDrawer(item: any) {
+    // Assuming item has user data or we need to fetch it
+    this.selectedUser = item; // Adjust based on your data structure
+    this.showDrawer = true;
+  }
+
+  closeDrawer() {
+    this.showDrawer = false;
+    this.selectedUser = null;
   }
 
   downloadCaseReport(case_: DebtCase) {

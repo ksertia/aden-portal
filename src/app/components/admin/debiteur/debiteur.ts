@@ -4,13 +4,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule} from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
+import { ProfileComponent } from '../../profile/profile.component';
 import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
 import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case.model';
+import { User } from '../../../models/user.model';
 
 @Component({
   selector: 'app-debiteur',
-  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule],
+  imports: [CommonModule, FormsModule, ViewToggleComponent, ProfileComponent, RouterModule],
   templateUrl: './debiteur.html',
   styleUrl: './debiteur.css'
 })
@@ -28,6 +30,10 @@ export class Debiteur  implements OnInit {
   
   showCaseDetailsModal = false;
   selectedCase: DebtCase | null = null;
+
+  // drawer state
+  showDrawer = false;
+  selectedUser: User | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -206,6 +212,54 @@ export class Debiteur  implements OnInit {
       'legal_action_initiated': 'legal'
     };
     return typeMap[type] || 'status';
+  }
+
+  // Ouvre le tiroir avec mapping vers User
+  openDrawer(item: any) {
+    const roleMap: { [key: string]: string } = {
+      Débiteur: 'debtor',
+      Créancier: 'creditor',
+      Huissier: 'bailiff',
+      Avocat: 'lawyer',
+      Cédant: 'cedant',
+      Partenaire: 'partner'
+    };
+
+    const frenchRole = item.creditorName.split(' ')[0];
+    const englishRole = roleMap[frenchRole] || 'debtor';
+
+    const nameParts = item.creditorName.split(' ');
+
+    this.selectedUser = {
+      id: 'static-id', // fake id
+      email: item.email,
+      firstname: nameParts[1] || '',
+      lastname: nameParts[2] || nameParts[1] || '',
+      username: item.username,
+      role: {
+        id: 1,
+        name: englishRole,
+        documentId: '',
+        description: '',
+        type: '',
+        createdAt: '',
+        updatedAt: '',
+        publishedAt: ''
+      },
+      statut: item.status,
+      phone: item.phone,
+      companyName: '',
+      address: undefined,
+      firstLogin: false,
+      businessId: ''
+    } as User;
+
+    this.showDrawer = true;
+  }
+
+  closeDrawer() {
+    this.showDrawer = false;
+    this.selectedUser = null;
   }
 
   // données statique

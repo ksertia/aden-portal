@@ -6,12 +6,13 @@ import { CaseService } from '../../services/case.service';
 import { User, StrapiRole } from '../../models/user.model';
 import { DebtCase } from '../../models/case.model';
 import { I18nService } from '../../services/i18n.service';
+import { ProfileComponent } from '../profile/profile.component';
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ProfileComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -21,6 +22,9 @@ export class DashboardComponent implements OnInit {
   statistics: any = null;
 
   translations: any = {};
+
+  showDrawer = false;
+  selectedUser: User | null = null;
 
 
   constructor(
@@ -184,7 +188,36 @@ export class DashboardComponent implements OnInit {
       role: 'Partenaire'
     }
   ];
-   // retourne une classe CSS (string) à appliquer selon le status
+  openDrawer(item: any) {
+    // Transform the static data into a User object
+    this.selectedUser = {
+      id: item.creditorName.replace(/\s+/g, '').toLowerCase(), // Generate a simple ID
+      email: item.email,
+      firstname: item.creditorName.split(' ')[0] || '',
+      lastname: item.creditorName.split(' ').slice(1).join(' ') || '',
+      username: item.username,
+      phone: item.phone,
+      role: {
+        id: 1,
+        documentId: '1',
+        name: item.role.toLowerCase(),
+        description: '',
+        type: 'authenticated',
+        createdAt: '',
+        updatedAt: '',
+        publishedAt: ''
+      },
+      statut: item.status
+    };
+    this.showDrawer = true;
+  }
+
+  closeDrawer() {
+    this.showDrawer = false;
+    this.selectedUser = null;
+  }
+
+  // retourne une classe CSS (string) à appliquer selon le status
   statusClass(status: string): string {
     if (!status) return 'badge badge-secondary';
     return status.toLowerCase() === 'actif'

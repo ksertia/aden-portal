@@ -13,29 +13,31 @@ import { I18nService } from '../../services/i18n.service';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  @Input() user: User | null = null;
+  @Input() user?: User; // injecté par UserList
   isUpdating = false;
   updateSuccess = false;
 
   translations: any = {};
 
-  constructor(private authService: AuthService,  private i18nService: I18nService) {}
+  constructor(
+    private authService: AuthService,
+    private i18nService: I18nService
+  ) {}
 
   ngOnInit() {
-    if (!this.user) {
-      this.user = this.authService.getCurrentUser();
-    }
-    if (this.user) {
-      // Créer une copie pour éviter la modification directe
-      this.user = { ...this.user };
-      if (this.user.address) {
-        this.user.address = { ...this.user.address };
-      }
-    }
+    // si aucun user injecté, on prend le connecté
+    // if (!this.user) {
+    //   this.user = this.authService.getCurrentUser();
+    //   if (this.user) {
+    //     this.user = { ...this.user };
+    //     if (this.user.address) {
+    //       this.user.address = { ...this.user.address };
+    //     }
+    //   }
+    // }
 
     this.loadTranslations();
     this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
-
   }
 
   private loadTranslations() {
@@ -44,47 +46,28 @@ export class ProfileComponent implements OnInit {
       this.translations = translations;
     });
   }
-   t(key: string): string {
+
+  t(key: string): string {
     return this.i18nService.translate(key, this.translations);
   }
 
-  // Méthode pour obtenir le libellé du rôle de l'utilisateur
   getUserRoleLabel(): string {
     if (!this.user) return '';
-
-    // Utilisation de l'énumération StrapiRole pour obtenir le libellé du rôle
-    switch (this.user.role.name) {  // Utilisez "name" pour comparer avec l'énumération
-      case StrapiRole.DEBTOR:
-        return 'Débiteur';
-      case StrapiRole.BAILIFF:
-        return 'Huissier de Justice';
-      case StrapiRole.LAWYER:
-        return 'Avocat';
-      case StrapiRole.CREDITOR:
-        return 'Créancier';
-      case StrapiRole.CEDANT:
-        return 'Cédant';
-      case StrapiRole.PARTNER:
-        return 'Partenaire';
-      case StrapiRole.RECOVERY_PARTNER:
-        return 'Partenaire de recouvrement';
-      case StrapiRole.ADMINISTRATEUR:
-        return 'Administrateur';
-      default:
-        return 'Rôle inconnu';
+    switch (this.user.role.name) {
+      case StrapiRole.DEBTOR: return 'Débiteur';
+      case StrapiRole.BAILIFF: return 'Huissier de Justice';
+      case StrapiRole.LAWYER: return 'Avocat';
+      case StrapiRole.CREDITOR: return 'Créancier';
+      case StrapiRole.CEDANT: return 'Cédant';
+      case StrapiRole.PARTNER: return 'Partenaire';
+      case StrapiRole.RECOVERY_PARTNER: return 'Partenaire de recouvrement';
+      case StrapiRole.ADMINISTRATEUR: return 'Administrateur';
+      default: return 'Rôle inconnu';
     }
   }
 
-  // Méthode pour mettre à jour le profil de l'utilisateur
   updateProfile() {
     if (!this.user) return;
-
-    // Prevent updating profile of another user (admin view)
-    if (this.user.id !== this.authService.getCurrentUser()?.id) {
-      console.warn('Cannot update profile of another user');
-      return;
-    }
-
     this.isUpdating = true;
 
     this.authService.updateProfile(this.user).subscribe({
@@ -100,7 +83,6 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  // Méthode pour afficher un message de succès
   private showSuccessMessage() {
     this.updateSuccess = true;
     setTimeout(() => {

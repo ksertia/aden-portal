@@ -1,34 +1,35 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule} from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { ProfileComponent } from '../../profile/profile.component';
-import { CaseService} from '../../../services/case.service';
+import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
 import { User } from '../../../models/user.model';
 import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case.model';
 
 @Component({
   selector: 'app-user-list',
+  standalone: true,
   imports: [CommonModule, FormsModule, ViewToggleComponent, ProfileComponent, RouterModule],
   templateUrl: './user-list.html',
-  styleUrl: './user-list.css'
+  styleUrls: ['./user-list.css']
 })
 export class UserList implements OnInit {
-
   cases: DebtCase[] = [];
   filteredCases: DebtCase[] = [];
-  // filteredCase: DebtCase[] = [];
   statistics: any = null;
   currentView: 'grid' | 'table' = 'grid';
-  
+
   filters: CaseFilter = {};
   selectedStatus = '';
   selectedPriority = '';
-  
+
   showCaseDetailsModal = false;
   selectedCase: DebtCase | null = null;
+
+  // ✅ drawer state
   showDrawer = false;
   selectedUser: User | null = null;
 
@@ -42,7 +43,7 @@ export class UserList implements OnInit {
   ngOnInit() {
     this.loadCases();
     this.loadStatistics();
-    
+
     // Vérifier si on doit ouvrir un dossier spécifique depuis les notifications
     this.route.queryParams.subscribe(params => {
       if (params['caseId']) {
@@ -56,10 +57,10 @@ export class UserList implements OnInit {
     if (!currentUser) return;
 
     this.caseService.getCases().subscribe(cases => {
-      // Filtrer les dossiers pour ce créancier
-      this.cases = cases.filter(c => 
-        c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
+      this.cases = cases.filter(
+        c =>
+          c.creditor.name === currentUser.companyName ||
+          c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
       );
       this.applyFilters();
     });
@@ -72,7 +73,6 @@ export class UserList implements OnInit {
   }
 
   openCaseFromNotification(caseId: string) {
-    // Attendre que les données soient chargées
     setTimeout(() => {
       const case_ = this.cases.find(c => c.id === caseId);
       if (case_) {
@@ -85,10 +85,11 @@ export class UserList implements OnInit {
     this.caseService.getCasesWithFilter(this.filters).subscribe(cases => {
       const currentUser = this.authService.getCurrentUser();
       if (!currentUser) return;
-      
-      this.filteredCases = cases.filter(c => 
-        c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
+
+      this.filteredCases = cases.filter(
+        c =>
+          c.creditor.name === currentUser.companyName ||
+          c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
       );
     });
   }
@@ -112,7 +113,9 @@ export class UserList implements OnInit {
 
   getSuccessRate(): number {
     const completedCases = this.filteredCases.filter(c => c.status === CaseStatus.COMPLETED).length;
-    return this.filteredCases.length > 0 ? Math.round((completedCases / this.filteredCases.length) * 100) : 0;
+    return this.filteredCases.length > 0
+      ? Math.round((completedCases / this.filteredCases.length) * 100)
+      : 0;
   }
 
   getTotalAmount(): number {
@@ -144,23 +147,23 @@ export class UserList implements OnInit {
 
   getStatusLabel(status: string): string {
     const labels: { [key: string]: string } = {
-      'pending': 'En attente',
-      'active': 'Actif',
-      'negotiation': 'Négociation',
-      'legal_action': 'Action légale',
-      'payment_plan': 'Plan de paiement',
-      'completed': 'Terminé',
-      'closed': 'Fermé'
+      pending: 'En attente',
+      active: 'Actif',
+      negotiation: 'Négociation',
+      legal_action: 'Action légale',
+      payment_plan: 'Plan de paiement',
+      completed: 'Terminé',
+      closed: 'Fermé'
     };
     return labels[status] || status;
   }
 
   getPriorityLabel(priority: string): string {
     const labels: { [key: string]: string } = {
-      'low': 'Faible',
-      'medium': 'Moyenne',
-      'high': 'Élevée',
-      'urgent': 'Urgente'
+      low: 'Faible',
+      medium: 'Moyenne',
+      high: 'Élevée',
+      urgent: 'Urgente'
     };
     return labels[priority] || priority;
   }
@@ -173,8 +176,7 @@ export class UserList implements OnInit {
   closeCaseDetailsModal() {
     this.showCaseDetailsModal = false;
     this.selectedCase = null;
-    
-    // Nettoyer l'URL si on vient des notifications
+
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {},
@@ -182,89 +184,26 @@ export class UserList implements OnInit {
     });
   }
 
-  downloadCaseReport(case_: DebtCase) {
-    console.log('Télécharger rapport pour:', case_.caseNumber);
-    // TODO: Implémenter le téléchargement de rapport spécifique au dossier
-  }
-
-  downloadDocument(doc: any) {
-    console.log('Télécharger document:', doc.name);
-    // TODO: Implémenter le téléchargement de document
-  }
-
-  generateCustomReport() {
-    this.router.navigate(['/professional/reports']);
-  }
-
-  getRecentActivities(case_: DebtCase) {
-    return case_.history.slice(-5).reverse();
-  }
-
-  getActivityClass(type: string): string {
-    const typeMap: { [key: string]: string } = {
-      'payment_received': 'payment',
-      'reminder_sent': 'reminder',
-      'status_changed': 'status',
-      'formal_notice_sent': 'legal',
-      'legal_action_initiated': 'legal'
-    };
-    return typeMap[type] || 'status';
-  }
-
-  // données statique
+  // ✅ données statiques (simulent les users)
   filteredCase = [
     {
       creditorName: 'Débiteur Antony',
-      username: 'Computer Science',
-      email: 'Débiteur@gmail.com',
-      phone: '+91 123 456 7890',
+      username: 'antony',
+      email: 'debiteur@gmail.com',
+      phone: '+33 601020304',
       status: 'Actif',
       role: 'Débiteur'
     },
     {
       creditorName: 'Créancier Oliver',
-      username: 'Computer Science',
-      email: 'Créancierr@gmail.com',
-      phone: '+91 123 456 7891',
+      username: 'oliver',
+      email: 'creancier@gmail.com',
+      phone: '+33 601020305',
       status: 'Inactif',
       role: 'Créancier'
-    },
-    
-    {
-      creditorName: 'Huissier Oliver',
-      username: 'Computer Science',
-      email: 'Huissier@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Actif',
-      role: 'Huissier'
-    },
-    {
-      creditorName: 'Avocat Oliver',
-      username: 'Computer Science',
-      email: 'Avocat@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Inactif',
-      role: 'Avocat'
-    },
-    {
-      creditorName: 'Cédant Oliver',
-      username: 'Computer Science',
-      email: 'Cédant@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Actif',
-      role: 'Cédant'
-    },
-    {
-      creditorName: 'Partenaire Oliver',
-      username: 'Computer Science',
-      email: 'Partenaire@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Inactif',
-      role: 'Partenaire'
     }
   ];
 
-  // retourne une classe CSS (string) à appliquer selon le status
   statusClass(status: string): string {
     if (!status) return 'badge badge-secondary';
     return status.toLowerCase() === 'actif'
@@ -272,31 +211,41 @@ export class UserList implements OnInit {
       : 'badge badge-danger light border-0';
   }
 
+  // ✅ Ouvre le tiroir avec mapping vers User
   openDrawer(item: any) {
-    // Map static data to User interface for profile component
     const roleMap: { [key: string]: string } = {
-      'Débiteur': 'debtor',
-      'Créancier': 'creditor',
-      'Huissier': 'bailiff',
-      'Avocat': 'lawyer',
-      'Cédant': 'cedant',
-      'Partenaire': 'partner'
+      Débiteur: 'debtor',
+      Créancier: 'creditor',
+      Huissier: 'bailiff',
+      Avocat: 'lawyer',
+      Cédant: 'cedant',
+      Partenaire: 'partner'
     };
 
-    const englishRole = roleMap[item.role] || 'debtor'; // default
+    const englishRole = roleMap[item.role] || 'debtor';
 
     const nameParts = item.creditorName.split(' ');
+
     this.selectedUser = {
-      id: '', // dummy for static
+      id: 'static-id', // fake id
       email: item.email,
       firstname: nameParts[0] || '',
       lastname: nameParts.slice(1).join(' ') || '',
       username: item.username,
-      role: { name: englishRole, id: 1, documentId: '', description: '', type: '', createdAt: '', updatedAt: '', publishedAt: '' },
+      role: {
+        id: 1,
+        name: englishRole,
+        documentId: '',
+        description: '',
+        type: '',
+        createdAt: '',
+        updatedAt: '',
+        publishedAt: ''
+      },
       statut: item.status,
       phone: item.phone,
-      companyName: '', // optional
-      address: undefined, // optional
+      companyName: '',
+      address: undefined,
       firstLogin: false,
       businessId: ''
     } as User;
@@ -309,20 +258,12 @@ export class UserList implements OnInit {
     this.selectedUser = null;
   }
 
-  // handlers d'actions (à compléter selon ta logique)
+  // actions
   editItem(item: any) {
     console.log('Edit', item);
-    // ouvre modal / route vers page édition...
   }
 
   deleteItem(item: any) {
     console.log('Delete', item);
-    // confirmation + suppression...
-    // exemple simple : this.filteredCases = this.filteredCases.filter(i => i.avocatId !== item.avocatId);
   }
-
-  //  return() {
-  //   this.router.navigate(['/dashboard']);
-  // }
-
-  }
+}
