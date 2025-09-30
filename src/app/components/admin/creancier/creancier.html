@@ -77,6 +77,29 @@
     </div>
   </div>
 
+   <!-- html du tiroir -->
+      <!-- Drawer Profil Créancier -->
+  <div class="drawer-overlay" *ngIf="showDrawer" (click)="closeDrawer()">
+  <div class="drawer-content" (click)="$event.stopPropagation()">
+    <div class="drawer-header">
+      <h2>Détails du créancier</h2>
+      <button class="drawer-close" (click)="closeDrawer()">✕</button>
+    </div>
+
+    <div class="drawer-body" *ngIf="selectedCreditor">
+      <p><strong>Nom complet :</strong> {{ selectedCreditor.contactPrincipal }}</p>
+      <p><strong>Raison Sociale :</strong> {{ selectedCreditor.raisonSociale }}</p>
+      <p><strong>Email :</strong> {{ selectedCreditor.emailProfessionnel }}</p>
+      <p><strong>Téléphone :</strong> {{ selectedCreditor.telephone }}</p>
+      <p><strong>Type :</strong> {{ selectedCreditor.typeCreancier }}</p>
+      <p><strong>Secteur d'activité :</strong> {{ selectedCreditor.secteurActivite }}</p>
+      <p><strong>Chiffre d'affaires :</strong> {{ selectedCreditor.chiffreAffaires | number }}</p>
+    </div>
+  </div>
+</div> 
+
+   <!-- fin du tiroir -->
+
   <!-- Liste des créances -->
   <div class="cases-content fade-in-up">
     <div class="cases-list" *ngIf="filteredCreditors.length > 0; else noCases">
@@ -121,12 +144,13 @@
             </div>
             
             <div class="case-actions">
-              <button class="btn btn-primary small" title="Voir le profil">
+              <button class="btn btn-primary small" title="Voir le profil" (click)="openDrawer(item)">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="8" r="4"/>
                   <path d="M6 20c0-4 12-4 12 0"/>
                 </svg> voir profil
               </button>
+
             </div>
           </div>
         </div>
@@ -172,6 +196,8 @@
         </table>
       </div>
     </div>
+
+    
 
     <ng-template #noCases>
       <div class="no-cases">

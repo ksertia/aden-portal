@@ -2,9 +2,11 @@ import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { User, StrapiRole } from '../../models/user.model';
-import { I18nService } from '../../services/i18n.service';
 
+import { User, StrapiRole } from '../../models/user.model';
+
+import { I18nService } from '../../services/i18n.service';
+import { LanguageSwitcherComponent } from '../shared/language-switcher/language-switcher.component';
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -13,28 +15,27 @@ import { I18nService } from '../../services/i18n.service';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  @Input() user?: User; // injecté par UserList
+  @Input() user: User | null = null;  // <- un seul champ
+
   isUpdating = false;
   updateSuccess = false;
-
   translations: any = {};
 
-  constructor(
-    private authService: AuthService,
-    private i18nService: I18nService
-  ) {}
+  constructor(private authService: AuthService, private i18nService: I18nService) {}
 
   ngOnInit() {
-    // si aucun user injecté, on prend le connecté
-    // if (!this.user) {
-    //   this.user = this.authService.getCurrentUser();
-    //   if (this.user) {
-    //     this.user = { ...this.user };
-    //     if (this.user.address) {
-    //       this.user.address = { ...this.user.address };
-    //     }
-    //   }
-    // }
+    // ⚠️ si user vient du parent (UserList), on l’utilise directement
+    if (!this.user) {
+      // sinon on fallback sur l’utilisateur connecté
+      this.user = this.authService.getCurrentUser();
+    }
+
+    if (this.user) {
+      this.user = { ...this.user };
+      if (this.user.address) {
+        this.user.address = { ...this.user.address };
+      }
+    }
 
     this.loadTranslations();
     this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
@@ -69,7 +70,6 @@ export class ProfileComponent implements OnInit {
   updateProfile() {
     if (!this.user) return;
     this.isUpdating = true;
-
     this.authService.updateProfile(this.user).subscribe({
       next: (updatedUser) => {
         this.user = updatedUser;
@@ -85,8 +85,6 @@ export class ProfileComponent implements OnInit {
 
   private showSuccessMessage() {
     this.updateSuccess = true;
-    setTimeout(() => {
-      this.updateSuccess = false;
-    }, 3000);
+    setTimeout(() => (this.updateSuccess = false), 3000);
   }
 }
