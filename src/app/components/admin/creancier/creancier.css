@@ -20,14 +20,6 @@
     color: #721c24;
     background-color: #f8d7da;
 }
-
-/* .list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-} */
-
 .cases-header h1 {
   font-size: 32px;
   font-weight: 700;
@@ -142,7 +134,6 @@
 
 .list-header {
   display: flex;
-  /* justify-content: space-between; */
   justify-content: flex-end;
   align-items: center;
   margin-bottom: 24px;

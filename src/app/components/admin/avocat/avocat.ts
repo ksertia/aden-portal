@@ -6,7 +6,8 @@ import { ActivatedRoute, Router, RouterModule} from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
-import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case.model';
+import { DebtCase, CaseStatus, Priority, CaseFilter, AvocatInfo } from '../../../models/case.model';
+import { AdminService } from '../../../services/admin.service';
 
 @Component({
   selector: 'app-avocat',
@@ -16,13 +17,24 @@ import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case
 })
 export class Avocat implements OnInit {
 
+  avocat: AvocatInfo[] = [];
+  filteredAvocat: AvocatInfo[] = [];
+
+   // Gestion des filtres
+  filters = {
+    searchTerm: ''
+  };
+
+  // Vue courante : 'grid' ou 'table'
+  currentView: 'grid' | 'table' = 'grid';
+
   cases: DebtCase[] = [];
   filteredCases: DebtCase[] = [];
   // filteredCase: DebtCase[] = [];
-  statistics: any = null;
-  currentView: 'grid' | 'table' = 'grid';
+  // statistics: any = null;
+  // currentView: 'grid' | 'table' = 'grid';
   
-  filters: CaseFilter = {};
+  // filters: CaseFilter = {};
   selectedStatus = '';
   selectedPriority = '';
   
@@ -33,40 +45,74 @@ export class Avocat implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private caseService: CaseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit() {
-    this.loadCases();
-    this.loadStatistics();
+    // this.loadCases();
+    // this.loadStatistics();
     
     // Vérifier si on doit ouvrir un dossier spécifique depuis les notifications
-    this.route.queryParams.subscribe(params => {
-      if (params['caseId']) {
-        this.openCaseFromNotification(params['caseId']);
+    // this.route.queryParams.subscribe(params => {
+    //   if (params['caseId']) {
+    //     this.openCaseFromNotification(params['caseId']);
+    //   }
+    // });
+    this.loadAvocat();
+  }
+
+   loadAvocat() {
+      const sitename = 'portail-recouvrement';
+        
+      this.adminService.getAvocats(sitename).subscribe({
+        next: (data: AvocatInfo[]) => {
+          this.avocat = data;
+          this.filteredAvocat = [...this.avocat];
+        },
+        error: (err) => console.error(err)
+      });
+    }
+
+     // filtrage par recherche
+    applyFilters() {
+      if (!this.filters.searchTerm) {
+        this.filteredAvocat = [...this.avocat];
+        return;
       }
-    });
-  }
-
-  loadCases() {
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
-
-    this.caseService.getCases().subscribe(cases => {
-      // Filtrer les dossiers pour ce créancier
-      this.cases = cases.filter(c => 
-        c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
+      const term = this.filters.searchTerm.toLowerCase();
+      this.filteredAvocat = this.avocat.filter(c =>
+        c.nomAvocat.toLowerCase().includes(term) ||
+        c.prenomAvocat.toLowerCase().includes(term) ||
+        c.emailProfessionnel.toLowerCase().includes(term) ||
+        c.nodeId.toLowerCase().includes(term)
       );
-      this.applyFilters();
-    });
   }
 
-  loadStatistics() {
-    this.caseService.getStatistics().subscribe(stats => {
-      this.statistics = stats;
-    });
+  resetFilters() {
+    this.filters.searchTerm = '';
+    this.filteredAvocat = [...this.avocat];
   }
+
+  // loadCases() {
+  //   const currentUser = this.authService.getCurrentUser();
+  //   if (!currentUser) return;
+
+  //   this.caseService.getCases().subscribe(cases => {
+  //     // Filtrer les dossiers pour ce créancier
+  //     this.cases = cases.filter(c => 
+  //       c.creditor.name === currentUser.companyName || 
+  //       c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
+  //     );
+  //     this.applyFilters();
+  //   });
+  // }
+
+  // loadStatistics() {
+  //   this.caseService.getStatistics().subscribe(stats => {
+  //     this.statistics = stats;
+  //   });
+  // }
 
   openCaseFromNotification(caseId: string) {
     // Attendre que les données soient chargées
@@ -78,34 +124,34 @@ export class Avocat implements OnInit {
     }, 500);
   }
 
-  applyFilters() {
-    this.caseService.getCasesWithFilter(this.filters).subscribe(cases => {
-      const currentUser = this.authService.getCurrentUser();
-      if (!currentUser) return;
+  // applyFilters() {
+  //   this.caseService.getCasesWithFilter(this.filters).subscribe(cases => {
+  //     const currentUser = this.authService.getCurrentUser();
+  //     if (!currentUser) return;
       
-      this.filteredCases = cases.filter(c => 
-        c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
-      );
-    });
-  }
+  //     this.filteredCases = cases.filter(c => 
+  //       c.creditor.name === currentUser.companyName || 
+  //       c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
+  //     );
+  //   });
+  // }
 
-  updateStatusFilter() {
-    this.filters.status = this.selectedStatus ? [this.selectedStatus as CaseStatus] : undefined;
-    this.applyFilters();
-  }
+  // updateStatusFilter() {
+  //   this.filters.status = this.selectedStatus ? [this.selectedStatus as CaseStatus] : undefined;
+  //   this.applyFilters();
+  // }
 
-  updatePriorityFilter() {
-    this.filters.priority = this.selectedPriority ? [this.selectedPriority as Priority] : undefined;
-    this.applyFilters();
-  }
+  // updatePriorityFilter() {
+  //   this.filters.priority = this.selectedPriority ? [this.selectedPriority as Priority] : undefined;
+  //   this.applyFilters();
+  // }
 
-  resetFilters() {
-    this.filters = {};
-    this.selectedStatus = '';
-    this.selectedPriority = '';
-    this.filteredCases = [...this.cases];
-  }
+  // resetFilters() {
+  //   this.filters = {};
+  //   this.selectedStatus = '';
+  //   this.selectedPriority = '';
+  //   this.filteredCases = [...this.cases];
+  // }
 
   getSuccessRate(): number {
     const completedCases = this.filteredCases.filter(c => c.status === CaseStatus.COMPLETED).length;

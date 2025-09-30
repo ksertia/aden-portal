@@ -6,17 +6,6 @@
         <h1>Huissiers</h1>
         <p>Gérez et suivez les huissiers en cours de recouvrement</p>
       </div>
-      <!-- <div class="header-actions">
-        <button class="btn btn-secondary" (click)="generateCustomReport()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 2v6l3-3 3 3-3 3v6"/>
-            <path d="M15 8h6"/>
-            <path d="M15 16h6"/>
-          </svg>
-          Rapport personnalisé
-          Retour
-        </button>
-      </div> -->
     </div>
   </div>
 
@@ -66,7 +55,7 @@
   </div>
 
   <!-- Statistiques -->
-  <div class="stats-section fade-in-up" *ngIf="statistics">
+  <div class="stats-section fade-in-up" *ngIf="huisier.length">
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon primary">
@@ -78,7 +67,7 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-value">{{ filteredHuisier.length }}</div>
           <div class="stat-label">Tous les huissiers</div>
         </div>
       </div>
@@ -93,7 +82,7 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-value">0</div>
           <div class="stat-label">huissiers actifs</div>
         </div>
       </div>
@@ -108,31 +97,17 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{filteredCases.length }}</div>
+          <div class="stat-value">0</div>
           <div class="stat-label">huissiers inactifs</div>
         </div>
       </div>
-      
-      <!-- <div class="stat-card">
-        <div class="stat-icon info">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="1" x2="12" y2="23"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ formatCurrency(getTotalRecovered()) }}</div>
-          <div class="stat-label">Montant recouvré</div>
-        </div>
-      </div> -->
     </div>
   </div>
 
   <!-- Liste des créances -->
     <div class="cases-content fade-in-up">
-    <div class="cases-list" *ngIf="filteredCase.length > 0; else noCases">
+    <div class="cases-list" *ngIf="filteredHuisier.length > 0; else noCases">
         <div class="list-header">
-        <!-- <h3>Créances ({{ filteredCases.length }})</h3> -->
         <app-view-toggle 
             [currentView]="currentView" 
             (viewChange)="currentView = $event">
@@ -141,14 +116,14 @@
         
         <!-- Vue grille -->
         <div class="cases-grid" *ngIf="currentView === 'grid'">
-        <div class="case-card" *ngFor="let item of filteredCase">
+        <div class="case-card" *ngFor="let item of filteredHuisier">
             <div class="case-header">
             <div class="case-info">
-                <p class="debtor-name">{{ item.creditorName }}</p>
+                <p class="debtor-name">{{ item.nomHuissier }}</p>
             </div>
             <div class="case-badges">
-                <span class="status-badge" [ngClass]="statusClass(item.status)">
-                {{ item.status }}
+                <span class="status-badge">
+                {{ item.specialites }}
                 </span>
             </div>
             </div>
@@ -157,15 +132,15 @@
             <div class="case-amounts">
                 <div class="amount-item">
                 <span class="amount-label">Username</span>
-                <span class="amount-value">{{ item.username }}</span>
+                <span class="amount-value">{{ item.nomEtude }}</span>
                 </div>
                 <div class="amount-item">
                 <span class="amount-label">Email</span>
-                <span class="amount-value">{{ item.email }}</span>
+                <span class="amount-value">{{ item.emailProfessionnel }}</span>
                 </div>
                 <div class="amount-item">
                 <span class="amount-label">Téléphone</span>
-                <span class="amount-value">{{ item.phone }}</span>
+                <span class="amount-value">{{ item.telephone }}</span>
                 </div>
             </div>
             
@@ -176,7 +151,6 @@
                             <path d="M6 20c0-4 12-4 12 0"/>
                     </svg> voir profil
                 </button>
-                <!-- <button class="btn btn-primary small" (click)="editItem(item)">Modifier</button> -->
             </div>
             </div>
         </div>
@@ -188,24 +162,26 @@
             <thead>
             <tr>
                 <th>Nom complet</th>
-                <th>Username</th>
+                <th>Nom d'etude</th>
                 <th>Email</th>
                 <th>Téléphone</th>
                 <th>Status</th>
+                <th>Chambre Departementale</th>
                 <th>Actions</th>
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let item of filteredCase" class="case-row">
-                <td>{{ item.creditorName }}</td>
-                <td>{{ item.username }}</td>
-                <td>{{ item.email }}</td>
-                <td>{{ item.phone }}</td>
+            <tr *ngFor="let item of filteredHuisier" class="case-row">
+                <td>{{ item.nomHuissier }}</td>
+                <td>{{ item.nomEtude }}</td>
+                <td>{{ item.emailProfessionnel }}</td>
+                <td>{{ item.telephone }}</td>
                 <td>
-                <span class="status-badge" [ngClass]="statusClass(item.status)" >
-                    {{ item.status }}
+                <span class="status-badge"  >
+                    {{ item.specialites }}
                 </span>
                 </td>
+                <td>{{ item.chambreDepartementale }}</td>
                 <td>
                 <div class="table-actions">
                     <button class="btn btn-primary small"  title="Voir le profil">

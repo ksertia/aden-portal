@@ -18,7 +18,6 @@ export class UserList implements OnInit {
 
   cases: DebtCase[] = [];
   filteredCases: DebtCase[] = [];
-  // filteredCase: DebtCase[] = [];
   statistics: any = null;
   currentView: 'grid' | 'table' = 'grid';
   

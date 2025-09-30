@@ -27,270 +27,270 @@ export class PartnerService {
   private initializeMockData() {
     // Simulation de dossiers cédés
     this.mockCededCases = [
-      {
-        id: 'partner-case-1',
-        caseNumber: 'REC-P-2024-001',
-        debtor: {
-          firstName: 'Michel',
-          lastName: 'Bernard',
-          email: 'michel.bernard@email.com',
-          phone: '+33 1 23 45 67 88',
-          type: 'individual',
-          address: {
-            street: '15 Rue des Lilas',
-            city: 'Lyon',
-            postalCode: '69000',
-            country: 'France'
-          }
-        },
-        creditor: {
-          name: 'TechCorp Solutions',
-          contactPerson: 'Thomas Moreau',
-          email: 'thomas.moreau@techcorp.fr',
-          phone: '+33 1 23 45 67 93',
-          address: {
-            street: '789 Rue de l\'Innovation',
-            city: 'Marseille',
-            postalCode: '13000',
-            country: 'France'
-          }
-        },
-        amount: 5000,
-        amountPaid: 1500,
-        debtBreakdown: {
-          principalAmount: 4000,
-          interests: [
-            {
-              id: '1',
-              type: 'legal',
-              rate: 3.15,
-              startDate: new Date('2024-01-15'),
-              amount: 300,
-              description: 'Intérêts légaux'
-            },
-            {
-              id: '2',
-              type: 'delay',
-              rate: 10,
-              startDate: new Date('2024-02-15'),
-              amount: 200,
-              description: 'Intérêts de retard'
-            }
-          ],
-          penalties: [
-            {
-              id: '1',
-              type: 'late_payment',
-              amount: 200,
-              appliedDate: new Date('2024-02-15'),
-              description: 'Pénalité de retard de paiement'
-            },
-            {
-              id: '2',
-              type: 'administrative',
-              amount: 100,
-              appliedDate: new Date('2024-02-20'),
-              description: 'Frais administratifs'
-            }
-          ],
-          fees: [
-            {
-              id: '1',
-              type: 'collection',
-              amount: 150,
-              appliedDate: new Date('2024-01-20'),
-              description: 'Frais de recouvrement'
-            },
-            {
-              id: '2',
-              type: 'legal',
-              amount: 50,
-              appliedDate: new Date('2024-01-25'),
-              description: 'Frais juridiques'
-            }
-          ],
-          totalInterests: 500,
-          totalPenalties: 300,
-          totalFees: 200,
-          totalAmount: 5000
-        },
-        status: CaseStatus.ACTIVE,
-        priority: Priority.HIGH,
-        createdAt: new Date('2024-01-15'),
-        dueDate: new Date('2024-03-15'),
-        partnerCommission: 25,
-        cededBy: '5',
-        cededAt: new Date('2024-01-20'),
-        documents: [
-          {
-            id: '1',
-            name: 'Contrat de service TechCorp.pdf',
-            type: DocumentType.CONTRACT,
-            url: '#',
-            uploadedAt: new Date('2024-01-15'),
-            uploadedBy: 'Thomas Moreau'
-          },
-          {
-            id: '2',
-            name: 'Facture impayée F-2024-001.pdf',
-            type: DocumentType.INVOICE,
-            url: '#',
-            uploadedAt: new Date('2024-01-16'),
-            uploadedBy: 'Thomas Moreau'
-          },
-          {
-            id: '3',
-            name: 'Correspondance client.pdf',
-            type: DocumentType.CORRESPONDENCE,
-            url: '#',
-            uploadedAt: new Date('2024-01-18'),
-            uploadedBy: 'Thomas Moreau'
-          }
-        ],
-        history: [
-          {
-            id: '1',
-            type: ActivityType.CASE_CEDED,
-            description: 'Dossier cédé au partenaire Recouvrement Solutions',
-            date: new Date('2024-01-20'),
-            userId: '5',
-            userName: 'Thomas Moreau'
-          },
-          {
-            id: '2',
-            type: ActivityType.PAYMENT_RECEIVED,
-            description: 'Paiement partiel reçu de 1500€',
-            date: new Date('2024-01-25'),
-            userId: '6',
-            userName: 'Laurent Rousseau'
-          },
-          {
-            id: '3',
-            type: ActivityType.PARTNER_UPDATE,
-            description: 'Contact établi avec le débiteur, négociation en cours',
-            date: new Date('2024-01-23'),
-            userId: '6',
-            userName: 'Laurent Rousseau'
-          }
-        ]
-      },
-      {
-        id: 'partner-case-2',
-        caseNumber: 'REC-P-2024-002',
-        debtor: {
-          firstName: 'Claire',
-          lastName: 'Dubois',
-          email: 'claire.dubois@email.com',
-          phone: '+33 1 23 45 67 87',
-          type: 'individual',
-          address: {
-            street: '42 Avenue des Champs',
-            city: 'Nice',
-            postalCode: '06000',
-            country: 'France'
-          }
-        },
-        creditor: {
-          name: 'ABC Services',
-          contactPerson: 'Sophie Lambert',
-          email: 'sophie.lambert@abc-services.fr',
-          phone: '+33 1 23 45 67 92',
-          address: {
-            street: '456 Avenue des Affaires',
-            city: 'Lyon',
-            postalCode: '69000',
-            country: 'France'
-          }
-        },
-        amount: 3200,
-        amountPaid: 800,
-        debtBreakdown: {
-          principalAmount: 2800,
-          interests: [
-            {
-              id: '3',
-              type: 'contractual',
-              rate: 8,
-              startDate: new Date('2024-01-10'),
-              amount: 150,
-              description: 'Intérêts contractuels'
-            }
-          ],
-          penalties: [
-            {
-              id: '3',
-              type: 'late_payment',
-              amount: 100,
-              appliedDate: new Date('2024-02-10'),
-              description: 'Pénalité de retard'
-            }
-          ],
-          fees: [
-            {
-              id: '3',
-              type: 'administrative',
-              amount: 50,
-              appliedDate: new Date('2024-01-18'),
-              description: 'Frais de dossier'
-            }
-          ],
-          totalInterests: 200,
-          totalPenalties: 150,
-          totalFees: 50,
-          totalAmount: 3200
-        },
-        status: CaseStatus.NEGOTIATION,
-        priority: Priority.MEDIUM,
-        createdAt: new Date('2024-01-10'),
-        dueDate: new Date('2024-03-10'),
-        partnerCommission: 30,
-        cededBy: '4',
-        cededAt: new Date('2024-01-18'),
-        documents: [
-          {
-            id: '4',
-            name: 'Contrat ABC Services.pdf',
-            type: DocumentType.CONTRACT,
-            url: '#',
-            uploadedAt: new Date('2024-01-10'),
-            uploadedBy: 'Sophie Lambert'
-          },
-          {
-            id: '5',
-            name: 'Mise en demeure préalable.pdf',
-            type: DocumentType.LEGAL_NOTICE,
-            url: '#',
-            uploadedAt: new Date('2024-01-12'),
-            uploadedBy: 'Sophie Lambert'
-          }
-        ],
-        history: [
-          {
-            id: '2',
-            type: ActivityType.CASE_CEDED,
-            description: 'Dossier cédé au partenaire Recouvrement Solutions',
-            date: new Date('2024-01-18'),
-            userId: '4',
-            userName: 'Sophie Lambert'
-          },
-          {
-            id: '4',
-            type: ActivityType.STATUS_CHANGED,
-            description: 'Statut modifié vers "Négociation" par le partenaire',
-            date: new Date('2024-01-22'),
-            userId: '6',
-            userName: 'Laurent Rousseau'
-          },
-          {
-            id: '5',
-            type: ActivityType.PAYMENT_RECEIVED,
-            description: 'Paiement partiel reçu de 800€',
-            date: new Date('2024-01-24'),
-            userId: '6',
-            userName: 'Laurent Rousseau'
-          }
-        ]
-      }
+      // {
+      //   id: 'partner-case-1',
+      //   caseNumber: 'REC-P-2024-001',
+      //   debtor: {
+      //     firstName: 'Michel',
+      //     lastName: 'Bernard',
+      //     email: 'michel.bernard@email.com',
+      //     phone: '+33 1 23 45 67 88',
+      //     type: 'individual',
+      //     address: {
+      //       street: '15 Rue des Lilas',
+      //       city: 'Lyon',
+      //       postalCode: '69000',
+      //       country: 'France'
+      //     }
+      //   },
+      //   creditor: {
+      //     name: 'TechCorp Solutions',
+      //     contactPerson: 'Thomas Moreau',
+      //     email: 'thomas.moreau@techcorp.fr',
+      //     phone: '+33 1 23 45 67 93',
+      //     address: {
+      //       street: '789 Rue de l\'Innovation',
+      //       city: 'Marseille',
+      //       postalCode: '13000',
+      //       country: 'France'
+      //     }
+      //   },
+      //   amount: 5000,
+      //   amountPaid: 1500,
+      //   debtBreakdown: {
+      //     principalAmount: 4000,
+      //     interests: [
+      //       {
+      //         id: '1',
+      //         type: 'legal',
+      //         rate: 3.15,
+      //         startDate: new Date('2024-01-15'),
+      //         amount: 300,
+      //         description: 'Intérêts légaux'
+      //       },
+      //       {
+      //         id: '2',
+      //         type: 'delay',
+      //         rate: 10,
+      //         startDate: new Date('2024-02-15'),
+      //         amount: 200,
+      //         description: 'Intérêts de retard'
+      //       }
+      //     ],
+      //     penalties: [
+      //       {
+      //         id: '1',
+      //         type: 'late_payment',
+      //         amount: 200,
+      //         appliedDate: new Date('2024-02-15'),
+      //         description: 'Pénalité de retard de paiement'
+      //       },
+      //       {
+      //         id: '2',
+      //         type: 'administrative',
+      //         amount: 100,
+      //         appliedDate: new Date('2024-02-20'),
+      //         description: 'Frais administratifs'
+      //       }
+      //     ],
+      //     fees: [
+      //       {
+      //         id: '1',
+      //         type: 'collection',
+      //         amount: 150,
+      //         appliedDate: new Date('2024-01-20'),
+      //         description: 'Frais de recouvrement'
+      //       },
+      //       {
+      //         id: '2',
+      //         type: 'legal',
+      //         amount: 50,
+      //         appliedDate: new Date('2024-01-25'),
+      //         description: 'Frais juridiques'
+      //       }
+      //     ],
+      //     totalInterests: 500,
+      //     totalPenalties: 300,
+      //     totalFees: 200,
+      //     totalAmount: 5000
+      //   },
+      //   status: CaseStatus.ACTIVE,
+      //   priority: Priority.HIGH,
+      //   createdAt: new Date('2024-01-15'),
+      //   dueDate: new Date('2024-03-15'),
+      //   partnerCommission: 25,
+      //   cededBy: '5',
+      //   cededAt: new Date('2024-01-20'),
+      //   documents: [
+      //     {
+      //       id: '1',
+      //       name: 'Contrat de service TechCorp.pdf',
+      //       type: DocumentType.CONTRACT,
+      //       url: '#',
+      //       uploadedAt: new Date('2024-01-15'),
+      //       uploadedBy: 'Thomas Moreau'
+      //     },
+      //     {
+      //       id: '2',
+      //       name: 'Facture impayée F-2024-001.pdf',
+      //       type: DocumentType.INVOICE,
+      //       url: '#',
+      //       uploadedAt: new Date('2024-01-16'),
+      //       uploadedBy: 'Thomas Moreau'
+      //     },
+      //     {
+      //       id: '3',
+      //       name: 'Correspondance client.pdf',
+      //       type: DocumentType.CORRESPONDENCE,
+      //       url: '#',
+      //       uploadedAt: new Date('2024-01-18'),
+      //       uploadedBy: 'Thomas Moreau'
+      //     }
+      //   ],
+      //   history: [
+      //     {
+      //       id: '1',
+      //       type: ActivityType.CASE_CEDED,
+      //       description: 'Dossier cédé au partenaire Recouvrement Solutions',
+      //       date: new Date('2024-01-20'),
+      //       userId: '5',
+      //       userName: 'Thomas Moreau'
+      //     },
+      //     {
+      //       id: '2',
+      //       type: ActivityType.PAYMENT_RECEIVED,
+      //       description: 'Paiement partiel reçu de 1500€',
+      //       date: new Date('2024-01-25'),
+      //       userId: '6',
+      //       userName: 'Laurent Rousseau'
+      //     },
+      //     {
+      //       id: '3',
+      //       type: ActivityType.PARTNER_UPDATE,
+      //       description: 'Contact établi avec le débiteur, négociation en cours',
+      //       date: new Date('2024-01-23'),
+      //       userId: '6',
+      //       userName: 'Laurent Rousseau'
+      //     }
+      //   ]
+      // },
+      // {
+      //   id: 'partner-case-2',
+      //   caseNumber: 'REC-P-2024-002',
+      //   debtor: {
+      //     firstName: 'Claire',
+      //     lastName: 'Dubois',
+      //     email: 'claire.dubois@email.com',
+      //     phone: '+33 1 23 45 67 87',
+      //     type: 'individual',
+      //     address: {
+      //       street: '42 Avenue des Champs',
+      //       city: 'Nice',
+      //       postalCode: '06000',
+      //       country: 'France'
+      //     }
+      //   },
+      //   creditor: {
+      //     name: 'ABC Services',
+      //     contactPerson: 'Sophie Lambert',
+      //     email: 'sophie.lambert@abc-services.fr',
+      //     phone: '+33 1 23 45 67 92',
+      //     address: {
+      //       street: '456 Avenue des Affaires',
+      //       city: 'Lyon',
+      //       postalCode: '69000',
+      //       country: 'France'
+      //     }
+      //   },
+      //   amount: 3200,
+      //   amountPaid: 800,
+      //   debtBreakdown: {
+      //     principalAmount: 2800,
+      //     interests: [
+      //       {
+      //         id: '3',
+      //         type: 'contractual',
+      //         rate: 8,
+      //         startDate: new Date('2024-01-10'),
+      //         amount: 150,
+      //         description: 'Intérêts contractuels'
+      //       }
+      //     ],
+      //     penalties: [
+      //       {
+      //         id: '3',
+      //         type: 'late_payment',
+      //         amount: 100,
+      //         appliedDate: new Date('2024-02-10'),
+      //         description: 'Pénalité de retard'
+      //       }
+      //     ],
+      //     fees: [
+      //       {
+      //         id: '3',
+      //         type: 'administrative',
+      //         amount: 50,
+      //         appliedDate: new Date('2024-01-18'),
+      //         description: 'Frais de dossier'
+      //       }
+      //     ],
+      //     totalInterests: 200,
+      //     totalPenalties: 150,
+      //     totalFees: 50,
+      //     totalAmount: 3200
+      //   },
+      //   status: CaseStatus.NEGOTIATION,
+      //   priority: Priority.MEDIUM,
+      //   createdAt: new Date('2024-01-10'),
+      //   dueDate: new Date('2024-03-10'),
+      //   partnerCommission: 30,
+      //   cededBy: '4',
+      //   cededAt: new Date('2024-01-18'),
+      //   documents: [
+      //     {
+      //       id: '4',
+      //       name: 'Contrat ABC Services.pdf',
+      //       type: DocumentType.CONTRACT,
+      //       url: '#',
+      //       uploadedAt: new Date('2024-01-10'),
+      //       uploadedBy: 'Sophie Lambert'
+      //     },
+      //     {
+      //       id: '5',
+      //       name: 'Mise en demeure préalable.pdf',
+      //       type: DocumentType.LEGAL_NOTICE,
+      //       url: '#',
+      //       uploadedAt: new Date('2024-01-12'),
+      //       uploadedBy: 'Sophie Lambert'
+      //     }
+      //   ],
+      //   history: [
+      //     {
+      //       id: '2',
+      //       type: ActivityType.CASE_CEDED,
+      //       description: 'Dossier cédé au partenaire Recouvrement Solutions',
+      //       date: new Date('2024-01-18'),
+      //       userId: '4',
+      //       userName: 'Sophie Lambert'
+      //     },
+      //     {
+      //       id: '4',
+      //       type: ActivityType.STATUS_CHANGED,
+      //       description: 'Statut modifié vers "Négociation" par le partenaire',
+      //       date: new Date('2024-01-22'),
+      //       userId: '6',
+      //       userName: 'Laurent Rousseau'
+      //     },
+      //     {
+      //       id: '5',
+      //       type: ActivityType.PAYMENT_RECEIVED,
+      //       description: 'Paiement partiel reçu de 800€',
+      //       date: new Date('2024-01-24'),
+      //       userId: '6',
+      //       userName: 'Laurent Rousseau'
+      //     }
+      //   ]
+      // }
     ];
 
     // Simulation de mises à jour partenaire

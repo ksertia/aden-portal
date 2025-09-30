@@ -6,17 +6,6 @@
         <h1>Tous les profils</h1>
         <p>Gérez et suivez les profils en cours de recouvrement</p>
       </div>
-      <!-- <div class="header-actions">
-        <button class="btn btn-secondary" (click)="generateCustomReport()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 2v6l3-3 3 3-3 3v6"/>
-            <path d="M15 8h6"/>
-            <path d="M15 16h6"/>
-          </svg>
-          Rapport personnalisé
-          Retour
-        </button>
-      </div> -->
     </div>
   </div>
 
@@ -50,17 +39,6 @@
             <option value="completed">Partenaire</option>
           </select>
         </div>
-        
-        <!-- <div class="filter-group">
-          <label>Priorité</label>
-          <select [(ngModel)]="selectedPriority" (change)="updatePriorityFilter()">
-            <option value="">Toutes les priorités</option>
-            <option value="low">Faible</option>
-            <option value="medium">Moyenne</option>
-            <option value="high">Élevée</option>
-            <option value="urgent">Urgente</option>
-          </select>
-        </div> -->
       </div>
     </div>
   </div>
@@ -106,19 +84,6 @@
           <div class="stat-label">Profils inactifs</div>
         </div>
       </div>
-      
-      <!-- <div class="stat-card">
-        <div class="stat-icon info">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="1" x2="12" y2="23"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ formatCurrency(getTotalRecovered()) }}</div>
-          <div class="stat-label">Montant recouvré</div>
-        </div>
-      </div> -->
     </div>
   </div>
 
@@ -126,7 +91,6 @@
 <div class="cases-content fade-in-up">
   <div class="cases-list" *ngIf="filteredCase.length > 0; else noCases">
     <div class="list-header">
-      <!-- <h3>Créances ({{ filteredCases.length }})</h3> -->
       <app-view-toggle 
         [currentView]="currentView" 
         (viewChange)="currentView = $event">
@@ -171,7 +135,6 @@
                         <path d="M6 20c0-4 12-4 12 0"/>
                    </svg> voir profil
             </button>
-            <!-- <button class="btn btn-primary small" (click)="editItem(item)">Modifier</button> -->
           </div>
         </div>
       </div>

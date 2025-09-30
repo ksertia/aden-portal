@@ -196,7 +196,7 @@ export const routes: Routes = [
           },
           { 
             path: 'debiteur',
-            loadComponent: () => import('./components/admin/debiteur/debiteur').then(c => c.Debiteur)
+            loadComponent: () => import('./components/admin/debiteur/debiteur').then(m => m.Debiteur)
           },
           { 
             path: 'huissier',

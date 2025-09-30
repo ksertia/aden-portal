@@ -4,8 +4,9 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CaseService } from '../../services/case.service';
 import { User, StrapiRole } from '../../models/user.model';
-import { DebtCase } from '../../models/case.model';
+import { DebtCase, CreditorDetail } from '../../models/case.model';
 import { I18nService } from '../../services/i18n.service';
+import { AdminService } from '../../services/admin.service';
 
 
 @Component({
@@ -16,6 +17,11 @@ import { I18nService } from '../../services/i18n.service';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+  creditors: CreditorDetail[] = [];
+  filteredCreditors: CreditorDetail[] = [];
+  
+
+
   currentUser: User | null = null;
   userCases: DebtCase[] = [];
   statistics: any = null;
@@ -23,10 +29,12 @@ export class DashboardComponent implements OnInit {
   translations: any = {};
 
 
+
   constructor(
     private authService: AuthService,
     private caseService: CaseService,
-    private i18nService: I18nService
+    private i18nService: I18nService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit() {
@@ -90,6 +98,16 @@ export class DashboardComponent implements OnInit {
       .subscribe(stats => {
         this.statistics = stats;
       });
+
+      const sitename = 'portail-recouvrement';
+  
+    this.adminService.getCreanciers(sitename).subscribe({
+      next: (data: CreditorDetail[]) => {
+        this.creditors = data;
+        this.filteredCreditors = [...this.creditors];
+      },
+      error: (err) => console.error(err)
+    });
   }
 
   // Formatage du montant en devise

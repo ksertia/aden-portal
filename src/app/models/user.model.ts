@@ -48,6 +48,16 @@ export interface User {
   businessId?: string;   // Ajouté pour liaison avec profil business
 }
 
+export interface Debiteurs {
+  id?: string;
+  creditorName: string;
+  username: string;
+  email: string;
+  phone: string;
+  status: string;
+}
+
+
 // Interface pour la demande de connexion
 export interface LoginRequest {
   email: string;
