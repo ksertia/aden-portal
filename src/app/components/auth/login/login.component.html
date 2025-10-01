@@ -47,7 +47,8 @@
             </svg>
             {{ errorMessage }}
           </div>
-
+          <div class="ch">
+          <button routerLink="/accueil" class="cancel-btn">Annuler</button>
           <button type="submit" class="login-btn" [disabled]="isLoading">
             <span *ngIf="!isLoading">Se connecter</span>
             <span *ngIf="isLoading" class="loading">
@@ -57,7 +58,11 @@
               Connexion...
             </span>
           </button>
+<<<<<<< HEAD
           
+=======
+          </div>
+>>>>>>> eb8e44249f2d1f49211fbbf27af037595aa6de30
         </form>
 
         <!-- <div class="demo-accounts">

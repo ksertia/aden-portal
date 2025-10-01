@@ -32,6 +32,7 @@ export interface Address {
 
 // Interface pour l'utilisateur
 export interface User {
+allUser: any;
   id: string;
   email: string;
   firstname: string;
@@ -46,6 +47,16 @@ export interface User {
   address?: Address;
   firstLogin?: boolean;  // Ajouté pour gestion du premier login
   businessId?: string;   // Ajouté pour liaison avec profil business
+  prenom: string;
+  nom: string;
+  telephone?: string;
+  emailProfessionnel: string;
+  contactPrincipal: string;
+  secteurActivite: string;
+  raisonSociale: string;
+  chambreDepartementale: string;
+  nomCabinet: string;
+  typePartenaire: string;
 }
 
 export interface Debiteurs {
