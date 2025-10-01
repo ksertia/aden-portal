@@ -29,15 +29,14 @@
 
         <div class="filter-group">
           <label>Profil</label>
-          <!-- (change)="updateStatusFilter()" -->
-          <select [(ngModel)]="selectedStatus" >
+          <select [(ngModel)]="selectedStatus" (change)="updateStatusFilter()">
             <option value="">Tous les profils</option>
-            <option value="Créancier">Créancier</option>
-            <option value="Débiteur">Débiteur</option>
-            <option value="Huissier">Huissier</option>
-            <option value="Cédant">Cédant</option>
-            <option value="Avocat">Avocat</option>
-            <option value="Partenaire">Partenaire</option>
+            <option value="créancier">Créancier</option>
+            <option value="débiteur">Débiteur</option>
+            <option value="huissier">Huissier</option>
+            <option value="cédant">Cédant</option>
+            <option value="avocat">Avocat</option>
+            <option value="partenaire">Partenaire</option>
           </select>
         </div>
       </div>
@@ -60,7 +59,7 @@
   </div> -->
 
   <!-- Statistiques -->
-  <div class="stats-section fade-in-up">
+  <div class="stats-section fade-in-up" *ngIf="allUser.length >0">
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon primary">
@@ -70,7 +69,7 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ allUser.length }}</div>
+          <div class="stat-value">{{ filteredAllUser.length }}</div>
           <div class="stat-label">Tous les profils</div>
         </div>
       </div>
@@ -84,9 +83,7 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">
-          
-          </div>
+          <div class="stat-value"></div>
           <div class="stat-value">-</div>
           <div class="stat-label">Profils actifs</div>
         </div>
@@ -100,10 +97,9 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ allUser.length }}</div>
-          </div>
-          
+          <div class="stat-value">-</div>
           <div class="stat-label">Profils inactifs</div>
+        </div>
         </div>
       </div>
     </div>
@@ -122,11 +118,12 @@
         <div class="case-card" *ngFor="let item of allUser">
           <div class="case-header">
             <p class="debtor-name">{{ item.firstname + ' ' + item.lastname }}</p>
+            <p class="debtor-name">
             <div class="case-badges">
               <span class="status-badge">
                 {{ item.role?.name? item.role.name : item.role || 'Non défini' }}
               </span>
-              <span class="priority-badge">{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</span>
+              <!-- <span class="priority-badge">{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</span> -->
             </div>
           </div>
 
@@ -163,33 +160,33 @@
         <thead>
           <tr>
             <th>Nom complet</th>
-            <th>Username</th>
             <th>Email</th>
             <th>Téléphone</th>
+            <th>Secteur</th>
             <th>Status</th>
             <th>Rôle</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of allUser">
-            <td>{{ item.firstname + ' ' + item.lastname }}</td>
-            <td>{{ item.username }}</td>
-            <td>{{ item.email }}</td>
-            <td>{{ item.phone }}</td>
-            <td>
-              <span class="status-badge">{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</span>
-            </td>
-            <td>{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</td>
-            <td>
-              <button class="btn btn-primary small">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="8" r="4"/>
-                  <path d="M6 20c0-4 12-4 12 0"/>
-                </svg>
-              </button>
-            </td>
-          </tr>
+          <tr *ngFor="let user of filteredAllUser">
+          <td>{{ user.prenom }} {{ user.nom }} {{user.contactPrincipal}}</td>
+          <td>{{ user.email}} {{user.emailProfessionnel}}</td>
+          <td>{{ user.telephone }}</td>
+          <td>{{ user.secteurActivite }} {{ user.raisonSociale }} {{ user.chambreDepartementale }} 
+            {{ user.nomCabinet }} {{ user.typePartenaire }}</td>
+          <td>-</td>
+          <td>{{ user.role }}</td>
+          <td>
+            <button class="btn btn-primary small">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M6 20c0-4 12-4 12 0"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+
         </tbody>
         </table>
 

@@ -397,8 +397,8 @@
         <a routerLink="/Administrateur/user-list" class="btn btn-primary">Voir tout les utilisateurs</a>
       </div>
 
-      <div class="cases-grid" *ngIf="userCases.length > 0">
-        <div class="case-card" *ngFor="let item of filteredCase">
+      <div class="cases-grid" *ngIf="highlightedUsers.length > 0">
+        <div class="case-card" *ngFor="let item of highlightedUsers">
           <div class="case-header">
             <div class="case-info">
               <p class="debtor-name">{{ item.creditorName }}</p>
@@ -414,8 +414,8 @@
           <div class="case-body">
             <div class="case-amounts">
               <div class="amount-item">
-                <span class="amount-label">Username</span>
-                <span class="amount-value">{{ item.username }}</span>
+                <span class="amount-label">Secteur</span>
+                <span class="amount-value">{{ item.Secteur }}</span>
               </div>
               <div class="amount-item">
                 <span class="amount-label">Email</span>
