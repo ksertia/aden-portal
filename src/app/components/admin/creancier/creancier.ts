@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule} from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
-
 import { DebtCase, CaseStatus, Priority, CaseFilter, CreditorDetail } from '../../../models/case.model';
 import { AdminService } from '../../../services/admin.service';
 
@@ -81,4 +79,4 @@ export class Creancier  implements OnInit {
     this.selectedCreditor = null;
   }
 
-  }
+}

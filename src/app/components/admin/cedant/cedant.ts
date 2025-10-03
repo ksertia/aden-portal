@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule} from '@angular/router';
@@ -19,7 +18,6 @@ export class Cedant implements OnInit {
 
   cases: DebtCase[] = [];
   filteredCases: DebtCase[] = [];
-  // filteredCase: DebtCase[] = [];
   statistics: any = null;
   currentView: 'grid' | 'table' = 'grid';
   
@@ -40,13 +38,6 @@ export class Cedant implements OnInit {
   ngOnInit() {
     this.loadCases();
     this.loadStatistics();
-    
-    // Vérifier si on doit ouvrir un dossier spécifique depuis les notifications
-    this.route.queryParams.subscribe(params => {
-      if (params['caseId']) {
-        this.openCaseFromNotification(params['caseId']);
-      }
-    });
   }
 
   loadCases() {
@@ -67,16 +58,6 @@ export class Cedant implements OnInit {
     this.caseService.getStatistics().subscribe(stats => {
       this.statistics = stats;
     });
-  }
-
-  openCaseFromNotification(caseId: string) {
-    // Attendre que les données soient chargées
-    setTimeout(() => {
-      const case_ = this.cases.find(c => c.id === caseId);
-      if (case_) {
-        this.viewCaseDetails(case_);
-      }
-    }, 500);
   }
 
   applyFilters() {
@@ -108,38 +89,6 @@ export class Cedant implements OnInit {
     this.filteredCases = [...this.cases];
   }
 
-  getSuccessRate(): number {
-    const completedCases = this.filteredCases.filter(c => c.status === CaseStatus.COMPLETED).length;
-    return this.filteredCases.length > 0 ? Math.round((completedCases / this.filteredCases.length) * 100) : 0;
-  }
-
-  getTotalAmount(): number {
-    return this.filteredCases.reduce((sum, c) => sum + c.amount, 0);
-  }
-
-  getTotalRecovered(): number {
-    return this.filteredCases.reduce((sum, c) => sum + c.amountPaid, 0);
-  }
-
-  getPaymentPercentage(case_: DebtCase): number {
-    return Math.round((case_.amountPaid / case_.amount) * 100);
-  }
-
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR'
-    }).format(amount);
-  }
-
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
-
   getStatusLabel(status: string): string {
     const labels: { [key: string]: string } = {
       'pending': 'En attente',
@@ -161,52 +110,6 @@ export class Cedant implements OnInit {
       'urgent': 'Urgente'
     };
     return labels[priority] || priority;
-  }
-
-  viewCaseDetails(case_: DebtCase) {
-    this.selectedCase = case_;
-    this.showCaseDetailsModal = true;
-  }
-
-  closeCaseDetailsModal() {
-    this.showCaseDetailsModal = false;
-    this.selectedCase = null;
-    
-    // Nettoyer l'URL si on vient des notifications
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {},
-      replaceUrl: true
-    });
-  }
-
-  downloadCaseReport(case_: DebtCase) {
-    console.log('Télécharger rapport pour:', case_.caseNumber);
-    // TODO: Implémenter le téléchargement de rapport spécifique au dossier
-  }
-
-  downloadDocument(doc: any) {
-    console.log('Télécharger document:', doc.name);
-    // TODO: Implémenter le téléchargement de document
-  }
-
-  generateCustomReport() {
-    this.router.navigate(['/professional/reports']);
-  }
-
-  getRecentActivities(case_: DebtCase) {
-    return case_.history.slice(-5).reverse();
-  }
-
-  getActivityClass(type: string): string {
-    const typeMap: { [key: string]: string } = {
-      'payment_received': 'payment',
-      'reminder_sent': 'reminder',
-      'status_changed': 'status',
-      'formal_notice_sent': 'legal',
-      'legal_action_initiated': 'legal'
-    };
-    return typeMap[type] || 'status';
   }
 
   // données statique
@@ -264,23 +167,7 @@ export class Cedant implements OnInit {
       : 'badge badge-danger light border-0';
   }
 
-  // handlers d'actions (à compléter selon ta logique)
-  editItem(item: any) {
-    console.log('Edit', item);
-    // ouvre modal / route vers page édition...
-  }
-
-  deleteItem(item: any) {
-    console.log('Delete', item);
-    // confirmation + suppression...
-    // exemple simple : this.filteredCases = this.filteredCases.filter(i => i.avocatId !== item.avocatId);
-  }
-
-  //  return() {
-  //   this.router.navigate(['/dashboard']);
-  // }
-
-  }
+}
 
 
 

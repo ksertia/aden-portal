@@ -4,10 +4,9 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CaseService } from '../../services/case.service';
 import { User, StrapiRole } from '../../models/user.model';
-import { DebtCase, CreditorDetail } from '../../models/case.model';
+import { DebtCase, CreditorDetail, DebtorInfo, HuissierInfo, AvocatInfo, PartenaireInfo } from '../../models/case.model';
 import { I18nService } from '../../services/i18n.service';
 import { AdminService } from '../../services/admin.service';
-
 
 @Component({
   selector: 'app-dashboard',
@@ -19,8 +18,14 @@ import { AdminService } from '../../services/admin.service';
 export class DashboardComponent implements OnInit {
   creditors: CreditorDetail[] = [];
   filteredCreditors: CreditorDetail[] = [];
-  
-
+  debiteurs: DebtorInfo[] = [];
+  filteredDebiteurs: DebtorInfo[] = [];
+  huisier: HuissierInfo[] = [];
+  filteredHuisier: HuissierInfo[] = [];
+  avocat: AvocatInfo[] = [];
+  filteredAvocat: AvocatInfo[] = [];
+  partenaire: PartenaireInfo[] = [];
+  filteredPartenaire: PartenaireInfo[] = [];
 
   currentUser: User | null = null;
   userCases: DebtCase[] = [];
@@ -28,7 +33,8 @@ export class DashboardComponent implements OnInit {
 
   translations: any = {};
 
-
+  // tableau final regroupant un utilisateur de chaque rôle
+  highlightedUsers: any[] = [];
 
   constructor(
     private authService: AuthService,
@@ -42,18 +48,18 @@ export class DashboardComponent implements OnInit {
     this.loadDashboardData();
 
     this.loadTranslations();
-
     this.i18nService.currentLocale$.subscribe(() => {
       this.loadTranslations();
     });
   }
 
-   private loadTranslations() {
+  private loadTranslations() {
     const locale = this.i18nService.getCurrentLocale();
     this.i18nService.loadTranslations(locale).subscribe(translations => {
       this.translations = translations;
     });
   }
+
   t(key: string): string {
     return this.i18nService.translate(key, this.translations);
   }
@@ -88,7 +94,7 @@ export class DashboardComponent implements OnInit {
     if (!this.currentUser) return;
 
     // Charger les dossiers de l'utilisateur en fonction de son rôle
-    this.caseService.getCasesByUserId(this.currentUser.id, this.currentUser.role.name) // Utiliser le nom du rôle pour filtrer
+    this.caseService.getCasesByUserId(this.currentUser.id, this.currentUser.role.name)
       .subscribe(cases => {
         this.userCases = cases;
       });
@@ -99,15 +105,117 @@ export class DashboardComponent implements OnInit {
         this.statistics = stats;
       });
 
-      const sitename = 'portail-recouvrement';
-  
+    const sitename = 'portail-recouvrement';
+
     this.adminService.getCreanciers(sitename).subscribe({
       next: (data: CreditorDetail[]) => {
         this.creditors = data;
         this.filteredCreditors = [...this.creditors];
+        this.buildHighlightedUsers(); // mise à jour
       },
       error: (err) => console.error(err)
     });
+
+    this.adminService.getDebiteurs(sitename).subscribe({
+      next: (data: DebtorInfo[]) => {
+        this.debiteurs = data;
+        this.filteredDebiteurs = [...this.debiteurs];
+        this.buildHighlightedUsers(); // mise à jour
+      },
+      error: (err) => console.error(err)
+    });
+
+    this.adminService.getHuissiers(sitename).subscribe({
+      next: (data: HuissierInfo[]) => {
+        this.huisier = data;
+        this.filteredHuisier = [...this.huisier];
+        this.buildHighlightedUsers(); // mise à jour
+      },
+      error: (err) => console.error(err)
+    });
+
+    this.adminService.getAvocats(sitename).subscribe({
+      next: (data: AvocatInfo[]) => {
+        this.avocat = data;
+        this.filteredAvocat = [...this.avocat];
+        this.buildHighlightedUsers(); // mise à jour
+      },
+      error: (err) => console.error(err)
+    });
+
+    this.adminService.getPartenaires(sitename).subscribe({
+      next: (data: PartenaireInfo[]) => {
+        this.partenaire = data;
+        this.filteredPartenaire = [...this.partenaire];
+        this.buildHighlightedUsers(); // mise à jour
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  // Regroupe un utilisateur de chaque rôle
+  buildHighlightedUsers() {
+    this.highlightedUsers = [];
+
+    if (this.filteredDebiteurs.length > 0) {
+      const deb = this.filteredDebiteurs[0];
+      this.highlightedUsers.push({
+        creditorName: deb.firstName || deb.lastName || "Débiteur inconnu",
+        Secteur: deb.companyName,
+        email: deb.email,
+        phone: deb.phone,
+        status: deb.type ? "Actif" : "Inactif",
+        role: "Débiteur"
+      });
+    }
+
+    if (this.filteredCreditors.length > 0) {
+      const cred = this.filteredCreditors[0];
+      this.highlightedUsers.push({
+        creditorName: cred.contactPrincipal || cred.raisonSociale || "Créancier inconnu",
+        Secteur: cred.secteurActivite,
+        email: cred.emailProfessionnel,
+        phone: cred.telephone,
+        status: cred.secteurActivite ? "Actif" : "Inactif",
+        role: "Créancier"
+      });
+    }
+
+    if (this.filteredHuisier.length > 0) {
+      const huis = this.filteredHuisier[0];
+      this.highlightedUsers.push({
+        creditorName: huis.nomHuissier|| "Huissier inconnu",
+        Secteur: huis.nomEtude,
+        email: huis.emailProfessionnel,
+        phone: huis.telephone,
+        status: huis.commentaires ? "Actif" : "Inactif",
+        role: "Huissier"
+      });
+    }
+
+    if (this.filteredAvocat.length > 0) {
+      const av = this.filteredAvocat[0];
+      this.highlightedUsers.push({
+        creditorName: av.prenomAvocat || av.nomAvocat || "Avocat inconnu",
+        Secteur: av.nomCabinet,
+        email: av.emailProfessionnel,
+        phone: av.telephone,
+        status: av.nomCabinet ? "Actif" : "Inactif",
+        role: "Avocat"
+      });
+    }
+
+    if (this.filteredPartenaire.length > 0) {
+      const part = this.filteredPartenaire[0];
+      this.highlightedUsers.push({
+        creditorName: part.nomCommercial || "Partenaire inconnu",
+        Secteur: part.typePartenaire,
+        email: part.emailProfessionnel,
+        phone: part.telephone,
+        status: part.typePartenaire ? "Actif" : "Inactif",
+        role: "Partenaire"
+      });
+    }
   }
 
   // Formatage du montant en devise
@@ -147,64 +255,6 @@ export class DashboardComponent implements OnInit {
     return nextDue ? new Date(nextDue).toLocaleDateString('fr-FR') : 'Aucune';
   }
 
-
-
-
-   // données statique
-  filteredCase = [
-    {
-      creditorName: 'SAWADOGO Ahmad Abdoul-Latif',
-      username: 'Computer Science',
-      email: 'Débiteur@gmail.com',
-      phone: '+91 123 456 7890',
-      status: 'Actif',
-      role: 'Débiteur'
-    },
-    {
-      creditorName: 'Kagambega Aboubacar ',
-      username: 'Computer Science',
-      email: 'Créancierr@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Inactif',
-      role: 'Créancier'
-    },
-    
-    {
-      creditorName: 'Bikiega Faril ',
-      username: 'Computer Science',
-      email: 'Huissier@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Actif',
-      role: 'Huissier'
-    },
-    {
-      creditorName: 'Mr Konate Constant',
-      username: 'Computer Science',
-      email: 'Avocat@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Inactif',
-      role: 'Avocat'
-    },
-    {
-      creditorName: 'Mr Wise',
-      username: 'Computer Science',
-      email: 'Cédant@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Actif',
-      role: 'Cédant'
-    },
-    {
-      creditorName: 'KABORE FAICAL',
-      username: 'Computer Science',
-      email: 'Partenaire@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Inactif',
-      role: 'Partenaire'
-    }
-  ];
-  
-
-
   // retourne une classe CSS (string) à appliquer selon le status
   statusClass(status: string): string {
     if (!status) return 'badge badge-secondary';
@@ -212,6 +262,4 @@ export class DashboardComponent implements OnInit {
       ? 'badge badge-success light border-0'
       : 'badge badge-danger light border-0';
   }
-
-
 }

@@ -586,6 +586,19 @@ export interface ApiUserResponse {
   cedants: any[];
   partenaires: any[];
 }
+export interface AnyUser {
+  firstname?: string;
+  lastname?: string;
+  username?: string;
+  email?: string;
+  nomAvocat?: string;
+  nomHuissier?: string;
+  raisonSociale?: string;
+  telephone?: string;
+  role?: string;
+  name?:any;
+}
+
 
 
 

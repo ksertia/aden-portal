@@ -26,30 +26,6 @@
             placeholder="Entrez le nom, prénom ou email du Huissier ..."
             (input)="applyFilters()">
         </div>
-        
-        <!-- <div class="filter-group">
-          <label>Profil</label>
-          <select [(ngModel)]="selectedStatus" (change)="updateStatusFilter()">
-            <option value="">Tous les profils</option>
-            <option value="pending">Créancier</option>
-            <option value="active">Débiteur</option>
-            <option value="negotiation">Huissier</option>
-            <option value="legal_action">Cedant</option>
-            <option value="completed">Avocat</option>
-            <option value="completed">Partenaire</option>
-          </select>
-        </div> -->
-        
-        <!-- <div class="filter-group">
-          <label>Priorité</label>
-          <select [(ngModel)]="selectedPriority" (change)="updatePriorityFilter()">
-            <option value="">Toutes les priorités</option>
-            <option value="low">Faible</option>
-            <option value="medium">Moyenne</option>
-            <option value="high">Élevée</option>
-            <option value="urgent">Urgente</option>
-          </select>
-        </div> -->
       </div>
     </div>
   </div>
@@ -82,7 +58,7 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">0</div>
+          <div class="stat-value">-</div>
           <div class="stat-label">huissiers actifs</div>
         </div>
       </div>
@@ -97,7 +73,7 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">0</div>
+          <div class="stat-value">-</div>
           <div class="stat-label">huissiers inactifs</div>
         </div>
       </div>

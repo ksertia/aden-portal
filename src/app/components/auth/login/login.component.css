@@ -15,6 +15,28 @@
     width: 100%;
     max-width: 480px;
 }
+.ch { 
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+.cancel-btn {
+     width: 100%;
+    padding: 16px;
+    background: var(--secondary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+}
 
 .login-header {
     text-align: center;

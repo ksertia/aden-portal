@@ -36,8 +36,8 @@ export class AdminService {
         address: {
           street: item.map.adresse,
           postalCode: item.map.codePostal,
-          city: '', // si tu as la ville, tu peux la mettre ici
-          country: '' // obligatoire pour respecter le type Address
+          city: '', 
+          country: '' 
         },
         type: item.map.typeDebiteur 
       })))

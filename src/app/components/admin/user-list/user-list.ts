@@ -57,46 +57,86 @@ export class UserList implements OnInit {
   ) {}
 
   ngOnInit() {
-    
     this.loadAllUsers();
   }
 
   // 🔑 Récupération des utilisateurs
-  loadAllUsers() {
-    this.adminService.getAllUsers('portail-recouvrement').subscribe({
-      next: (res: any) => {
-        this.users = res; // pour debug
-        console.log('Réponse brute:', res);
+ loadAllUsers() {
+  this.adminService.getAllUsers('portail-recouvrement').subscribe({
+    next: (res: any) => {
+      this.users = res;
 
-        // Mapping des rôles
-        this.debiteurs = res.debiteurs.map((item: any) => item.map);
-        this.huissiers = res.huissiers.map((item: any) => item.map);
-        this.avocats = res.avocats.map((item: any) => item.map);
-        this.creanciers = res.creanciers.map((item: any) => item.map);
-        this.partenaires = res.partenaires.map((item: any) => item.map);
-        console.log('Debiteurs brut:', res.debiteurs);
-        console.log('Debiteurs map:', this.debiteurs);
+      this.debiteurs = (res.debiteurs || []).map((d: any) => ({
+      id: d.map.objetId,
+      prenom: d.map.prenomDebiteur,
+      nom: d.map.nomDebiteur,
+      email: d.map.emailDebiteur,
+      telephone: d.map.telephone,
+      role: "débiteur",
+      adresse: d.map.adresse,
+      raisonSociale: d.map.raisonSociale,
+      dateNaissance: d.map.dateNaissance,
+      ...d.map
+    }));
 
+    this.huissiers = (res.huissiers || []).map((h: any) => ({
+      id: h.map.objetId,
+      prenom: h.map.prenomHuissier,
+      nom: h.map.nomHuissier,
+      email: h.map.emailHuissier,
+      telephone: h.map.telephone,
+      role: "huissier",
+      ...h.map
+    }));
 
-        // Combiner tous les utilisateurs dans un tableau unique pour l'affichage
-        this.allUser = [
-          ...this.debiteurs,
-          ...this.huissiers,
-          ...this.avocats,
-          ...this.creanciers,
-          ...this.partenaires
-        ];
+    this.avocats = (res.avocats || []).map((a: any) => ({
+      id: a.map.objetId,
+      prenom: a.map.prenomAvocat,
+      nom: a.map.nomAvocat,
+      email: a.map.emailAvocat,
+      telephone: a.map.telephone,
+      role: "avocat",
+      ...a.map
+    }));
 
-        // Initialisation du tableau filtré
-        this.filteredAllUser = [...this.allUser];
+    this.creanciers = (res.creanciers || []).map((c: any) => ({
+      id: c.map.objetId,
+      prenom: c.map.prenomCreancier,
+      nom: c.map.nomCreancier,
+      email: c.map.emailCreancier,
+      telephone: c.map.telephone,
+      role: "créancier",
+      ...c.map
+    }));
 
-        console.log('Tous les utilisateurs:', this.allUser);
-      },
-      error: (err) => console.error('❌ Erreur lors de la récupération:', err)
-    });
+    this.partenaires = (res.partenaires || []).map((p: any) => ({
+      id: p.map.objetId,
+      prenom: p.map.prenomPartenaire,
+      nom: p.map.nomPartenaire,
+      email: p.map.emailPartenaire,
+      telephone: p.map.telephone,
+      role: "partenaire",
+      ...p.map
+    }));
+
+    // Combinaisons tous les utilisateurs
+    this.allUser = [
+      ...this.debiteurs,
+      ...this.huissiers,
+      ...this.avocats,
+      ...this.creanciers,
+      ...this.partenaires
+    ];
+
+    this.filteredAllUser = [...this.allUser];
+
+    console.log('Tous les utilisateurs:', this.allUser);
+    },
+    error: (err) => console.error('Erreur lors de la récupération:', err)
+  });
   }
 
-  // 🔎 Filtrage par recherche
+  // Filtrage par recherche
   applyFilters() {
     const term = this.filters.searchTerm?.toLowerCase() || '';
     this.filteredAllUser = this.allUser.filter(user => {
@@ -108,18 +148,24 @@ export class UserList implements OnInit {
     // Filtrage par rôle si sélectionné
     if (this.selectedStatus) {
       this.filteredAllUser = this.filteredAllUser.filter(u => {
-        const roleName = u.role?.name || u.role;
-        return roleName === this.selectedStatus;
+      const roleName = String(u.role).toLowerCase();
+      return roleName === this.selectedStatus.toLowerCase();
       });
     }
   }
 
-  // 🔄 Réinitialiser les filtres
+  //Réinitialiser les filtres
   resetFilters() {
     this.filters.searchTerm = '';
     this.selectedStatus = '';
     this.filteredAllUser = [...this.allUser];
   }
+
+  // 🔄 Mise à jour du filtre par rôle (profil)
+  updateStatusFilter() {
+    this.applyFilters();
+  }
+
 
   // ✅ Ouvre le drawer avec mapping vers User
   openDrawer(item: User) {
