@@ -115,14 +115,12 @@
 
       <!-- Grille -->
       <div class="cases-grid" *ngIf="currentView === 'grid'">
-        <div class="case-card" *ngFor="let item of allUser">
+        <div class="case-card" *ngFor="let user of filteredAllUser">
           <div class="case-header">
-            <p class="debtor-name">{{ item.firstname + ' ' + item.lastname }}</p>
+            <p class="debtor-name">{{ user.prenom }} {{ user.nom }} {{user.contactPrincipal}}</p>
             <p class="debtor-name">
             <div class="case-badges">
-              <span class="status-badge">
-                {{ item.role?.name? item.role.name : item.role || 'Non défini' }}
-              </span>
+              <span class="status-badge">{{ user.role }}</span>
               <!-- <span class="priority-badge">{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</span> -->
             </div>
           </div>
@@ -130,16 +128,18 @@
           <div class="case-body">
             <div class="case-amounts">
               <div class="amount-item">
-                <span class="amount-label">Username</span>
-                <span class="amount-value">{{ item.username }}</span>
+                <span class="amount-label">Secteur</span>
+                <span class="amount-value">{{ user.secteurActivite }} {{ user.raisonSociale }} {{ user.chambreDepartementale }} 
+                  {{ user.nomCabinet }} {{ user.typePartenaire }}
+                </span>
               </div>
               <div class="amount-item">
                 <span class="amount-label">Email</span>
-                <span class="amount-value">{{ item.email }}</span>
+                <span class="amount-value">{{ user.email}} {{user.emailProfessionnel}}</span>
               </div>
               <div class="amount-item">
                 <span class="amount-label">Téléphone</span>
-                <span class="amount-value">{{ item.phone }}</span>
+                <span class="amount-value">{{ user.telephone }}</span>
               </div>
             </div>
 
