@@ -81,7 +81,19 @@ getPartenaires(sitename: string): Observable<PartenaireInfo[]> {
     return this.http.get<GlobalApiResponse>(`${this.allUrl}/${sitename}`)
   }
 
-  
+  //dinnée de strapi
+  // récupérer un user Strapi par email
+getUserByEmail(email: string): Observable<any | null> {
+  return this.http
+    .get<any>(`${environment.apiUrl}/users-permissions/users?filters[email][$eq]=${email}`)
+    .pipe(
+      map((res: any) => {
+        // Strapi renvoie un tableau de users
+        return res && res.length > 0 ? res[0] : null;
+      })
+    );
+}
+
 
 
   

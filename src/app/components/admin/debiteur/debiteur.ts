@@ -16,6 +16,8 @@ export class Debiteur implements OnInit {
   // État du tiroir
   showDrawer = false;
   selectedDebtor: DebtorInfo | null = null;
+  selectedUser: any | null = null; // données Strapi User
+
 
   // Liste brute et filtrée
   debiteurs: DebtorInfo[] = [];
@@ -70,9 +72,20 @@ export class Debiteur implements OnInit {
   }
 
   // --- Gestion du tiroir ---
-  openDrawer(debtor: DebtorInfo) {
-    this.selectedDebtor = debtor;
-    this.showDrawer = true;
+ openDrawer(debtor: DebtorInfo) {
+  this.selectedDebtor = debtor;
+  this.showDrawer = true;
+
+  // ⚡ On appelle Strapi pour récupérer le user associé au débiteur
+  this.adminService.getUserByEmail(debtor.email).subscribe({
+    next: (user) => {
+      this.selectedUser = user;
+    },
+    error: (err) => {
+      console.error("Erreur récupération user:", err);
+      this.selectedUser = null;
+    }
+  });
   }
 
   closeDrawer() {
