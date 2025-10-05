@@ -215,6 +215,7 @@
   padding: 12px;
   background: #f8fafc;
   border-radius: 8px;
+  overflow-wrap: anywhere;
 }
 
 .amount-label {

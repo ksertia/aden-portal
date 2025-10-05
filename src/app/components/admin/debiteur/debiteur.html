@@ -178,7 +178,7 @@
     </div>
 
     <!-- Drawer -->
-<div class="drawer-overlay" *ngIf="showDrawer" (click)="closeDrawer()">
+<div class="drawer-overlay" *ngIf="showDrawer" >
   <div class="drawer-content" (click)="$event.stopPropagation()">
     <!-- Header -->
     <div class="drawer-header">
@@ -231,6 +231,29 @@
           </div>
         </div>
       </div>
+
+      <!-- Section infos compte -->
+        <div class="details-section" *ngIf="selectedUser">
+          <h4>Informations du Compte</h4>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Nom d'utilisateur</span>
+              <span class="detail-value">{{ selectedUser.username }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Adresse e-mail</span>
+              <span class="detail-value">{{ selectedUser.email }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Rôle</span>
+              <span class="detail-value">{{ selectedUser.role?.name }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Statut</span>
+              <span class="detail-value">{{ selectedUser.blocked ? 'Bloqué' : 'Actif' }}</span>
+            </div>
+          </div>
+        </div>
 
       <!-- Bouton action -->
       <div class="drawer-actions">
