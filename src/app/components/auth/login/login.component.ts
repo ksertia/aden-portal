@@ -87,8 +87,8 @@ private redirectToDashboard(user: any): void {
       case 'avocat':
         this.router.navigate(['/lawyer/cases']); // Rediriger vers une page existante
         break;
-      case 'creancier':
-        this.router.navigate(['/creditor/cases']); // Rediriger vers une page existante
+      case 'creditor':
+        this.router.navigate(['/creditor/dashboard']); // Rediriger vers une page existante
         break;
       case 'cedant':
         this.router.navigate(['/cedant/portfolios']); // Rediriger vers une page existante

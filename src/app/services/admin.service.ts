@@ -5,8 +5,18 @@ import { environment } from '../../environment/environment';
 import { Debiteurs } from '../models/user.model';
 import { map } from 'rxjs/operators';
 import { DebtorInfo } from '../models/case.model';
-import { ApiDebtorResponse,CreditorDetail, ApiCreditorResponse, HuissierInfo, ApiHuissierResponse,
-   PartenaireInfo, ApiPartenaireResponse, AvocatInfo, ApiResponseAvocat, GlobalApiResponse  } from '../models/case.model';
+import { 
+  ApiDebtorResponse,
+  CreditorDetail,
+  ApiCreditorResponse,
+  HuissierInfo,
+  ApiHuissierResponse,
+  PartenaireInfo,
+  ApiPartenaireResponse,
+  AvocatInfo,
+  ApiResponseAvocat,
+  GlobalApiResponse  
+} from '../models/case.model';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +32,7 @@ export class AdminService {
 
   constructor(private http: HttpClient) {}
 
- // récupérer la liste des débiteurs
+  // récupérer la liste des débiteurs
   getDebiteurs(sitename: string): Observable<DebtorInfo[]> {
     return this.http.get<ApiDebtorResponse>(`${this.apiUrl}/${sitename}`).pipe(
       map(res => res.data.map(item => ({
@@ -31,13 +41,13 @@ export class AdminService {
         companyName: item.map.raisonSociale,
         email: item.map.emailDebiteur,
         phone: item.map.telephone,
-        situation:item.map.situationFinanciere,
-        dette:item.map.montantDette,
+        situation: item.map.situationFinanciere,
+        dette: item.map.montantDette,
         address: {
           street: item.map.adresse,
           postalCode: item.map.codePostal,
-          city: '', 
-          country: '' 
+          city: '', // si dispo, ajouter ville
+          country: '' // obligatoire pour respecter le type Address
         },
         type: item.map.typeDebiteur 
       })))
@@ -49,7 +59,7 @@ export class AdminService {
     return this.http.get<Debiteurs>(`${this.apiUrl}/${sitename}/${debiteurId}`);
   }
 
-// récupérer la liste des créanciers
+  // récupérer la liste des créanciers
   getCreanciers(sitename: string): Observable<CreditorDetail[]> {
     return this.http.get<ApiCreditorResponse>(`${this.creancierUrl}/${sitename}`).pipe(
       map(res => res.data.map(item => item.map))
@@ -58,43 +68,67 @@ export class AdminService {
 
   // récupérer la liste des huissiers
   getHuissiers(sitename: string): Observable<HuissierInfo[]> {
-  return this.http.get<ApiHuissierResponse>(`${this.huissierUrl}/${sitename}`).pipe(
-    map(res => res.data.map(item => item.map))
-  );
-}
-
-// récupérer la liste des partenaires
-getPartenaires(sitename: string): Observable<PartenaireInfo[]> {
-  return this.http.get<ApiPartenaireResponse>(`${this.partenaireUrl}/${sitename}`).pipe(
-    map(res => res.data.map(item => item.map))
-  );
-}
-
-  // Récupérer les avocats 
-  getAvocats(sitename: string): Observable<AvocatInfo[]> {
-    return this.http.get<ApiResponseAvocat>(`${this.avocatUrl}/${sitename}`).pipe(
-    map(res => res.data.map(item => item.map)))
-  };
-
-  // pour tous les utilisateurs
-  getAllUsers(sitename: string): Observable<GlobalApiResponse> {
-    return this.http.get<GlobalApiResponse>(`${this.allUrl}/${sitename}`)
+    return this.http.get<ApiHuissierResponse>(`${this.huissierUrl}/${sitename}`).pipe(
+      map(res => res.data.map(item => item.map))
+    );
   }
 
-  //dinnée de strapi
-  // récupérer un user Strapi par email
-getUserByEmail(email: string): Observable<any | null> {
-  return this.http
-    .get<any>(`${environment.apiUrl}/users-permissions/users?filters[email][$eq]=${email}`)
-    .pipe(
-      map((res: any) => {
-        // Strapi renvoie un tableau de users
-        return res && res.length > 0 ? res[0] : null;
-      })
+  // récupérer la liste des partenaires
+  getPartenaires(sitename: string): Observable<PartenaireInfo[]> {
+    return this.http.get<ApiPartenaireResponse>(`${this.partenaireUrl}/${sitename}`).pipe(
+      map(res => res.data.map(item => item.map))
     );
+  }
+
+  // récupérer les avocats
+  getAvocats(sitename: string): Observable<AvocatInfo[]> {
+    return this.http.get<ApiResponseAvocat>(`${this.avocatUrl}/${sitename}`).pipe(
+      map(res => res.data.map(item => item.map))
+    );
+  }
+
+  // récupérer tous les utilisateurs
+  getAllUsers(sitename: string): Observable<GlobalApiResponse> {
+    return this.http.get<GlobalApiResponse>(`${this.allUrl}/${sitename}`);
+  }
+
+  // --- intégration Strapi ---
+
+  // récupérer un user Strapi par email
+  getUserByEmail(email: string): Observable<any | null> {
+    return this.http
+      .get<any>(`${environment.apiUrl}/users?filters[email][$eq]=${email}`)
+      .pipe(
+        map((res: any) => {
+          // Strapi renvoie un tableau de users
+          return res && res.length > 0 ? res[0] : null;
+        })
+      );
+  }
+
+  // Récupérer la liste des rôles Strapi
+getStrapiRoles(): Observable<any> {
+  const url = `${environment.apiUrl}/users-permissions/roles`;
+  return this.http.get<any>(url);
+}
+
+  // créer un utilisateur dans Strapi
+// admin.service.ts
+createUserInStrapi(user: any) {
+  const url = 'http://localhost:1337/api/users'; // ✅ bon endpoint Users-Permissions
+  const payload = {
+    username: user.username,
+    email: user.email,
+    password: user.password || 'TempPass123!', // mot de passe par défaut
+    firstName: user.firstName,
+    lastName: user.lastName,
+    role: user.role, // ⚠️ doit être un ID valide du rôle
+    confirmed: true,
+    blocked: false
+  };
+
+  return this.http.post(url, payload);
 }
 
 
-
-  
 }

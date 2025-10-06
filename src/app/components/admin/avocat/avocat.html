@@ -121,7 +121,7 @@
             </div>
             
             <div class="case-actions">
-              <button class="btn btn-primary small"  title="Voir le profil">
+              <button class="btn btn-primary small"  title="Voir le profil" (click)="openDrawer(item)">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="8" r="4"/>
                   <path d="M6 20c0-4 12-4 12 0"/>
@@ -158,7 +158,7 @@
                 </td>
                 <td>
                 <div class="table-actions">
-                  <button class="btn btn-primary small"  title="Voir le profil">
+                  <button class="btn btn-primary small"  title="Voir le profil" (click)="openDrawer(item)">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <circle cx="12" cy="8" r="4"/>
                       <path d="M6 20c0-4 12-4 12 0"/>
@@ -171,6 +171,88 @@
         </table>
         </div>
     </div>
+
+  <!-- Drawer Overlay -->
+<div class="drawer-overlay" *ngIf="showDrawer">
+  <div class="drawer-content" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="drawer-header">
+      <h3>Profil de l’avocat</h3>
+      <button class="drawer-close" (click)="closeDrawer()">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div class="drawer-body" *ngIf="selectedAvocat">
+
+      <!-- Profil résumé -->
+      <div class="debtor-profile">
+        <div class="debtor-avatar">
+          {{ selectedAvocat.nomAvocat[0] }}{{ selectedAvocat.prenomAvocat[0] }}
+        </div>
+        <div class="debtor-info">
+          <p class="debtor-name">
+            {{ selectedAvocat.nomAvocat }} {{ selectedAvocat.prenomAvocat }}
+          </p>
+          <p class="debtor-role">Avocat</p>
+        </div>
+      </div>
+
+      <!-- Section infos perso -->
+      <div class="details-section">
+        <h4>Informations professionnelles</h4>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-label">Email</span>
+            <span class="detail-value">{{ selectedAvocat.emailProfessionnel }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Téléphone</span>
+            <span class="detail-value">{{ selectedAvocat.telephone }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Barreau</span>
+            <span class="detail-value">{{ selectedAvocat.barreau }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Cabinet</span>
+            <span class="detail-value">{{ selectedAvocat.nomCabinet }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section infos Strapi -->
+      <div class="details-section">
+        <h4>Compte Strapi</h4>
+        <div *ngIf="selectedAvocat?.strapiAccount; else noStrapiUser">
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Nom d'utilisateur</span>
+              <span class="detail-value">{{ selectedAvocat.strapiAccount.username }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Rôle</span>
+              <span class="detail-value">{{ selectedAvocat.strapiAccount.role }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cas où aucun compte n’existe -->
+      <ng-template #noStrapiUser>
+        <p>Aucun compte Strapi n’existe pour cet avocat.</p>
+        <button class="btn btn-primary" >Créer un compte</button>
+      </ng-template>
+    </div>
+
+    <!-- Actions -->
+    <div class="drawer-actions">
+      <button class="btn btn-primary">Reset Password</button>
+    </div>
+  </div>
+</div>
+
+
 
     <ng-template #noCases>
         <div class="no-cases">

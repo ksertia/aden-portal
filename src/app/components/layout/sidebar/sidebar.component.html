@@ -12,7 +12,7 @@
 
   <nav class="sidebar-nav">
     <ul>
-      <li *ngIf="!isDebtorUser">
+      <li *ngIf="!isDebtorUser && !isCreditorUser">
         <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="7" height="7"/>
@@ -119,6 +119,17 @@
       </li>
 
       <!-- Creancier -->
+          <li *ngIf="isCreditorUser">
+        <a routerLink="/creditor/dashboard" routerLinkActive="active" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          <span>{{ t('sidebar.dashboard') }}</span>
+        </a>
+      </li>
       <li *ngIf="isCreditorUser">
         <a routerLink="/creditor/cases" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
