@@ -20,6 +20,11 @@ export class Cedant implements OnInit {
   filteredCases: DebtCase[] = [];
   statistics: any = null;
   currentView: 'grid' | 'table' = 'grid';
+
+  
+  // 👉 Drawer
+  isDrawerOpen: boolean = false;
+  selectedCedant: DebtCase | null = null;
   
   filters: CaseFilter = {};
   selectedStatus = '';
@@ -167,7 +172,18 @@ export class Cedant implements OnInit {
       : 'badge badge-danger light border-0';
   }
 
+  // 👉 Gestion du drawer
+  openDrawer(cedant: DebtCase): void {
+    this.selectedCedant = cedant;
+    this.isDrawerOpen = true;
+  }
+
+  closeDrawer(): void {
+    this.isDrawerOpen = false;
+    this.selectedCedant = null;
+  }
 }
+
 
 
 

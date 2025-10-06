@@ -71,8 +71,8 @@ export class Debiteur implements OnInit {
     }
   }
 
-  // --- Gestion du tiroir ---
- openDrawer(debtor: DebtorInfo) {
+ // --- Gestion du tiroir ---
+openDrawer(debtor: DebtorInfo) {
   this.selectedDebtor = debtor;
   this.showDrawer = true;
 
@@ -86,7 +86,28 @@ export class Debiteur implements OnInit {
       this.selectedUser = null;
     }
   });
-  }
+}
+
+createStrapiUser() {
+  if (!this.selectedDebtor) return;
+
+  const payload = {
+    username: this.selectedDebtor.email.split('@')[0], // username par défaut
+    email: this.selectedDebtor.email,
+    firstname: this.selectedDebtor.firstName,
+    lastname: this.selectedDebtor.lastName,
+    role: 3 // ⚠️ ID du rôle Strapi (à adapter selon ton Strapi)
+  };
+
+  this.adminService.createUserInStrapi(payload).subscribe({
+    next: (res) => {
+      console.log("Utilisateur créé dans Strapi:", res);
+      this.selectedUser = res;
+    },
+    error: (err) => console.error("Erreur création user:", err)
+  });
+}
+
 
   closeDrawer() {
     this.showDrawer = false;
