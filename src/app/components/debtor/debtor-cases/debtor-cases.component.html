@@ -1,7 +1,6 @@
 <div class="cases-container">
   <div class="cases-header fade-in-up">
     <h1>{{ t('cases.title') }}</h1>
-    <!-- <p>Consultez et gérez vos dossiers de recouvrement</p> -->
     <p>{{ t('cases.subtitle') }}</p>
   </div>
 
@@ -49,6 +48,7 @@
         </div>
       </div>
     </div>
+    
 
     <!-- Liste des dossiers -->
     <div class="cases-list" *ngIf="userCases.length > 0; else noCases">
