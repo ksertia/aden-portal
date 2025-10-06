@@ -17,6 +17,11 @@ export class Avocat implements OnInit {
   avocat: AvocatInfo[] = [];
   filteredAvocat: AvocatInfo[] = [];
 
+
+showDrawer = false;
+selectedAvocat: (AvocatInfo & { strapiAccount?: any }) | null = null;
+
+
   // Gestion des filtres
   filters = {
     searchTerm: ''
@@ -107,6 +112,17 @@ export class Avocat implements OnInit {
       ? 'badge badge-success light border-0'
       : 'badge badge-danger light border-0';
   }
+
+  openDrawer(avocat: AvocatInfo) {
+  this.selectedAvocat = avocat;
+  this.showDrawer = true;
+}
+
+closeDrawer() {
+  this.showDrawer = false;
+  this.selectedAvocat = null;
+}
+
 
 }
 

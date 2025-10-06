@@ -124,12 +124,13 @@
             </div>
             
             <div class="case-actions">
-                <button class="btn btn-primary small"  title="Voir le profil">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="8" r="4"/>
-                            <path d="M6 20c0-4 12-4 12 0"/>
-                    </svg> voir profil
+                <button class="btn btn-primary small" title="Voir le profil" >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M6 20c0-4 12-4 12 0"/>
+                  </svg> voir profil
                 </button>
+
             </div>
             </div>
         </div>
@@ -174,6 +175,32 @@
         </table>
         </div>
     </div>
+
+    <!-- Drawer du Cédant -->
+<div class="drawer-backdrop" *ngIf="isDrawerOpen" (click)="closeDrawer()"></div>
+
+<div class="drawer" *ngIf="isDrawerOpen">
+  <div class="drawer-header">
+    <h3>Profil du cédant</h3>
+    <button class="btn-close" (click)="closeDrawer()">×</button>
+  </div>
+<!-- 
+  <div class="drawer-body" *ngIf="selectedCedant">
+    <div class="profile-info">
+      <h4>{{ selectedCedant.creditorName }}</h4>
+      <p><strong>Username :</strong> {{ selectedCedant.username }}</p>
+      <p><strong>Email :</strong> {{ selectedCedant.email }}</p>
+      <p><strong>Téléphone :</strong> {{ selectedCedant.phone }}</p>
+      <p>
+        <strong>Status :</strong>
+        <span class="status-badge" [ngClass]="statusClass(selectedCedant.status)">
+          {{ selectedCedant.status }}
+        </span>
+      </p>
+    </div>
+  </div> -->
+</div>
+
 
     <ng-template #noCases>
         <div class="no-cases">

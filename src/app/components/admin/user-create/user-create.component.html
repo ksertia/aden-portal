@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <!-- Email + Téléphone -->
+    <!-- Email + Username -->
     <div class="form-row">
       <div class="form-group">
         <label for="email">Email</label>
@@ -27,12 +27,14 @@
       </div>
     </div>
 
-    <!-- Profil -->
+    <!-- Sélecteur de rôle -->
     <div class="form-group">
       <label for="role">Profil</label>
       <select id="role" formControlName="role" required>
         <option value="">Sélectionnez votre profil</option>
-        <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+        <option *ngFor="let role of roles" [value]="role.id">
+          {{ role.attributes.name }}
+        </option>
       </select>
     </div>
 
