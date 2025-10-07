@@ -5,10 +5,11 @@ import { RouterModule } from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { AdminService } from '../../../services/admin.service';
 import { DebtorInfo } from '../../../models/case.model';
+import { UserCreateComponent } from '../user-create/user-create.component';
 
 @Component({
   selector: 'app-debiteur',
-  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule],
+  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule, UserCreateComponent],
   templateUrl: './debiteur.html',
   styleUrls: ['./debiteur.css']
 })
@@ -88,29 +89,18 @@ openDrawer(debtor: DebtorInfo) {
   });
 }
 
-createStrapiUser() {
-  if (!this.selectedDebtor) return;
 
-  const payload = {
-    username: this.selectedDebtor.email.split('@')[0], // username par défaut
-    email: this.selectedDebtor.email,
-    firstname: this.selectedDebtor.firstName,
-    lastname: this.selectedDebtor.lastName,
-    role: 3 // ⚠️ ID du rôle Strapi (à adapter selon ton Strapi)
-  };
 
-  this.adminService.createUserInStrapi(payload).subscribe({
-    next: (res) => {
-      console.log("Utilisateur créé dans Strapi:", res);
-      this.selectedUser = res;
-    },
-    error: (err) => console.error("Erreur création user:", err)
-  });
-}
 
 
   closeDrawer() {
     this.showDrawer = false;
     this.selectedDebtor = null;
   }
+
+  onUserCreated(user: any) {
+  console.log('Utilisateur Strapi créé:', user);
+  this.selectedUser = user;
+}
+
 }

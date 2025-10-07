@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AdminService } from '../../../services/admin.service';
 import { User } from '../../../models/user.model';
+import { environment } from '../../../../environment/environment';
 
 @Component({
   selector: 'app-user-create',
@@ -13,10 +14,11 @@ import { User } from '../../../models/user.model';
 })
 export class UserCreateComponent implements OnInit {
   @Input() prefillData: any; // infos venant du BFF (email, prénom, nom, role…)
+  @Input() isDrawerOpen: boolean = false;
+  @Output() drawerClosed = new EventEmitter<void>();
   @Output() userCreated = new EventEmitter<any>();
 
   userForm: FormGroup;
-  roles: any[] = []; // récupérés depuis Strapi
   successMessage = '';
   errorMessage = '';
 
@@ -26,59 +28,58 @@ export class UserCreateComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      role: ['', Validators.required], // contiendra l'ID du rôle
+      role: [''], // prérempli depuis le BFF
     });
   }
 
   ngOnInit(): void {
-    // Charger les rôles depuis Strapi
-    this.adminService.getStrapiRoles().subscribe({
-      next: (res: any) => {
-        this.roles = res.data;
-      },
-      error: (err) => console.error('Erreur lors du chargement des rôles:', err)
-    });
-
-    // Préremplir si données dispo
+    // Préremplir avec les infos du BFF
     if (this.prefillData) {
       this.userForm.patchValue({
         email: this.prefillData.email,
         firstName: this.prefillData.firstName,
         lastName: this.prefillData.lastName,
-        role: this.prefillData.roleId || '' // si ton BFF stocke déjà un roleId
+        username: this.prefillData.username || '',
+        role: this.prefillData.roleId || this.prefillData.role || '' // rôle transmis
       });
     }
   }
 
   onSubmit() {
-    if (this.userForm.valid) {
-      const formValue = this.userForm.value;
-      const defaultPassword = 'default123';
+  if (this.userForm.valid) {
+    const formValue = this.userForm.value;
 
-      const newUser: Partial<User> = {
-        username: formValue.username,
-        email: formValue.email,
-        firstname: formValue.firstName,
-        lastname: formValue.lastName,
-        // password: defaultPassword,
-        role: formValue.role // ⚠️ c’est l’ID du rôle dans Strapi
-      };
+    const newUser = {
+      username: formValue.username,
+      email: formValue.email,
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
+      role: formValue.role // ID du rôle transmis par le BFF
+    };
 
-      this.adminService.createUserInStrapi(newUser).subscribe({
-        next: (res) => {
-          this.successMessage = "Utilisateur créé avec succès ✅";
-          this.errorMessage = "";
-          this.userCreated.emit(res);
-        },
-        error: (err) => {
-          console.error(err);
-          this.errorMessage = "Erreur lors de la création de l'utilisateur";
-          this.successMessage = "";
-        }
-      });
-    } else {
-      this.errorMessage = "Veuillez remplir tous les champs obligatoires.";
-      this.successMessage = "";
-    }
+    this.adminService.createUserViaBFF(newUser).subscribe({
+      next: (res) => {
+        this.successMessage = "Utilisateur créé avec succès ✅";
+        this.errorMessage = "";
+        this.userCreated.emit(res);
+        this.closeDrawer();
+      },
+      error: (err) => {
+        console.error(err);
+        // Affiche le message reçu du BFF si dispo
+        this.errorMessage = err.error?.message || "Erreur lors de la création de l'utilisateur";
+        this.successMessage = "";
+      }
+    });
+  } else {
+    this.errorMessage = "Veuillez remplir tous les champs obligatoires.";
+    this.successMessage = "";
+  }
+}
+
+
+  closeDrawer() {
+    this.isDrawerOpen = false;
+    this.drawerClosed.emit();
   }
 }
