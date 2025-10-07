@@ -91,6 +91,29 @@
           </div>
         </div>
       </div>
+      <!-- Pour le test -->
+      <div class="cases-grid" *ngIf="dossiers.length > 0">
+        <div class="case-card"  *ngFor="let dossier of dossiers.slice(0, 3)">
+          <div class="case-header">
+            <h3>{{ dossier.numeroDossier }}</h3>
+            <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
+              {{ getStatusLabel(dossier.statutGlobal) }}
+            </span>
+          </div>
+          <div class="case-details">
+            <div class="case-amount">
+              <span class="label">Montant dû :</span>
+              <span class="amount">{{ dossier.montantTotal | currency:'EUR' }}</span>
+            </div>
+            <div class="case-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="(dossier.montantPrincipal / dossier.montantTotal) * 100"></div>
+              </div>
+              <span class="progress-text">{{ ((dossier.montantPrincipal / dossier.montantTotal) * 100).toFixed(0) }}% payé</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="quick-actions">
         <h3>Actions Rapides</h3>
