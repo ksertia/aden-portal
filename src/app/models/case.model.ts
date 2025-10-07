@@ -60,6 +60,7 @@ export interface FeeDetail {
   description: string;
 }
 export interface DebtorInfo {
+  id?: string | number; // ✅ ajouté
   firstName: string;
   lastName: string;
   companyName?: string;

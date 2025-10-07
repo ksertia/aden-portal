@@ -114,20 +114,22 @@ getStrapiRoles(): Observable<any> {
 
   // créer un utilisateur dans Strapi
 // admin.service.ts
-createUserInStrapi(user: any) {
-  const url = 'http://localhost:1337/api/users'; // ✅ bon endpoint Users-Permissions
+createUserViaBFF(userData: any): Observable<any> {
+  const url = 'http://localhost:3000/auth/register';
+ // ton BFF
+  // Ne pas envoyer role en objet, juste l'ID ou info nécessaire
   const payload = {
-    username: user.username,
-    email: user.email,
-    password: user.password || 'TempPass123!', // mot de passe par défaut
-    firstName: user.firstName,
-    lastName: user.lastName,
-    role: user.role, // ⚠️ doit être un ID valide du rôle
-    confirmed: true,
-    blocked: false
+    username: userData.username,
+    email: userData.email,
+    firstname: userData.firstName,
+    lastname: userData.lastName,
+    role: userData.role // ID du rôle
   };
-
   return this.http.post(url, payload);
+}
+
+getDebiteurRole() {
+  return this.http.get(`${this.apiUrl}/roles/debiteur`);
 }
 
 
