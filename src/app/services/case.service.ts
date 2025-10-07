@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { DebtCase, CaseStatus, Priority, DocumentType, ActivityType, PaymentProposal, CaseNote, CaseFilter, CaseDocument } from '../models/case.model';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environment/environment';
+
 
 @Injectable({
   providedIn: 'root'
@@ -1805,8 +1808,13 @@ export class CaseService {
     }
   ];
 
-  constructor() {
+  private apiUrl = `${environment.baseUrl}/debiteurs`;
+  constructor(private http: HttpClient) {
     this.casesSubject.next(this.mockCases);
+  }
+   // Récupérer tous les dossiers d'un site
+  getDossiers(siteName: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${siteName}/dossiers`);
   }
 
   getCases(): Observable<DebtCase[]> {

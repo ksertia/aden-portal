@@ -19,32 +19,54 @@ export class DebtorDashboard implements OnInit {
   userCases: DebtCase[] = [];
   statistics: any = null;
 
+  dossiers: any[] = [];
+  isLoading = true;
+  errorMessage = '';
+
   constructor(
     private authService: AuthService,
-    private caseService: CaseService
+    private casesService: CaseService
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
     this.loadDashboardData();
+
+    this.loadDossiers();
+  }
+  loadDossiers() {
+    const siteName = 'portail-recouvrement';
+    this.casesService.getDossiers(siteName).subscribe({
+      next: (response) => {
+        // Les dossiers sont dans response.data
+        this.dossiers = response.data.map((item: any) => item.map);
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des dossiers :', error);
+        this.errorMessage = 'Impossible de récupérer les dossiers.';
+        this.isLoading = false;
+      }
+    });
   }
 
   loadDashboardData() {
     if (!this.currentUser) return;
 
     // Charger les dossiers de l'utilisateur
-    this.caseService.getCasesByUserId(this.currentUser.id, this.currentUser!.role.name)
+    this.casesService.getCasesByUserId(this.currentUser.id, this.currentUser!.role.name)
       .subscribe(cases => {
         this.userCases = cases.length? cases : [
           // Simulation de données pour tester l'affichage
           { caseNumber: 'REC2024-001', status: 'active', amount: 1000, amountPaid: 200 } as DebtCase,
           { caseNumber: 'REC2024-003', status: 'pending', amount: 500, amountPaid: 0 } as DebtCase,
           { caseNumber: 'REC2024-004', status: 'completed', amount: 800, amountPaid: 800 } as DebtCase,
+          { caseNumber: 'REC2024-005', status: 'new', amount: 800, amountPaid: 0 } as unknown as DebtCase,
         ]
       });
 
     // Charger les statistiques
-    this.caseService.getStatistics()
+    this.casesService.getStatistics()
       .subscribe(stats => {
         this.statistics = stats;
       });
@@ -80,7 +102,8 @@ export class DebtorDashboard implements OnInit {
       'legal_action': 'Action légale',
       'payment_plan': 'Plan de paiement',
       'completed': 'Terminé',
-      'closed': 'Fermé'
+      'closed': 'Fermé',
+      'new': 'Nouveau'
     };
     return labels[status] || status;
   }

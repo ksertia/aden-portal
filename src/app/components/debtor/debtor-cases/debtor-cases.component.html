@@ -6,7 +6,8 @@
 
   <div class="cases-content fade-in-up">
     <!-- Statistiques -->
-    <div class="stats-section" *ngIf="statistics">
+    <div class="stats-section"  *ngIf="dossiers" > 
+      <!-- *ngIf="statistics" -->
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon primary">
@@ -16,7 +17,7 @@
             </svg>
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ userCases.length }}</div>
+            <div class="stat-value">{{ dossiers.length }}</div>
             <div class="stat-label">{{ t('cases.stats.active') }}</div>
           </div>
         </div>
@@ -51,27 +52,32 @@
     
 
     <!-- Liste des dossiers -->
-    <div class="cases-list" *ngIf="userCases.length > 0; else noCases">
-      <div class="cases-grid">
-        <div class="case-card" *ngFor="let case of userCases">
-          <div class="case-header">
+    <!-- <div class="cases-list" *ngIf="dossiers.length > 0; else noCases"> -->
+      <!-- <div class="cases-grid">
+        <div class="case-card"  *ngFor="let dossier of dossiers"> -->
+          <!-- *ngFor="let case of userCases" -->
+          <!-- <div class="case-header">
             <div class="case-info">
-              <h3>{{ case.caseNumber }}</h3>
-              <p class="creditor-name">{{ case.creditor.name }}</p>
+              <h3> {{ dossier.numeroDossier }}</h3>
+              <p class="creditor-name">{{ dossier.objet }}</p>
             </div>
-            <span class="status-badge" [ngClass]="'status-' + case.status">
-              {{ getStatusLabel(case.status) }}
+            <div class="case-amount">
+                  <span class="label">Montant dû :</span>
+                  <span class="amount"> {{ dossier.montantTotal | currency:'EUR' }}</span>
+                </div>
+            <span class="status-badge" >
+              {{ getStatusLabel(dossier.status) }}
             </span>
-          </div>
+          </div> -->
           
-          <div class="case-body">
+          <!-- <div class="case-body"> -->
             <!-- Détail de la dette -->
-            <div class="debt-breakdown">
+            <!-- <div class="debt-breakdown">
               <h4>{{ t('cases.debt.title') }}</h4>
               <div class="breakdown-grid">
                 <div class="breakdown-item">
                   <span class="label">{{ t('cases.debt.principal') }}</span>
-                  <span class="value">{{ formatCurrency(case.debtBreakdown.principalAmount) }}</span>
+                  <span class="value">{{ dossier.montantTotal | currency:'EUR' }}</span>
                 </div>
                 <div class="breakdown-item">
                   <span class="label">{{ t('cases.debt.interests') }}</span>
@@ -98,10 +104,10 @@
                   <span class="value">{{ formatCurrency(case.amount - case.amountPaid) }}</span>
                 </div>
               </div>
-            </div>
+            </div> -->
 
             <!-- Détail des intérêts -->
-            <div class="interests-detail" *ngIf="case.debtBreakdown.interests.length > 0">
+            <!-- <div class="interests-detail" *ngIf="case.debtBreakdown.interests.length > 0">
               <h5>{{ t('cases.interestsDetail') }}</h5>
               <div class="interests-list">
                 <div class="interest-item" *ngFor="let interest of case.debtBreakdown.interests">
@@ -112,10 +118,10 @@
                   <div class="interest-amount">{{ formatCurrency(interest.amount) }}</div>
                 </div>
               </div>
-            </div>
+            </div> -->
 
             <!-- Détail des pénalités -->
-            <div class="penalties-detail" *ngIf="case.debtBreakdown.penalties.length > 0">
+            <!-- <div class="penalties-detail" *ngIf="case.debtBreakdown.penalties.length > 0">
               <h5>{{ t('cases.penaltiesDetail') }}</h5>
               <div class="penalties-list">
                 <div class="penalty-item" *ngFor="let penalty of case.debtBreakdown.penalties">
@@ -126,21 +132,21 @@
                   <div class="penalty-amount">{{ formatCurrency(penalty.amount) }}</div>
                 </div>
               </div>
-            </div>
+            </div> -->
 
             <!-- Barre de progression -->
-            <div class="payment-progress">
+            <!-- <div class="payment-progress">
               <div class="progress-info">
                 <span class="progress-label">{{ t('cases.paymentProgress') }}</span>
-                <span class="progress-percentage">{{ getPaymentPercentage(case) }}%</span>
+                <span class="progress-percentage">{{ getPaymentPercentage(dossier) }}%</span>
               </div>
               <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="getPaymentPercentage(case)"></div>
+                <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
               </div>
-            </div>
+            </div> -->
 
             <!-- Historique des relances -->
-            <div class="reminder-history" *ngIf="getReminderHistory(case).length > 0">
+            <!-- <div class="reminder-history" *ngIf="getReminderHistory(case).length > 0">
               <h5>{{ t('cases.reminderHistory') }}</h5>
               <div class="reminder-list">
                 <div class="reminder-item" *ngFor="let reminder of getReminderHistory(case)">
@@ -156,10 +162,10 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
 
             <!-- Actions -->
-            <div class="case-actions">
+            <!-- <div class="case-actions">
               <button class="btn btn-primary" (click)="makePayment(case)" *ngIf="case.amount > case.amountPaid">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
@@ -188,11 +194,11 @@
                 </svg>
                 {{ t('cases.actions.details') }}
               </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </div> -->
+          <!-- </div>
+        </div> -->
+      <!-- </div> -->
+    <!-- </div> -->
 
     <ng-template #noCases>
       <div class="no-cases">
@@ -207,7 +213,7 @@
   </div>
 
   <!-- Modal de paiement -->
-  <div class="modal-overlay" *ngIf="showPaymentModal" (click)="closePaymentModal()">
+  <!-- <div class="modal-overlay" *ngIf="showPaymentModal" (click)="closePaymentModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ t('cases.paymentModal.title') }}</h3>
@@ -276,10 +282,10 @@
         </button>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Modal proposition d'échéancier -->
-  <div class="modal-overlay" *ngIf="showPaymentPlanModal" (click)="closePaymentPlanModal()">
+  <!-- <div class="modal-overlay" *ngIf="showPaymentPlanModal" (click)="closePaymentPlanModal()">
     <div class="modal-content large" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ t('cases.paymentPlanModal.title') }}</h3>
@@ -376,10 +382,10 @@
         </button>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Modal de contestation -->
-  <div class="modal-overlay" *ngIf="showDisputeModal" (click)="closeDisputeModal()">
+  <!-- <div class="modal-overlay" *ngIf="showDisputeModal" (click)="closeDisputeModal()">
     <div class="modal-content large" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ t('cases.disputeModal.title') }}</h3>
@@ -512,5 +518,206 @@
         </button>
       </div>
     </div>
+  </div> -->
+</div>
+
+
+
+<!-- <div class="debtor-cases-container">
+  <h2>📂 Liste des dossiers</h2>
+
+  <div *ngIf="isLoading" class="loading">Chargement des dossiers...</div>
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+  <div *ngIf="!isLoading && dossiers.length > 0" class="cases-grid">
+    <div *ngFor="let dossier of dossiers" class="case-card">
+      <h3>{{ dossier.numeroDossier }}</h3>
+      <p><strong>Objet :</strong> {{ dossier.objet }}</p>
+      <p><strong>Montant total :</strong> {{ dossier.montantTotal | currency:'EUR' }}</p>
+      <p><strong>Statut :</strong> {{ dossier.statutGlobal }}</p>
+      <p><strong>Phase :</strong> {{ dossier.phaseCode }}</p>
+      <p><strong>Date de création :</strong> {{ dossier.dateCreation }}</p>
+    </div>
   </div>
+
+  <div *ngIf="!isLoading && dossiers.length === 0" class="no-cases">
+    Aucun dossier trouvé pour ce débiteur.
+  </div>
+</div> -->
+
+ <!-- Liste des créances -->
+  <div class="cases-content fade-in-up">
+    <div class="cases-list" >
+      <div class="list-header">
+        <app-view-toggle 
+          [currentView]="currentView" 
+          (viewChange)="currentView = $event">
+        </app-view-toggle>
+      </div>
+
+     <!-- Vue grille -->
+      <div class="cases-grid" *ngIf="currentView === 'grid'">
+        <div class="case-card" *ngFor="let dossier of dossiers">
+          <div class="case-header">
+            <div class="case-info">
+              <h3>{{ dossier.numeroDossier }}</h3>
+              <p class="debtor-name">{{ dossier.objet }}</p>
+            </div>
+            <div class="case-badges">
+              <span class="status-badge" [ngClass]="'status-' + dossier.status">
+                {{ getStatusLabel(dossier.status) }}
+              </span>
+              <span class="priority-badge" [ngClass]="'priority-' + dossier.priority">
+                {{ getPriorityLabel(dossier.priority) }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="case-body">
+            <div class="case-amounts">
+              <div class="amount-item">
+                <span class="amount-label">Montant total</span>
+                <span class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</span>
+              </div>
+              <div class="amount-item">
+                <span class="amount-label">Déjà payé</span>
+                <span class="amount-value recovered">-</span>
+                <!-- {{ formatCurrency(dossier.amountPaid) }} -->
+              </div>
+              <div class="amount-item">
+                <span class="amount-label">Reste à payer</span>
+                <span class="amount-value remaining">-</span>
+                <!-- {{ formatCurrency(dossier.amount - dossier.amountPaid) }} -->
+              </div>
+            </div>
+            
+            <div class="case-progress">
+              <div class="progress-info">
+                <span class="progress-label">Progression</span>
+                <span class="progress-percentage">{{ getPaymentPercentage(dossier) }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
+              </div>
+            </div>
+            
+            <div class="case-meta">
+              <div class="meta-item">
+                <span class="meta-label">Statut :</span>
+                <span class="meta-value">{{ dossier.statutGlobal }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Phase :</span>
+                <span class="meta-value">{{ dossier.phaseCode }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Créé le :</span>
+                <span class="meta-value">{{ dossier.dateCreation }}</span>
+              </div>
+            </div>
+            
+            <div class="case-actions">
+              <button class="btn btn-primary small" (click)="viewCaseDetails(dossier)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Détails
+              </button>
+              <button class="btn btn-secondary small" (click)="downloadCaseReport(dossier)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7,10 12,15 17,10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Rapport
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vue table -->
+      <div class="cases-table-container" *ngIf="currentView === 'table'">
+        <table class="cases-table">
+          <thead>
+            <tr>
+              <th>Dossier</th>
+              <th>Créancier</th>
+              <th>Montant total</th>
+              <th>Déjà payé</th>
+              <th>Reste à payer</th>
+              <th>Statut</th>
+              <th>Progression</th>
+              <!-- <th>Échéance</th> -->
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dossier of dossiers" class="case-row">
+              <td>
+                <div class="case-cell">
+                  <div class="case-number">{{ dossier.numeroDossier }}</div>
+                  <div class="case-date">{{ dossier.dateCreation }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="debtor-cell">
+                  <div class="debtor-name">{{ dossier.debtor.firstName }} {{ dossier.debtor.lastName }}</div>
+                  <div class="debtor-type">{{ dossier.debtor.type === 'company' ? 'Entreprise' : 'Particulier' }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="amount-cell">
+                  <div class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="amount-cell recovered">
+                  <div class="amount-value">---</div>
+                </div>
+              </td>
+              <td>
+                <div class="amount-cell remaining">
+                  <div class="amount-value">---</div>
+                </div>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="'status-' + dossier.status">
+                  {{ getStatusLabel(dossier.status) }}
+                </span>
+              </td>
+              <td>
+                <div class="progress-cell">
+                  <div class="progress-bar-small">
+                    <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
+                  </div>
+                  <span class="progress-text">{{ getPaymentPercentage(dossier) }}%</span>
+                </div>
+              </td>
+              <!-- <td>
+                <div class="date-cell">{{ formatDate(dossier.dueDate) }}</div>
+              </td> -->
+              <td>
+                <div class="table-actions">
+                  <button class="btn btn-primary small" (click)="viewCaseDetails(dossier)" title="Voir détails">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                  <button class="btn btn-secondary small" (click)="downloadCaseReport(dossier)" title="Télécharger rapport">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7,10 12,15 17,10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
 </div>
