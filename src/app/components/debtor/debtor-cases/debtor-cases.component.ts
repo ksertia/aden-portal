@@ -356,16 +356,18 @@
 // }
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// import { DebiteurService } from '../../services/debiteur.service';
 import { CaseService } from '../../../services/case.service';
 import { I18nService } from '../../../services/i18n.service';
-import { DebtCase, CaseStatus, Priority, ActivityType, PaymentProposal } from '../../../models/case.model';
+import { DebtCase, CaseStatus, Priority, ActivityType, PaymentProposal, CaseFilter  } from '../../../models/case.model';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
+import { AuthService } from '../../../services/auth.service';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-debtor-cases',
   standalone: true,
-  imports: [CommonModule, ViewToggleComponent],
+  imports: [CommonModule, ViewToggleComponent, RouterModule, FormsModule],
   templateUrl: './debtor-cases.component.html',
   styleUrls: ['./debtor-cases.component.css']
 })
@@ -377,15 +379,27 @@ export class DebtorCasesComponent implements OnInit {
   translations: any = {};
   userCases: DebtCase[] = [];
 
-  currentView: 'grid' | 'table' = 'grid';
+  currentView: 'grid' | 'table' = 'table';
+
+  // --- Filtres ---
+  filters = {
+    searchTerm: '',
+    status: '',
+    priority: ''
+  };
+
+  selectedStatus = '';
+  selectedPriority = '';
+  filteredDossiers: any[] = [];
 
   constructor(private casesService: CaseService,
-    private i18nService: I18nService
+    private i18nService: I18nService,
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
 
-     this.loadTranslations();
+    this.loadTranslations();
     this.i18nService.currentLocale$.subscribe(() => {
       this.loadTranslations();
     });
@@ -396,10 +410,29 @@ export class DebtorCasesComponent implements OnInit {
 
   loadDossiers() {
     const siteName = 'portail-recouvrement';
-    this.casesService.getDossiers(siteName).subscribe({
+    const currentUser = this.authService.getCurrentUser();
+
+    if (!currentUser) {
+      this.errorMessage = 'Utilisateur non connecté.';
+      this.isLoading = false;
+      return;
+    }
+
+    const debiteurNodeId = currentUser.nodeId;
+    console.log('Débiteur connecté :', currentUser);
+    console.log('debiteurNodeId envoyé :', debiteurNodeId);
+
+    if (!debiteurNodeId) {
+      this.errorMessage = 'Identifiant du débiteur introuvable.';
+      this.isLoading = false;
+      return;
+    }
+
+    this.casesService.getDossiers(siteName, debiteurNodeId).subscribe({
       next: (response) => {
-        // Les dossiers sont dans response.data
-        this.dossiers = response.data.map((item: any) => item.map);
+        console.log('Réponse API dossiers :', response);
+        this.dossiers = response.data?.map((item: any) => item.map) || [];
+        this.filteredDossiers = [...this.dossiers];
         this.isLoading = false;
       },
       error: (error) => {
@@ -419,24 +452,17 @@ export class DebtorCasesComponent implements OnInit {
   t(key: string): string {
     return this.i18nService.translate(key, this.translations);
   }
-    getTotalDebt(): number {
-    return this.userCases.reduce((sum, case_) => sum + (case_.amount - case_.amountPaid), 0);
-  }
 
-  getTotalPaid(): number {
-    return this.userCases.reduce((sum, case_) => sum + case_.amountPaid, 0);
-  }
 
-  getPaymentPercentage(case_: DebtCase): number {
-    return Math.round((case_.amountPaid / case_.amount) * 100);
-  }
-   formatCurrency(amount: number): string {
+
+  formatCurrency(amount: number): string {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR'
     }).format(amount);
   }
-    getStatusLabel(status: string): string {
+
+  getStatusLabel(status: string): string {
     const labels: { [key: string]: string } = {
       'pending': 'En attente',
       'active': 'Actif',
@@ -444,11 +470,13 @@ export class DebtorCasesComponent implements OnInit {
       'legal_action': 'Action légale',
       'payment_plan': 'Plan de paiement',
       'completed': 'Terminé',
-      'closed': 'Fermé'
+      'closed': 'Fermé',
+      'new': 'Nouveau'
     };
     return labels[status] || status;
   }
-    getPriorityLabel(priority: string): string {
+
+  getPriorityLabel(priority: string): string {
     const labels: { [key: string]: string } = {
       'low': 'Faible',
       'medium': 'Moyenne',
@@ -457,24 +485,82 @@ export class DebtorCasesComponent implements OnInit {
     };
     return labels[priority] || priority;
   }
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
-    viewCaseDetails(case_: DebtCase) {
+
+  viewCaseDetails(case_: DebtCase) {
     
   }
    downloadCaseReport(case_: DebtCase) {
     console.log('Télécharger rapport pour:', case_.caseNumber);
-    // TODO: Implémenter le téléchargement de rapport spécifique au dossier
   }
 
   downloadDocument(doc: any) {
     console.log('Télécharger document:', doc.name);
-    // TODO: Implémenter le téléchargement de document
   }
+
+  // Réinitialiser tous les filtres
+  resetFilters(): void {
+    this.filters = {
+      searchTerm: '',
+      status: '',
+      priority: ''
+    };
+    this.selectedStatus = '';
+    this.selectedPriority = '';
+    this.filteredDossiers = [...this.dossiers];
+  }
+
+  // Appliquer les filtres (recherche, statut, priorité)
+  applyFilters(): void {
+    const term = this.filters.searchTerm.toLowerCase().trim();
+    const status = this.filters.status;
+    const priority = this.filters.priority;
+
+    this.filteredDossiers = this.dossiers.filter((dossier) => {
+      const matchesTerm =
+        !term ||
+        dossier.numeroDossier?.toLowerCase().includes(term) ||
+        dossier.objet?.toLowerCase().includes(term) ||
+        dossier.nomDebiteur?.toLowerCase().includes(term);
+
+      // const matchesStatus = !status || dossier.statutGlobal === status;
+      const matchesStatus =!status ||dossier.statutGlobal === status ||
+      this.getStatusLabel(dossier.statutGlobal).toLowerCase() === this.getStatusLabel(status).toLowerCase();
+      const matchesPriority = !priority || dossier.priority === priority;
+
+      return matchesTerm && matchesStatus && matchesPriority;
+    });
+  }
+
+  // Lorsqu’on change le filtre de statut
+  updateStatusFilter(): void {
+    this.filters.status = this.selectedStatus;
+    this.applyFilters();
+  }
+
+  // Lorsqu’on change le filtre de priorité
+  updatePriorityFilter(): void {
+    this.filters.priority = this.selectedPriority;
+    this.applyFilters();
+  }
+
+  getPaymentPercentage(dossier: any): number {
+    const total = dossier.montantTotal || 0;
+    const paid = dossier.montantPaye || 0;
+    return total ? Math.round((paid / total) * 100) : 0;
+  }
+
+  getTotalDebt(): number {
+    return this.filteredDossiers.reduce((acc, d) => acc + (d.montantTotal || 0), 0);
+  }
+
+  getTotalPaid(): number {
+    return this.filteredDossiers.reduce((acc, d) => acc + (d.montantPaye || 0), 0);
+  }
+  getFormattedRemainingAmount(dossier: any): string {
+  const reste = (dossier.montantTotal || 0) - (dossier.montantPaye || 0);
+  return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+}
+
+
 
 }

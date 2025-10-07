@@ -270,3 +270,26 @@
     justify-content: flex-end;
   }
 }
+
+.no-documents{
+  text-align: center;
+  padding: 64px 32px;
+  color: var(--text-secondary);
+}
+
+.no-documents svg {
+  margin-bottom: 24px;
+  color: var(--text-secondary);
+}
+
+.no-documents h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.no-documents p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}

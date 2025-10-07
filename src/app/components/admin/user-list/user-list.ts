@@ -37,7 +37,7 @@ export class UserList implements OnInit {
   selectedStatus = '';
 
   // Vue courante : 'grid' ou 'table'
-  currentView: 'grid' | 'table' = 'grid';
+  currentView: 'grid' | 'table' = 'table';
 
   // Cases (non utilisées ici, mais conservées pour référence)
   cases: DebtCase[] = [];
