@@ -235,9 +235,19 @@
       <!-- Bouton action -->
       <div class="drawer-actions">
   <ng-template #noStrapiUser>
-    <p>Aucun compte Strapi n’existe pour ce débiteur.</p>
-    <button class="btn btn-primary" (click)="createStrapiUser()">Créer un compte</button>
-  </ng-template>
+  <p>Aucun compte Strapi n’existe pour ce débiteur.</p>
+  <app-user-create
+    *ngIf="selectedDebtor"
+    [prefillData]="{
+      email: selectedDebtor.email,
+      firstName: selectedDebtor.firstName,
+      lastName: selectedDebtor.lastName,
+      nodeId: selectedDebtor.id
+    }"
+    (userCreated)="onUserCreated($event)">
+  </app-user-create>
+</ng-template>
+
         <button class="btn btn-primary">reset password</button>
       </div>
     </div>

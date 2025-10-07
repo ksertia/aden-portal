@@ -27,15 +27,16 @@
       </div>
     </div>
 
-    <!-- Sélecteur de rôle -->
+    <!-- Profil (rôle) — prérempli et non modifiable -->
     <div class="form-group">
       <label for="role">Profil</label>
-      <select id="role" formControlName="role" required>
-        <option value="">Sélectionnez votre profil</option>
-        <option *ngFor="let role of roles" [value]="role.id">
-          {{ role.attributes.name }}
-        </option>
-      </select>
+      <input type="text"
+             id="role"
+             formControlName="role"
+             readonly
+             class="readonly-input"
+             placeholder="Profil utilisateur (auto)"
+      />
     </div>
 
     <button type="submit" [disabled]="!userForm.valid" class="submit-btn">
