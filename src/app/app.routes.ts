@@ -112,6 +112,10 @@ export const routes: Routes = [
           {
             path: 'notifications',
             loadComponent: () => import('./components/creditor/creditor-notifications/creditor-notifications.component').then(c => c.CreditorNotificationsComponent)
+          },
+          {
+            path: 'dashboard',
+            loadComponent: () => import('./components/creditor/creditor-dashboard/creditor-dashboard').then(c => c.CreditorDashboard)
           }
         ]
       },

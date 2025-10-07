@@ -47,7 +47,7 @@
     <!-- Liste des documents -->
     <div class="documents-list" >
       <!-- *ngIf="filteredDocuments.length > 0; else noDocuments" -->
-      <div class="documents-grid">
+      <div class="documents-grid" *ngIf="filteredDocuments.length > 0; else noDocuments">
         <div class="document-card" *ngFor="let doc of filteredDocuments">
           <div class="document-header">
             <div class="document-icon" [ngClass]="'icon-' + doc.type">

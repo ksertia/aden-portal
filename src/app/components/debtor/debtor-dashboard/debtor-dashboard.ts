@@ -5,7 +5,6 @@ import { AuthService } from '../../../services/auth.service';
 import { CaseService } from '../../../services/case.service';
 import { User, StrapiRole } from '../../../models/user.model';
 import { DebtCase } from '../../../models/case.model';
-import { I18nService } from '../../../services/i18n.service';
 
 @Component({
   selector: 'app-debtor-dashboard',
@@ -30,26 +29,6 @@ export class DebtorDashboard implements OnInit {
     this.loadDashboardData();
   }
 
-  // get isDebtorUser(): boolean {
-  //   return this.authService.hasRole(StrapiRole.DEBTOR);
-  // }
-
-  // get isBailiffUser(): boolean {
-  //   return this.authService.hasRole(StrapiRole.BAILIFF);
-  // }
-
-  // get isLawyerUser(): boolean {
-  //   return this.authService.hasRole(StrapiRole.LAWYER);
-  // }
-
-  // get isCreditorUser(): boolean {
-  //   return this.authService.hasRole(StrapiRole.CREDITOR);
-  // }
-
-  // get isCedantUser(): boolean {
-  //   return this.authService.hasRole(StrapiRole.CEDANT);
-  // }
-
   loadDashboardData() {
     if (!this.currentUser) return;
 
@@ -58,9 +37,9 @@ export class DebtorDashboard implements OnInit {
       .subscribe(cases => {
         this.userCases = cases.length? cases : [
           // Simulation de données pour tester l'affichage
-          { caseNumber: 'DOS-001', status: 'active', amount: 1000, amountPaid: 200 } as DebtCase,
-          { caseNumber: 'DOS-002', status: 'pending', amount: 500, amountPaid: 0 } as DebtCase,
-          { caseNumber: 'DOS-003', status: 'closed', amount: 800, amountPaid: 800 } as DebtCase,
+          { caseNumber: 'REC2024-001', status: 'active', amount: 1000, amountPaid: 200 } as DebtCase,
+          { caseNumber: 'REC2024-003', status: 'pending', amount: 500, amountPaid: 0 } as DebtCase,
+          { caseNumber: 'REC2024-004', status: 'completed', amount: 800, amountPaid: 800 } as DebtCase,
         ]
       });
 
@@ -69,6 +48,21 @@ export class DebtorDashboard implements OnInit {
       .subscribe(stats => {
         this.statistics = stats;
       });
+  }
+
+    getUserRoleLabel(): string {
+    if (!this.currentUser) return '';
+    switch (this.currentUser.role.name) {
+      case StrapiRole.DEBTOR: return 'Débiteur';
+      case StrapiRole.BAILIFF: return 'Huissier de Justice';
+      case StrapiRole.LAWYER: return 'Avocat';
+      case StrapiRole.CREDITOR: return 'Créancier';
+      case StrapiRole.CEDANT: return 'Cédant';
+      case StrapiRole.PARTNER: return 'Partenaire';
+      case StrapiRole.RECOVERY_PARTNER: return 'Partenaire de recouvrement';
+      case StrapiRole.ADMINISTRATEUR: return 'Administrateur';
+      default: return 'Rôle inconnu';
+    }
   }
 
   formatCurrency(amount: number): string {
@@ -91,82 +85,79 @@ export class DebtorDashboard implements OnInit {
     return labels[status] || status;
   }
 
-  getNextDueDate(): string {
-    if (this.userCases.length === 0) return 'Aucune';
+  // getNextDueDate(): string {
+  //   if (this.userCases.length === 0) return 'Aucune';
     
-    const activeCases = this.userCases.filter(c => c.status === 'active' || c.status === 'payment_plan');
-    if (activeCases.length === 0) return 'Aucune';
+  //   const activeCases = this.userCases.filter(c => c.status === 'active' || c.status === 'payment_plan');
+  //   if (activeCases.length === 0) return 'Aucune';
     
-    const nextDue = activeCases
-      .map(c => c.dueDate)
-      .filter(date => new Date(date) > new Date())
-      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())[0];
+  //   const nextDue = activeCases
+  //     .map(c => c.dueDate)
+  //     .filter(date => new Date(date) > new Date())
+  //     .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())[0];
     
-    return nextDue ? new Date(nextDue).toLocaleDateString('fr-FR') : 'Aucune';
-  }
-
-
-
+  //   return nextDue ? new Date(nextDue).toLocaleDateString('fr-FR') : 'Aucune';
+  // }
 
    // données statique
-  filteredCase = [
-    {
-      creditorName: 'SAWADOGO Ahmad Abdoul-Latif',
-      username: 'Computer Science',
-      email: 'Débiteur@gmail.com',
-      phone: '+91 123 456 7890',
-      status: 'Actif',
-      role: 'Débiteur'
-    },
-    {
-      creditorName: 'Kagambega Aboubacar ',
-      username: 'Computer Science',
-      email: 'Créancierr@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Inactif',
-      role: 'Créancier'
-    },
+  // filteredCase = [
+  //   {
+  //     creditorName: 'SAWADOGO Ahmad Abdoul-Latif',
+  //     username: 'Computer Science',
+  //     email: 'Débiteur@gmail.com',
+  //     phone: '+91 123 456 7890',
+  //     status: 'Actif',
+  //     role: 'Débiteur'
+  //   },
+  //   {
+  //     creditorName: 'Kagambega Aboubacar ',
+  //     username: 'Computer Science',
+  //     email: 'Créancierr@gmail.com',
+  //     phone: '+91 123 456 7891',
+  //     status: 'Inactif',
+  //     role: 'Créancier'
+  //   },
     
-    {
-      creditorName: 'Bikiega Faril ',
-      username: 'Computer Science',
-      email: 'Huissier@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Actif',
-      role: 'Huissier'
-    },
-    {
-      creditorName: 'Mr Konate Constant',
-      username: 'Computer Science',
-      email: 'Avocat@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Inactif',
-      role: 'Avocat'
-    },
-    {
-      creditorName: 'Mr Wise',
-      username: 'Computer Science',
-      email: 'Cédant@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Actif',
-      role: 'Cédant'
-    },
-    {
-      creditorName: 'KABORE FAICAL',
-      username: 'Computer Science',
-      email: 'Partenaire@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Inactif',
-      role: 'Partenaire'
-    }
-  ];
+  //   {
+  //     creditorName: 'Bikiega Faril ',
+  //     username: 'Computer Science',
+  //     email: 'Huissier@gmail.com',
+  //     phone: '+91 123 456 7891',
+  //     status: 'Actif',
+  //     role: 'Huissier'
+  //   },
+  //   {
+  //     creditorName: 'Mr Konate Constant',
+  //     username: 'Computer Science',
+  //     email: 'Avocat@gmail.com',
+  //     phone: '+91 123 456 7891',
+  //     status: 'Inactif',
+  //     role: 'Avocat'
+  //   },
+  //   {
+  //     creditorName: 'Mr Wise',
+  //     username: 'Computer Science',
+  //     email: 'Cédant@gmail.com',
+  //     phone: '+91 123 456 7891',
+  //     status: 'Actif',
+  //     role: 'Cédant'
+  //   },
+  //   {
+  //     creditorName: 'KABORE FAICAL',
+  //     username: 'Computer Science',
+  //     email: 'Partenaire@gmail.com',
+  //     phone: '+91 123 456 7891',
+  //     status: 'Inactif',
+  //     role: 'Partenaire'
+  //   }
+  // ];
    // retourne une classe CSS (string) à appliquer selon le status
-  statusClass(status: string): string {
-    if (!status) return 'badge badge-secondary';
-    return status.toLowerCase() === 'actif'
-      ? 'badge badge-success light border-0'
-      : 'badge badge-danger light border-0';
-  }
+  // statusClass(status: string): string {
+  //   if (!status) return 'badge badge-secondary';
+  //   return status.toLowerCase() === 'actif'
+  //     ? 'badge badge-success light border-0'
+  //     : 'badge badge-danger light border-0';
+  // }
 
 
 }
