@@ -36,6 +36,7 @@
       align-items: center;
       gap: 16px;
       transition: all 0.2s ease;
+      cursor: pointer;
     }
 
     .stat-card:hover {
@@ -314,3 +315,26 @@
         grid-template-columns: 1fr;
       }
     }
+
+.no-cases {
+  text-align: center;
+  padding: 64px 32px;
+  color: var(--text-secondary);
+}
+
+.no-cases svg {
+  margin-bottom: 24px;
+  color: var(--text-secondary);
+}
+
+.no-cases h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.no-cases p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}

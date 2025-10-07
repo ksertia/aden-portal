@@ -28,7 +28,7 @@ selectedAvocat: (AvocatInfo & { strapiAccount?: any }) | null = null;
   };
 
   // Vue courante : 'grid' ou 'table'
-  currentView: 'grid' | 'table' = 'grid';
+  currentView: 'grid' | 'table' = 'table';
 
   cases: DebtCase[] = [];
   filteredCases: DebtCase[] = [];

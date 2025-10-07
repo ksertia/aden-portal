@@ -57,6 +57,8 @@ allUser: any;
   chambreDepartementale: string;
   nomCabinet: string;
   typePartenaire: string;
+  debiteurNodeId?: string;
+  nodeId: string;
 }
 
 export interface Debiteurs {

@@ -30,7 +30,7 @@ export class Debiteur implements OnInit {
   };
 
   // Vue courante : 'grid' ou 'table'
-  currentView: 'grid' | 'table' = 'grid';
+  currentView: 'grid' | 'table' = 'table';
 
   constructor(private adminService: AdminService) {}
 

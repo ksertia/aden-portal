@@ -1,7 +1,7 @@
 /* Général */
 .cases-container {
   padding: 32px;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -1000,4 +1000,58 @@
   font-weight: 600;
   color: var(--text);
   margin-bottom: 8px;
+}
+.header-content {
+  display: flex;
+  /* justify-content: space-between; */
+  justify-content: flex-start;
+  align-items: center;
+  gap: 25px;
+}
+
+.filters-section {
+  margin-bottom: 32px;
+}
+
+.filters-card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filters-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.filter-group label {
+  display: block;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.filter-group input,
+.filter-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
 }

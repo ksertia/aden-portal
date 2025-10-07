@@ -1813,9 +1813,23 @@ export class CaseService {
     this.casesSubject.next(this.mockCases);
   }
    // Récupérer tous les dossiers d'un site
-  getDossiers(siteName: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${siteName}/dossiers`);
-  }
+  // getDossiers(siteName: string): Observable<any> {
+  //   return this.http.get(`${this.apiUrl}/${siteName}/dossiers`);
+  // }
+//   getDossiers(siteName: string, debiteurNodeId?: string): Observable<any> {
+//   let url = `${this.apiUrl}/${siteName}/dossiers`;
+//   if (debiteurNodeId) {
+//     url += `?debiteurNodeId=${debiteurNodeId}`;
+//   }
+//   return this.http.get(url);
+// }
+getDossiers(siteName: string, debiteurNodeId: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
+    params: { debiteurNodeId } // 👈 Ajout du paramètre de requête
+  });
+}
+
+
 
   getCases(): Observable<DebtCase[]> {
     return of(this.mockCases).pipe(delay(500));
