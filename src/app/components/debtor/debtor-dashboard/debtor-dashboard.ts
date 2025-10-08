@@ -54,7 +54,7 @@ export class DebtorDashboard implements OnInit {
       return;
     }
 
-    this.casesService.getDossiers(siteName, debiteurNodeId).subscribe({
+    this.casesService.getDossiersDebiteur(siteName, debiteurNodeId).subscribe({
       next: (response) => {
         console.log('Réponse API dossiers :', response);
         this.dossiers = response.data?.map((item: any) => item.map) || [];

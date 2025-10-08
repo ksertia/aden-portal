@@ -1812,20 +1812,15 @@ export class CaseService {
   constructor(private http: HttpClient) {
     this.casesSubject.next(this.mockCases);
   }
-   // Récupérer tous les dossiers d'un site
-  // getDossiers(siteName: string): Observable<any> {
-  //   return this.http.get(`${this.apiUrl}/${siteName}/dossiers`);
-  // }
-//   getDossiers(siteName: string, debiteurNodeId?: string): Observable<any> {
-//   let url = `${this.apiUrl}/${siteName}/dossiers`;
-//   if (debiteurNodeId) {
-//     url += `?debiteurNodeId=${debiteurNodeId}`;
-//   }
-//   return this.http.get(url);
-// }
-getDossiers(siteName: string, debiteurNodeId: string): Observable<any> {
+  
+getDossiersDebiteur(siteName: string, debiteurNodeId: string): Observable<any> {
   return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
     params: { debiteurNodeId } // 👈 Ajout du paramètre de requête
+  });
+}
+getDossiersCreancier(siteName: string, creancierNodeId: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
+    params: { creancierNodeId } // 👈 Ajout du paramètre de requête
   });
 }
 

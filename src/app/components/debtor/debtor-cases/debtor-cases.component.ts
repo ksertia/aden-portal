@@ -376,7 +376,11 @@ export class DebtorCasesComponent implements OnInit {
   dossiers: any[] = [];
   isLoading = true;
   errorMessage = '';
+  // tiroir
+  showDrawer = false;  // Variable pour contrôler l'affichage du tiroir
+  selectedDossier: any = null;  // Dossier sélectionné pour afficher les détails
 
+  // End tiroir
   translations: any = {};
   userCases: DebtCase[] = [];
 
@@ -393,12 +397,43 @@ export class DebtorCasesComponent implements OnInit {
   selectedPriority = '';
   filteredDossiers: any[] = [];
 
+// A enlever start
+  showPaymentModal = false;
+  showPaymentPlanModal = false;
+  showDisputeModal = false;
+  selectedCase: DebtCase | null = null;
+  
+  paymentAmount = 0;
+  isProcessingPayment = false;
+  
+  paymentPlanProposal = {
+    monthlyAmount: 0,
+    duration: 0,
+    startDate: '',
+    notes: ''
+  };
+
+  disputeForm = {
+    reason: '',
+    description: '',
+    attachments: [] as File[]
+  };
+  // end
+
   constructor(private casesService: CaseService,
     private i18nService: I18nService,
     private authService: AuthService,
   ) {}
   // KAGAMBEGA ajout variable START
+    viewCaseDetails(dossier: any) {
+    this.selectedDossier = dossier;  // Stocker le dossier sélectionné
+    this.showDrawer = true;  // Afficher le tiroir
+  }
 
+  closeDrawer() {
+  this.showDrawer = false;  // Fermer le tiroir
+  this.selectedDossier = null;  // Réinitialiser le dossier sélectionné
+  }
   // KAGAMBEGA ajout variable END
 
   ngOnInit(): void {
@@ -432,7 +467,7 @@ export class DebtorCasesComponent implements OnInit {
       return;
     }
 
-    this.casesService.getDossiers(siteName, debiteurNodeId).subscribe({
+    this.casesService.getDossiersDebiteur(siteName, debiteurNodeId).subscribe({
       next: (response) => {
         console.log('Réponse API dossiers :', response);
         this.dossiers = response.data?.map((item: any) => item.map) || [];
@@ -490,9 +525,9 @@ export class DebtorCasesComponent implements OnInit {
     return labels[priority] || priority;
   }
 
-  viewCaseDetails(case_: DebtCase) {
+  // viewCaseDetails(case_: DebtCase) {
     
-  }
+  // }
    downloadCaseReport(case_: DebtCase) {
     console.log('Télécharger rapport pour:', case_.caseNumber);
   }
@@ -565,5 +600,67 @@ export class DebtorCasesComponent implements OnInit {
   return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
 }
 
+
+
+
+ getReminderHistory(case_: DebtCase) {
+    return case_.history.filter(activity => 
+      activity.type === ActivityType.REMINDER_SENT || 
+      activity.type === ActivityType.FORMAL_NOTICE_SENT ||
+      activity.type === ActivityType.CORRESPONDENCE_SENT
+    );
+  }
+  getReminderIconClass(type: string): string {
+    const classes: { [key: string]: string } = {
+      [ActivityType.REMINDER_SENT]: 'email',
+      [ActivityType.FORMAL_NOTICE_SENT]: 'legal',
+      [ActivityType.CORRESPONDENCE_SENT]: 'mail'
+    };
+    return classes[type] || 'email';
+  }
+   getReminderTypeLabel(type: string): string {
+    const labels: { [key: string]: string } = {
+      [ActivityType.REMINDER_SENT]: 'Relance',
+      [ActivityType.FORMAL_NOTICE_SENT]: 'Mise en demeure',
+      [ActivityType.CORRESPONDENCE_SENT]: 'Correspondance'
+    };
+    return labels[type] || 'Communication';
+  }
+  formatDate(date: Date): string {
+    return new Date(date).toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+    fileDispute(case_: DebtCase) {
+    this.selectedCase = case_;
+    this.disputeForm = {
+      reason: '',
+      description: '',
+      attachments: []
+    };
+    this.showDisputeModal = true;
+  }
+     proposePaymentPlan(case_: DebtCase) {
+    this.selectedCase = case_;
+    this.paymentPlanProposal = {
+      monthlyAmount: 0,
+      duration: 0,
+      startDate: this.getTomorrowDate(),
+      notes: ''
+    };
+    this.showPaymentPlanModal = true;
+  }
+   makePayment(case_: DebtCase) {
+    this.selectedCase = case_;
+    this.paymentAmount = 0;
+    this.showPaymentModal = true;
+  }
+   getTomorrowDate(): string {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  }
 
 }
