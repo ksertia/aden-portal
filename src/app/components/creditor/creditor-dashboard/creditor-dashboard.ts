@@ -5,6 +5,8 @@ import { AuthService } from '../../../services/auth.service';
 import { CaseService } from '../../../services/case.service';
 import { User, StrapiRole } from '../../../models/user.model';
 import { DebtCase } from '../../../models/case.model';
+import { AdminService } from '../../../services/admin.service';
+import { DebtorInfo } from '../../../models/case.model';
 
 @Component({
   selector: 'app-creditor-dashboard',
@@ -22,9 +24,14 @@ export class CreditorDashboard implements OnInit{
 
   filteredDossiers: any[] = [];
 
+  // Liste brute et filtrée
+  debiteurs: DebtorInfo[] = [];
+  filteredDebiteurs: DebtorInfo[] = [];
+
   constructor(
     private authService: AuthService,
-    private casesService: CaseService
+    private casesService: CaseService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit() {
@@ -34,39 +41,6 @@ export class CreditorDashboard implements OnInit{
   }
 
   // Chargement des dossiers
-  // loadDossiers() {
-  //   const siteName = 'portail-recouvrement';
-  //   const currentUser = this.authService.getCurrentUser();
-
-  //   if (!currentUser) {
-  //     this.errorMessage = 'Utilisateur non connecté.';
-  //     this.isLoading = false;
-  //     return;
-  //   }
-
-  //   const creancierNodeId = currentUser.nodeId;
-  //   console.log('Creancier connecté :', currentUser);
-  //   console.log('creancierNodeId envoyé :', creancierNodeId);
-
-  //   if (!creancierNodeId) {
-  //     this.errorMessage = 'Identifiant du débiteur introuvable.';
-  //     this.isLoading = false;
-  //     return;
-  //   }
-
-  //   this.casesService.getDossiersCreancier(siteName, creancierNodeId).subscribe({
-  //     next: (response) => {
-  //       console.log('Réponse API dossiers :', response);
-  //       this.dossiers = response.data?.map((item: any) => item.map) || [];
-  //       this.isLoading = false;
-  //     },
-  //     error: (error) => {
-  //       console.error('Erreur lors du chargement des dossiers :', error);
-  //       this.errorMessage = 'Impossible de récupérer les dossiers.';
-  //       this.isLoading = false;
-  //     }
-  //   });
-  // }
   loadDossiers() {
   const siteName = 'portail-recouvrement';
   const currentUser = this.authService.getCurrentUser();
@@ -109,7 +83,18 @@ export class CreditorDashboard implements OnInit{
       this.isLoading = false;
     }
   });
+
+   this.adminService.getDebiteurs(siteName).subscribe({
+      next: (data: DebtorInfo[]) => {
+        this.debiteurs = data;
+        this.filteredDebiteurs = [...this.debiteurs];
+      },
+      error: (err) => console.error(err)
+    });
 }
+getDebiteurForDossier(dossier: any): DebtorInfo | undefined {
+    return this.debiteurs.find(d => d.nodeId === dossier.debiteurNodeId);
+  }
 
 
   getTotalDebt(): number {

@@ -46,6 +46,7 @@
             <option value="negotiation">Négociation</option>
             <option value="legal_action">Action légale</option>
             <option value="completed">Terminé</option>
+            <option value="new">Nouveau</option>
           </select>
         </div>
         
@@ -53,9 +54,10 @@
           <label>Priorité</label>
           <select [(ngModel)]="selectedPriority" (change)="updatePriorityFilter()">
             <option value="">Toutes les priorités</option>
-            <option value="low">Faible</option>
-            <option value="medium">Moyenne</option>
-            <option value="high">Élevée</option>
+            <option value="FAIBLE">Faible</option>
+            <option value="MOYENNE">Moyenne</option>
+            <option value="Élevée">Élevée</option>
+            <!-- <option value="HAUTE">Élevée</option> -->
             <option value="urgent">Urgente</option>
           </select>
         </div>
@@ -64,7 +66,7 @@
   </div>
 
   <!-- Statistiques -->
-  <div class="stats-section fade-in-up" *ngIf="statistics">
+  <div class="stats-section fade-in-up" *ngIf="dossiers">
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon primary">
@@ -74,7 +76,7 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-value">{{ filteredDossiers.length }}</div>
           <div class="stat-label">Créances actives</div>
         </div>
       </div>
@@ -87,7 +89,7 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ getSuccessRate() }}%</div>
+          <div class="stat-value">{{ getPaymentPercentage(dossiers) }}%</div>
           <div class="stat-label">Taux de recouvrement</div>
         </div>
       </div>
@@ -100,7 +102,7 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ formatCurrency(getTotalAmount()) }}</div>
+          <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div>
           <div class="stat-label">Montant total</div>
         </div>
       </div>
@@ -113,7 +115,7 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ formatCurrency(getTotalRecovered()) }}</div>
+          <div class="stat-value">{{ formatCurrency(getTotalPaid()) }}</div>
           <div class="stat-label">Montant recouvré</div>
         </div>
       </div>
@@ -122,9 +124,9 @@
 
   <!-- Liste des créances -->
   <div class="cases-content fade-in-up">
-    <div class="cases-list" *ngIf="filteredCases.length > 0; else noCases">
+    <div class="cases-list" *ngIf="dossiers.length > 0; else noCases">
       <div class="list-header">
-        <h3>Créances ({{ filteredCases.length }})</h3>
+        <h3>Créances ({{ filteredDossiers.length }})</h3>
         <app-view-toggle 
           [currentView]="currentView" 
           (viewChange)="currentView = $event">
@@ -133,18 +135,19 @@
       
       <!-- Vue grille -->
       <div class="cases-grid" *ngIf="currentView === 'grid'">
-        <div class="case-card" *ngFor="let case of filteredCases">
+        <div class="case-card" *ngFor="let dossier of filteredDossiers; let i = index">
           <div class="case-header">
             <div class="case-info">
-              <h3>{{ case.caseNumber }}</h3>
-              <p class="debtor-name">{{ case.debtor.firstName }} {{ case.debtor.lastName }}</p>
+              <h3>{{ dossier.numeroDossier }}</h3>
+              <!-- <p class="debtor-name">{{ dossier.debiteurNodeId }}</p> -->
+              <span>{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
             </div>
             <div class="case-badges">
-              <span class="status-badge" [ngClass]="'status-' + case.status">
-                {{ getStatusLabel(case.status) }}
+              <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
+                {{ getStatusLabel(dossier.statutGlobal) }}
               </span>
-              <span class="priority-badge" [ngClass]="'priority-' + case.priority">
-                {{ getPriorityLabel(case.priority) }}
+              <span class="priority-badge" [ngClass]="'priority-' + dossier.priorite">
+                {{ getPriorityLabel(dossier.priorite) }}
               </span>
             </div>
           </div>
@@ -153,48 +156,48 @@
             <div class="case-amounts">
               <div class="amount-item">
                 <span class="amount-label">Montant total</span>
-                <span class="amount-value">{{ formatCurrency(case.amount) }}</span>
+                <span class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</span>
               </div>
               <div class="amount-item">
                 <span class="amount-label">Recouvré</span>
-                <span class="amount-value recovered">{{ formatCurrency(case.amountPaid) }}</span>
+                <span class="amount-value recovered">{{ formatCurrency(getTotalPaid()) }}</span>
               </div>
               <div class="amount-item">
                 <span class="amount-label">Restant</span>
-                <span class="amount-value remaining">{{ formatCurrency(case.amount - case.amountPaid) }}</span>
+                <span class="amount-value remaining">{{ getFormattedRemainingAmount(dossier) }}</span>
               </div>
             </div>
             
             <div class="case-progress">
               <div class="progress-info">
                 <span class="progress-label">Progression</span>
-                <span class="progress-percentage">{{ getPaymentPercentage(case) }}%</span>
+                <span class="progress-percentage">{{ getPaymentPercentage(dossier) }}%</span>
               </div>
               <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="getPaymentPercentage(case)"></div>
+                <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
               </div>
             </div>
             
             <div class="case-meta">
               <div class="meta-item">
                 <span class="meta-label">Échéance :</span>
-                <span class="meta-value">{{ formatDate(case.dueDate) }}</span>
+                <span class="meta-value">{{ dossier.dateEcheance }}</span>
               </div>
               <div class="meta-item">
                 <span class="meta-label">Créé le :</span>
-                <span class="meta-value">{{ formatDate(case.createdAt) }}</span>
+                <span class="meta-value">{{ dossier.dateCreation }}</span>
               </div>
             </div>
             
             <div class="case-actions">
-              <button class="btn btn-primary small" (click)="viewCaseDetails(case)">
+              <button class="btn btn-primary small" (click)="viewCaseDetails(i)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
                 Détails
               </button>
-              <button class="btn btn-secondary small" (click)="downloadCaseReport(case)">
+              <button class="btn btn-secondary small" (click)="downloadCaseReport(dossier)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                   <polyline points="7,10 12,15 17,10"/>
@@ -224,59 +227,60 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let case of filteredCases" class="case-row">
+            <tr *ngFor="let dossier of filteredDossiers; let i = index" class="case-row">
               <td>
                 <div class="case-cell">
-                  <div class="case-number">{{ case.caseNumber }}</div>
-                  <div class="case-date">{{ formatDate(case.createdAt) }}</div>
+                  <div class="case-number">{{ dossier.numeroDossier }}</div> 
+                  <div class="case-date">{{ dossier.dateCreation }}</div>
                 </div>
               </td>
               <td>
                 <div class="debtor-cell">
-                  <div class="debtor-name">{{ case.debtor.firstName }} {{ case.debtor.lastName }}</div>
-                  <div class="debtor-type">{{ case.debtor.type === 'company' ? 'Entreprise' : 'Particulier' }}</div>
+                  <!-- <div class="debtor-name">{{ dossier.debiteurNodeId }}</div> -->
+                  <span>{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
+                  <div class="debtor-type">{{ dossier.typeCreance }}</div>
                 </div>
               </td>
               <td>
                 <div class="amount-cell">
-                  <div class="amount-value">{{ formatCurrency(case.amount) }}</div>
+                  <div class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</div>
                 </div>
               </td>
               <td>
                 <div class="amount-cell recovered">
-                  <div class="amount-value">{{ formatCurrency(case.amountPaid) }}</div>
+                  <div class="amount-value">{{ formatCurrency(getTotalPaid()) }}</div>
                 </div>
               </td>
               <td>
                 <div class="amount-cell remaining">
-                  <div class="amount-value">{{ formatCurrency(case.amount - case.amountPaid) }}</div>
+                  <div class="amount-value">{{ getFormattedRemainingAmount(dossier) }}</div>
                 </div>
               </td>
               <td>
-                <span class="status-badge" [ngClass]="'status-' + case.status">
-                  {{ getStatusLabel(case.status) }}
+                <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
+                  {{ getStatusLabel(dossier.statutGlobal) }}
                 </span>
               </td>
               <td>
                 <div class="progress-cell">
                   <div class="progress-bar-small">
-                    <div class="progress-fill" [style.width.%]="getPaymentPercentage(case)"></div>
+                    <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
                   </div>
-                  <span class="progress-text">{{ getPaymentPercentage(case) }}%</span>
+                  <span class="progress-text">{{ getPaymentPercentage(dossier) }}%</span>
                 </div>
               </td>
               <td>
-                <div class="date-cell">{{ formatDate(case.dueDate) }}</div>
+                <div class="date-cell">{{ dossier.dateEcheance }}</div>
               </td>
               <td>
                 <div class="table-actions">
-                  <button class="btn btn-primary small" (click)="viewCaseDetails(case)" title="Voir détails">
+                  <button class="btn btn-primary small" (click)="viewCaseDetails(i)" title="Voir détails">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                       <circle cx="12" cy="12" r="3"/>
                     </svg>
                   </button>
-                  <button class="btn btn-secondary small" (click)="downloadCaseReport(case)" title="Télécharger rapport">
+                  <button class="btn btn-secondary small" (click)="downloadCaseReport(dossier)" title="Télécharger rapport">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                       <polyline points="7,10 12,15 17,10"/>
@@ -307,7 +311,7 @@
   <div class="modal-overlay" *ngIf="showCaseDetailsModal" (click)="closeCaseDetailsModal()">
     <div class="modal-content large" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Détails du dossier {{ selectedCase?.caseNumber }}</h3>
+        <h3>Détails du dossier {{ dossiers[selectedIndex!]?.numeroDossier }}</h3>
         <button class="modal-close" (click)="closeCaseDetailsModal()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/>
@@ -315,7 +319,7 @@
           </svg>
         </button>
       </div>
-      <div class="modal-body" *ngIf="selectedCase">
+      <div class="modal-body" *ngIf="selectedIndex !== null">
         <div class="case-details">
           <!-- Informations générales -->
           <div class="details-section">
@@ -323,20 +327,20 @@
             <div class="details-grid">
               <div class="detail-item">
                 <span class="detail-label">Numéro de dossier</span>
-                <span class="detail-value">{{ selectedCase.caseNumber }}</span>
+                <span class="detail-value">{{ dossiers[selectedIndex!].numeroDossier }}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Date de création</span>
-                <span class="detail-value">{{ formatDate(selectedCase.createdAt) }}</span>
+                <span class="detail-value">{{ dossiers[selectedIndex!].dateCreation }}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Échéance</span>
-                <span class="detail-value">{{ formatDate(selectedCase.dueDate) }}</span>
+                <span class="detail-value">{{ dossiers[selectedIndex!].dateEcheance }}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">Statut</span>
-                <span class="status-badge" [ngClass]="'status-' + selectedCase.status">
-                  {{ getStatusLabel(selectedCase.status) }}
+                <span class="status-badge"  [ngClass]="'status-' + dossiers[selectedIndex!].statutGlobal">
+                  {{ getStatusLabel(dossiers[selectedIndex!].statutGlobal) }}
                 </span>
               </div>
             </div>
@@ -347,22 +351,23 @@
             <h4>Débiteur</h4>
             <div class="debtor-profile">
               <div class="debtor-avatar">
-                {{ selectedCase.debtor.firstName.charAt(0) }}{{ selectedCase.debtor.lastName.charAt(0) }}
+                {{ selectedDebtor?.firstName?.charAt(0) }}{{ selectedDebtor?.lastName?.charAt(0) }}
+                <!-- {{ selectedCase.debtor.firstName.charAt(0) }}{{ selectedCase.debtor.lastName.charAt(0) }} -->
               </div>
               <div class="debtor-info">
-                <div class="debtor-name">{{ selectedCase.debtor.firstName }} {{ selectedCase.debtor.lastName }}</div>
+                <div class="debtor-name">{{ selectedDebtor?.firstName }} {{ selectedDebtor?.lastName }}
                 <div class="debtor-details">
                   <div class="detail-row">
                     <span class="label">Email :</span>
-                    <span class="value">{{ selectedCase.debtor.email }}</span>
+                    <span class="value">{{ selectedDebtor?.email }}</span>
                   </div>
                   <div class="detail-row">
                     <span class="label">Téléphone :</span>
-                    <span class="value">{{ selectedCase.debtor.phone }}</span>
+                    <span class="value">{{ selectedDebtor?.phone || '---' }}</span>
                   </div>
                   <div class="detail-row">
                     <span class="label">Type :</span>
-                    <span class="value">{{ selectedCase.debtor.type === 'company' ? 'Entreprise' : 'Particulier' }}</span>
+                    <span class="value">{{ selectedDebtor?.type || dossiers[selectedIndex!].typeCreance }}</span>
                   </div>
                 </div>
               </div>
@@ -381,7 +386,7 @@
                   </svg>
                 </div>
                 <div class="card-content">
-                  <div class="card-value">{{ formatCurrency(selectedCase.amount) }}</div>
+                  <div class="card-value">{{ dossiers[selectedIndex!].montantTotal | currency:'EUR' }}</div>
                   <div class="card-label">Montant total</div>
                 </div>
               </div>
@@ -393,8 +398,8 @@
                   </svg>
                 </div>
                 <div class="card-content">
-                  <div class="card-value">{{ formatCurrency(selectedCase.amountPaid) }}</div>
-                  <div class="card-label">Montant recouvré</div>
+                  <div class="card-value">{{ formatCurrency(getTotalPaid()) }}</div>
+                  <div class="card-label">Montant recouvré</div> 
                 </div>
               </div>
               <div class="financial-card remaining">
@@ -406,7 +411,7 @@
                   </svg>
                 </div>
                 <div class="card-content">
-                  <div class="card-value">{{ formatCurrency(selectedCase.amount - selectedCase.amountPaid) }}</div>
+                  <div class="card-value">{{ getFormattedRemainingAmount(dossiers[selectedIndex!]) }}</div>
                   <div class="card-label">Reste à recouvrer</div>
                 </div>
               </div>
@@ -415,10 +420,10 @@
             <div class="progress-section">
               <div class="progress-header">
                 <span class="progress-title">Progression du recouvrement</span>
-                <span class="progress-percentage">{{ getPaymentPercentage(selectedCase) }}%</span>
+                <span class="progress-percentage">{{ getPaymentPercentage(dossiers[selectedIndex!]) }}%</span>
               </div>
               <div class="progress-bar-large">
-                <div class="progress-fill" [style.width.%]="getPaymentPercentage(selectedCase)"></div>
+                <div class="progress-fill"  [style.width.%]="getPaymentPercentage(dossiers[selectedIndex!])"></div>
               </div>
             </div>
           </div>
@@ -427,7 +432,7 @@
           <div class="details-section">
             <h4>Historique des activités</h4>
             <div class="activity-timeline">
-              <div class="timeline-item" *ngFor="let activity of getRecentActivities(selectedCase)">
+              <div class="timeline-item" *ngFor="let activity  getRecentActivities(selectedIndex)">
                 <div class="timeline-dot" [ngClass]="getActivityClass(activity.type)"></div>
                 <div class="timeline-content">
                   <div class="timeline-description">{{ activity.description }}</div>
@@ -441,10 +446,10 @@
           </div>
 
           <!-- Documents -->
-          <div class="details-section" *ngIf="selectedCase.documents.length > 0">
-            <h4>Documents joints ({{ selectedCase.documents.length }})</h4>
+          <div class="details-section" *ngIf="filteredDossiers.length > 0">
+            <h4>Documents joints ({{ dossiers.length }})</h4>
             <div class="documents-list">
-              <div class="document-item" *ngFor="let doc of selectedCase.documents">
+              <div class="document-item" *ngFor="let doc of dossiers">
                 <div class="document-icon">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>

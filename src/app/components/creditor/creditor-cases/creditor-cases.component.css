@@ -187,9 +187,10 @@
   text-transform: uppercase;
 }
 
-.priority-low { background: #f0f9ff; color: #0369a1; }
-.priority-medium { background: #fef3c7; color: #92400e; }
-.priority-high { background: #fee2e2; color: #991b1b; }
+.priority-FAIBLE { background: #f0f9ff; color: #0369a1; }
+.priority-MOYENNE { background: #fef3c7; color: #92400e; }
+.priority-Élevée { background: #fee2e2; color: #991b1b; }
+/* .priority-HAUTE { background: #fee2e2; color: #991b1b; } */
 .priority-urgent { background: #fdf2f8; color: #be185d; }
 
 .case-amounts {

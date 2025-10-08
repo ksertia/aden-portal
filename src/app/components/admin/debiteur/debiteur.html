@@ -116,6 +116,7 @@
               <th>Email</th>
               <th>Téléphone</th>
               <th>Type</th>
+              <!-- <th>nodeId</th> -->
               <th>Situation Financiere</th>
               <th>Montant Dette</th>
               <th>Actions</th>
@@ -133,6 +134,7 @@
                 </span>
               </td>
               <td>{{ item.situation }}</td>
+              <!-- <td>{{ item.nodeId }}</td> -->
               <td>{{ item.dette }}</td>
               <td>
                 <div class="table-actions">
@@ -193,6 +195,10 @@
           <div class="detail-item">
             <span class="detail-label">Téléphone</span>
             <span class="detail-value">{{ selectedDebtor.phone }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label hidden">nodeId</span>
+            <span class="detail-value">{{ selectedDebtor.nodeId }}</span>
           </div>
           <div class="detail-item" *ngIf="selectedDebtor.address">
             <span class="detail-label">Adresse</span>

@@ -392,29 +392,6 @@ export class DebtorCasesComponent implements OnInit {
   selectedPriority = '';
   filteredDossiers: any[] = [];
 
-// A enlever start
-  showPaymentModal = false;
-  showPaymentPlanModal = false;
-  showDisputeModal = false;
-  selectedCase: DebtCase | null = null;
-  
-  paymentAmount = 0;
-  isProcessingPayment = false;
-  
-  paymentPlanProposal = {
-    monthlyAmount: 0,
-    duration: 0,
-    startDate: '',
-    notes: ''
-  };
-
-  disputeForm = {
-    reason: '',
-    description: '',
-    attachments: [] as File[]
-  };
-  // end
-
   constructor(private casesService: CaseService,
     private i18nService: I18nService,
     private authService: AuthService,
@@ -585,66 +562,5 @@ export class DebtorCasesComponent implements OnInit {
 }
 
 
-
-
- getReminderHistory(case_: DebtCase) {
-    return case_.history.filter(activity => 
-      activity.type === ActivityType.REMINDER_SENT || 
-      activity.type === ActivityType.FORMAL_NOTICE_SENT ||
-      activity.type === ActivityType.CORRESPONDENCE_SENT
-    );
-  }
-  getReminderIconClass(type: string): string {
-    const classes: { [key: string]: string } = {
-      [ActivityType.REMINDER_SENT]: 'email',
-      [ActivityType.FORMAL_NOTICE_SENT]: 'legal',
-      [ActivityType.CORRESPONDENCE_SENT]: 'mail'
-    };
-    return classes[type] || 'email';
-  }
-   getReminderTypeLabel(type: string): string {
-    const labels: { [key: string]: string } = {
-      [ActivityType.REMINDER_SENT]: 'Relance',
-      [ActivityType.FORMAL_NOTICE_SENT]: 'Mise en demeure',
-      [ActivityType.CORRESPONDENCE_SENT]: 'Correspondance'
-    };
-    return labels[type] || 'Communication';
-  }
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-    fileDispute(case_: DebtCase) {
-    this.selectedCase = case_;
-    this.disputeForm = {
-      reason: '',
-      description: '',
-      attachments: []
-    };
-    this.showDisputeModal = true;
-  }
-     proposePaymentPlan(case_: DebtCase) {
-    this.selectedCase = case_;
-    this.paymentPlanProposal = {
-      monthlyAmount: 0,
-      duration: 0,
-      startDate: this.getTomorrowDate(),
-      notes: ''
-    };
-    this.showPaymentPlanModal = true;
-  }
-   makePayment(case_: DebtCase) {
-    this.selectedCase = case_;
-    this.paymentAmount = 0;
-    this.showPaymentModal = true;
-  }
-   getTomorrowDate(): string {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split('T')[0];
-  }
 
 }
