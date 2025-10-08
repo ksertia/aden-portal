@@ -7,7 +7,7 @@
   </div>
 
   <!-- Statistiques générales -->
-  <div class="stats-grid fade-in-up" *ngIf="statistics">
+  <div class="stats-grid fade-in-up" *ngIf="dossiers">
     <div class="stat-card">
       <div class="stat-icon primary">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -16,7 +16,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-value">{{ statistics.totalCases }}</div>
+        <div class="stat-value">{{ dossiers.length }}</div>
         <div class="stat-label">Dossiers totaux</div>
       </div>
     </div>
@@ -29,7 +29,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-value">{{ statistics.activeCases }}</div>
+        <div class="stat-value">--</div>
         <div class="stat-label">Dossiers actifs</div>
       </div>
     </div>
@@ -43,7 +43,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-value">{{ statistics.pendingCases }}</div>
+        <div class="stat-value">--</div>
         <div class="stat-label">En attente</div>
       </div>
     </div>
@@ -56,39 +56,43 @@
         </svg>
       </div>
       <div class="stat-content">
-            <div class="stat-value">{{ formatCurrency(statistics.totalAmount) }}</div>
+            <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div>
             <div class="stat-label">Montant total</div>
       </div>
     </div>
   </div>
 
-  <!-- Vue spécifique par rôle -->
+  <!-- Liste des creances-->
   <div class="role-content fade-in-up">
-    <!-- Vue Débiteur -->
     <div  class="debtor-dashboard">
-      <div class="section-header">
+      <div class="section-header" *ngIf="dossiers.length > 0">
         <h2>Mes Créances</h2>
         <a routerLink="/creditor/cases" class="btn btn-primary">Voir toutes les créances</a>
       </div>
           
-      <div class="cases-grid" *ngIf="userCases.length > 0">
-        <div class="case-card" *ngFor="let case of userCases.slice(0, 3)">
+      <!--Affichage de trois dossiers -->
+      <div class="cases-grid" *ngIf="dossiers.length > 0">
+        <div class="case-card"  *ngFor="let dossier of dossiers.slice(0, 6)">
           <div class="case-header">
-            <h3>{{ case.caseNumber }}</h3>
-            <span class="status-badge" [ngClass]="'status-' + case.status">
-              {{ getStatusLabel(case.status) }}
+            <h3>{{ dossier.numeroDossier }}</h3>
+            <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
+              {{ getStatusLabel(dossier.statutGlobal) }}
             </span>
           </div>
           <div class="case-details">
+            <div class="case-info">
+              <span class="label">Débiteur :</span>
+              <span>{{ dossier.debiteurNodeId }}</span>
+            </div>
             <div class="case-amount">
-              <span class="label">Montant dû :</span>
-              <span class="amount">{{ formatCurrency(case.amount - case.amountPaid) }}</span>
+              <span class="label">Montant:</span>
+              <span class="amount">{{ dossier.montantTotal | currency:'EUR' }}</span>
             </div>
             <div class="case-progress">
               <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="(case.amountPaid / case.amount) * 100"></div>
+                <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
               </div>
-              <span class="progress-text">{{ ((case.amountPaid / case.amount) * 100).toFixed(0) }}% payé</span>
+              <span class="progress-text">{{ getPaymentPercentage(dossier) }}% payé</span>
             </div>
           </div>
         </div>
