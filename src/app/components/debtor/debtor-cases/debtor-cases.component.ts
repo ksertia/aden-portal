@@ -354,6 +354,7 @@
 //     console.log('Voir détails du dossier:', case_.caseNumber);
 //   }
 // }
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CaseService } from '../../../services/case.service';
@@ -396,6 +397,9 @@ export class DebtorCasesComponent implements OnInit {
     private i18nService: I18nService,
     private authService: AuthService,
   ) {}
+  // KAGAMBEGA ajout variable START
+
+  // KAGAMBEGA ajout variable END
 
   ngOnInit(): void {
 
@@ -560,7 +564,6 @@ export class DebtorCasesComponent implements OnInit {
   const reste = (dossier.montantTotal || 0) - (dossier.montantPaye || 0);
   return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
 }
-
 
 
 }
