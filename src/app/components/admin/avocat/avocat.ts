@@ -5,10 +5,11 @@ import { ActivatedRoute, Router, RouterModule} from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { DebtCase, AvocatInfo } from '../../../models/case.model';
 import { AdminService } from '../../../services/admin.service';
+import { UserCreateComponent } from '../user-create/user-create.component';
 
 @Component({
   selector: 'app-avocat',
-  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule],
+  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule, UserCreateComponent],
   templateUrl: './avocat.html',
   styleUrl: './avocat.css'
 })
@@ -17,10 +18,10 @@ export class Avocat implements OnInit {
   avocat: AvocatInfo[] = [];
   filteredAvocat: AvocatInfo[] = [];
 
-
-showDrawer = false;
-selectedAvocat: (AvocatInfo & { strapiAccount?: any }) | null = null;
-
+  // État du tiroir
+  showDrawer = false;
+  selectedAvocat: AvocatInfo | null = null;
+  selectedUser: any | null = null; // données Strapi User
 
   // Gestion des filtres
   filters = {
@@ -46,7 +47,6 @@ selectedAvocat: (AvocatInfo & { strapiAccount?: any }) | null = null;
   ) {}
 
   ngOnInit() {
-
     this.loadAvocat();
   }
 
@@ -113,17 +113,31 @@ selectedAvocat: (AvocatInfo & { strapiAccount?: any }) | null = null;
       : 'badge badge-danger light border-0';
   }
 
+  // --- Gestion du tiroir ---
   openDrawer(avocat: AvocatInfo) {
-  this.selectedAvocat = avocat;
-  this.showDrawer = true;
+    this.selectedAvocat = avocat;
+    this.showDrawer = true;
+
+    // ⚡ On appelle Strapi pour récupérer le user associé à l'avocat
+    this.adminService.getUserByEmail(avocat.emailProfessionnel).subscribe({
+      next: (user) => {
+        this.selectedUser = user;
+      },
+      error: (err) => {
+        console.error("Erreur récupération user:", err);
+        this.selectedUser = null;
+      }
+    });
+  }
+
+  closeDrawer() {
+    this.showDrawer = false;
+    this.selectedAvocat = null;
+    this.selectedUser = null;
+  }
+
+  onUserCreated(user: any) {
+    console.log('Utilisateur Strapi créé:', user);
+    this.selectedUser = user;
+  }
 }
-
-closeDrawer() {
-  this.showDrawer = false;
-  this.selectedAvocat = null;
-}
-
-
-}
-
-

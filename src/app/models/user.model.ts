@@ -57,6 +57,7 @@ allUser: any;
   chambreDepartementale: string;
   nomCabinet: string;
   typePartenaire: string;
+  
 }
 
 export interface Debiteurs {
