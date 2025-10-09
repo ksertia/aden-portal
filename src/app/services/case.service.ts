@@ -23,6 +23,7 @@ export class CaseService {
         lastName: 'Dupont',
         email: 'jean.dupont@email.com',
         phone: '+33 1 23 45 67 89',
+        nodeId: '+33 1 23 45 67 89',
         address: {
           street: '123 Rue de la Paix',
           city: 'Paris',
@@ -157,6 +158,7 @@ export class CaseService {
         lastName: 'Dupont',
         email: 'jean.dupont@email.com',
         phone: '+33 1 23 45 67 89',
+        nodeId: '+33 1 23 45 67 89',
         address: {
           street: '123 Rue de la Paix',
           city: 'Paris',
@@ -267,6 +269,7 @@ export class CaseService {
         lastName: 'Dupont',
         email: 'jean.dupont@email.com',
         phone: '+33 1 23 45 67 89',
+        nodeId: '+33 1 23 45 67 89',
         address: {
           street: '123 Rue de la Paix',
           city: 'Paris',
@@ -432,6 +435,7 @@ export class CaseService {
         lastName: 'Dupont',
         email: 'jean.dupont@email.com',
         phone: '+33 1 23 45 67 89',
+        nodeId: '+33 1 23 45 67 89',
         address: {
           street: '123 Rue de la Paix',
           city: 'Paris',
@@ -558,6 +562,7 @@ export class CaseService {
         lastName: 'Dupont',
         email: 'jean.dupont@email.com',
         phone: '+33 1 23 45 67 89',
+        nodeId: '+33 1 23 45 67 89',
         address: {
           street: '123 Rue de la Paix',
           city: 'Paris',
@@ -669,6 +674,7 @@ export class CaseService {
         companyName: 'Bernard SARL',
         email: 'paul.bernard@bernard-sarl.fr',
         phone: '+33 1 23 45 67 90',
+        nodeId: '+33 1 23 45 67 90',
         address: {
           street: '789 Rue du Commerce',
           city: 'Marseille',
@@ -761,6 +767,7 @@ export class CaseService {
         companyName: 'Rousseau Design',
         email: 'claire@rousseaudesign.fr',
         phone: '+33 1 23 45 67 95',
+        nodeId: '+33 1 23 45 67 95',
         address: {
           street: '258 Rue Créative',
           city: 'Lyon',
@@ -886,6 +893,7 @@ export class CaseService {
         lastName: 'Lefevre',
         email: 'michel.lefevre@email.com',
         phone: '+33 1 23 45 67 96',
+        nodeId: '+33 1 23 45 67 96',
         address: {
           street: '741 Avenue République',
           city: 'Strasbourg',
@@ -1006,6 +1014,7 @@ export class CaseService {
         companyName: 'Moreau Consulting',
         email: 'sylvie@moreauconsulting.fr',
         phone: '+33 1 23 45 67 97',
+        nodeId: '+33 1 23 45 67 97',
         address: {
           street: '369 Boulevard Business',
           city: 'Montpellier',
@@ -1116,658 +1125,8 @@ export class CaseService {
         }
       ]
     },
-    {
-      id: '10',
-      caseNumber: 'REC2024-010',
-      debtor: {
-        firstName: 'Antoine',
-        lastName: 'Girard',
-        email: 'antoine.girard@email.com',
-        phone: '+33 1 23 45 67 98',
-        address: {
-          street: '147 Rue Liberté',
-          city: 'Rennes',
-          postalCode: '35000',
-          country: 'France'
-        },
-        type: 'individual',
-        situation: '',
-        dette: 0
-      },
-      creditor: {
-        name: 'Banque Régionale',
-        contactPerson: 'Catherine Leroy',
-        email: 'catherine@banqueregionale.fr',
-        phone: '+33 1 23 45 67 78',
-        address: {
-          street: '753 Avenue Banque',
-          city: 'Rennes',
-          postalCode: '35001',
-          country: 'France'
-        }
-      },
-      amount: 45000,
-      amountPaid: 0,
-      debtBreakdown: {
-        principalAmount: 40000,
-        interests: [
-          {
-            id: '12',
-            type: 'contractual',
-            rate: 18,
-            startDate: new Date('2023-10-01'),
-            amount: 4200,
-            description: 'Intérêts contractuels (18% par an)'
-          }
-        ],
-        penalties: [
-          {
-            id: '10',
-            type: 'breach',
-            amount: 600,
-            appliedDate: new Date('2024-01-01'),
-            description: 'Pénalité pour défaut de paiement'
-          }
-        ],
-        fees: [
-          {
-            id: '10',
-            type: 'legal',
-            amount: 200,
-            appliedDate: new Date('2024-01-15'),
-            description: 'Frais juridiques et de recouvrement'
-          }
-        ],
-        totalInterests: 4200,
-        totalPenalties: 600,
-        totalFees: 200,
-        totalAmount: 45000
-      },
-      status: CaseStatus.LEGAL_ACTION,
-      priority: Priority.URGENT,
-      createdAt: new Date('2023-10-01'),
-      dueDate: new Date('2023-12-01'),
-      assignedBailiff: '2',
-      assignedLawyer: '3',
-      documents: [
-        {
-          id: '16',
-          name: 'Contrat de prêt.pdf',
-          type: DocumentType.CONTRACT,
-          url: '#',
-          uploadedAt: new Date('2023-10-01'),
-          uploadedBy: 'Catherine Leroy'
-        },
-        {
-          id: '17',
-          name: 'Assignation en justice.pdf',
-          type: DocumentType.COURT_DOCUMENT,
-          url: '#',
-          uploadedAt: new Date('2024-02-01'),
-          uploadedBy: 'Pierre Durand'
-        }
-      ],
-      history: [
-        {
-          id: '29',
-          type: ActivityType.CASE_CREATED,
-          description: 'Dossier créé',
-          date: new Date('2023-10-01'),
-          userId: '3',
-          userName: 'Pierre Durand'
-        },
-        {
-          id: '30',
-          type: ActivityType.REMINDER_SENT,
-          description: 'Relances multiples envoyées',
-          date: new Date('2023-12-15'),
-          userId: '2',
-          userName: 'Marie Martin'
-        },
-        {
-          id: '31',
-          type: ActivityType.LEGAL_ACTION_INITIATED,
-          description: 'Procédure judiciaire engagée',
-          date: new Date('2024-02-01'),
-          userId: '3',
-          userName: 'Pierre Durand'
-        }
-      ]
-    },
-    {
-      id: '11',
-      caseNumber: 'REC2024-011',
-      debtor: {
-        firstName: 'Émilie',
-        lastName: 'Fabre',
-        email: 'emilie.fabre@email.com',
-        phone: '+33 1 23 45 67 99',
-        address: {
-          street: '852 Rue Paix',
-          city: 'Dijon',
-          postalCode: '21000',
-          country: 'France'
-        },
-        type: 'individual',
-        situation: '',
-        dette: 0
-      },
-      creditor: {
-        name: 'Télécoms Avenir',
-        contactPerson: 'Olivier Garnier',
-        email: 'olivier@telecomsavenir.fr',
-        phone: '+33 1 23 45 67 77',
-        address: {
-          street: '456 Zone Tech',
-          city: 'Dijon',
-          postalCode: '21001',
-          country: 'France'
-        }
-      },
-      amount: 680,
-      amountPaid: 680,
-      debtBreakdown: {
-        principalAmount: 600,
-        interests: [
-          {
-            id: '13',
-            type: 'legal',
-            rate: 3.15,
-            startDate: new Date('2024-01-01'),
-            endDate: new Date('2024-02-01'),
-            amount: 60,
-            description: 'Intérêts légaux (3,15% par an)'
-          }
-        ],
-        penalties: [
-          {
-            id: '11',
-            type: 'late_payment',
-            amount: 15,
-            appliedDate: new Date('2024-01-15'),
-            description: 'Pénalité de retard forfaitaire'
-          }
-        ],
-        fees: [
-          {
-            id: '11',
-            type: 'collection',
-            amount: 5,
-            appliedDate: new Date('2024-01-10'),
-            description: 'Frais de recouvrement'
-          }
-        ],
-        totalInterests: 60,
-        totalPenalties: 15,
-        totalFees: 5,
-        totalAmount: 680
-      },
-      status: CaseStatus.COMPLETED,
-      priority: Priority.LOW,
-      createdAt: new Date('2024-01-01'),
-      dueDate: new Date('2024-02-01'),
-      assignedBailiff: '2',
-      documents: [
-        {
-          id: '18',
-          name: 'Facture télécoms.pdf',
-          type: DocumentType.INVOICE,
-          url: '#',
-          uploadedAt: new Date('2024-01-01'),
-          uploadedBy: 'Olivier Garnier'
-        }
-      ],
-      history: [
-        {
-          id: '32',
-          type: ActivityType.CASE_CREATED,
-          description: 'Dossier créé',
-          date: new Date('2024-01-01'),
-          userId: '2',
-          userName: 'Marie Martin'
-        },
-        {
-          id: '33',
-          type: ActivityType.PAYMENT_RECEIVED,
-          description: 'Paiement complet reçu - 680€',
-          date: new Date('2024-02-01'),
-          userId: '11',
-          userName: 'Émilie Fabre'
-        }
-      ]
-    },
-    // Dossiers pour le créancier Sophie Lambert (creditor contactPerson)
-    {
-      id: '12',
-      caseNumber: 'REC2024-012',
-      debtor: {
-        firstName: 'David',
-        lastName: 'Mercier',
-        companyName: 'Mercier EURL',
-        email: 'david@mercier-eurl.fr',
-        phone: '+33 1 23 45 67 93',
-        address: {
-          street: '741 Zone Artisanale',
-          city: 'Clermont-Ferrand',
-          postalCode: '63000',
-          country: 'France'
-        },
-        type: 'company',
-        situation: '',
-        dette: 0
-      },
-      creditor: {
-        name: 'ABC Services',
-        contactPerson: 'Sophie Lambert',
-        email: 'contact@abc-services.fr',
-        phone: '+33 1 23 45 67 88',
-        address: {
-          street: '456 Avenue des Affaires',
-          city: 'Lyon',
-          postalCode: '69000',
-          country: 'France'
-        }
-      },
-      amount: 7800,
-      amountPaid: 2000,
-      debtBreakdown: {
-        principalAmount: 7000,
-        interests: [
-          {
-            id: '14',
-            type: 'contractual',
-            rate: 8,
-            startDate: new Date('2024-01-01'),
-            amount: 650,
-            description: 'Intérêts contractuels (8% par an)'
-          }
-        ],
-        penalties: [
-          {
-            id: '12',
-            type: 'late_payment',
-            amount: 120,
-            appliedDate: new Date('2024-02-01'),
-            description: 'Pénalité de retard'
-          }
-        ],
-        fees: [
-          {
-            id: '12',
-            type: 'collection',
-            amount: 30,
-            appliedDate: new Date('2024-02-10'),
-            description: 'Frais de recouvrement'
-          }
-        ],
-        totalInterests: 650,
-        totalPenalties: 120,
-        totalFees: 30,
-        totalAmount: 7800
-      },
-      status: CaseStatus.ACTIVE,
-      priority: Priority.HIGH,
-      createdAt: new Date('2024-01-01'),
-      dueDate: new Date('2024-03-01'),
-      assignedBailiff: '2',
-      assignedLawyer: '3',
-      documents: [
-        {
-          id: '19',
-          name: 'Contrat prestation.pdf',
-          type: DocumentType.CONTRACT,
-          url: '#',
-          uploadedAt: new Date('2024-01-01'),
-          uploadedBy: 'Sophie Lambert'
-        }
-      ],
-      history: [
-        {
-          id: '34',
-          type: ActivityType.CASE_CREATED,
-          description: 'Dossier créé',
-          date: new Date('2024-01-01'),
-          userId: '4',
-          userName: 'Sophie Lambert'
-        },
-        {
-          id: '35',
-          type: ActivityType.PAYMENT_RECEIVED,
-          description: 'Paiement partiel reçu - 2000€',
-          date: new Date('2024-02-15'),
-          userId: '12',
-          userName: 'David Mercier'
-        },
-        {
-          id: '36',
-          type: ActivityType.REMINDER_SENT,
-          description: 'Relance pour solde restant',
-          date: new Date('2024-03-01'),
-          userId: '2',
-          userName: 'Marie Martin'
-        }
-      ]
-    },
-    {
-      id: '13',
-      caseNumber: 'REC2024-013',
-      debtor: {
-        firstName: 'Lucie',
-        lastName: 'Perrin',
-        email: 'lucie.perrin@email.com',
-        phone: '+33 1 23 45 67 94',
-        address: {
-          street: '963 Avenue Liberté',
-          city: 'Angers',
-          postalCode: '49000',
-          country: 'France'
-        },
-        type: 'individual',
-        situation: '',
-        dette: 0
-      },
-      creditor: {
-        name: 'ABC Services',
-        contactPerson: 'Sophie Lambert',
-        email: 'contact@abc-services.fr',
-        phone: '+33 1 23 45 67 88',
-        address: {
-          street: '456 Avenue des Affaires',
-          city: 'Lyon',
-          postalCode: '69000',
-          country: 'France'
-        }
-      },
-      amount: 1200,
-      amountPaid: 400,
-      debtBreakdown: {
-        principalAmount: 1000,
-        interests: [
-          {
-            id: '15',
-            type: 'legal',
-            rate: 3.15,
-            startDate: new Date('2024-02-01'),
-            amount: 150,
-            description: 'Intérêts légaux (3,15% par an)'
-          }
-        ],
-        penalties: [
-          {
-            id: '13',
-            type: 'late_payment',
-            amount: 35,
-            appliedDate: new Date('2024-02-15'),
-            description: 'Pénalité de retard forfaitaire'
-          }
-        ],
-        fees: [
-          {
-            id: '13',
-            type: 'collection',
-            amount: 15,
-            appliedDate: new Date('2024-02-10'),
-            description: 'Frais de recouvrement'
-          }
-        ],
-        totalInterests: 150,
-        totalPenalties: 35,
-        totalFees: 15,
-        totalAmount: 1200
-      },
-      status: CaseStatus.NEGOTIATION,
-      priority: Priority.MEDIUM,
-      createdAt: new Date('2024-02-01'),
-      dueDate: new Date('2024-04-01'),
-      assignedBailiff: '2',
-      documents: [
-        {
-          id: '20',
-          name: 'Facture impayée.pdf',
-          type: DocumentType.INVOICE,
-          url: '#',
-          uploadedAt: new Date('2024-02-01'),
-          uploadedBy: 'Sophie Lambert'
-        }
-      ],
-      history: [
-        {
-          id: '37',
-          type: ActivityType.CASE_CREATED,
-          description: 'Dossier créé',
-          date: new Date('2024-02-01'),
-          userId: '4',
-          userName: 'Sophie Lambert'
-        },
-        {
-          id: '38',
-          type: ActivityType.PAYMENT_RECEIVED,
-          description: 'Paiement partiel reçu - 400€',
-          date: new Date('2024-02-20'),
-          userId: '13',
-          userName: 'Lucie Perrin'
-        },
-        {
-          id: '39',
-          type: ActivityType.STATUS_CHANGED,
-          description: 'Statut modifié vers "Négociation"',
-          date: new Date('2024-02-25'),
-          userId: '2',
-          userName: 'Marie Martin'
-        }
-      ]
-    },
-    {
-      id: '14',
-      caseNumber: 'REC2024-014',
-      debtor: {
-        firstName: 'Maxime',
-        lastName: 'Roussel',
-        email: 'maxime.roussel@email.com',
-        phone: '+33 1 23 45 67 92',
-        address: {
-          street: '159 Rue Nouvelle',
-          city: 'Reims',
-          postalCode: '51100',
-          country: 'France'
-        },
-        type: 'individual',
-        situation: '',
-        dette: 0
-      },
-      creditor: {
-        name: 'ABC Services',
-        contactPerson: 'Sophie Lambert',
-        email: 'contact@abc-services.fr',
-        phone: '+33 1 23 45 67 88',
-        address: {
-          street: '456 Avenue des Affaires',
-          city: 'Lyon',
-          postalCode: '69000',
-          country: 'France'
-        }
-      },
-      amount: 3400,
-      amountPaid: 3400,
-      debtBreakdown: {
-        principalAmount: 3100,
-        interests: [
-          {
-            id: '16',
-            type: 'legal',
-            rate: 3.15,
-            startDate: new Date('2024-01-15'),
-            endDate: new Date('2024-02-28'),
-            amount: 250,
-            description: 'Intérêts légaux (3,15% par an)'
-          }
-        ],
-        penalties: [
-          {
-            id: '14',
-            type: 'late_payment',
-            amount: 40,
-            appliedDate: new Date('2024-02-01'),
-            description: 'Pénalité de retard forfaitaire'
-          }
-        ],
-        fees: [
-          {
-            id: '14',
-            type: 'collection',
-            amount: 10,
-            appliedDate: new Date('2024-01-20'),
-            description: 'Frais de recouvrement'
-          }
-        ],
-        totalInterests: 250,
-        totalPenalties: 40,
-        totalFees: 10,
-        totalAmount: 3400
-      },
-      status: CaseStatus.COMPLETED,
-      priority: Priority.MEDIUM,
-      createdAt: new Date('2024-01-15'),
-      dueDate: new Date('2024-02-28'),
-      assignedBailiff: '2',
-      documents: [
-        {
-          id: '21',
-          name: 'Facture maintenance.pdf',
-          type: DocumentType.INVOICE,
-          url: '#',
-          uploadedAt: new Date('2024-01-15'),
-          uploadedBy: 'Sophie Lambert'
-        },
-        {
-          id: '22',
-          name: 'Reçu paiement final.pdf',
-          type: DocumentType.PAYMENT_PROOF,
-          url: '#',
-          uploadedAt: new Date('2024-02-28'),
-          uploadedBy: 'Maxime Roussel'
-        }
-      ],
-      history: [
-        {
-          id: '40',
-          type: ActivityType.CASE_CREATED,
-          description: 'Dossier créé',
-          date: new Date('2024-01-15'),
-          userId: '4',
-          userName: 'Sophie Lambert'
-        },
-        {
-          id: '41',
-          type: ActivityType.REMINDER_SENT,
-          description: 'Relance par email',
-          date: new Date('2024-02-01'),
-          userId: '2',
-          userName: 'Marie Martin'
-        },
-        {
-          id: '42',
-          type: ActivityType.PAYMENT_RECEIVED,
-          description: 'Paiement complet reçu - 3400€',
-          date: new Date('2024-02-28'),
-          userId: '14',
-          userName: 'Maxime Roussel'
-        }
-      ]
-    },
-    {
-      id: '15',
-      caseNumber: 'REC2024-015',
-      debtor: {
-        firstName: 'Caroline',
-        lastName: 'Vidal',
-        companyName: 'Vidal & Co',
-        email: 'caroline@vidal-co.fr',
-        phone: '+33 1 23 45 67 91',
-        address: {
-          street: '753 Rue Commerce',
-          city: 'Tours',
-          postalCode: '37000',
-          country: 'France'
-        },
-        type: 'company',
-        situation: '',
-        dette: 0
-      },
-      creditor: {
-        name: 'ABC Services',
-        contactPerson: 'Sophie Lambert',
-        email: 'contact@abc-services.fr',
-        phone: '+33 1 23 45 67 88',
-        address: {
-          street: '456 Avenue des Affaires',
-          city: 'Lyon',
-          postalCode: '69000',
-          country: 'France'
-        }
-      },
-      amount: 18500,
-      amountPaid: 0,
-      debtBreakdown: {
-        principalAmount: 16000,
-        interests: [
-          {
-            id: '17',
-            type: 'contractual',
-            rate: 14,
-            startDate: new Date('2023-12-01'),
-            amount: 2000,
-            description: 'Intérêts contractuels (14% par an)'
-          }
-        ],
-        penalties: [
-          {
-            id: '15',
-            type: 'breach',
-            amount: 400,
-            appliedDate: new Date('2024-01-01'),
-            description: 'Pénalité pour rupture de contrat'
-          }
-        ],
-        fees: [
-          {
-            id: '15',
-            type: 'legal',
-            amount: 100,
-            appliedDate: new Date('2024-01-15'),
-            description: 'Frais juridiques'
-          }
-        ],
-        totalInterests: 2000,
-        totalPenalties: 400,
-        totalFees: 100,
-        totalAmount: 18500
-      },
-      status: CaseStatus.PENDING,
-      priority: Priority.HIGH,
-      createdAt: new Date('2023-12-01'),
-      dueDate: new Date('2024-02-01'),
-      documents: [
-        {
-          id: '23',
-          name: 'Contrat commercial.pdf',
-          type: DocumentType.CONTRACT,
-          url: '#',
-          uploadedAt: new Date('2023-12-01'),
-          uploadedBy: 'Sophie Lambert'
-        }
-      ],
-      history: [
-        {
-          id: '43',
-          type: ActivityType.CASE_CREATED,
-          description: 'Dossier créé - En attente d\'assignation',
-          date: new Date('2023-12-01'),
-          userId: '4',
-          userName: 'Sophie Lambert'
-        }
-      ]
-    }
+   
+    
   ];
 
   private mockPaymentProposals: PaymentProposal[] = [
@@ -1823,7 +1182,6 @@ getDossiersCreancier(siteName: string, creancierNodeId: string): Observable<any>
     params: { creancierNodeId } // 👈 Ajout du paramètre de requête
   });
 }
-
 
 
   getCases(): Observable<DebtCase[]> {

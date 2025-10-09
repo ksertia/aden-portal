@@ -70,6 +70,7 @@ export interface DebtorInfo {
   type: 'individual' | 'company';
   situation:string;
   dette:number;
+  nodeId: string;
 }
 export interface ApiDebtorResponse {
   map: any;

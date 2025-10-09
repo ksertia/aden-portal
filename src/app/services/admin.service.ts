@@ -41,6 +41,7 @@ export class AdminService {
         companyName: item.map.raisonSociale,
         email: item.map.emailDebiteur,
         phone: item.map.telephone,
+        nodeId: item.map.nodeId,
         situation: item.map.situationFinanciere,
         dette: item.map.montantDette,
         address: {

@@ -81,8 +81,10 @@
           </div>
           <div class="case-details">
             <div class="case-info">
+              <!-- *ngIf="filteredDebiteurs.length > 0" -->
               <span class="label">Débiteur :</span>
-              <span>{{ dossier.debiteurNodeId }}</span>
+              <!-- <span>{{ dossier.debiteurNodeId }}</span> -->
+              <span>{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
             </div>
             <div class="case-amount">
               <span class="label">Montant:</span>

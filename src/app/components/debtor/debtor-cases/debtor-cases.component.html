@@ -282,146 +282,146 @@
   </div>
 
   <!-- Details-->
-   <!-- Tiroir qui s'ouvre avec les détails -->
-  
-  <!-- Ajouter une vérification pour s'assurer que selectedDossier est défini avant d'afficher le contenu -->
-  <div class="drawer-overlay" *ngIf="showDrawer && selectedDossier">
-    <div class="drawer-content" (click)="$event.stopPropagation()"> <!-- Empêche la propagation du clic -->
-      <div class="cases-list">
-        <div class="cases-grid">
-          <div class="case-card">
-            <div class="case-header">
-              <div class="case-info">
-                <h3>{{ selectedDossier?.numeroDossier }}</h3>
-                <p class="creditor-name">{{ selectedDossier?.objet }}</p>
+   <div class="cases-list" *ngIf="dossiers.length > 0; else noCases">
+      <div class="cases-grid">
+        <div class="case-card"  *ngFor="let dossier of dossiers">
+          <div class="case-header">
+            <div class="case-info">
+              <h3> {{ dossier.numeroDossier }}</h3>
+              <p class="creditor-name">{{ dossier.objet }}</p>
+            </div>
+            <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
+              {{ getStatusLabel(dossier.statutGlobal) }}
+            </span>
+          </div>
+          
+          <div class="case-body">
+            <!-- Détail de la dette -->
+            <div class="debt-breakdown">
+              <h4>{{ t('cases.debt.title') }}</h4>
+              <div class="breakdown-grid">
+                <div class="breakdown-item">
+                  <span class="label">{{ t('cases.debt.principal') }}</span>
+                  <span class="value">{{ dossier.montantTotal | currency:'EUR' }}</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="label">{{ t('cases.debt.interests') }}</span>
+                  <span class="value">---</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="label">{{ t('cases.debt.penalties') }}</span>
+                  <span class="value">---</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="label">{{ t('cases.debt.fees') }}</span>
+                  <span class="value">---</span>
+                </div>
+                <div class="breakdown-item total">
+                  <span class="label">{{ t('cases.debt.totalDue') }}</span>
+                  <span class="value">---</span>
+                </div>
+                <div class="breakdown-item paid">
+                  <span class="label">{{ t('cases.debt.alreadyPaid') }}</span>
+                  <span class="value">{{ formatCurrency(getTotalPaid()) }}</span>
+                </div>
+                <div class="breakdown-item remaining">
+                  <span class="label">{{ t('cases.debt.remaining') }}</span>
+                  <span class="value">{{ getFormattedRemainingAmount(dossier) }}</span>
+                </div>
               </div>
-              <span class="status-badge">
-                {{ getStatusLabel(selectedDossier?.status) }}
-              </span>
             </div>
 
-            <div class="case-body">
-              <!-- Détail de la dette -->
-              <div class="debt-breakdown">
-                <h4>Détail de la créance</h4>
-                <div class="breakdown-grid">
-                  <div class="breakdown-item">
-                    <span class="label">Montant principal</span>
-                    <span class="value">{{ selectedDossier?.montantTotal | currency:'EUR' }}</span>
+            <!-- Détail des intérêts -->
+            <div class="interests-detail" >
+              <h5>{{ t('cases.interestsDetail') }}</h5>
+              <div class="interests-list">
+                <div class="interest-item">
+                  <div class="interest-info">
+                    <span class="interest-type">Intérêts légaux</span>
+                    <span class="interest-rate">3.15% par an</span>
                   </div>
-                  <div class="breakdown-item">
-                    <span class="label">Intérêts</span>
-                    <span class="value">{{ formatCurrency(selectedDossier?.debtBreakdown?.totalInterests) }}</span>
+                  <div class="interest-amount">420,00€</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Détail des pénalités -->
+            <div class="penalties-detail">
+              <h5>{{ t('cases.penaltiesDetail') }}</h5>
+              <div class="penalties-list">
+                <div class="penalty-item" >
+                  <div class="penalty-info">
+                    <span class="penalty-type">Pénalité de retard</span>
+                    <span class="penalty-date">15 février 2024</span>
                   </div>
-                  <div class="breakdown-item">
-                    <span class="label">Pénalités</span>
-                    <span class="value">{{ formatCurrency(selectedDossier?.debtBreakdown?.totalPenalties) }}</span>
+                  <div class="penalty-amount">50,00 €</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Barre de progression -->
+            <div class="payment-progress">
+              <div class="progress-info">
+                <span class="progress-label">{{ t('cases.paymentProgress') }}</span>
+                <span class="progress-percentage">{{ getPaymentPercentage(dossier) }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
+              </div>
+            </div>
+
+            <!-- Historique des relances -->
+            <div class="reminder-history" >
+              <h5>{{ t('cases.reminderHistory') }}</h5>
+              <div class="reminder-list">
+                <div class="reminder-item" >
+                  <div class="reminder-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
                   </div>
-                  <div class="breakdown-item">
-                    <span class="label">Frais</span>
-                    <span class="value">{{ formatCurrency(selectedDossier?.debtBreakdown?.totalFees) }}</span>
-                  </div>
-                  <div class="breakdown-item total">
-                    <span class="label">Total dû</span>
-                    <span class="value">{{ formatCurrency(selectedDossier?.amount) }}</span>
-                  </div>
-                  <div class="breakdown-item paid">
-                    <span class="label">Déjà payé</span>
-                    <span class="value">{{ formatCurrency(selectedDossier?.amountPaid) }}</span>
-                  </div>
-                  <div class="breakdown-item remaining">
-                    <span class="label">Reste à payer</span>
-                    <span class="value">{{ formatCurrency(selectedDossier?.amount - selectedDossier?.amountPaid) }}</span>
+                  <div class="reminder-content">
+                    <div class="reminder-type">Relance</div>
+                    <div class="reminder-description">Première relance envoyée par email</div>
+                    <div class="reminder-date">25 janvier 2024</div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Détail des intérêts -->
-              <div class="interests-detail" *ngIf="selectedDossier?.debtBreakdown?.interests?.length > 0">
-                <h5>Détail des intérêts</h5>
-                <div class="interests-list">
-                  <div class="interest-item" *ngFor="let interest of selectedDossier?.debtBreakdown?.interests">
-                    <div class="interest-info">
-                      <span class="interest-type">--</span>
-                      <span class="interest-rate">{{ interest.rate }}% par an</span>
-                    </div>
-                    <div class="interest-amount">{{ formatCurrency(interest.amount) }}</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Détail des pénalités -->
-              <div class="penalties-detail" *ngIf="selectedDossier?.debtBreakdown?.penalties?.length > 0">
-                <h5>Détail des pénalités</h5>
-                <div class="penalties-list">
-                  <div class="penalty-item" *ngFor="let penalty of selectedDossier?.debtBreakdown?.penalties">
-                    <div class="penalty-info">
-                      <span class="penalty-type">--</span>
-                      <span class="penalty-date">--</span>
-                    </div>
-                    <div class="penalty-amount">{{ formatCurrency(penalty.amount) }}</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Barre de progression -->
-              <div class="payment-progress">
-                <div class="progress-info">
-                  <span class="progress-label">Progression du paiement</span>
-                  <span class="progress-percentage">{{ getPaymentPercentage(selectedDossier) }}%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill" [style.width.%]="getPaymentPercentage(selectedDossier)"></div>
-                </div>
-              </div>
-
-              <!-- Historique des relances -->
-              <!-- <div class="reminder-history" *ngIf="getReminderHistory(selectedDossier)?.length > 0">
-                <h5>Historique des relances</h5>
-                <div class="reminder-list">
-                  <div class="reminder-item" *ngFor="let reminder of getReminderHistory(selectedDossier)">
-                    <div class="reminder-icon" [ngClass]="getReminderIconClass(reminder.type)">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                      </svg>
-                    </div>
-                    <div class="reminder-content">
-                      <div class="reminder-type">{{ getReminderTypeLabel(reminder.type) }}</div>
-                      <div class="reminder-description">{{ reminder.description }}</div>
-                      <div class="reminder-date">{{ formatDate(reminder.date) }}</div>
-                    </div>
-                  </div>
-                </div>
-              </div> -->
-
-              <!-- Actions -->
-              <div class="case-actions">
-                <button class="btn btn-primary" (click)="makePayment(selectedDossier)" *ngIf="selectedDossier?.amount > selectedDossier?.amountPaid">
-                  Effectuer un paiement
-                </button>
-                <button class="btn btn-secondary" (click)="proposePaymentPlan(selectedDossier)" *ngIf="selectedDossier?.amount > selectedDossier?.amountPaid">
-                  Proposer échéancier
-                </button>
-                <button class="btn btn-warning" (click)="fileDispute(selectedDossier)" *ngIf="selectedDossier?.status !== 'completed'">
-                  Contester
-                </button>
-                <button class="btn btn-secondary" (click)="closeDrawer()">
-                  Fermer
-                </button>
-              </div>
+            <!-- Actions -->
+            <div class="case-actions">
+              <button class="btn btn-primary" (click)="makePayment(dossier)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+                {{ t('cases.actions.makePayment') }}
+              </button>
+              <button class="btn btn-secondary" (click)="proposePaymentPlan(dossier)" >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+                </svg>
+                {{ t('cases.actions.paymentPlan') }}
+              </button>
+              <button class="btn btn-warning" (click)="fileDispute(dossier)" >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="15" y1="9" x2="9" y2="15"/>
+                  <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                {{ t('cases.actions.dispute') }}
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      
   </div>
-
-
-
  
 
   <!-- Modal de paiement -->
-  <!-- <div class="modal-overlay" *ngIf="showPaymentModal" (click)="closePaymentModal()">
+  <div class="modal-overlay" *ngIf="showPaymentModal" (click)="closePaymentModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ t('cases.paymentModal.title') }}</h3>
@@ -490,10 +490,10 @@
         </button>
       </div>
     </div>
-  </div> -->
+  </div>
 
   <!-- Modal proposition d'échéancier -->
-  <!-- <div class="modal-overlay" *ngIf="showPaymentPlanModal" (click)="closePaymentPlanModal()">
+  <div class="modal-overlay" *ngIf="showPaymentPlanModal" (click)="closePaymentPlanModal()">
     <div class="modal-content large" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ t('cases.paymentPlanModal.title') }}</h3>
@@ -590,10 +590,10 @@
         </button>
       </div>
     </div>
-  </div> -->
+  </div>
 
   <!-- Modal de contestation -->
-  <!-- <div class="modal-overlay" *ngIf="showDisputeModal" (click)="closeDisputeModal()">
+  <div class="modal-overlay" *ngIf="showDisputeModal" (click)="closeDisputeModal()">
     <div class="modal-content large" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ t('cases.disputeModal.title') }}</h3>
@@ -726,31 +726,6 @@
         </button>
       </div>
     </div>
-  </div> -->
+  </div>
   
 </div>
-
-
-
-
-<!-- <div class="debtor-cases-container">
-  <h2>📂 Liste des dossiers</h2>
-
-  <div *ngIf="isLoading" class="loading">Chargement des dossiers...</div>
-  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
-
-  <div *ngIf="!isLoading && dossiers.length > 0" class="cases-grid">
-    <div *ngFor="let dossier of dossiers" class="case-card">
-      <h3>{{ dossier.numeroDossier }}</h3>
-      <p><strong>Objet :</strong> {{ dossier.objet }}</p>
-      <p><strong>Montant total :</strong> {{ dossier.montantTotal | currency:'EUR' }}</p>
-      <p><strong>Statut :</strong> {{ dossier.statutGlobal }}</p>
-      <p><strong>Phase :</strong> {{ dossier.phaseCode }}</p>
-      <p><strong>Date de création :</strong> {{ dossier.dateCreation }}</p>
-    </div>
-  </div>
-
-  <div *ngIf="!isLoading && dossiers.length === 0" class="no-cases">
-    Aucun dossier trouvé pour ce débiteur.
-  </div>
-</div> -->

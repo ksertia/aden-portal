@@ -753,7 +753,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .case-info h3 {
@@ -1055,44 +1055,3 @@
   border-radius: 6px;
   font-size: 14px;
 }
-
-/* Start Style pour le tiroir */
-/* Style pour le tiroir */
-.drawer-overlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 300px;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
-  z-index: 1000;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  opacity: 0; /* Initialement invisible */
-  pointer-events: none; /* Désactive les interactions quand le tiroir est fermé */
-  transition: opacity 0.3s ease-in-out; /* Transition pour l'overlay */
-}
-
-.drawer-overlay.show { 
-  opacity: 1; /* Rendre visible l'overlay */
-  pointer-events: auto; /* Permettre les interactions quand le tiroir est ouvert */
-}
-
-.drawer-content {
-  background-color: #fff;
-  width: 300px; /* Ajuster à votre préférence */
-  height: 100%;
-  padding: 20px;
-  box-shadow: -2px 0px 10px rgba(0, 0, 0, 0.1);
-  transform: translateX(100%); /* Initialement, le tiroir est hors de l'écran */
-  transition: transform 0.3s ease-in-out; /* Transition de l'animation du tiroir */
-}
-
-.drawer-content.show {
-  transform: translateX(0); /* Quand showDrawer est true, on affiche le tiroir */
-}
-
-
-
-/* End Style pour le tiroir */
