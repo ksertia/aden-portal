@@ -139,7 +139,6 @@
           <div class="case-header">
             <div class="case-info">
               <h3>{{ dossier.numeroDossier }}</h3>
-              <!-- <p class="debtor-name">{{ dossier.debiteurNodeId }}</p> -->
               <span>{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
             </div>
             <div class="case-badges">
@@ -236,7 +235,6 @@
               </td>
               <td>
                 <div class="debtor-cell">
-                  <!-- <div class="debtor-name">{{ dossier.debiteurNodeId }}</div> -->
                   <span>{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
                   <div class="debtor-type">{{ dossier.typeCreance }}</div>
                 </div>
@@ -352,7 +350,6 @@
             <div class="debtor-profile">
               <div class="debtor-avatar">
                 {{ selectedDebtor?.firstName?.charAt(0) }}{{ selectedDebtor?.lastName?.charAt(0) }}
-                <!-- {{ selectedCase.debtor.firstName.charAt(0) }}{{ selectedCase.debtor.lastName.charAt(0) }} -->
               </div>
               <div class="debtor-info">
                 <div class="debtor-name">{{ selectedDebtor?.firstName }} {{ selectedDebtor?.lastName }}
