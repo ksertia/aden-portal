@@ -26,6 +26,12 @@ export class DebtorCasesComponent implements OnInit {
   userCases: DebtCase[] = [];
 
   currentView: 'grid' | 'table' = 'table';
+  // tiroir variale start
+  // selectedDetailCase: DebtCase | null = null; // Case selected for details
+  selectedDetailCase: any;
+  showCaseDetailsModal = false; // Control whether the drawer is shown
+
+  // tiroir variale end
 
   // --- Filtres ---
   filters = {
@@ -61,7 +67,7 @@ export class DebtorCasesComponent implements OnInit {
   selectedcreditor: CreditorDetail | undefined;
 
    selectedIndex: number | null = null;
-  showCaseDetailsModal = false;
+  // showCaseDetailsModal = false;
 
   constructor(private casesService: CaseService,
     private i18nService: I18nService,
@@ -125,6 +131,18 @@ export class DebtorCasesComponent implements OnInit {
       },
       error: (err) => console.error(err)
     });
+  }
+    // Lorsque le bouton "Détails" est cliqué
+  viewDossierDetails(dossier: any): void {
+    // console.log("le dossier selectionner",dossier);
+    this.selectedDetailCase = dossier;
+    console.log("this.selectedDetailCase", this.selectedDetailCase);
+    this.showCaseDetailsModal = true; // Afficher le tiroir
+  }
+
+  // Fermer le tiroir
+  closeDrawer(): void {
+    this.showCaseDetailsModal = false; // Fermer le tiroir
   }
 
    // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
@@ -466,5 +484,11 @@ getInterestTypeLabel(type: string): string {
     };
     return labels[type] || type;
   }
+
+
+
+
+
+
 
 }

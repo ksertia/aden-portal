@@ -169,7 +169,7 @@
             </div>
             
             <div class="case-actions">
-              <button class="btn btn-primary small" (click)="viewCaseDetails(dossier)">
+              <button class="btn btn-primary small" (click)="viewDossierDetails(dossier)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                   <circle cx="12" cy="12" r="3"/>
@@ -248,7 +248,7 @@
               </td>
               <td>
                 <div class="table-actions">
-                  <button class="btn btn-primary small" (click)="viewCaseDetails(dossier)" title="Voir détails">
+                  <button class="btn btn-primary small" (click)="viewDossierDetails(dossier)" title="Voir détails">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                       <circle cx="12" cy="12" r="3"/>
@@ -281,143 +281,164 @@
    </ng-template>
   </div>
 
-  <!-- Details-->
-   <div class="cases-list" *ngIf="dossiers.length > 0; else noCases">
-      <div class="cases-grid">
-        <div class="case-card"  *ngFor="let dossier of dossiers">
-          <div class="case-header">
-            <div class="case-info">
-              <h3> {{ dossier.numeroDossier }}</h3>
-              <p class="creditor-name">{{ dossier.objet }}</p>
-            </div>
-            <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
-              {{ getStatusLabel(dossier.statutGlobal) }}
-            </span>
-          </div>
-          
-          <div class="case-body">
-            <!-- Détail de la dette -->
-            <div class="debt-breakdown">
-              <h4>{{ t('cases.debt.title') }}</h4>
-              <div class="breakdown-grid">
-                <div class="breakdown-item">
-                  <span class="label">{{ t('cases.debt.principal') }}</span>
-                  <span class="value">{{ dossier.montantTotal | currency:'EUR' }}</span>
-                </div>
-                <div class="breakdown-item">
-                  <span class="label">{{ t('cases.debt.interests') }}</span>
-                  <span class="value">---</span>
-                </div>
-                <div class="breakdown-item">
-                  <span class="label">{{ t('cases.debt.penalties') }}</span>
-                  <span class="value">---</span>
-                </div>
-                <div class="breakdown-item">
-                  <span class="label">{{ t('cases.debt.fees') }}</span>
-                  <span class="value">---</span>
-                </div>
-                <div class="breakdown-item total">
-                  <span class="label">{{ t('cases.debt.totalDue') }}</span>
-                  <span class="value">---</span>
-                </div>
-                <div class="breakdown-item paid">
-                  <span class="label">{{ t('cases.debt.alreadyPaid') }}</span>
-                  <span class="value">{{ formatCurrency(getTotalPaid()) }}</span>
-                </div>
-                <div class="breakdown-item remaining">
-                  <span class="label">{{ t('cases.debt.remaining') }}</span>
-                  <span class="value">{{ getFormattedRemainingAmount(dossier) }}</span>
-                </div>
+   <!-- Details-->
+  <div class="drawer-overlay" *ngIf="showCaseDetailsModal" (click)="closeDrawer()">
+  <!-- *ngIf="dossiers.length > 0; else noCases" -->
+    <!-- <div class="cases-grid drawer-content" [class.open]="showCaseDetailsModal"> -->
+    <div class="drawer" [class.open]="showCaseDetailsModal" (click)="$event.stopPropagation()">
+      <!-- Bouton close -->
+        <div class="drawer-content">
+          <button class="close-button" (click)="closeDrawer()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+          <div class="case-card-drawer" *ngIf="selectedDetailCase">
+            <!-- *ngFor="let dossier of dossiers" -->
+            <!-- <button class="close-button" (click)="closeDrawer()">X</button> -->
+            <div class="case-header">
+              
+              <div class="case-info">
+                <h3> {{ selectedDetailCase.numeroDossier }}</h3>
+                <p class="creditor-name">{{ selectedDetailCase.objet }}</p>
               </div>
+              <span class="status-badge" [ngClass]="'status-' + selectedDetailCase.statutGlobal">
+                {{ getStatusLabel(selectedDetailCase.statutGlobal) }}
+              </span>
             </div>
-
-            <!-- Détail des intérêts -->
-            <div class="interests-detail" >
-              <h5>{{ t('cases.interestsDetail') }}</h5>
-              <div class="interests-list">
-                <div class="interest-item">
-                  <div class="interest-info">
-                    <span class="interest-type">Intérêts légaux</span>
-                    <span class="interest-rate">3.15% par an</span>
+            
+            <div class="case-body">
+              <!-- Détail de la dette -->
+              <div class="debt-breakdown">
+                <h4>{{ t('cases.debt.title') }}</h4>
+                <div class="breakdown-grid">
+                  <div class="breakdown-item">
+                    <span class="label">{{ t('cases.debt.principal') }}</span>
+                    <span class="value">{{ selectedDetailCase.montantTotal | currency:'EUR' }}</span>
                   </div>
-                  <div class="interest-amount">420,00€</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Détail des pénalités -->
-            <div class="penalties-detail">
-              <h5>{{ t('cases.penaltiesDetail') }}</h5>
-              <div class="penalties-list">
-                <div class="penalty-item" >
-                  <div class="penalty-info">
-                    <span class="penalty-type">Pénalité de retard</span>
-                    <span class="penalty-date">15 février 2024</span>
+                  <div class="breakdown-item">
+                    <span class="label">{{ t('cases.debt.interests') }}</span>
+                    <span class="value">---</span>
                   </div>
-                  <div class="penalty-amount">50,00 €</div>
+                  <div class="breakdown-item">
+                    <span class="label">{{ t('cases.debt.penalties') }}</span>
+                    <span class="value">---</span>
+                  </div>
+                  <div class="breakdown-item">
+                    <span class="label">{{ t('cases.debt.fees') }}</span>
+                    <span class="value">---</span>
+                  </div>
+                  <div class="breakdown-item total">
+                    <span class="label">{{ t('cases.debt.totalDue') }}</span>
+                    <span class="value">---</span>
+                  </div>
+                  <div class="breakdown-item paid">
+                    <span class="label">{{ t('cases.debt.alreadyPaid') }}</span>
+                    <span class="value">{{ formatCurrency(getTotalPaid()) }}</span>
+                  </div>
+                  <div class="breakdown-item remaining">
+                    <span class="label">{{ t('cases.debt.remaining') }}</span>
+                    <span class="value">{{ getFormattedRemainingAmount(selectedDetailCase) }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Barre de progression -->
-            <div class="payment-progress">
-              <div class="progress-info">
-                <span class="progress-label">{{ t('cases.paymentProgress') }}</span>
-                <span class="progress-percentage">{{ getPaymentPercentage(dossier) }}%</span>
+              <!-- Détail des intérêts -->
+              <div class="interests-detail" >
+                <h5>{{ t('cases.interestsDetail') }}</h5>
+                <div class="interests-list">
+                  <div class="interest-item">
+                    <div class="interest-info">
+                      <span class="interest-type">Intérêts légaux</span>
+                      <span class="interest-rate">3.15% par an</span>
+                    </div>
+                    <div class="interest-amount">420,00€</div>
+                  </div>
+                </div>
               </div>
-              <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
-              </div>
-            </div>
 
-            <!-- Historique des relances -->
-            <div class="reminder-history" >
-              <h5>{{ t('cases.reminderHistory') }}</h5>
-              <div class="reminder-list">
-                <div class="reminder-item" >
-                  <div class="reminder-icon">
+              <!-- Détail des pénalités -->
+              <div class="penalties-detail">
+                <h5>{{ t('cases.penaltiesDetail') }}</h5>
+                <div class="penalties-list">
+                  <div class="penalty-item" >
+                    <div class="penalty-info">
+                      <span class="penalty-type">Pénalité de retard</span>
+                      <span class="penalty-date">15 février 2024</span>
+                    </div>
+                    <div class="penalty-amount">50,00 €</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Barre de progression -->
+              <div class="payment-progress">
+                <div class="progress-info">
+                  <span class="progress-label">{{ t('cases.paymentProgress') }}</span>
+                  <span class="progress-percentage">{{ getPaymentPercentage(selectedDetailCase) }}%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="getPaymentPercentage(selectedDetailCase)"></div>
+                </div>
+              </div>
+
+              <!-- Historique des relances -->
+              <div class="reminder-history" >
+                <h5>{{ t('cases.reminderHistory') }}</h5>
+                <div class="reminder-list">
+                  <div class="reminder-item" >
+                    <div class="reminder-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                      </svg>
+                    </div>
+                    <div class="reminder-content">
+                      <div class="reminder-type">Relance</div>
+                      <div class="reminder-description">Première relance envoyée par email</div>
+                      <div class="reminder-date">25 janvier 2024</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="case-actions">
+                <button class="btn btn-primary" (click)="makePayment(selectedDetailCase)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                    <line x1="1" y1="10" x2="23" y2="10"/>
+                  </svg>
+                  {{ t('cases.actions.makePayment') }}
+                </button>
+                <button class="btn btn-secondary" (click)="proposePaymentPlan(selectedDetailCase)" >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+                  </svg>
+                  {{ t('cases.actions.paymentPlan') }}
+                </button>
+                <button class="btn btn-warning" (click)="fileDispute(selectedDetailCase)" >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                  {{ t('cases.actions.dispute') }}
+                </button>
+                <button class="btn btn-secondary" (click)="closeDrawer()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
                     </svg>
-                  </div>
-                  <div class="reminder-content">
-                    <div class="reminder-type">Relance</div>
-                    <div class="reminder-description">Première relance envoyée par email</div>
-                    <div class="reminder-date">25 janvier 2024</div>
-                  </div>
-                </div>
+                    Fermer
+                </button>
               </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="case-actions">
-              <button class="btn btn-primary" (click)="makePayment(dossier)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                  <line x1="1" y1="10" x2="23" y2="10"/>
-                </svg>
-                {{ t('cases.actions.makePayment') }}
-              </button>
-              <button class="btn btn-secondary" (click)="proposePaymentPlan(dossier)" >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
-                </svg>
-                {{ t('cases.actions.paymentPlan') }}
-              </button>
-              <button class="btn btn-warning" (click)="fileDispute(dossier)" >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="15" y1="9" x2="9" y2="15"/>
-                  <line x1="9" y1="9" x2="15" y2="15"/>
-                </svg>
-                {{ t('cases.actions.dispute') }}
-              </button>
             </div>
           </div>
         </div>
-      </div>
-      
+    </div>
   </div>
+
  
 
   <!-- Modal de paiement -->
@@ -729,3 +750,4 @@
   </div>
   
 </div>
+
