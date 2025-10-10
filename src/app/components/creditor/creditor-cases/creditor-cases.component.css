@@ -723,7 +723,58 @@
   gap: 12px;
   padding: 24px;
   border-top: 1px solid var(--border);
+  /* padding-top: 30px; */
 }
+
+/* Tiroir début */
+/* Styles pour le tiroir */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 50%; /* Légèrement plus large pour mieux voir le contenu */
+  height: 100%;
+  background-color: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  transform: translateX(100%); /* Tiroir caché à droite */
+  overflow-y: auto;
+}
+
+.drawer.open {
+  transform: translateX(0); /* Ouvre le tiroir en le ramenant à sa position d'origine (à droite) */
+}
+
+.drawer-content {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.close-button {
+  background: #f44336;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+/* Overlay pour le fond quand le tiroir est ouvert */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background: rgba(0, 0, 0, 0.5); */
+  z-index: 999;
+}
+
+/* Fin Tiroir */
+
 
 @keyframes fadeIn {
   from { opacity: 0; }

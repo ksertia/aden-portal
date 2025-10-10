@@ -305,181 +305,181 @@
     </ng-template>
   </div>
 
-  <!-- Modal de détails du dossier -->
-  <div class="modal-overlay" *ngIf="showCaseDetailsModal" (click)="closeCaseDetailsModal()">
-    <div class="modal-content large" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Détails du dossier {{ dossiers[selectedIndex!]?.numeroDossier }}</h3>
-        <button class="modal-close" (click)="closeCaseDetailsModal()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body" *ngIf="selectedIndex !== null">
-        <div class="case-details">
-          <!-- Informations générales -->
-          <div class="details-section">
-            <h4>Informations générales</h4>
-            <div class="details-grid">
-              <div class="detail-item">
-                <span class="detail-label">Numéro de dossier</span>
-                <span class="detail-value">{{ dossiers[selectedIndex!].numeroDossier }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Date de création</span>
-                <span class="detail-value">{{ dossiers[selectedIndex!].dateCreation }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Échéance</span>
-                <span class="detail-value">{{ dossiers[selectedIndex!].dateEcheance }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Statut</span>
-                <span class="status-badge"  [ngClass]="'status-' + dossiers[selectedIndex!].statutGlobal">
-                  {{ getStatusLabel(dossiers[selectedIndex!].statutGlobal) }}
-                </span>
+  <!-- Draver de détails du dossier -->
+  <div class="drawer-overlay" *ngIf="showDrawer" (click)="closeDrawer()">
+      <div class="drawer" [class.open]="showDrawer" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Détails du dossier {{ dossiers[selectedIndex!]?.numeroDossier }}</h3>
+          <button class="modal-close" (click)="closeDrawer()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="drawer-content" *ngIf="selectedIndex !== null">
+          <div class="case-details">
+            <!-- Informations générales -->
+            <div class="details-section">
+              <h4>Informations générales</h4>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="detail-label">Numéro de dossier</span>
+                  <span class="detail-value">{{ dossiers[selectedIndex!].numeroDossier }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Date de création</span>
+                  <span class="detail-value">{{ dossiers[selectedIndex!].dateCreation }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Échéance</span>
+                  <span class="detail-value">{{ dossiers[selectedIndex!].dateEcheance }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Statut</span>
+                  <span class="status-badge"  [ngClass]="'status-' + dossiers[selectedIndex!].statutGlobal">
+                    {{ getStatusLabel(dossiers[selectedIndex!].statutGlobal) }}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Informations débiteur -->
-          <div class="details-section">
-            <h4>Débiteur</h4>
-            <div class="debtor-profile">
-              <div class="debtor-avatar">
-                {{ selectedDebtor?.firstName?.charAt(0) }}{{ selectedDebtor?.lastName?.charAt(0) }}
-              </div>
-              <div class="debtor-info">
-                <div class="debtor-name">{{ selectedDebtor?.firstName }} {{ selectedDebtor?.lastName }}
-                <div class="debtor-details">
-                  <div class="detail-row">
-                    <span class="label">Email :</span>
-                    <span class="value">{{ selectedDebtor?.email }}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="label">Téléphone :</span>
-                    <span class="value">{{ selectedDebtor?.phone || '---' }}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="label">Type :</span>
-                    <span class="value">{{ selectedDebtor?.type || dossiers[selectedIndex!].typeCreance }}</span>
-                  </div>
+            <!-- Informations débiteur -->
+            <div class="details-section">
+              <h4>Débiteur</h4>
+              <div class="debtor-profile">
+                <div class="debtor-avatar">
+                  {{ selectedDebtor?.firstName?.charAt(0) }}{{ selectedDebtor?.lastName?.charAt(0) }}
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Analyse financière -->
-          <div class="details-section">
-            <h4>Analyse financière</h4>
-            <div class="financial-cards">
-              <div class="financial-card total">
-                <div class="card-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="1" x2="12" y2="23"/>
-                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                  </svg>
-                </div>
-                <div class="card-content">
-                  <div class="card-value">{{ dossiers[selectedIndex!].montantTotal | currency:'EUR' }}</div>
-                  <div class="card-label">Montant total</div>
-                </div>
-              </div>
-              <div class="financial-card recovered">
-                <div class="card-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 12l2 2 4-4"/>
-                    <circle cx="12" cy="12" r="9"/>
-                  </svg>
-                </div>
-                <div class="card-content">
-                  <div class="card-value">{{ formatCurrency(getTotalPaid()) }}</div>
-                  <div class="card-label">Montant recouvré</div> 
-                </div>
-              </div>
-              <div class="financial-card remaining">
-                <div class="card-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                  </svg>
-                </div>
-                <div class="card-content">
-                  <div class="card-value">{{ getFormattedRemainingAmount(dossiers[selectedIndex!]) }}</div>
-                  <div class="card-label">Reste à recouvrer</div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="progress-section">
-              <div class="progress-header">
-                <span class="progress-title">Progression du recouvrement</span>
-                <span class="progress-percentage">{{ getPaymentPercentage(dossiers[selectedIndex!]) }}%</span>
-              </div>
-              <div class="progress-bar-large">
-                <div class="progress-fill"  [style.width.%]="getPaymentPercentage(dossiers[selectedIndex!])"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Historique des activités -->
-          <div class="details-section">
-            <h4>Historique des activités</h4>
-            <div class="activity-timeline">
-              <div class="timeline-item" *ngFor="let activity  getRecentActivities(selectedIndex)">
-                <div class="timeline-dot" [ngClass]="getActivityClass(activity.type)"></div>
-                <div class="timeline-content">
-                  <div class="timeline-description">{{ activity.description }}</div>
-                  <div class="timeline-meta">
-                    <span class="timeline-date">{{ formatDate(activity.date) }}</span>
-                    <span class="timeline-user">par {{ activity.userName }}</span>
+                <div class="debtor-info">
+                  <div class="debtor-name">{{ selectedDebtor?.firstName }} {{ selectedDebtor?.lastName }}
+                  <div class="debtor-details">
+                    <div class="detail-row">
+                      <span class="label">Email :</span>
+                      <span class="value">{{ selectedDebtor?.email }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="label">Téléphone :</span>
+                      <span class="value">{{ selectedDebtor?.phone || '---' }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="label">Type :</span>
+                      <span class="value">{{ selectedDebtor?.type || dossiers[selectedIndex!].typeCreance }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Documents -->
-          <div class="details-section" *ngIf="filteredDossiers.length > 0">
-            <h4>Documents joints ({{ dossiers.length }})</h4>
-            <div class="documents-list">
-              <div class="document-item" *ngFor="let doc of dossiers">
-                <div class="document-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14,2 14,8 20,8"/>
-                  </svg>
+            <!-- Analyse financière -->
+            <div class="details-section">
+              <h4>Analyse financière</h4>
+              <div class="financial-cards">
+                <div class="financial-card total">
+                  <div class="card-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="12" y1="1" x2="12" y2="23"/>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-value">{{ dossiers[selectedIndex!].montantTotal | currency:'EUR' }}</div>
+                    <div class="card-label">Montant total</div>
+                  </div>
                 </div>
-                <div class="document-info">
-                  <div class="document-name">{{ doc.name }}</div>
-                  <div class="document-meta">{{ formatDate(doc.uploadedAt) }} • {{ doc.uploadedBy }}</div>
+                <div class="financial-card recovered">
+                  <div class="card-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M9 12l2 2 4-4"/>
+                      <circle cx="12" cy="12" r="9"/>
+                    </svg>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-value">{{ formatCurrency(getTotalPaid()) }}</div>
+                    <div class="card-label">Montant recouvré</div> 
+                  </div>
                 </div>
-                <button class="btn btn-secondary small" (click)="downloadDocument(doc)">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7,10 12,15 17,10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                  </svg>
-                </button>
+                <div class="financial-card remaining">
+                  <div class="card-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="12"/>
+                      <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-value">{{ getFormattedRemainingAmount(dossiers[selectedIndex!]) }}</div>
+                    <div class="card-label">Reste à recouvrer</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="progress-section">
+                <div class="progress-header">
+                  <span class="progress-title">Progression du recouvrement</span>
+                  <span class="progress-percentage">{{ getPaymentPercentage(dossiers[selectedIndex!]) }}%</span>
+                </div>
+                <div class="progress-bar-large">
+                  <div class="progress-fill"  [style.width.%]="getPaymentPercentage(dossiers[selectedIndex!])"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Historique des activités -->
+            <!-- <div class="details-section">
+              <h4>Historique des activités</h4>
+              <div class="activity-timeline">
+                <div class="timeline-item" *ngFor="let activity of getRecentActivities(selectedIndex)">
+                  <div class="timeline-dot" [ngClass]="getActivityClass(activity.type)"></div>
+                  <div class="timeline-content">
+                    <div class="timeline-description">{{ activity.description }}</div>
+                    <div class="timeline-meta">
+                      <span class="timeline-date">{{ formatDate(activity.date) }}</span>
+                      <span class="timeline-user">par {{ activity.userName }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+
+            <!-- Documents -->
+            <div class="details-section" *ngIf="filteredDossiers.length > 0">
+              <h4>Documents joints ({{ dossiers.length }})</h4>
+              <div class="documents-list">
+                <div class="document-item" *ngFor="let doc of dossiers">
+                  <div class="document-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14,2 14,8 20,8"/>
+                    </svg>
+                  </div>
+                  <div class="document-info">
+                    <div class="document-name">{{ doc.name }}</div>
+                    <div class="document-meta">{{ formatDate(doc.uploadedAt) }} • {{ doc.uploadedBy }}</div>
+                  </div>
+                  <button class="btn btn-secondary small" (click)="downloadDocument(doc)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7,10 12,15 17,10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closeCaseDetailsModal()">Fermer</button>
-        <button class="btn btn-primary" (click)="downloadCaseReport(selectedCase!)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7,10 12,15 17,10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          Télécharger le rapport
-        </button>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeDrawer()">Fermer</button>
+          <button class="btn btn-primary" (click)="downloadCaseReport(selectedCase!)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Télécharger le rapport
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
