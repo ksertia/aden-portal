@@ -5,6 +5,8 @@ import { AuthService } from '../../../services/auth.service';
 import { CaseService } from '../../../services/case.service';
 import { User, StrapiRole } from '../../../models/user.model';
 import { DebtCase } from '../../../models/case.model';
+import { AdminService } from '../../../services/admin.service';
+import { DebtorInfo } from '../../../models/case.model';
 
 @Component({
   selector: 'app-creditor-dashboard',
@@ -22,9 +24,14 @@ export class CreditorDashboard implements OnInit{
 
   filteredDossiers: any[] = [];
 
+  // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
+  debiteurs: DebtorInfo[] = [];
+  filteredDebiteurs: DebtorInfo[] = [];
+
   constructor(
     private authService: AuthService,
-    private casesService: CaseService
+    private casesService: CaseService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit() {
@@ -34,82 +41,65 @@ export class CreditorDashboard implements OnInit{
   }
 
   // Chargement des dossiers
-  // loadDossiers() {
-  //   const siteName = 'portail-recouvrement';
-  //   const currentUser = this.authService.getCurrentUser();
-
-  //   if (!currentUser) {
-  //     this.errorMessage = 'Utilisateur non connecté.';
-  //     this.isLoading = false;
-  //     return;
-  //   }
-
-  //   const creancierNodeId = currentUser.nodeId;
-  //   console.log('Creancier connecté :', currentUser);
-  //   console.log('creancierNodeId envoyé :', creancierNodeId);
-
-  //   if (!creancierNodeId) {
-  //     this.errorMessage = 'Identifiant du débiteur introuvable.';
-  //     this.isLoading = false;
-  //     return;
-  //   }
-
-  //   this.casesService.getDossiersCreancier(siteName, creancierNodeId).subscribe({
-  //     next: (response) => {
-  //       console.log('Réponse API dossiers :', response);
-  //       this.dossiers = response.data?.map((item: any) => item.map) || [];
-  //       this.isLoading = false;
-  //     },
-  //     error: (error) => {
-  //       console.error('Erreur lors du chargement des dossiers :', error);
-  //       this.errorMessage = 'Impossible de récupérer les dossiers.';
-  //       this.isLoading = false;
-  //     }
-  //   });
-  // }
   loadDossiers() {
-  const siteName = 'portail-recouvrement';
-  const currentUser = this.authService.getCurrentUser();
+    const siteName = 'portail-recouvrement';
+    const currentUser = this.authService.getCurrentUser();
 
-  if (!currentUser) {
-    this.errorMessage = 'Utilisateur non connecté.';
-    this.isLoading = false;
-    return;
-  }
-
-  const creancierNodeId = currentUser.nodeId;
-  console.log('Créancier connecté :', currentUser);
-  console.log('creancierNodeId envoyé :', creancierNodeId);
-
-  if (!creancierNodeId) {
-    this.errorMessage = 'Identifiant du créancier introuvable.';
-    this.isLoading = false;
-    return;
-  }
-
-  this.casesService.getDossiersCreancier(siteName, creancierNodeId).subscribe({
-    next: (response) => {
-      console.log('Réponse API dossiers :', response);
-
-      // ✅ Étape 1 : extraction correcte du tableau de dossiers
-      const dossiers = response.data?.map((item: any) => item.map) || [];
-
-      // ✅ Étape 2 : filtrage local
-      this.dossiers = dossiers.filter(
-        (d: any) => d.creancierNodeId === creancierNodeId
-      );
-
-      console.log('Dossiers filtrés pour ce créancier :', this.dossiers);
-
+    // Verification si l'utilisateur est connecté
+    if (!currentUser) {
+      this.errorMessage = 'Utilisateur non connecté.';
       this.isLoading = false;
-    },
-    error: (error) => {
-      console.error('Erreur lors du chargement des dossiers :', error);
-      this.errorMessage = 'Impossible de récupérer les dossiers.';
-      this.isLoading = false;
+      return;
     }
-  });
-}
+
+    const creancierNodeId = currentUser.nodeId;
+    console.log('Créancier connecté :', currentUser);
+    console.log('creancierNodeId envoyé :', creancierNodeId);
+
+    // Verification si l'utilisateur connecté à un NodeId
+    if (!creancierNodeId) {
+      this.errorMessage = 'Identifiant du créancier introuvable.';
+      this.isLoading = false;
+      return;
+    }
+
+    // Appel du web service pour la recuperation des dossiers du creanciers
+    this.casesService.getDossiersCreancier(siteName, creancierNodeId).subscribe({
+      next: (response) => {
+        console.log('Réponse API dossiers :', response);
+
+        // Étape 1 : extraction correcte du tableau de dossiers
+        const dossiers = response.data?.map((item: any) => item.map) || [];
+
+        // Étape 2 : filtrage local
+        this.dossiers = dossiers.filter(
+          (d: any) => d.creancierNodeId === creancierNodeId
+        );
+        console.log('Dossiers filtrés pour ce créancier :', this.dossiers);
+
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des dossiers :', error);
+        this.errorMessage = 'Impossible de récupérer les dossiers.';
+        this.isLoading = false;
+      }
+    });
+
+    // Appel du web service pour la recuperation des données(extraction du lastname,firstname,email,telephone et type) du débiteurs
+    this.adminService.getDebiteurs(siteName).subscribe({
+      next: (data: DebtorInfo[]) => {
+        this.debiteurs = data;
+        this.filteredDebiteurs = [...this.debiteurs];
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
+  getDebiteurForDossier(dossier: any): DebtorInfo | undefined {
+      return this.debiteurs.find(d => d.nodeId === dossier.debiteurNodeId);
+  }
 
 
   getTotalDebt(): number {
@@ -122,7 +112,7 @@ export class CreditorDashboard implements OnInit{
     return total ? Math.round((paid / total) * 100) : 0;
   }
 
-    getUserRoleLabel(): string {
+  getUserRoleLabel(): string {
     if (!this.currentUser) return '';
     switch (this.currentUser.role.name) {
       case StrapiRole.DEBTOR: return 'Débiteur';

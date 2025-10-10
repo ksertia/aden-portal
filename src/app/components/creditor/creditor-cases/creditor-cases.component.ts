@@ -1,125 +1,198 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
 import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case.model';
+import { AdminService } from '../../../services/admin.service';
+import { DebtorInfo } from '../../../models/case.model';
 
 @Component({
   selector: 'app-creditor-cases',
   standalone: true,
-  imports: [CommonModule, FormsModule, ViewToggleComponent],
+  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule],
   templateUrl: './creditor-cases.component.html',
   styleUrls: ['./creditor-cases.component.css']
 })
 export class CreditorCasesComponent implements OnInit {
-  cases: DebtCase[] = [];
-  filteredCases: DebtCase[] = [];
-  statistics: any = null;
-  currentView: 'grid' | 'table' = 'grid';
-  
-  filters: CaseFilter = {};
+
+  selectedCase: DebtCase | null = null;
+
+  selectedIndex: number | null = null;
+  showCaseDetailsModal = false;
+
+
+  dossiers: any[] = [];
+  isLoading = true;
+  errorMessage = '';
+
+  currentView: 'grid' | 'table' = 'table';
+
+  // --- Filtres ---
+  filters = {
+    searchTerm: '',
+    status: '',
+    priority: ''
+  };
+
   selectedStatus = '';
   selectedPriority = '';
-  
-  showCaseDetailsModal = false;
-  selectedCase: DebtCase | null = null;
+  filteredDossiers: any[] = [];
+
+  // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
+  debiteurs: DebtorInfo[] = [];
+  filteredDebiteurs: DebtorInfo[] = [];
+
+  selectedDebtor: DebtorInfo | undefined;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private caseService: CaseService,
-    private authService: AuthService
+    private casesService: CaseService,
+    private authService: AuthService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit() {
-    this.loadCases();
-    this.loadStatistics();
     
     // Vérifier si on doit ouvrir un dossier spécifique depuis les notifications
-    this.route.queryParams.subscribe(params => {
-      if (params['caseId']) {
-        this.openCaseFromNotification(params['caseId']);
-      }
-    });
+    // this.route.queryParams.subscribe(params => {
+    //   if (params['caseId']) {
+    //     this.openCaseFromNotification(params['caseId']);
+    //   }
+    // });
+
+    this.loadDossiers();
   }
 
-  loadCases() {
+  // Fonction pour charger les dossiers
+  loadDossiers() {
+    const siteName = 'portail-recouvrement';
     const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
 
-    this.caseService.getCases().subscribe(cases => {
-      // Filtrer les dossiers pour ce créancier
-      this.cases = cases.filter(c => 
-        c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
-      );
-      this.applyFilters();
-    });
-  }
+    // Verification si l'utilisateur est connecté
+    if (!currentUser) {
+      this.errorMessage = 'Utilisateur non connecté.';
+      this.isLoading = false;
+      return;
+    }
 
-  loadStatistics() {
-    this.caseService.getStatistics().subscribe(stats => {
-      this.statistics = stats;
-    });
-  }
+    const creancierNodeId = currentUser.nodeId;
+    console.log('Créancier connecté :', currentUser);
+    console.log('creancierNodeId envoyé :', creancierNodeId);
 
-  openCaseFromNotification(caseId: string) {
-    // Attendre que les données soient chargées
-    setTimeout(() => {
-      const case_ = this.cases.find(c => c.id === caseId);
-      if (case_) {
-        this.viewCaseDetails(case_);
+    // Verification si l'utilisateur connecté à un NodeId
+    if (!creancierNodeId) {
+      this.errorMessage = 'Identifiant du créancier introuvable.';
+      this.isLoading = false;
+      return;
+    }
+
+    // Appel du web service pour la recuperation des dossiers du creanciers
+    this.casesService.getDossiersCreancier(siteName, creancierNodeId).subscribe({
+      next: (response) => {
+        console.log('Réponse API dossiers :', response);
+
+        // Étape 1 : extraction correcte du tableau de dossiers
+        const dossiers = response.data?.map((item: any) => item.map) || [];
+
+        // Étape 2 : filtrage local
+        this.dossiers = dossiers.filter(
+          (d: any) => d.creancierNodeId === creancierNodeId
+        );
+
+        // Étape 3 : initialisation du tableau filtré
+        this.filteredDossiers = [...this.dossiers];
+        console.log('Dossiers filtrés pour ce créancier :', this.dossiers);
+
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des dossiers :', error);
+        this.errorMessage = 'Impossible de récupérer les dossiers.';
+        this.isLoading = false;
       }
-    }, 500);
-  }
+    });
 
-  applyFilters() {
-    this.caseService.getCasesWithFilter(this.filters).subscribe(cases => {
-      const currentUser = this.authService.getCurrentUser();
-      if (!currentUser) return;
-      
-      this.filteredCases = cases.filter(c => 
-        c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
-      );
+    // Appel du web service pour la recuperation des données(extraction du lastname,firstname,email,telephone et type) du débiteurs 
+    this.adminService.getDebiteurs(siteName).subscribe({
+        next: (data: DebtorInfo[]) => {
+          this.debiteurs = data;
+          this.filteredDebiteurs = [...this.debiteurs];
+        },
+        error: (err) => console.error(err)
     });
   }
 
-  updateStatusFilter() {
-    this.filters.status = this.selectedStatus ? [this.selectedStatus as CaseStatus] : undefined;
-    this.applyFilters();
+  // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
+  getDebiteurForDossier(dossier: any): DebtorInfo | undefined {
+      return this.debiteurs.find(d => d.nodeId === dossier.debiteurNodeId);
   }
 
-  updatePriorityFilter() {
-    this.filters.priority = this.selectedPriority ? [this.selectedPriority as Priority] : undefined;
-    this.applyFilters();
-  }
-
-  resetFilters() {
-    this.filters = {};
+  // Réinitialiser tous les filtres
+  resetFilters(): void {
+    this.filters = {
+      searchTerm: '',
+      status: '',
+      priority: ''
+    };
     this.selectedStatus = '';
     this.selectedPriority = '';
-    this.filteredCases = [...this.cases];
+    this.filteredDossiers = [...this.dossiers];
   }
 
-  getSuccessRate(): number {
-    const completedCases = this.filteredCases.filter(c => c.status === CaseStatus.COMPLETED).length;
-    return this.filteredCases.length > 0 ? Math.round((completedCases / this.filteredCases.length) * 100) : 0;
+  // Appliquer les filtres (recherche, statut, priorité)
+  applyFilters(): void {
+    const term = this.filters.searchTerm.toLowerCase().trim();
+    const status = this.filters.status;
+    const priority = this.filters.priority;
+
+    this.filteredDossiers = this.dossiers.filter((dossier) => {
+      const matchesTerm =
+      !term ||
+      dossier.numeroDossier?.toLowerCase().includes(term) ||
+      dossier.objet?.toLowerCase().includes(term) ||
+      dossier.nomDebiteur?.toLowerCase().includes(term);
+
+      // const matchesStatus = !status || dossier.statutGlobal === status;
+      const matchesStatus =!status ||dossier.statutGlobal === status ||
+      this.getStatusLabel(dossier.statutGlobal).toLowerCase() === this.getStatusLabel(status).toLowerCase();
+      const matchesPriority = !priority || dossier.priorite === priority;
+
+      return matchesTerm && matchesStatus && matchesPriority;
+    });
   }
 
-  getTotalAmount(): number {
-    return this.filteredCases.reduce((sum, c) => sum + c.amount, 0);
+  // Lorsqu’on change le filtre de statut
+  updateStatusFilter(): void {
+    this.filters.status = this.selectedStatus;
+    this.applyFilters();
   }
 
-  getTotalRecovered(): number {
-    return this.filteredCases.reduce((sum, c) => sum + c.amountPaid, 0);
+  // Lorsqu’on change le filtre de priorité
+  updatePriorityFilter(): void {
+    this.filters.priority = this.selectedPriority;
+    this.applyFilters();
   }
 
-  getPaymentPercentage(case_: DebtCase): number {
-    return Math.round((case_.amountPaid / case_.amount) * 100);
+  getPaymentPercentage(dossier: any): number {
+    const total = dossier.montantTotal || 0;
+    const paid = dossier.montantPaye || 0;
+    return total ? Math.round((paid / total) * 100) : 0;
+  }
+
+  getTotalDebt(): number {
+    return this.filteredDossiers.reduce((acc, d) => acc + (d.montantTotal || 0), 0);
+  }
+
+  getTotalPaid(): number {
+    return this.filteredDossiers.reduce((acc, d) => acc + (d.montantPaye || 0), 0);
+  }
+  getFormattedRemainingAmount(dossier: any): string {
+    const reste = (dossier.montantTotal || 0) - (dossier.montantPaye || 0);
+    return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
   }
 
   formatCurrency(amount: number): string {
@@ -145,30 +218,35 @@ export class CreditorCasesComponent implements OnInit {
       'legal_action': 'Action légale',
       'payment_plan': 'Plan de paiement',
       'completed': 'Terminé',
-      'closed': 'Fermé'
+      'closed': 'Fermé',
+      'new': 'Nouveau'
     };
     return labels[status] || status;
   }
 
   getPriorityLabel(priority: string): string {
     const labels: { [key: string]: string } = {
-      'low': 'Faible',
-      'medium': 'Moyenne',
-      'high': 'Élevée',
+      'FAIBLE': 'Faible',
+      'MOYENNE': 'Moyenne',
+      'Élevée': 'Élevée',
+      // 'HAUTE': 'Élevée',
       'urgent': 'Urgente'
     };
     return labels[priority] || priority;
   }
 
-  viewCaseDetails(case_: DebtCase) {
-    this.selectedCase = case_;
+  viewCaseDetails(index: number): void {
+    this.selectedIndex = index;
+    const dossier = this.filteredDossiers[index];
+    this.selectedDebtor = this.getDebiteurForDossier(dossier);
     this.showCaseDetailsModal = true;
   }
 
+
   closeCaseDetailsModal() {
     this.showCaseDetailsModal = false;
-    this.selectedCase = null;
-    
+    this.selectedIndex  = null;
+      
     // Nettoyer l'URL si on vient des notifications
     this.router.navigate([], {
       relativeTo: this.route,
@@ -191,8 +269,8 @@ export class CreditorCasesComponent implements OnInit {
     this.router.navigate(['/professional/reports']);
   }
 
-  getRecentActivities(case_: DebtCase) {
-    return case_.history.slice(-5).reverse();
+  getRecentActivities(index: number) {
+      
   }
 
   getActivityClass(type: string): string {
