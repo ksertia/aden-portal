@@ -19,7 +19,7 @@ export class Cedant implements OnInit {
   cases: DebtCase[] = [];
   filteredCases: DebtCase[] = [];
   statistics: any = null;
-  currentView: 'grid' | 'table' = 'grid';
+  currentView: 'grid' | 'table' = 'table';
 
   
   // 👉 Drawer

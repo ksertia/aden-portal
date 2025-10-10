@@ -7,19 +7,19 @@
   </div>
 
   <!-- Statistiques générales -->
-  <div class="stats-grid fade-in-up" *ngIf="statistics">
-    <div class="stat-card">
+  <div class="stats-grid fade-in-up" *ngIf="dossiers" >
+    <a class="stat-card">
       <div class="stat-icon primary">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14,2 14,8 20,8"/>
         </svg>
       </div>
-      <div class="stat-content">
-        <div class="stat-value">{{ statistics.totalCases }}</div>
+      <div class="stat-content" routerLink="/debtor/cases">
+        <div class="stat-value">{{ dossiers.length }}</div>
         <div class="stat-label">Dossiers totaux</div>
       </div>
-    </div>
+    </a>
 
     <div class="stat-card">
       <div class="stat-icon success">
@@ -29,7 +29,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-value">{{ statistics.activeCases }}</div>
+        <div class="stat-value">-</div>
         <div class="stat-label">Dossiers actifs</div>
       </div>
     </div>
@@ -43,7 +43,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-value">{{ statistics.pendingCases }}</div>
+        <div class="stat-value">-</div>
         <div class="stat-label">En attente</div>
       </div>
     </div>
@@ -56,70 +56,82 @@
         </svg>
       </div>
       <div class="stat-content">
-            <div class="stat-value">{{ formatCurrency(statistics.totalAmount) }}</div>
-            <div class="stat-label">Montant total</div>
+        <!-- {{ dossiers.montantTotal | currency:'EUR' }} -->
+          <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div>
+          <div class="stat-label">Montant total</div>
       </div>
     </div>
   </div>
 
+  <!-- Liste des dossiers en cours -->
   <div class="role-content fade-in-up">
-    <div  class="debtor-dashboard">
+    <div  class="debtor-dashboard" *ngIf="dossiers.length > 0; else noCases">
       <div class="section-header">
         <h2>Mes Dossiers en Cours</h2>
         <a routerLink="/debtor/cases" class="btn btn-primary">Voir tous les dossiers</a>
       </div>
-          
-      <div class="cases-grid" *ngIf="userCases.length > 0">
-        <div class="case-card" *ngFor="let case of userCases.slice(0, 4)">
+      <!--Affichage de trois dossiers -->
+      <div class="cases-grid" *ngIf="dossiers.length > 0">
+        <div class="case-card"  *ngFor="let dossier of dossiers.slice(0, 3)">
           <div class="case-header">
-            <h3>{{ case.caseNumber }}</h3>
-            <span class="status-badge" [ngClass]="'status-' + case.status">
-              {{ getStatusLabel(case.status) }}
+            <h3>{{ dossier.numeroDossier }}</h3>
+            <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
+              {{ getStatusLabel(dossier.statutGlobal) }}
             </span>
           </div>
           <div class="case-details">
             <div class="case-amount">
               <span class="label">Montant dû :</span>
-              <span class="amount">{{ formatCurrency(case.amount - case.amountPaid) }}</span>
+              <span class="amount">{{ dossier.montantTotal | currency:'EUR' }}</span>
             </div>
             <div class="case-progress">
               <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="(case.amountPaid / case.amount) * 100"></div>
+                <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
               </div>
-              <span class="progress-text">{{ ((case.amountPaid / case.amount) * 100).toFixed(0) }}% payé</span>
+              <span class="progress-text">{{ getPaymentPercentage(dossier) }}% payé</span>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="quick-actions">
-        <h3>Actions Rapides</h3>
-        <div class="actions-grid">
-          <a routerLink="/debtor/payments" class="action-card highlight1">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-              <line x1="1" y1="10" x2="23" y2="10"/>
-            </svg>
-            <span>Effectuer un paiement</span>
-          </a>
-          <a routerLink="/debtor/payment-plan" class="action-card highlight2">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
-            </svg>
-            <span>Proposer échéancier</span>
-          </a>
-          <a routerLink="/debtor/documents" class="action-card highlight3">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14,2 14,8 20,8"/>
-            </svg>
-            <span>Mes documents</span>
-          </a>
+         </div>
         </div>
       </div>
     </div>
+    <ng-template #noCases>
+      <div class="no-cases">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <h3>Aucun dossier trouvé</h3>
+        <p>Vous n'avez actuellement aucun dossier de recouvrement.</p>
+      </div>
+   </ng-template>
   </div>
 
+  <!-- Pour les actions rapides -->
+  <div class="quick-actions">
+    <h3>Actions Rapides</h3>
+    <div class="actions-grid">
+      <a routerLink="/debtor/payments" class="action-card highlight1">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+        <span>Effectuer un paiement</span>
+      </a>
+      <a routerLink="/debtor/payment-plan" class="action-card highlight2">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+        </svg>
+        <span>Proposer échéancier</span>
+      </a>
+      <a routerLink="/debtor/documents" class="action-card highlight3">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <span>Mes documents</span>
+      </a>
+    </div>
+  </div>
 </div>
 
        

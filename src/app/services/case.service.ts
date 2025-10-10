@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { DebtCase, CaseStatus, Priority, DocumentType, ActivityType, PaymentProposal, CaseNote, CaseFilter, CaseDocument } from '../models/case.model';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environment/environment';
+
 
 @Injectable({
   providedIn: 'root'
@@ -1805,9 +1808,23 @@ export class CaseService {
     }
   ];
 
-  constructor() {
+  private apiUrl = `${environment.baseUrl}/debiteurs`;
+  constructor(private http: HttpClient) {
     this.casesSubject.next(this.mockCases);
   }
+  
+getDossiersDebiteur(siteName: string, debiteurNodeId: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
+    params: { debiteurNodeId } // 👈 Ajout du paramètre de requête
+  });
+}
+getDossiersCreancier(siteName: string, creancierNodeId: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
+    params: { creancierNodeId } // 👈 Ajout du paramètre de requête
+  });
+}
+
+
 
   getCases(): Observable<DebtCase[]> {
     return of(this.mockCases).pipe(delay(500));

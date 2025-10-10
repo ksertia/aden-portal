@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
@@ -15,39 +14,112 @@ import { DebtCase } from '../../../models/case.model';
 })
 export class CreditorDashboard implements OnInit{
 
-   currentUser: User | null = null;
-  userCases: DebtCase[] = [];
-  statistics: any = null;
+  currentUser: User | null = null;
+
+  dossiers: any[] = [];
+  isLoading = true;
+  errorMessage = '';
+
+  filteredDossiers: any[] = [];
 
   constructor(
     private authService: AuthService,
-    private caseService: CaseService
+    private casesService: CaseService
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
-    this.loadDashboardData();
+
+    this.loadDossiers();
   }
 
-  loadDashboardData() {
-    if (!this.currentUser) return;
+  // Chargement des dossiers
+  // loadDossiers() {
+  //   const siteName = 'portail-recouvrement';
+  //   const currentUser = this.authService.getCurrentUser();
 
-    // Charger les dossiers de l'utilisateur
-    this.caseService.getCasesByUserId(this.currentUser.id, this.currentUser!.role.name)
-      .subscribe(cases => {
-        this.userCases = cases.length? cases : [
-          // Simulation de données pour tester l'affichage
-          { caseNumber: 'DOS-200', status: 'active', amount: 1000, amountPaid: 200 } as DebtCase,
-          { caseNumber: 'DOS-202', status: 'pending', amount: 500, amountPaid: 0 } as DebtCase,
-          { caseNumber: 'DOS-203', status: 'closed', amount: 800, amountPaid: 800 } as DebtCase,
-        ]
-      });
+  //   if (!currentUser) {
+  //     this.errorMessage = 'Utilisateur non connecté.';
+  //     this.isLoading = false;
+  //     return;
+  //   }
 
-    // Charger les statistiques
-    this.caseService.getStatistics()
-      .subscribe(stats => {
-        this.statistics = stats;
-      });
+  //   const creancierNodeId = currentUser.nodeId;
+  //   console.log('Creancier connecté :', currentUser);
+  //   console.log('creancierNodeId envoyé :', creancierNodeId);
+
+  //   if (!creancierNodeId) {
+  //     this.errorMessage = 'Identifiant du débiteur introuvable.';
+  //     this.isLoading = false;
+  //     return;
+  //   }
+
+  //   this.casesService.getDossiersCreancier(siteName, creancierNodeId).subscribe({
+  //     next: (response) => {
+  //       console.log('Réponse API dossiers :', response);
+  //       this.dossiers = response.data?.map((item: any) => item.map) || [];
+  //       this.isLoading = false;
+  //     },
+  //     error: (error) => {
+  //       console.error('Erreur lors du chargement des dossiers :', error);
+  //       this.errorMessage = 'Impossible de récupérer les dossiers.';
+  //       this.isLoading = false;
+  //     }
+  //   });
+  // }
+  loadDossiers() {
+  const siteName = 'portail-recouvrement';
+  const currentUser = this.authService.getCurrentUser();
+
+  if (!currentUser) {
+    this.errorMessage = 'Utilisateur non connecté.';
+    this.isLoading = false;
+    return;
+  }
+
+  const creancierNodeId = currentUser.nodeId;
+  console.log('Créancier connecté :', currentUser);
+  console.log('creancierNodeId envoyé :', creancierNodeId);
+
+  if (!creancierNodeId) {
+    this.errorMessage = 'Identifiant du créancier introuvable.';
+    this.isLoading = false;
+    return;
+  }
+
+  this.casesService.getDossiersCreancier(siteName, creancierNodeId).subscribe({
+    next: (response) => {
+      console.log('Réponse API dossiers :', response);
+
+      // ✅ Étape 1 : extraction correcte du tableau de dossiers
+      const dossiers = response.data?.map((item: any) => item.map) || [];
+
+      // ✅ Étape 2 : filtrage local
+      this.dossiers = dossiers.filter(
+        (d: any) => d.creancierNodeId === creancierNodeId
+      );
+
+      console.log('Dossiers filtrés pour ce créancier :', this.dossiers);
+
+      this.isLoading = false;
+    },
+    error: (error) => {
+      console.error('Erreur lors du chargement des dossiers :', error);
+      this.errorMessage = 'Impossible de récupérer les dossiers.';
+      this.isLoading = false;
+    }
+  });
+}
+
+
+  getTotalDebt(): number {
+    return this.filteredDossiers.reduce((acc, d) => acc + (d.montantTotal || 0), 0);
+  }
+
+  getPaymentPercentage(dossier: any): number {
+    const total = dossier.montantTotal || 0;
+    const paid = dossier.montantPaye || 0;
+    return total ? Math.round((paid / total) * 100) : 0;
   }
 
     getUserRoleLabel(): string {

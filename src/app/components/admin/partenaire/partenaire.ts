@@ -25,7 +25,7 @@ export class Partenaire implements OnInit {
   };
 
   // Vue courante : 'grid' ou 'table'
-  currentView: 'grid' | 'table' = 'grid';
+  currentView: 'grid' | 'table' = 'table';
 
   cases: DebtCase[] = [];
   filteredCases: DebtCase[] = [];
