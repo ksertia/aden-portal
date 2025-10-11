@@ -283,7 +283,7 @@
   </div>
 
   <!-- Details-->
-   <div class="cases-list" *ngIf="dossiers.length > 0">
+   <!-- <div class="cases-list" *ngIf="dossiers.length > 0">
       <div class="cases-grid">
         <div class="case-card"  *ngFor="let dossier of dossiers">
           <div class="case-header">
@@ -294,11 +294,11 @@
             <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
               {{ getStatusLabel(dossier.statutGlobal) }}
             </span>
-          </div>
+          </div> -->
           
-          <div class="case-body">
+          <!-- <div class="case-body"> -->
             <!-- Détail de la dette -->
-            <div class="debt-breakdown">
+            <!-- <div class="debt-breakdown">
               <h4>{{ t('cases.debt.title') }}</h4>
               <div class="breakdown-grid">
                 <div class="breakdown-item">
@@ -328,7 +328,7 @@
                 <div class="breakdown-item remaining">
                   <span class="label">{{ t('cases.debt.remaining') }}</span>
                   <span class="value">{{ getFormattedRemainingAmount(dossier) }}</span>
-                </div>
+                </div> -->
    <!-- Details-->
   <div class="drawer-overlay" *ngIf="showCaseDetailsModal" (click)="closeDrawer()">
   <!-- *ngIf="dossiers.length > 0; else noCases" -->
