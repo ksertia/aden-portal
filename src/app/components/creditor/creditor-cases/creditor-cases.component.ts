@@ -21,7 +21,7 @@ export class CreditorCasesComponent implements OnInit {
   selectedCase: DebtCase | null = null;
 
   selectedIndex: number | null = null;
-  showCaseDetailsModal = false;
+  showDrawer  = false;
 
 
   dossiers: any[] = [];
@@ -239,12 +239,13 @@ export class CreditorCasesComponent implements OnInit {
     this.selectedIndex = index;
     const dossier = this.filteredDossiers[index];
     this.selectedDebtor = this.getDebiteurForDossier(dossier);
-    this.showCaseDetailsModal = true;
+    console.log("selectedDebtor", this.selectedDebtor);
+    this.showDrawer  = true;
   }
 
 
-  closeCaseDetailsModal() {
-    this.showCaseDetailsModal = false;
+  closeDrawer() {
+    this.showDrawer  = false;
     this.selectedIndex  = null;
       
     // Nettoyer l'URL si on vient des notifications

@@ -152,33 +152,35 @@
       </div>
     </div>
 
-    <!-- Drawer -->
-<div class="drawer-overlay" *ngIf="showDrawer" >
+   <!-- Drawer -->
+<div class="drawer-overlay" *ngIf="showDrawer">
   <div class="drawer-content" (click)="$event.stopPropagation()">
+
     <!-- Header -->
     <div class="drawer-header">
-      <h3>Détails du debiteur</h3>
+      <h3>Détails du débiteur</h3>
       <button class="drawer-close" (click)="closeDrawer()">✕</button>
     </div>
 
     <!-- Body -->
     <div class="drawer-body" *ngIf="selectedDebtor">
-      <!-- Profil résumé -->
-      <div class="debtor-profile">
+
+      <!-- Profil résumé centré -->
+      <div class="debtor-profile centered">
         <div class="debtor-avatar">
           {{ selectedDebtor.firstName[0] }}{{ selectedDebtor.lastName[0] }}
         </div>
         <div class="debtor-info">
-          <p class="debtor-name">
+          <h2 class="debtor-name">
             {{ selectedDebtor.firstName }} {{ selectedDebtor.lastName }}
-          </p>
+          </h2>
           <p class="debtor-role">Débiteur</p>
         </div>
       </div>
 
-      <!-- Section infos perso -->
+      <!-- Informations personnelles -->
       <div class="details-section">
-        <h4>Informations Personnelles</h4>
+        <h4>Informations personnelles</h4>
         <div class="details-grid">
           <div class="detail-item">
             <span class="detail-label">Prénom</span>
@@ -203,56 +205,51 @@
           <div class="detail-item" *ngIf="selectedDebtor.address">
             <span class="detail-label">Adresse</span>
             <span class="detail-value">
-              {{ selectedDebtor.address.street }},
-              {{ selectedDebtor.address.postalCode }}
-              {{ selectedDebtor.address.city }}
+              {{ selectedDebtor.address.street }}, {{ selectedDebtor.address.postalCode }} {{ selectedDebtor.address.city }}
             </span>
           </div>
         </div>
       </div>
 
-       <!-- Section infos compte -->
-<div class="details-section">
-  <h4>Informations du compte</h4>
+      <!-- Informations du compte -->
+      <div class="details-section">
+        <h4>Informations du compte</h4>
 
-  <div *ngIf="selectedUser; else noStrapiUser">
-    <div class="details-grid">
-      <div class="detail-item">
-        <span class="detail-label">Nom d'utilisateur</span>
-        <span class="detail-value">{{ selectedUser.username }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">Adresse e-mail</span>
-        <span class="detail-value">{{ selectedUser.email }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">Rôle</span>
-        <span class="detail-value">{{ selectedUser.role?.name }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">Statut</span>
-        <span class="detail-value">{{ selectedUser.blocked ? 'Bloqué' : 'Actif' }}</span>
-      </div>
-    </div>
-  </div>
-  </div>
+        <ng-container *ngIf="selectedUser; else noStrapiUser">
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Nom d'utilisateur</span>
+              <span class="detail-value">{{ selectedUser.username }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Adresse e-mail</span>
+              <span class="detail-value">{{ selectedUser.email }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Rôle</span>
+              <span class="detail-value">{{ selectedUser.role }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Statut</span>
+              <span class="detail-value">{{ selectedUser.blocked ? 'Bloqué' : 'Actif' }}</span>
+            </div>
+          </div>
+        </ng-container>
 
-  <!-- Cas où aucun compte n’existe -->
-      <!-- Bouton action -->
-      <div class="drawer-actions">
-  <ng-template #noStrapiUser>
-  <p>Aucun compte Strapi n’existe pour ce débiteur.</p>
-  <app-user-create
-    *ngIf="selectedDebtor"
-    [prefillData]="{
-      email: selectedDebtor.email,
-      firstName: selectedDebtor.firstName,
-      lastName: selectedDebtor.lastName,
-      nodeId: selectedDebtor.id
-    }"
-    (userCreated)="onUserCreated($event)">
-  </app-user-create>
-</ng-template>
+        <!-- Aucun compte -->
+        <ng-template #noStrapiUser>
+          <p class="no-account">Aucun compte utilisateur.</p>
+          <app-user-create
+            *ngIf="selectedDebtor"
+            [prefillData]="{
+              email: selectedDebtor.email,
+              firstName: selectedDebtor.firstName,
+              lastName: selectedDebtor.lastName,
+              nodeId: selectedDebtor.id
+            }"
+            (userCreated)="onUserCreated($event)">
+          </app-user-create>
+        </ng-template>
 
         <button class="btn btn-primary">reset password</button>
       </div>

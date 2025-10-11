@@ -117,17 +117,22 @@ getStrapiRoles(): Observable<any> {
 // admin.service.ts
 createUserViaBFF(userData: any): Observable<any> {
   const url = 'http://localhost:3000/auth/register';
- // ton BFF
-  // Ne pas envoyer role en objet, juste l'ID ou info nécessaire
+
   const payload = {
     username: userData.username,
     email: userData.email,
     firstname: userData.firstName,
     lastname: userData.lastName,
-    role: userData.role // ID du rôle
+    nodeId: userData.nodeId, // ✅ Vérifie bien que ce champ existe
+    role: userData.role, // ID du rôle
   };
+
+  // 🔍 Log avant d’envoyer
+  console.log('📤 [Angular] Données envoyées au BFF:', payload);
+
   return this.http.post(url, payload);
 }
+
 
 getDebiteurRole() {
   return this.http.get(`${this.apiUrl}/roles/debiteur`);
