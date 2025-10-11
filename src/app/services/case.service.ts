@@ -1182,6 +1182,11 @@ getDossiersCreancier(siteName: string, creancierNodeId: string): Observable<any>
     params: { creancierNodeId } // 👈 Ajout du paramètre de requête
   });
 }
+getDossiersHuissier(siteName: string, huissierNodeId: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
+    params: { huissierNodeId } // 👈 Ajout du paramètre de requête
+  });
+}
 
 
   getCases(): Observable<DebtCase[]> {

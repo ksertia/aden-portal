@@ -6,8 +6,13 @@
 
 .header-content {
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  justify-content: flex-start;
   align-items: center;
+  gap: 25px;
+}
+.cases-header {
+  margin-bottom: 32px;
 }
 
 .cases-header h1 {
@@ -20,6 +25,11 @@
 .cases-header p {
   font-size: 16px;
   color: var(--text-secondary);
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
 }
 
 .filters-section {
@@ -102,6 +112,7 @@
 .stat-icon.primary { background: var(--primary); }
 .stat-icon.success { background: var(--success); }
 .stat-icon.warning { background: var(--warning); }
+.stat-icon.info { background: #3b82f6; }
 
 .stat-value {
   font-size: 24px;
@@ -116,21 +127,35 @@
   letter-spacing: 0.5px;
 }
 
-.cases-grid {
-  display: grid;
-  gap: 20px;
+.list-header {
+  display: flex;
+  /* justify-content: space-between; */
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 24px;
 }
 
-.case-card.professional {
+.list-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.case-card {
   background: var(--surface);
-  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 24px;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   transition: all 0.2s ease;
 }
 
-.case-card.professional:hover {
-  border-color: var(--primary);
+.case-card:hover {
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
@@ -150,13 +175,6 @@
 
 .debtor-name {
   font-size: 14px;
-  color: var(--text);
-  font-weight: 500;
-  margin-bottom: 2px;
-}
-
-.creditor-name {
-  font-size: 12px;
   color: var(--text-secondary);
 }
 
@@ -175,9 +193,10 @@
   text-transform: uppercase;
 }
 
-.priority-low { background: #f0f9ff; color: #0369a1; }
-.priority-medium { background: #fef3c7; color: #92400e; }
-.priority-high { background: #fee2e2; color: #991b1b; }
+.priority-FAIBLE { background: #f0f9ff; color: #0369a1; }
+.priority-MOYENNE { background: #fef3c7; color: #92400e; }
+.priority-Élevée { background: #fee2e2; color: #991b1b; }
+/* .priority-HAUTE { background: #fee2e2; color: #991b1b; } */
 .priority-urgent { background: #fdf2f8; color: #be185d; }
 
 .case-amounts {
@@ -218,17 +237,32 @@
 }
 
 .case-progress {
+  margin-bottom: 16px;
+}
+
+.progress-info {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
+}
+
+.progress-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.progress-percentage {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
 }
 
 .progress-bar {
-  flex: 1;
-  height: 6px;
+  height: 8px;
   background: #e2e8f0;
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
@@ -238,16 +272,33 @@
   transition: width 0.3s ease;
 }
 
-.progress-text {
+.case-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-label {
   font-size: 12px;
   color: var(--text-secondary);
   font-weight: 500;
 }
 
+.meta-value {
+  font-size: 14px;
+  color: var(--text);
+}
+
 .case-actions {
   display: flex;
   gap: 8px;
-  flex-wrap: wrap;
 }
 
 .btn.small {
@@ -255,29 +306,98 @@
   font-size: 12px;
 }
 
-.table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+.cases-table-container {
+  background: var(--surface);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
-.table-title {
-  display: flex;
-  align-items: center;
-  gap: 24px;
+.cases-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.table-title h3 {
-  font-size: 18px;
+.cases-table th {
+  background: #f8fafc;
+  padding: 16px 12px;
+  text-align: left;
   font-weight: 600;
   color: var(--text);
-  margin: 0;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.cases-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.case-row:hover {
+  background: #f8fafc;
+}
+
+.case-cell, .debtor-cell, .amount-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.case-number, .debtor-name {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.case-date, .debtor-type {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.amount-cell .amount-value {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.amount-cell.recovered .amount-value {
+  color: var(--success);
+}
+
+.amount-cell.remaining .amount-value {
+  color: var(--warning);
+}
+
+.progress-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-bar-small {
+  width: 60px;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  min-width: 35px;
+}
+
+.date-cell {
+  font-size: 14px;
+  color: var(--text);
 }
 
 .table-actions {
   display: flex;
-  gap: 12px;
+  gap: 4px;
 }
 
 .no-cases {
@@ -316,14 +436,14 @@
   background: var(--surface);
   border-radius: 12px;
   width: 90%;
-  max-width: 500px;
+  max-width: 800px;
   max-height: 90vh;
   overflow: hidden;
   animation: slideInUp 0.3s ease;
 }
 
 .modal-content.large {
-  max-width: 800px;
+  max-width: 1000px;
 }
 
 .modal-header {
@@ -353,11 +473,11 @@
   overflow-y: auto;
 }
 
-.form-section {
-  margin-bottom: 24px;
+.details-section {
+  margin-bottom: 32px;
 }
 
-.form-section h4 {
+.details-section h4 {
   font-size: 16px;
   font-weight: 600;
   color: var(--text);
@@ -366,41 +486,241 @@
   border-bottom: 1px solid var(--border);
 }
 
-.form-row {
+.details-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 
-.form-group {
-  margin-bottom: 16px;
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.form-group label {
-  display: block;
+.detail-label {
+  font-size: 12px;
+  color: var(--text-secondary);
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  font-size: 14px;
   color: var(--text);
-  margin-bottom: 6px;
-  font-size: 14px;
+  font-weight: 500;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 14px;
-  font-family: inherit;
+.debtor-profile {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
 }
 
-.checkbox-label {
+.debtor-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
   display: flex;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.debtor-info {
+  flex: 1;
+}
+
+.debtor-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.label {
   font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.value {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.financial-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.financial-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.financial-card.total {
+  background: #eff6ff;
+  border-color: var(--primary);
+}
+
+.financial-card.recovered {
+  background: #f0fdf4;
+  border-color: var(--success);
+}
+
+.financial-card.remaining {
+  background: #fefce8;
+  border-color: var(--warning);
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.financial-card.total .card-icon { background: var(--primary); }
+.financial-card.recovered .card-icon { background: var(--success); }
+.financial-card.remaining .card-icon { background: var(--warning); }
+
+.card-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.card-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.progress-section {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.progress-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.progress-bar-large {
+  height: 12px;
+  background: #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.activity-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.timeline-dot.payment { background: var(--success); }
+.timeline-dot.reminder { background: var(--warning); }
+.timeline-dot.legal { background: var(--error); }
+.timeline-dot.status { background: var(--primary); }
+
+.timeline-description {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.timeline-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.document-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.document-icon {
+  color: var(--primary);
+}
+
+.document-info {
+  flex: 1;
+}
+
+.document-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.document-meta {
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 
 .modal-footer {
@@ -409,7 +729,58 @@
   gap: 12px;
   padding: 24px;
   border-top: 1px solid var(--border);
+  /* padding-top: 30px; */
 }
+
+/* Tiroir début */
+/* Styles pour le tiroir */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 50%; /* Légèrement plus large pour mieux voir le contenu */
+  height: 100%;
+  background-color: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  transform: translateX(100%); /* Tiroir caché à droite */
+  overflow-y: auto;
+}
+
+.drawer.open {
+  transform: translateX(0); /* Ouvre le tiroir en le ramenant à sa position d'origine (à droite) */
+}
+
+.drawer-content {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.close-button {
+  background: #f44336;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+/* Overlay pour le fond quand le tiroir est ouvert */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background: rgba(0, 0, 0, 0.5); */
+  z-index: 999;
+}
+
+/* Fin Tiroir */
+
 
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -424,6 +795,20 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .cases-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .financial-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -443,18 +828,20 @@
   }
 
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .case-amounts {
     grid-template-columns: 1fr;
   }
 
-  .case-badges {
-    align-items: flex-start;
+  .case-meta {
+    grid-template-columns: 1fr;
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
+  .debtor-profile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 }
