@@ -441,81 +441,81 @@
 
  
 
-  <!-- Modal de paiement -->
-  <div class="modal-overlay" *ngIf="showPaymentModal" (click)="closePaymentModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>{{ t('cases.paymentModal.title') }}</h3>
-        <button class="modal-close" (click)="closePaymentModal()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body" *ngIf="selectedCase">
-        <div class="payment-summary">
-          <h4>{{ t('cases.paymentModal.case') }} {{ selectedCase.caseNumber }}</h4>
-          <div class="summary-grid">
-            <div class="summary-item">
-              <span class="label">{{ t('cases.paymentModal.totalDue') }}</span>
-              <span class="value">{{ formatCurrency(selectedCase.amount) }}</span>
-            </div>
-            <div class="summary-item">
-              <span class="label">{{ t('cases.paymentModal.alreadyPaid') }}</span>
-              <span class="value">{{ formatCurrency(selectedCase.amountPaid) }}</span>
-            </div>
-            <div class="summary-item highlight">
-              <span class="label">{{ t('cases.paymentModal.remaining') }}</span>
-              <span class="value">{{ formatCurrency(selectedCase.amount - selectedCase.amountPaid) }}</span>
-            </div>
-          </div>
+  <!-- Tiroir de paiement -->
+  <div class="drawer-overlay-payment" *ngIf="showPaymentModal" (click)="closePaymentModal()">
+      <div class="drawer-payment" [class.open]="showPaymentModal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ t('cases.paymentModal.title') }}</h3>
+          <button class="modal-close" (click)="closePaymentModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
         </div>
-        
-        <div class="payment-form">
-          <div class="form-group">
-            <label>{{ t('cases.paymentModal.paymentAmount') }}</label>
-            <input
-              type="number"
-              [(ngModel)]="paymentAmount"
-              [max]="selectedCase.amount - selectedCase.amountPaid"
-              min="1"
-              step="0.01"
-              placeholder="{{ t('cases.paymentModal.placeholder') }}"
-            >
+        <div class="modal-body" *ngIf="selectedCase">
+          <div class="payment-summary">
+            <h4>{{ t('cases.paymentModal.case') }} {{ selectedCase.caseNumber }}</h4>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <span class="label">{{ t('cases.paymentModal.totalDue') }}</span>
+                <span class="value">{{ formatCurrency(selectedCase.amount) }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">{{ t('cases.paymentModal.alreadyPaid') }}</span>
+                <span class="value">{{ formatCurrency(selectedCase.amountPaid) }}</span>
+              </div>
+              <div class="summary-item highlight">
+                <span class="label">{{ t('cases.paymentModal.remaining') }}</span>
+                <span class="value">{{ formatCurrency(selectedCase.amount - selectedCase.amountPaid) }}</span>
+              </div>
+            </div>
           </div>
           
-          <div class="quick-amounts">
-            <button
-              type="button"
-              class="quick-amount-btn"
-              (click)="setPaymentAmount(selectedCase.amount - selectedCase.amountPaid)"
-            >
-              {{ t('cases.paymentModal.quickAmounts.full') }}
-            </button>
-            <button
-              type="button"
-              class="quick-amount-btn"
-              (click)="setPaymentAmount((selectedCase.amount - selectedCase.amountPaid) / 2)"
-            >
-              {{ t('cases.paymentModal.quickAmounts.half') }}
-            </button>
+          <div class="payment-form">
+            <div class="form-group">
+              <label>{{ t('cases.paymentModal.paymentAmount') }}</label>
+              <input
+                type="number"
+                [(ngModel)]="paymentAmount"
+                [max]="selectedCase.amount - selectedCase.amountPaid"
+                min="1"
+                step="0.01"
+                placeholder="{{ t('cases.paymentModal.placeholder') }}"
+              >
+            </div>
+            
+            <div class="quick-amounts">
+              <button
+                type="button"
+                class="quick-amount-btn"
+                (click)="setPaymentAmount(selectedCase.amount - selectedCase.amountPaid)"
+              >
+                {{ t('cases.paymentModal.quickAmounts.full') }}
+              </button>
+              <button
+                type="button"
+                class="quick-amount-btn"
+                (click)="setPaymentAmount((selectedCase.amount - selectedCase.amountPaid) / 2)"
+              >
+                {{ t('cases.paymentModal.quickAmounts.half') }}
+              </button>
+            </div>
           </div>
         </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closePaymentModal()">{{ t('cases.paymentModal.cancel') }}</button>
+          <button class="btn btn-primary" (click)="processPayment()" [disabled]="!paymentAmount || paymentAmount <= 0 || isProcessingPayment">
+            <span *ngIf="!isProcessingPayment">{{ t('cases.paymentModal.confirm') }}</span>
+            <span *ngIf="isProcessingPayment">{{ t('cases.paymentModal.processing') }}</span>
+          </button>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closePaymentModal()">{{ t('cases.paymentModal.cancel') }}</button>
-        <button class="btn btn-primary" (click)="processPayment()" [disabled]="!paymentAmount || paymentAmount <= 0 || isProcessingPayment">
-          <span *ngIf="!isProcessingPayment">{{ t('cases.paymentModal.confirm') }}</span>
-          <span *ngIf="isProcessingPayment">{{ t('cases.paymentModal.processing') }}</span>
-        </button>
-      </div>
-    </div>
   </div>
 
-  <!-- Modal proposition d'échéancier -->
-  <div class="modal-overlay" *ngIf="showPaymentPlanModal" (click)="closePaymentPlanModal()">
-    <div class="modal-content large" (click)="$event.stopPropagation()">
+  <!-- Tiroir proposition d'échéancier -->
+  <div class="drawer-overlay-echancier" *ngIf="showPaymentPlanModal" (click)="closePaymentPlanModal()">
+    <div class="drawer-echancier" [class.open]="showPaymentPlanModal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ t('cases.paymentPlanModal.title') }}</h3>
         <button class="modal-close" (click)="closePaymentPlanModal()">
@@ -613,9 +613,9 @@
     </div>
   </div>
 
-  <!-- Modal de contestation -->
-  <div class="modal-overlay" *ngIf="showDisputeModal" (click)="closeDisputeModal()">
-    <div class="modal-content large" (click)="$event.stopPropagation()">
+  <!-- Tiroi de contestation -->
+  <div class="drawer-overlay-contestation" *ngIf="showDisputeModal" (click)="closeDisputeModal()">
+    <div class="drawer-contestation" [class.open]="showDisputeModal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ t('cases.disputeModal.title') }}</h3>
         <button class="modal-close" (click)="closeDisputeModal()">
