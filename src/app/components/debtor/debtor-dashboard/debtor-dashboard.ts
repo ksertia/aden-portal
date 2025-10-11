@@ -4,6 +4,8 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { CaseService } from '../../../services/case.service';
 import { User, StrapiRole } from '../../../models/user.model';
+import { AdminService } from '../../../services/admin.service';
+import { CreditorDetail } from '../../../models/case.model';
 
 @Component({
   selector: 'app-debtor-dashboard',
@@ -22,9 +24,19 @@ export class DebtorDashboard implements OnInit {
 
   filteredDossiers: any[] = [];
 
+  // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
+  creditors: CreditorDetail[] = [];
+  filteredCreditors: CreditorDetail[] = [];
+
+  selectedcreditor: CreditorDetail | undefined;
+
+  selectedIndex: number | null = null;
+  showCaseDetailsModal = false;
+
   constructor(
     private authService: AuthService,
-    private casesService: CaseService
+    private casesService: CaseService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit() {
@@ -66,7 +78,21 @@ export class DebtorDashboard implements OnInit {
         this.isLoading = false;
       }
     });
+
+     // Appel du web service pour la recuperation des données(extraction du lastname,firstname,email,telephone et type) du creancier 
+    this.adminService.getCreanciers(siteName).subscribe({
+      next: (data: CreditorDetail[]) => {
+        this.creditors = data;
+        this.filteredCreditors = [...this.creditors];
+      },
+      error: (err) => console.error(err)
+    });
   }
+
+   // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
+    getCreancierForDossier(dossier: any): CreditorDetail | undefined {
+        return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
+    }
 
   getUserRoleLabel(): string {
     if (!this.currentUser) return '';

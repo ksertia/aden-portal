@@ -80,6 +80,10 @@
             </span>
           </div>
           <div class="case-details">
+            <div class="case-info">
+              <span class="label">Créancier :</span>
+              <span>{{ getCreancierForDossier(dossier)?.contactPrincipal }}</span>
+            </div>
             <div class="case-amount">
               <span class="label">Montant dû :</span>
               <span class="amount">{{ dossier.montantTotal | currency:'EUR' }}</span>

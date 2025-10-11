@@ -1,11 +1,12 @@
 <div class="cases-container">
   <div class="cases-header fade-in-up">
     <div class="header-content">
+      <button class="btn btn-secondary" routerLink="/creditor/dashboard">Retour</button>
       <div>
         <h1>Mes Créances</h1>
         <p>Gérez et suivez vos créances en cours de recouvrement</p>
       </div>
-      <div class="header-actions">
+      <!-- <div class="header-actions">
         <button class="btn btn-secondary" (click)="generateCustomReport()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 2v6l3-3 3 3-3 3v6"/>
@@ -14,7 +15,7 @@
           </svg>
           Rapport personnalisé
         </button>
-      </div>
+      </div> -->
     </div>
   </div>
 
@@ -32,7 +33,7 @@
           <input
             type="text"
             [(ngModel)]="filters.searchTerm"
-            placeholder="Numéro, nom du débiteur..."
+            placeholder="Numéro, nom du dossier..."
             (input)="applyFilters()"
           >
         </div>
@@ -126,7 +127,7 @@
   <div class="cases-content fade-in-up">
     <div class="cases-list" *ngIf="dossiers.length > 0; else noCases">
       <div class="list-header">
-        <h3>Créances ({{ filteredDossiers.length }})</h3>
+        <!-- <h3>Créances ({{ filteredDossiers.length }})</h3> -->
         <app-view-toggle 
           [currentView]="currentView" 
           (viewChange)="currentView = $event">
