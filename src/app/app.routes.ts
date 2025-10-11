@@ -74,6 +74,10 @@ export const routes: Routes = [
           {
             path: 'actions',
             loadComponent: () => import('./components/bailiff/bailiff-actions/bailiff-actions.component').then(c => c.BailiffActionsComponent)
+          },
+          {
+            path: 'dashboard',
+            loadComponent: () => import('./components/bailiff/bailiff-dashboard/bailiff-dashboard').then(c => c.BailiffDashboard)
           }
         ]
       },

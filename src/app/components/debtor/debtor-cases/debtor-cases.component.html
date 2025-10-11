@@ -111,7 +111,7 @@
 
      <!-- Vue grille -->
       <div class="cases-grid" *ngIf="currentView === 'grid'">
-        <div class="case-card" *ngFor="let dossier of filteredDossiers">
+        <div class="case-card" *ngFor="let dossier of filteredDossiers; let i = index">
           <div class="case-header">
             <div class="case-info">
               <h3>{{ dossier.numeroDossier }}</h3>
@@ -155,8 +155,8 @@
             
             <div class="case-meta">
               <div class="meta-item">
-                <span class="meta-label">Statut :</span>
-                <span class="meta-value">{{ dossier.statutGlobal }}</span>
+                <span class="meta-label">Créancier:</span>
+                <span class="meta-value">{{ getCreancierForDossier(dossier)?.contactPrincipal }} </span>
               </div>
               <div class="meta-item">
                 <span class="meta-label">Phase :</span>
@@ -205,7 +205,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let dossier of filteredDossiers" class="case-row">
+            <tr *ngFor="let dossier of filteredDossiers; let i = index" class="case-row">
               <td>
                 <div class="case-cell">
                   <div class="case-number">{{ dossier.numeroDossier }}</div>
@@ -214,8 +214,9 @@
               </td>
               <td>
                 <div class="debtor-cell">
-                  <div class="debtor-name">{{ dossier.creancierNodeId}}</div>
-                  <div class="debtor-type">-</div>
+                  <!-- <div class="debtor-name">{{ dossier.creancierNodeId}}</div> -->
+                  <div class="debtor-name">{{ getCreancierForDossier(dossier)?.contactPrincipal }} </div>
+                  <div class="debtor-type">{{ getCreancierForDossier(dossier)?.raisonSociale }}</div>
                 </div>
               </td>
               <td>
@@ -281,6 +282,53 @@
    </ng-template>
   </div>
 
+  <!-- Details-->
+   <!-- <div class="cases-list" *ngIf="dossiers.length > 0">
+      <div class="cases-grid">
+        <div class="case-card"  *ngFor="let dossier of dossiers">
+          <div class="case-header">
+            <div class="case-info">
+              <h3> {{ dossier.numeroDossier }}</h3>
+              <p class="creditor-name">{{ dossier.objet }}</p>
+            </div>
+            <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
+              {{ getStatusLabel(dossier.statutGlobal) }}
+            </span>
+          </div> -->
+          
+          <!-- <div class="case-body"> -->
+            <!-- Détail de la dette -->
+            <!-- <div class="debt-breakdown">
+              <h4>{{ t('cases.debt.title') }}</h4>
+              <div class="breakdown-grid">
+                <div class="breakdown-item">
+                  <span class="label">{{ t('cases.debt.principal') }}</span>
+                  <span class="value">{{ dossier.montantTotal | currency:'EUR' }}</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="label">{{ t('cases.debt.interests') }}</span>
+                  <span class="value">---</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="label">{{ t('cases.debt.penalties') }}</span>
+                  <span class="value">---</span>
+                </div>
+                <div class="breakdown-item">
+                  <span class="label">{{ t('cases.debt.fees') }}</span>
+                  <span class="value">---</span>
+                </div>
+                <div class="breakdown-item total">
+                  <span class="label">{{ t('cases.debt.totalDue') }}</span>
+                  <span class="value">---</span>
+                </div>
+                <div class="breakdown-item paid">
+                  <span class="label">{{ t('cases.debt.alreadyPaid') }}</span>
+                  <span class="value">{{ formatCurrency(getTotalPaid()) }}</span>
+                </div>
+                <div class="breakdown-item remaining">
+                  <span class="label">{{ t('cases.debt.remaining') }}</span>
+                  <span class="value">{{ getFormattedRemainingAmount(dossier) }}</span>
+                </div> -->
    <!-- Details-->
   <div class="drawer-overlay" *ngIf="showCaseDetailsModal" (click)="closeDrawer()">
   <!-- *ngIf="dossiers.length > 0; else noCases" -->

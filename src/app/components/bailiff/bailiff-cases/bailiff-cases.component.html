@@ -1,17 +1,21 @@
 <div class="cases-container">
   <div class="cases-header fade-in-up">
     <div class="header-content">
+      <button class="btn btn-secondary" routerLink="/bailiff/dashboard">Retour</button>
       <div>
         <h1>Gestion des Dossiers</h1>
         <p>Gérez vos dossiers de recouvrement assignés</p>
       </div>
-      <button class="btn btn-primary" (click)="showCreateModal = true">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-        Nouveau dossier
-      </button>
+      <!-- <div class="header-actions">
+        <button class="btn btn-secondary" (click)="generateCustomReport()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 2v6l3-3 3 3-3 3v6"/>
+            <path d="M15 8h6"/>
+            <path d="M15 16h6"/>
+          </svg>
+          Rapport personnalisé
+        </button>
+      </div> -->
     </div>
   </div>
 
@@ -19,7 +23,7 @@
   <div class="filters-section fade-in-up">
     <div class="filters-card">
       <div class="filters-header">
-        <h3>Filtres</h3>
+        <h3>Filtres et recherche</h3>
         <button class="btn btn-secondary small" (click)="resetFilters()">Réinitialiser</button>
       </div>
       
@@ -29,7 +33,7 @@
           <input
             type="text"
             [(ngModel)]="filters.searchTerm"
-            placeholder="Numéro, nom du débiteur..."
+            placeholder="Numéro, nom du debiteur..."
             (input)="applyFilters()"
           >
         </div>
@@ -43,6 +47,7 @@
             <option value="negotiation">Négociation</option>
             <option value="legal_action">Action légale</option>
             <option value="completed">Terminé</option>
+            <option value="new">Nouveau</option>
           </select>
         </div>
         
@@ -50,9 +55,10 @@
           <label>Priorité</label>
           <select [(ngModel)]="selectedPriority" (change)="updatePriorityFilter()">
             <option value="">Toutes les priorités</option>
-            <option value="low">Faible</option>
-            <option value="medium">Moyenne</option>
-            <option value="high">Élevée</option>
+            <option value="FAIBLE">Faible</option>
+            <option value="MOYENNE">Moyenne</option>
+            <option value="Élevée">Élevée</option>
+            <!-- <option value="HAUTE">Élevée</option> -->
             <option value="urgent">Urgente</option>
           </select>
         </div>
@@ -61,7 +67,7 @@
   </div>
 
   <!-- Statistiques -->
-  <div class="stats-section fade-in-up" *ngIf="statistics">
+  <div class="stats-section fade-in-up" *ngIf="dossiers">
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon primary">
@@ -71,7 +77,7 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-value">{{ filteredDossiers.length }}</div>
           <div class="stat-label">Dossiers assignés</div>
         </div>
       </div>
@@ -84,12 +90,12 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ getSuccessRate() }}%</div>
+          <div class="stat-value">{{ getPaymentPercentage(dossiers) }}%</div>
           <div class="stat-label">Taux de succès</div>
         </div>
       </div>
       
-      <div class="stat-card">
+      <!-- <div class="stat-card">
         <div class="stat-icon warning">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="1" x2="12" y2="23"/>
@@ -97,43 +103,51 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ formatCurrency(getTotalRecovered()) }}</div>
+          <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div>
+          <div class="stat-label">Montant total</div>
+        </div>
+      </div> -->
+      
+      <div class="stat-card">
+        <div class="stat-icon info">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatCurrency(getTotalPaid()) }}</div>
           <div class="stat-label">Montant recouvré</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Liste des dossiers -->
+  <!-- Liste des créances -->
   <div class="cases-content fade-in-up">
-    <div class="cases-table" *ngIf="filteredCases.length > 0; else noCases">
-      <div class="table-header">
-        <div class="table-actions">
-          <button class="btn btn-secondary" (click)="generateReport()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7,10 12,15 17,10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Exporter rapport
-          </button>
-        </div>
+    <div class="cases-list" *ngIf="dossiers.length > 0; else noCases">
+      <div class="list-header">
+        <!-- <h3>Créances ({{ filteredDossiers.length }})</h3> -->
+        <app-view-toggle 
+          [currentView]="currentView" 
+          (viewChange)="currentView = $event">
+        </app-view-toggle>
       </div>
       
-      <div class="cases-grid">
-        <div class="case-card professional" *ngFor="let case of filteredCases">
+      <!-- Vue grille -->
+      <div class="cases-grid" *ngIf="currentView === 'grid'">
+        <div class="case-card" *ngFor="let dossier of filteredDossiers; let i = index">
           <div class="case-header">
             <div class="case-info">
-              <h3>{{ case.caseNumber }}</h3>
-              <p class="debtor-name">{{ case.debtor.firstName }} {{ case.debtor.lastName }}</p>
-              <p class="creditor-name">{{ case.creditor.name }}</p>
+              <h3>{{ dossier.numeroDossier }}</h3>
+              <span>{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
             </div>
             <div class="case-badges">
-              <span class="status-badge" [ngClass]="'status-' + case.status">
-                {{ getStatusLabel(case.status) }}
+              <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
+                {{ getStatusLabel(dossier.statutGlobal) }}
               </span>
-              <span class="priority-badge" [ngClass]="'priority-' + case.priority">
-                {{ getPriorityLabel(case.priority) }}
+              <span class="priority-badge" [ngClass]="'priority-' + dossier.priorite">
+                {{ getPriorityLabel(dossier.priorite) }}
               </span>
             </div>
           </div>
@@ -142,49 +156,141 @@
             <div class="case-amounts">
               <div class="amount-item">
                 <span class="amount-label">Montant total</span>
-                <span class="amount-value">{{ formatCurrency(case.amount) }}</span>
+                <span class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</span>
               </div>
               <div class="amount-item">
                 <span class="amount-label">Recouvré</span>
-                <span class="amount-value recovered">{{ formatCurrency(case.amountPaid) }}</span>
+                <span class="amount-value recovered">{{ formatCurrency(getTotalPaid()) }}</span>
               </div>
               <div class="amount-item">
                 <span class="amount-label">Restant</span>
-                <span class="amount-value remaining">{{ formatCurrency(case.amount - case.amountPaid) }}</span>
+                <span class="amount-value remaining">{{ getFormattedRemainingAmount(dossier) }}</span>
               </div>
             </div>
             
             <div class="case-progress">
-              <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="getPaymentPercentage(case)"></div>
+              <div class="progress-info">
+                <span class="progress-label">Progression</span>
+                <span class="progress-percentage">{{ getPaymentPercentage(dossier) }}% recouvré</span>
               </div>
-              <span class="progress-text">{{ getPaymentPercentage(case) }}% recouvré</span>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
+              </div>
+            </div>
+            
+            <div class="case-meta">
+              <div class="meta-item">
+                <span class="meta-label">Échéance :</span>
+                <span class="meta-value">{{ dossier.dateEcheance }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Créé le :</span>
+                <span class="meta-value">{{ dossier.dateCreation }}</span>
+              </div>
             </div>
             
             <div class="case-actions">
-              <button class="btn btn-primary small" (click)="editCase(case)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-                Modifier
-              </button>
-              <button class="btn btn-secondary small" (click)="addNote(case)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-                Ajouter note
-              </button>
-              <button class="btn btn-secondary small" (click)="viewCaseDetails(case)">
+              <button class="btn btn-primary small" (click)="viewCaseDetails(i)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                   <circle cx="12" cy="12" r="3"/>
                 </svg>
                 Détails
               </button>
+              <button class="btn btn-secondary small" (click)="downloadCaseReport(dossier)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7,10 12,15 17,10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Rapport
+              </button>
             </div>
           </div>
         </div>
+      </div>
+      
+      <!-- Vue table -->
+      <div class="cases-table-container" *ngIf="currentView === 'table'">
+        <table class="cases-table">
+          <thead>
+            <tr>
+              <th>Dossier</th>
+              <th>Débiteur</th>
+              <th>Montant total</th>
+              <th>Recouvré</th>
+              <th>Restant</th>
+              <th>Statut</th>
+              <th>Progression</th>
+              <th>Échéance</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dossier of filteredDossiers; let i = index" class="case-row">
+              <td>
+                <div class="case-cell">
+                  <div class="case-number">{{ dossier.numeroDossier }}</div> 
+                  <div class="case-date">{{ dossier.dateCreation }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="debtor-cell">
+                  <span>{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
+                  <div class="debtor-type">{{ dossier.typeCreance }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="amount-cell">
+                  <div class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="amount-cell recovered">
+                  <div class="amount-value">{{ formatCurrency(getTotalPaid()) }}</div>
+                </div>
+              </td>
+              <td>
+                <div class="amount-cell remaining">
+                  <div class="amount-value">{{ getFormattedRemainingAmount(dossier) }}</div>
+                </div>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
+                  {{ getStatusLabel(dossier.statutGlobal) }}
+                </span>
+              </td>
+              <td>
+                <div class="progress-cell">
+                  <div class="progress-bar-small">
+                    <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
+                  </div>
+                  <span class="progress-text">{{ getPaymentPercentage(dossier) }}%</span>
+                </div>
+              </td>
+              <td>
+                <div class="date-cell">{{ dossier.dateEcheance }}</div>
+              </td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn btn-primary small" (click)="viewCaseDetails(i)" title="Voir détails">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                  <button class="btn btn-secondary small" (click)="downloadCaseReport(dossier)" title="Télécharger rapport">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7,10 12,15 17,10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -194,111 +300,187 @@
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14,2 14,8 20,8"/>
         </svg>
-        <h3>Aucun dossier trouvé</h3>
+        <h3>Aucune dossier trouvée</h3>
         <p>Aucun dossier ne correspond aux critères sélectionnés.</p>
       </div>
     </ng-template>
   </div>
 
-  <!-- Modal création de dossier -->
-  <div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
-    <div class="modal-content large" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Créer un nouveau dossier</h3>
-        <button class="modal-close" (click)="closeCreateModal()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="create-form">
-          <div class="form-section">
-            <h4>Informations du débiteur</h4>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Prénom</label>
-                <input type="text" [(ngModel)]="newCase.debtor.firstName">
-              </div>
-              <div class="form-group">
-                <label>Nom</label>
-                <input type="text" [(ngModel)]="newCase.debtor.lastName">
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Email</label>
-              <input type="email" [(ngModel)]="newCase.debtor.email">
-            </div>
-          </div>
-          
-          <div class="form-section">
-            <h4>Informations du créancier</h4>
-            <div class="form-group">
-              <label>Nom de l'entreprise</label>
-              <input type="text" [(ngModel)]="newCase.creditor.name">
-            </div>
-            <div class="form-group">
-              <label>Montant de la créance</label>
-              <input type="number" [(ngModel)]="newCase.amount" min="1" step="0.01">
-            </div>
-          </div>
+  <!-- Draver de détails du dossier -->
+  <div class="drawer-overlay" *ngIf="showDrawer" (click)="closeDrawer()">
+      <div class="drawer" [class.open]="showDrawer" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Détails du dossier {{ dossiers[selectedIndex!]?.numeroDossier }}</h3>
+          <button class="modal-close" (click)="closeDrawer()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closeCreateModal()">Annuler</button>
-        <button class="btn btn-primary" (click)="createCase()">Créer le dossier</button>
-      </div>
-    </div>
-  </div>
+        <div class="drawer-content" *ngIf="selectedIndex !== null">
+          <div class="case-details">
+            <!-- Informations générales -->
+            <div class="details-section">
+              <h4>Informations générales</h4>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="detail-label">Numéro de dossier</span>
+                  <span class="detail-value">{{ dossiers[selectedIndex!].numeroDossier }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Date de création</span>
+                  <span class="detail-value">{{ dossiers[selectedIndex!].dateCreation }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Échéance</span>
+                  <span class="detail-value">{{ dossiers[selectedIndex!].dateEcheance }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Statut</span>
+                  <span class="status-badge"  [ngClass]="'status-' + dossiers[selectedIndex!].statutGlobal">
+                    {{ getStatusLabel(dossiers[selectedIndex!].statutGlobal) }}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-  <!-- Modal ajout de note -->
-  <div class="modal-overlay" *ngIf="showNoteModal" (click)="closeNoteModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Ajouter une note</h3>
-        <button class="modal-close" (click)="closeNoteModal()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="note-form">
-          <div class="form-group">
-            <label>Type d'interaction</label>
-            <select [(ngModel)]="newNote.type">
-              <option value="call">Appel téléphonique</option>
-              <option value="email">Email</option>
-              <option value="meeting">Rendez-vous</option>
-              <option value="legal">Action légale</option>
-              <option value="payment">Paiement</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label>Contenu de la note</label>
-            <textarea
-              [(ngModel)]="newNote.content"
-              rows="4"
-              placeholder="Décrivez l'interaction ou l'action effectuée..."
-            ></textarea>
-          </div>
-          
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" [(ngModel)]="newNote.isPrivate">
-              <span class="checkmark"></span>
-              Note privée (visible uniquement par les professionnels)
-            </label>
+            <!-- Informations débiteur -->
+            <div class="details-section">
+              <h4>Débiteur</h4>
+              <div class="debtor-profile">
+                <div class="debtor-avatar">
+                  {{ selectedDebtor?.firstName?.charAt(0) }}{{ selectedDebtor?.lastName?.charAt(0) }}
+                </div>
+                <div class="debtor-info">
+                  <div class="debtor-name">{{ selectedDebtor?.firstName }} {{ selectedDebtor?.lastName }}
+                  <div class="debtor-details">
+                    <div class="detail-row">
+                      <span class="label">Email :</span>
+                      <span class="value">{{ selectedDebtor?.email }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="label">Téléphone :</span>
+                      <span class="value">{{ selectedDebtor?.phone || '---' }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="label">Type :</span>
+                      <span class="value">{{ selectedDebtor?.type || dossiers[selectedIndex!].typeCreance }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Analyse financière -->
+            <div class="details-section">
+              <h4>Analyse financière</h4>
+              <div class="financial-cards">
+                <div class="financial-card total">
+                  <div class="card-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="12" y1="1" x2="12" y2="23"/>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-value">{{ dossiers[selectedIndex!].montantTotal | currency:'EUR' }}</div>
+                    <div class="card-label">Montant total</div>
+                  </div>
+                </div>
+                <div class="financial-card recovered">
+                  <div class="card-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M9 12l2 2 4-4"/>
+                      <circle cx="12" cy="12" r="9"/>
+                    </svg>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-value">{{ formatCurrency(getTotalPaid()) }}</div>
+                    <div class="card-label">Montant recouvré</div> 
+                  </div>
+                </div>
+                <div class="financial-card remaining">
+                  <div class="card-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="12"/>
+                      <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-value">{{ getFormattedRemainingAmount(dossiers[selectedIndex!]) }}</div>
+                    <div class="card-label">Reste à recouvrer</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="progress-section">
+                <div class="progress-header">
+                  <span class="progress-title">Progression du recouvrement</span>
+                  <span class="progress-percentage">{{ getPaymentPercentage(dossiers[selectedIndex!]) }}%</span>
+                </div>
+                <div class="progress-bar-large">
+                  <div class="progress-fill"  [style.width.%]="getPaymentPercentage(dossiers[selectedIndex!])"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Historique des activités -->
+            <!-- <div class="details-section">
+              <h4>Historique des activités</h4>
+              <div class="activity-timeline">
+                <div class="timeline-item" *ngFor="let activity of getRecentActivities(selectedIndex)">
+                  <div class="timeline-dot" [ngClass]="getActivityClass(activity.type)"></div>
+                  <div class="timeline-content">
+                    <div class="timeline-description">{{ activity.description }}</div>
+                    <div class="timeline-meta">
+                      <span class="timeline-date">{{ formatDate(activity.date) }}</span>
+                      <span class="timeline-user">par {{ activity.userName }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+
+            <!-- Documents -->
+            <div class="details-section" *ngIf="filteredDossiers.length > 0">
+              <h4>Documents joints ({{ dossiers.length }})</h4>
+              <div class="documents-list">
+                <div class="document-item" *ngFor="let doc of dossiers">
+                  <div class="document-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14,2 14,8 20,8"/>
+                    </svg>
+                  </div>
+                  <div class="document-info">
+                    <div class="document-name">{{ doc.name }}</div>
+                    <div class="document-meta">{{ formatDate(doc.uploadedAt) }} • {{ doc.uploadedBy }}</div>
+                  </div>
+                  <button class="btn btn-secondary small" (click)="downloadDocument(doc)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7,10 12,15 17,10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closeNoteModal()">Annuler</button>
-        <button class="btn btn-primary" (click)="saveNote()">Ajouter la note</button>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeDrawer()">Fermer</button>
+          <button class="btn btn-primary" (click)="downloadCaseReport(selectedCase!)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Télécharger le rapport
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
