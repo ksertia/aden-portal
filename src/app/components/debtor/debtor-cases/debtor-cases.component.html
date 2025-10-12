@@ -330,7 +330,7 @@
                   <span class="value">{{ getFormattedRemainingAmount(dossier) }}</span>
                 </div> -->
    <!-- Details-->
-  <div class="drawer-overlay" *ngIf="showCaseDetailsModal" (click)="closeDrawer()">
+  <div class="drawer-overlay" *ngIf="showCaseDetailsModal">
   <!-- *ngIf="dossiers.length > 0; else noCases" -->
     <!-- <div class="cases-grid drawer-content" [class.open]="showCaseDetailsModal"> -->
     <div class="drawer" [class.open]="showCaseDetailsModal" (click)="$event.stopPropagation()">
@@ -487,10 +487,8 @@
     </div>
   </div>
 
- 
-
   <!-- Tiroir de paiement -->
-  <div class="drawer-overlay-payment" *ngIf="showPaymentModal" (click)="closePaymentModal()">
+  <div class="drawer-overlay-payment" *ngIf="showPaymentModal">
       <div class="drawer-payment" [class.open]="showPaymentModal" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h3>{{ t('cases.paymentModal.title') }}</h3>
@@ -562,7 +560,7 @@
   </div>
 
   <!-- Tiroir proposition d'échéancier -->
-  <div class="drawer-overlay-echancier" *ngIf="showPaymentPlanModal" (click)="closePaymentPlanModal()">
+  <div class="drawer-overlay-echancier" *ngIf="showPaymentPlanModal">
     <div class="drawer-echancier" [class.open]="showPaymentPlanModal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ t('cases.paymentPlanModal.title') }}</h3>
@@ -662,7 +660,7 @@
   </div>
 
   <!-- Tiroi de contestation -->
-  <div class="drawer-overlay-contestation" *ngIf="showDisputeModal" (click)="closeDisputeModal()">
+  <div class="drawer-overlay-contestation" *ngIf="showDisputeModal">
     <div class="drawer-contestation" [class.open]="showDisputeModal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ t('cases.disputeModal.title') }}</h3>
