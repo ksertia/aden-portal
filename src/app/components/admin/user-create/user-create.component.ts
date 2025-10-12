@@ -13,7 +13,7 @@ import { environment } from '../../../../environment/environment';
   styleUrls: ['./user-create.component.css']
 })
 export class UserCreateComponent implements OnInit {
-  @Input() prefillData: any; // infos venant du BFF (email, prénom, nom, role…)
+  @Input() prefillData: any; // infos venant du BFF (email, prénom, nom, role, nodeId…)
   @Input() isDrawerOpen: boolean = false;
   @Output() drawerClosed = new EventEmitter<void>();
   @Output() userCreated = new EventEmitter<any>();
@@ -29,6 +29,7 @@ export class UserCreateComponent implements OnInit {
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       role: [''], // prérempli depuis le BFF
+      nodeId: [''] // ⚡ Ajout du champ nodeId
     });
   }
 
@@ -40,43 +41,44 @@ export class UserCreateComponent implements OnInit {
         firstName: this.prefillData.firstName,
         lastName: this.prefillData.lastName,
         username: this.prefillData.username || '',
-        role: this.prefillData.roleId || this.prefillData.role || '' // rôle transmis
+        role: this.prefillData.roleId || this.prefillData.role || '', // rôle transmis
+        nodeId: this.prefillData.nodeId || '' // ⚡ nodeId transmis
       });
     }
   }
 
   onSubmit() {
-  if (this.userForm.valid) {
-    const formValue = this.userForm.value;
+    if (this.userForm.valid) {
+      const formValue = this.userForm.value;
 
-    const newUser = {
-      username: formValue.username,
-      email: formValue.email,
-      firstName: formValue.firstName,
-      lastName: formValue.lastName,
-      role: formValue.role // ID du rôle transmis par le BFF
-    };
+      const newUser = {
+        username: formValue.username,
+        email: formValue.email,
+        firstName: formValue.firstName,
+        lastName: formValue.lastName,
+        role: formValue.role, // ID du rôle transmis par le BFF
+        nodeId: formValue.nodeId // ⚡ Ajout du nodeId dans le payload
+      };
 
-    this.adminService.createUserViaBFF(newUser).subscribe({
-      next: (res) => {
-        this.successMessage = "Utilisateur créé avec succès ✅";
-        this.errorMessage = "";
-        this.userCreated.emit(res);
-        this.closeDrawer();
-      },
-      error: (err) => {
-        console.error(err);
-        // Affiche le message reçu du BFF si dispo
-        this.errorMessage = err.error?.message || "Erreur lors de la création de l'utilisateur";
-        this.successMessage = "";
-      }
-    });
-  } else {
-    this.errorMessage = "Veuillez remplir tous les champs obligatoires.";
-    this.successMessage = "";
+      this.adminService.createUserViaBFF(newUser).subscribe({
+        next: (res) => {
+          this.successMessage = "Utilisateur créé avec succès ✅";
+          this.errorMessage = "";
+          this.userCreated.emit(res);
+          this.closeDrawer();
+        },
+        error: (err) => {
+          console.error(err);
+          // Affiche le message reçu du BFF si dispo
+          this.errorMessage = err.error?.message || "Erreur lors de la création de l'utilisateur";
+          this.successMessage = "";
+        }
+      });
+    } else {
+      this.errorMessage = "Veuillez remplir tous les champs obligatoires.";
+      this.successMessage = "";
+    }
   }
-}
-
 
   closeDrawer() {
     this.isDrawerOpen = false;

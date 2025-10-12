@@ -89,10 +89,6 @@ openDrawer(debtor: DebtorInfo) {
   });
 }
 
-
-
-
-
   closeDrawer() {
     this.showDrawer = false;
     this.selectedDebtor = null;

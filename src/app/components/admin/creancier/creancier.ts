@@ -5,18 +5,20 @@ import { ActivatedRoute, Router, RouterModule} from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { DebtCase, CaseStatus, Priority, CaseFilter, CreditorDetail } from '../../../models/case.model';
 import { AdminService } from '../../../services/admin.service';
+import { UserCreateComponent } from '../user-create/user-create.component';
 
 @Component({
   selector: 'app-creancier',
-  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule],
+  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule, UserCreateComponent],
   templateUrl: './creancier.html',
   styleUrl: './creancier.css'
 })
-export class Creancier  implements OnInit {
- 
-  // drawer
+export class Creancier implements OnInit {
+  
+  // État du tiroir
   showDrawer = false;
   selectedCreditor: CreditorDetail | null = null;
+  selectedUser: any | null = null; // données Strapi User
 
   creditors: CreditorDetail[] = [];
   filteredCreditors: CreditorDetail[] = [];
@@ -39,7 +41,7 @@ export class Creancier  implements OnInit {
 
   loadCreditors() {
     const sitename = 'portail-recouvrement';
-  
+    
     this.adminService.getCreanciers(sitename).subscribe({
       next: (data: CreditorDetail[]) => {
         this.creditors = data;
@@ -67,16 +69,32 @@ export class Creancier  implements OnInit {
     this.filters.searchTerm = '';
     this.filteredCreditors = [...this.creditors];
   }
- 
-   // gestion tiroir
+  
+  // --- Gestion du tiroir ---
   openDrawer(creditor: CreditorDetail) {
     this.selectedCreditor = creditor;
     this.showDrawer = true;
+
+    // ⚡ On appelle Strapi pour récupérer le user associé au créancier
+    this.adminService.getUserByEmail(creditor.emailProfessionnel).subscribe({
+      next: (user) => {
+        this.selectedUser = user;
+      },
+      error: (err) => {
+        console.error("Erreur récupération user:", err);
+        this.selectedUser = null;
+      }
+    });
   }
 
   closeDrawer() {
     this.showDrawer = false;
     this.selectedCreditor = null;
+    this.selectedUser = null;
   }
 
+  onUserCreated(user: any) {
+    console.log('Utilisateur Strapi créé:', user);
+    this.selectedUser = user;
+  }
 }

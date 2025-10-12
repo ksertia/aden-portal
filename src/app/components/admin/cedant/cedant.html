@@ -124,12 +124,12 @@
             </div>
             
             <div class="case-actions">
-                <button class="btn btn-primary small" title="Voir le profil" >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="8" r="4"/>
-                    <path d="M6 20c0-4 12-4 12 0"/>
-                  </svg> voir profil
-                </button>
+                <button class="btn btn-primary small" title="Voir le profil" (click)="openDrawer(item)">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="8" r="4"/>
+      <path d="M6 20c0-4 12-4 12 0"/>
+    </svg> voir profil
+  </button>
 
             </div>
             </div>
@@ -162,12 +162,12 @@
                 </td>
                 <td>
                 <div class="table-actions">
-                    <button class="btn btn-primary small"  title="Voir le profil">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <circle cx="12" cy="8" r="4"/>
-                      <path d="M6 20c0-4 12-4 12 0"/>
-                    </svg>
-                    </button>
+                    <button class="btn btn-primary small" title="Voir le profil" (click)="openDrawer(item)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M6 20c0-4 12-4 12 0"/>
+      </svg>
+    </button>
                 </div>
                 </td>
             </tr>
@@ -176,29 +176,110 @@
         </div>
     </div>
 
-    <!-- Drawer du Cédant -->
-<div class="drawer-backdrop" *ngIf="isDrawerOpen" (click)="closeDrawer()"></div>
+   <!-- Remplace l'ancien drawer par ce nouveau code -->
 
-<div class="drawer" *ngIf="isDrawerOpen">
-  <div class="drawer-header">
-    <h3>Profil du cédant</h3>
-    <button class="btn-close" (click)="closeDrawer()">×</button>
-  </div>
-<!-- 
-  <div class="drawer-body" *ngIf="selectedCedant">
-    <div class="profile-info">
-      <h4>{{ selectedCedant.creditorName }}</h4>
-      <p><strong>Username :</strong> {{ selectedCedant.username }}</p>
-      <p><strong>Email :</strong> {{ selectedCedant.email }}</p>
-      <p><strong>Téléphone :</strong> {{ selectedCedant.phone }}</p>
-      <p>
-        <strong>Status :</strong>
-        <span class="status-badge" [ngClass]="statusClass(selectedCedant.status)">
-          {{ selectedCedant.status }}
-        </span>
-      </p>
+<!-- Drawer Overlay -->
+<div class="drawer-overlay" *ngIf="showDrawer">
+  <div class="drawer-content" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="drawer-header">
+      <h3>Profil du cédant</h3>
+      <button class="drawer-close" (click)="closeDrawer()">✕</button>
     </div>
-  </div> -->
+
+    <!-- Body -->
+    <div class="drawer-body" *ngIf="selectedCedant">
+
+      <!-- Profil résumé centré -->
+      <div class="debtor-profile centered">
+        <div class="debtor-avatar">
+          {{ selectedCedant.creditorName[0] }}{{ selectedCedant.creditorName.split(' ')[1]?.[0] || '' }}
+        </div>
+        <div class="debtor-info">
+          <h2 class="debtor-name">
+            {{ selectedCedant.creditorName }}
+          </h2>
+          <p class="debtor-role">Cédant</p>
+        </div>
+      </div>
+
+      <!-- Informations personnelles -->
+      <div class="details-section">
+        <h4>Informations personnelles</h4>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-label">Nom complet</span>
+            <span class="detail-value">{{ selectedCedant.creditorName }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Nom d'utilisateur</span>
+            <span class="detail-value">{{ selectedCedant.username }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Adresse e-mail</span>
+            <span class="detail-value">{{ selectedCedant.email }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Téléphone</span>
+            <span class="detail-value">{{ selectedCedant.phone }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Statut</span>
+            <span class="detail-value">
+              <span class="status-badge" [ngClass]="statusClass(selectedCedant.status)">
+                {{ selectedCedant.status }}
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informations du compte Strapi -->
+      <div class="details-section">
+        <h4>Informations du compte</h4>
+
+        <ng-container *ngIf="selectedUser; else noStrapiUser">
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Nom d'utilisateur</span>
+              <span class="detail-value">{{ selectedUser.username }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Adresse e-mail</span>
+              <span class="detail-value">{{ selectedUser.email }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Rôle</span>
+              <span class="detail-value">{{ selectedUser.role }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Statut</span>
+              <span class="detail-value">{{ selectedUser.blocked ? 'Bloqué' : 'Actif' }}</span>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Aucun compte -->
+        <ng-template #noStrapiUser>
+          <p class="no-account">Aucun compte utilisateur.</p>
+          <app-user-create
+            *ngIf="selectedCedant"
+            [prefillData]="{
+              email: selectedCedant.email,
+              firstName: selectedCedant.creditorName.split(' ')[0],
+              lastName: selectedCedant.creditorName.split(' ')[1] || '',
+              nodeId: selectedCedant.id
+            }"
+            (userCreated)="onUserCreated($event)">
+          </app-user-create>
+        </ng-template>
+
+        <button class="btn btn-primary" *ngIf="selectedUser">Reset Password</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 

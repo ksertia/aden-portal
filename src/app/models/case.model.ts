@@ -307,6 +307,7 @@ export interface CessionContract {
 
 // pour les creanciers
 export interface CreditorDetail {
+  id?: string;   
   dateCreation: string;
   createurUsername: string;
   typeObjet: string;
@@ -361,6 +362,7 @@ export interface ApiCreditorResponse {
 }
 // pour HUISSIER
 export interface HuissierInfo {
+  id?: string;   
   conventionne: boolean;
   dateCreation: string;
   numeroInscription: string;
@@ -426,6 +428,7 @@ export interface ApiHuissierResponse {
 
 // Pour les Partenaire
 export interface PartenaireInfo {
+  id?: string;   
   dateCreation: string;
   createurUsername: string;
   assuranceRC: boolean;
@@ -502,6 +505,7 @@ export interface ApiPartenaireResponse {
 
 // Pour les Avocats
 export interface AvocatInfo {
+  id?: string;   
   dateCreation: string;
   numeroInscription: string;
   createurUsername: string;

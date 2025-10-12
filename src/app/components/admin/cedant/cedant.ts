@@ -5,12 +5,13 @@ import { ActivatedRoute, Router, RouterModule} from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
+import { AdminService } from '../../../services/admin.service';
 import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case.model';
-
+import { UserCreateComponent } from '../user-create/user-create.component';
 
 @Component({
   selector: 'app-cedant',
-  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule],
+  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule, UserCreateComponent],
   templateUrl: './cedant.html',
   styleUrl: './cedant.css'
 })
@@ -19,12 +20,12 @@ export class Cedant implements OnInit {
   cases: DebtCase[] = [];
   filteredCases: DebtCase[] = [];
   statistics: any = null;
-  currentView: 'grid' | 'table' = 'table';
+  currentView: 'grid' | 'table' = 'grid';
 
-  
-  // 👉 Drawer
-  isDrawerOpen: boolean = false;
-  selectedCedant: DebtCase | null = null;
+  // État du tiroir
+  showDrawer = false;
+  selectedCedant: any | null = null;
+  selectedUser: any | null = null; // données Strapi User
   
   filters: CaseFilter = {};
   selectedStatus = '';
@@ -37,7 +38,8 @@ export class Cedant implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private caseService: CaseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit() {
@@ -133,7 +135,6 @@ export class Cedant implements OnInit {
       phone: '+91 123 456 7891',
       status: 'Inactif'
     },
-    
     {
       creditorName: 'Huissier Oliver',
       username: 'Computer Science',
@@ -172,18 +173,31 @@ export class Cedant implements OnInit {
       : 'badge badge-danger light border-0';
   }
 
-  // 👉 Gestion du drawer
-  openDrawer(cedant: DebtCase): void {
+  // --- Gestion du tiroir ---
+  openDrawer(cedant: any) {
     this.selectedCedant = cedant;
-    this.isDrawerOpen = true;
+    this.showDrawer = true;
+
+    // ⚡ On appelle Strapi pour récupérer le user associé au cédant
+    this.adminService.getUserByEmail(cedant.email).subscribe({
+      next: (user) => {
+        this.selectedUser = user;
+      },
+      error: (err) => {
+        console.error("Erreur récupération user:", err);
+        this.selectedUser = null;
+      }
+    });
   }
 
-  closeDrawer(): void {
-    this.isDrawerOpen = false;
+  closeDrawer() {
+    this.showDrawer = false;
     this.selectedCedant = null;
+    this.selectedUser = null;
+  }
+
+  onUserCreated(user: any) {
+    console.log('Utilisateur Strapi créé:', user);
+    this.selectedUser = user;
   }
 }
-
-
-
-

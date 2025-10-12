@@ -7,19 +7,25 @@ import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
 import { DebtCase, PartenaireInfo } from '../../../models/case.model';
 import { AdminService } from '../../../services/admin.service';
+import { UserCreateComponent } from '../user-create/user-create.component';
 
 @Component({
   selector: 'app-partenaire',
-  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule],
+  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule, UserCreateComponent],
   templateUrl: './partenaire.html',
   styleUrl: './partenaire.css'
 })
 export class Partenaire implements OnInit {
 
+  // État du tiroir
+  showDrawer = false;
+  selectedPartenaire: PartenaireInfo | null = null;
+  selectedUser: any | null = null; // données Strapi User
+
   partenaire: PartenaireInfo[] = [];
   filteredPartenaire: PartenaireInfo[] = [];
 
-   // Gestion des filtres
+  // Gestion des filtres
   filters = {
     searchTerm: ''
   };
@@ -46,7 +52,6 @@ export class Partenaire implements OnInit {
   ) {}
 
   ngOnInit() {
-   
     this.loadPartenaire();
   }
 
@@ -107,8 +112,31 @@ export class Partenaire implements OnInit {
       : 'badge badge-danger light border-0';
   }
 
+  // --- Gestion du tiroir ---
+  openDrawer(partenaire: PartenaireInfo) {
+    this.selectedPartenaire = partenaire;
+    this.showDrawer = true;
+
+    // ⚡ On appelle Strapi pour récupérer le user associé au partenaire
+    this.adminService.getUserByEmail(partenaire.emailProfessionnel).subscribe({
+      next: (user) => {
+        this.selectedUser = user;
+      },
+      error: (err) => {
+        console.error("Erreur récupération user:", err);
+        this.selectedUser = null;
+      }
+    });
+  }
+
+  closeDrawer() {
+    this.showDrawer = false;
+    this.selectedPartenaire = null;
+    this.selectedUser = null;
+  }
+
+  onUserCreated(user: any) {
+    console.log('Utilisateur Strapi créé:', user);
+    this.selectedUser = user;
+  }
 }
-
-
-
-

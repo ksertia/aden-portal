@@ -77,29 +77,6 @@
     </div>
   </div>
 
-   <!-- html du tiroir -->
-      <!-- Drawer Profil Créancier -->
-  <div class="drawer-overlay" *ngIf="showDrawer" (click)="closeDrawer()">
-  <div class="drawer-content" (click)="$event.stopPropagation()">
-    <div class="drawer-header">
-      <h2>Détails du créancier</h2>
-      <button class="drawer-close" (click)="closeDrawer()">✕</button>
-    </div>
-
-    <div class="drawer-body" *ngIf="selectedCreditor">
-      <p><strong>Nom complet :</strong> {{ selectedCreditor.contactPrincipal }}</p>
-      <p><strong>Raison Sociale :</strong> {{ selectedCreditor.raisonSociale }}</p>
-      <p><strong>Email :</strong> {{ selectedCreditor.emailProfessionnel }}</p>
-      <p><strong>Téléphone :</strong> {{ selectedCreditor.telephone }}</p>
-      <p><strong>Type :</strong> {{ selectedCreditor.typeCreancier }}</p>
-      <p><strong>Secteur d'activité :</strong> {{ selectedCreditor.secteurActivite }}</p>
-      <p><strong>Chiffre d'affaires :</strong> {{ selectedCreditor.chiffreAffaires | number }}</p>
-    </div>
-  </div>
-</div> 
-
-   <!-- fin du tiroir -->
-
   <!-- Liste des créances -->
   <div class="cases-content fade-in-up">
     <div class="cases-list" *ngIf="filteredCreditors.length > 0; else noCases">
@@ -182,12 +159,12 @@
                <td>{{ item.chiffreAffaires }}</td>
               <td>
                 <div class="table-actions">
-                  <button class="btn btn-primary small" title="Voir le profil">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <circle cx="12" cy="8" r="4"/>
-                      <path d="M6 20c0-4 12-4 12 0"/>
-                    </svg>
-                  </button>
+                   <button class="btn btn-primary small" title="Voir le profil" (click)="openDrawer(item)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M6 20c0-4 12-4 12 0"/>
+      </svg>
+    </button>
                 </div>
               </td>
             </tr>
@@ -196,7 +173,121 @@
       </div>
     </div>
 
+    <!-- Remplace l'ancien drawer par ce nouveau code -->
+
+<!-- Drawer Overlay -->
+<div class="drawer-overlay" *ngIf="showDrawer">
+  <div class="drawer-content" (click)="$event.stopPropagation()">
     
+    <!-- Header -->
+    <div class="drawer-header">
+      <h3>Profil du créancier</h3>
+      <button class="drawer-close" (click)="closeDrawer()">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div class="drawer-body" *ngIf="selectedCreditor">
+
+      <!-- Profil résumé centré -->
+      <div class="debtor-profile centered">
+        <div class="debtor-avatar">
+          {{ selectedCreditor.contactPrincipal[0] }}{{ selectedCreditor.contactPrincipal.split(' ')[1]?.[0] || '' }}
+        </div>
+        <div class="debtor-info">
+          <h2 class="debtor-name">
+            {{ selectedCreditor.contactPrincipal }}
+          </h2>
+          <p class="debtor-role">Créancier</p>
+        </div>
+      </div>
+
+      <!-- Informations de l'entreprise -->
+      <div class="details-section">
+        <h4>Informations de l'entreprise</h4>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-label">Raison sociale</span>
+            <span class="detail-value">{{ selectedCreditor.raisonSociale }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Type de créancier</span>
+            <span class="detail-value">{{ selectedCreditor.typeCreancier }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Secteur d'activité</span>
+            <span class="detail-value">{{ selectedCreditor.secteurActivite }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Chiffre d'affaires</span>
+            <span class="detail-value">{{ selectedCreditor.chiffreAffaires | number:'1.0-0' }} FCFA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact professionnel -->
+      <div class="details-section">
+        <h4>Contact professionnel</h4>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-label">Contact principal</span>
+            <span class="detail-value">{{ selectedCreditor.contactPrincipal }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Email professionnel</span>
+            <span class="detail-value">{{ selectedCreditor.emailProfessionnel }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Téléphone</span>
+            <span class="detail-value">{{ selectedCreditor.telephone }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informations du compte Strapi -->
+      <div class="details-section">
+        <h4>Informations du compte</h4>
+
+        <ng-container *ngIf="selectedUser; else noStrapiUser">
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Nom d'utilisateur</span>
+              <span class="detail-value">{{ selectedUser.username }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Adresse e-mail</span>
+              <span class="detail-value">{{ selectedUser.email }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Rôle</span>
+              <span class="detail-value">{{ selectedUser.role }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Statut</span>
+              <span class="detail-value">{{ selectedUser.blocked ? 'Bloqué' : 'Actif' }}</span>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Aucun compte -->
+        <ng-template #noStrapiUser>
+          <p class="no-account">Aucun compte utilisateur.</p>
+          <app-user-create
+            *ngIf="selectedCreditor"
+            [prefillData]="{
+              email: selectedCreditor.emailProfessionnel,
+              firstName: selectedCreditor.contactPrincipal.split(' ')[0],
+              lastName: selectedCreditor.contactPrincipal.split(' ')[1] || '',
+              nodeId: selectedCreditor.nodeId
+            }"
+            (userCreated)="onUserCreated($event)">
+          </app-user-create>
+        </ng-template>
+
+        <button class="btn btn-primary" *ngIf="selectedUser">Reset Password</button>
+      </div>
+    </div>
+  </div>
+</div>
 
     <ng-template #noCases>
       <div class="no-cases">
