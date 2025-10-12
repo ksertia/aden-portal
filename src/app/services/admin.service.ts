@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { environment } from '../../environment/environment';
+import { catchError } from 'rxjs/operators';
 import { Debiteurs } from '../models/user.model';
 import { map } from 'rxjs/operators';
 import { DebtorInfo } from '../models/case.model';
@@ -96,15 +97,25 @@ export class AdminService {
   // --- intégration Strapi ---
 
   // récupérer un user Strapi par email
-  getUserByEmail(email: string): Observable<any | null> {
-    return this.http
-      .get<any>(`${environment.apiUrl}/users?filters[email][$eq]=${email}`)
-      .pipe(
-        map((res: any) => {
-          // Strapi renvoie un tableau de users
-          return res && res.length > 0 ? res[0] : null;
-        })
-      );
+  getUserByEmail(email: string): Observable<any> {
+    const url = `http://localhost:3000/auth/users/search/${encodeURIComponent(email)}`;
+
+    console.log('🔍 Recherche utilisateur via BFF:', email);
+
+    return this.http.get(url).pipe(
+      map((response: any) => {
+        console.log('✅ Utilisateur trouvé:', response);
+        return response;
+      }),
+      catchError((error) => {
+        if (error.status === 404) {
+          console.log('ℹ️ Aucun utilisateur trouvé pour:', email);
+          return of(null); // Retourne null si l'utilisateur n'existe pas
+        }
+        console.error('❌ Erreur recherche utilisateur:', error);
+        return of(null);
+      })
+    );
   }
 
   // Récupérer la liste des rôles Strapi

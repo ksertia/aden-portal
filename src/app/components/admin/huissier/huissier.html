@@ -267,6 +267,7 @@
               email: selectedHuissier.emailProfessionnel,
               firstName: selectedHuissier.nomHuissier.split(' ')[0],
               lastName: selectedHuissier.nomHuissier.split(' ')[1] || '',
+               userType: 'huissier',
               nodeId: selectedHuissier.nodeId
             }"
             (userCreated)="onUserCreated($event)">
