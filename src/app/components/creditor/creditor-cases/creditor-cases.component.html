@@ -309,7 +309,7 @@
   </div>
 
   <!-- Draver de détails du dossier -->
-  <div class="drawer-overlay" *ngIf="showDrawer" (click)="closeDrawer()">
+  <div class="drawer-overlay" *ngIf="showDrawer">
       <div class="drawer" [class.open]="showDrawer" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h3>Détails du dossier {{ dossiers[selectedIndex!]?.numeroDossier }}</h3>

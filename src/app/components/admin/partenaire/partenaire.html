@@ -258,6 +258,7 @@
               email: selectedPartenaire.emailProfessionnel,
               firstName: selectedPartenaire.contactPrincipal.split(' ')[0],
               lastName: selectedPartenaire.contactPrincipal.split(' ')[1] || '',
+                userType: 'partenaire',
               nodeId: selectedPartenaire.nodeId
             }"
             (userCreated)="onUserCreated($event)">

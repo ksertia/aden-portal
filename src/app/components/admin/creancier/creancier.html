@@ -277,6 +277,7 @@
               email: selectedCreditor.emailProfessionnel,
               firstName: selectedCreditor.contactPrincipal.split(' ')[0],
               lastName: selectedCreditor.contactPrincipal.split(' ')[1] || '',
+              userType: 'creancier',
               nodeId: selectedCreditor.nodeId
             }"
             (userCreated)="onUserCreated($event)">

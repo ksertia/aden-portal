@@ -269,6 +269,7 @@
               email: selectedCedant.email,
               firstName: selectedCedant.creditorName.split(' ')[0],
               lastName: selectedCedant.creditorName.split(' ')[1] || '',
+               userType: 'cedant',
               nodeId: selectedCedant.id
             }"
             (userCreated)="onUserCreated($event)">
