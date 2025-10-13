@@ -156,7 +156,8 @@
             <div class="case-amounts">
               <div class="amount-item">
                 <span class="amount-label">Montant total</span>
-                <span class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</span>
+                <span class="amount-value">{{ formatCurrency(dossier.montantTotal) }}</span>
+                <!-- <span class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</span> -->
               </div>
               <div class="amount-item">
                 <span class="amount-label">Recouvré</span>
@@ -242,7 +243,8 @@
               </td>
               <td>
                 <div class="amount-cell">
-                  <div class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</div>
+                  <div class="amount-value">{{ formatCurrency(dossier.montantTotal) }}</div>
+                  <!-- <div class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</div> -->
                 </div>
               </td>
               <td>

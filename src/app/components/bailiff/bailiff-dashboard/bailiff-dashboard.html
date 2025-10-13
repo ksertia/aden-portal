@@ -86,7 +86,8 @@
             </div>
             <div class="case-amount">
               <span class="label">Montant:</span>
-              <span class="amount">{{ dossier.montantTotal | currency:'EUR' }}</span>
+              <span class="amount">{{ formatCurrency(dossier.montantTotal) }}</span>
+              <!-- <span class="amount">{{ dossier.montantTotal | currency:'EUR' }}</span> -->
             </div>
             <div class="case-progress">
               <div class="progress-bar">

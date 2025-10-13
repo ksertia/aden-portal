@@ -196,7 +196,7 @@
 }
 
 .total-amount {
-  font-weight: 600;
+  font-weight: bold;
   color: var(--text);
   font-size: 14px;
 }
@@ -204,6 +204,7 @@
 .recovered-amount {
   font-size: 12px;
   color: var(--success);
+  font-weight: bold;
 }
 
 .priority-badge {
@@ -218,6 +219,13 @@
 .priority-medium { background: #fef3c7; color: #92400e; }
 .priority-high { background: #fee2e2; color: #991b1b; }
 .priority-urgent { background: #fdf2f8; color: #be185d; }
+
+.faible { background: #f0f9ff; color: #0369a1; }
+.moyenne { background: #fef3c7; color: #92400e; }
+.elevee { background: #fee2e2; color: #991b1b; }
+.urgente { background: #fdf2f8; color: #be185d; }
+.normale  { background: #dbeafe; color: #1d4ed8; }
+
 
 .action-buttons {
   display: flex;
@@ -402,4 +410,187 @@
   .action-buttons {
     flex-direction: column;
   }
+}
+
+
+.list-header {
+  display: flex;
+  justify-content: flex-end;
+  /* justify-content: space-between; */
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.list-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+.amount-cell.remaining {
+  color: var(--warning);
+  font-weight: bold;
+  font-size: 12px;
+}
+
+
+
+.cases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.case-card {
+  background: var(--surface);
+  /* border-radius: 12px; */
+  padding: 24px;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  transition: all 0.2s ease;
+}
+
+.case-card:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.case-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.case-info h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.debtor-name {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.case-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.priority-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.case-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.amount-item {
+  text-align: center;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.amount-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.amount-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.amount-value.recovered {
+  color: var(--success);
+}
+
+.amount-value.remaining {
+  color: var(--warning);
+}
+
+.case-progress {
+  margin-bottom: 16px;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.progress-percentage {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.progress-bar {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--success);
+  transition: width 0.3s ease;
+}
+
+.case-meta {
+  display: flex;
+  /* display: grid; */
+  /* grid-template-columns: 1fr 1fr; */
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.meta-value {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.case-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn.small {
+  padding: 6px 12px;
+  font-size: 12px;
 }

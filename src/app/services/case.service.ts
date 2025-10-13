@@ -1187,6 +1187,11 @@ getDossiersHuissier(siteName: string, huissierNodeId: string): Observable<any> {
     params: { huissierNodeId } // 👈 Ajout du paramètre de requête
   });
 }
+getDossiersAvocat(siteName: string, avocatNodeId: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
+    params: { avocatNodeId } // 👈 Ajout du paramètre de requête
+  });
+}
 
 
   getCases(): Observable<DebtCase[]> {

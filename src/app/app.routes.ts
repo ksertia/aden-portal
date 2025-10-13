@@ -95,6 +95,10 @@ export const routes: Routes = [
           {
             path: 'consultations',
             loadComponent: () => import('./components/lawyer/lawyer-consultations/lawyer-consultations.component').then(c => c.LawyerConsultationsComponent)
+          },
+          {
+            path: 'dashboard',
+            loadComponent: () => import('./components/lawyer/lawyer-dashboard/lawyer-dashboard').then(c => c.LawyerDashboard)
           }
         ]
       },

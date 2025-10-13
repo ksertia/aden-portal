@@ -46,6 +46,7 @@
             <option value="negotiation">Négociation</option>
             <option value="legal_action">Action légale</option>
             <option value="completed">Terminé</option>
+            <option value="NOUVEAU">Nouveau</option>
           </select>
         </div>
         
@@ -71,7 +72,7 @@
   </div>
 
   <!-- Statistiques -->
-  <div class="stats-section fade-in-up" *ngIf="statistics">
+  <div class="stats-section fade-in-up" *ngIf="dossiers">
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon primary">
@@ -81,7 +82,7 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-value">{{  filteredDossiers.length }}</div>
           <div class="stat-label">Dossiers juridiques</div>
         </div>
       </div>
@@ -116,77 +117,153 @@
 
   <!-- Liste des dossiers -->
   <div class="cases-content fade-in-up">
-    <div class="cases-table" *ngIf="filteredCases.length > 0; else noCases">
-      <div class="table-container">
-        <table class="cases-table-view">
-          <thead>
-            <tr>
-              <th>Dossier</th>
-              <th>Créancier</th>
-              <th>Débiteur</th>
-              <th>Montant</th>
-              <th>Statut</th>
-              <th>Priorité</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let case of filteredCases" class="case-row">
-              <td>
-                <div class="case-cell">
-                  <div class="case-number">{{ case.caseNumber }}</div>
-                  <div class="case-date">{{ formatDate(case.createdAt) }}</div>
-                </div>
-              </td>
-              <td>
-                <div class="creditor-cell">
-                  <div class="creditor-name">{{ case.creditor.name }}</div>
-                  <div class="creditor-contact">{{ case.creditor.contactPerson }}</div>
-                </div>
-              </td>
-              <td>
-                <div class="debtor-cell">
-                  <div class="debtor-name">{{ case.debtor.firstName }} {{ case.debtor.lastName }}</div>
-                  <div class="debtor-type">{{ case.debtor.type === 'company' ? 'Entreprise' : 'Particulier' }}</div>
-                </div>
-              </td>
-              <td>
-                <div class="amount-cell">
-                  <div class="total-amount">{{ formatCurrency(case.amount) }}</div>
-                  <div class="recovered-amount">{{ formatCurrency(case.amountPaid) }} recouvré</div>
-                </div>
-              </td>
-              <td>
-                <span class="status-badge" [ngClass]="'status-' + case.status">
-                  {{ getStatusLabel(case.status) }}
-                </span>
-              </td>
-              <td>
-                <span class="priority-badge" [ngClass]="'priority-' + case.priority">
-                  {{ getPriorityLabel(case.priority) }}
-                </span>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn btn-primary small" (click)="reviewCase(case)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                      <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                    Réviser
-                  </button>
-                  <button class="btn btn-secondary small" (click)="addLegalNote(case)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                    </svg>
-                    Note
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="cases-list" *ngIf="dossiers.length > 0; else noCases">
+      <div class="list-header">
+        <app-view-toggle 
+          [currentView]="currentView" 
+          (viewChange)="currentView = $event">
+        </app-view-toggle>
+     </div>
+
+      <!-- Vue grille -->
+      <div class="cases-grid" *ngIf="currentView === 'grid'">
+        <div class="case-card" *ngFor="let dossier of filteredDossiers; let i = index">
+          <div class="case-header">
+            <div class="case-info">
+              <h3>{{ dossier.numeroDossier }}</h3>
+              <p class="debtor-name">{{ dossier.objet }}</p>
+            </div>
+            <div class="case-badges">
+              <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
+                {{ getStatusLabel(dossier.statutGlobal) }}
+              </span>
+              <span class="priority-badge" [ngClass]="getPriorityClass(dossier.priorite)">
+                {{ getPriorityClass(dossier.priorite) }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="case-body">
+            <div class="case-amounts">
+              <div class="amount-item">
+                <span class="amount-label">Montant total</span>
+                <span class="amount-value">{{ formatCurrency(dossier.montantTotal) }}</span>
+              </div>
+              <div class="amount-item">
+                <span class="amount-label">Déjà payé</span>
+                <span class="amount-value recovered">{{ formatCurrency(getTotalPaid()) }}</span>
+              </div>
+              <div class="amount-item">
+                <span class="amount-label">Reste à payer</span>
+                <span class="amount-value remaining">{{ getFormattedRemainingAmount(dossier) }}</span>
+              </div>
+            </div>
+            
+            <div class="case-progress">
+              <div class="progress-info">
+                <span class="progress-label">Progression</span>
+                <span class="progress-percentage">{{ getPaymentPercentage(dossier) }}% payé</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill"[style.width.%]="getPaymentPercentage(dossier)"></div>
+              </div>
+            </div>
+            
+            <div class="case-meta">
+              <div class="meta-item">
+                <span class="meta-label">Créancier:</span>
+                <span class="meta-value">{{ getCreancierForDossier(dossier)?.contactPrincipal }} </span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Débiteur :</span>
+                <span class="meta-value">{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Créé le :</span>
+                <span class="meta-value">{{ dossier.dateCreation }}</span>
+              </div>
+            </div>
+            
+            <div class="case-actions">
+              <button class="btn btn-primary small" (click)="reviewCase(dossier)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Réviser
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- vue table -->
+      <div class="cases-table" *ngIf="currentView === 'table'">
+        <div class="table-container">
+          <table class="cases-table-view">
+            <thead>
+              <tr>
+                <th>Dossier</th>
+                <th>Créancier</th>
+                <th>Débiteur</th>
+                <th>Montant</th>
+                <th>Statut</th>
+                <th>Priorité</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let dossier of filteredDossiers; let i = index" class="case-row">
+                <td>
+                  <div class="case-cell">
+                    <div class="case-number">{{ dossier.numeroDossier }}</div>
+                    <div class="case-date">{{ dossier.dateCreation }}</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="creditor-cell">
+                    <div class="creditor-name">{{ getCreancierForDossier(dossier)?.contactPrincipal }}</div>
+                    <div class="creditor-contact">{{ getCreancierForDossier(dossier)?.raisonSociale }}</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="debtor-cell">
+                    <div class="debtor-name">{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</div>
+                    <div class="debtor-type">{{ dossier.typeCreance }}</div>
+                  </div>
+                </td>
+                <td>
+                  <div class="amount-cell">
+                    <div class="total-amount">{{ formatCurrency(dossier.montantTotal) }}</div>
+                    <div class="recovered-amount">{{ formatCurrency(getTotalPaid()) }} recouvré</div>
+                    <div class="amount-cell remaining">{{ getFormattedRemainingAmount(dossier) }}</div>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
+                    {{ getStatusLabel(dossier.statutGlobal) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="priority-badge" [ngClass]="getPriorityClass(dossier.priorite)">
+                    {{ getPriorityClass(dossier.priorite) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-primary small" (click)="reviewCase(dossier)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                      Réviser
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -201,4 +278,109 @@
       </div>
     </ng-template>
   </div>
+
+
+
+
+   <!-- Modal révision de dossier -->
+      <div class="modal-overlay" *ngIf="showReviewModal" (click)="closeReviewModal()">
+        <div class="modal-content large" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>Révision juridique - {{ selectedCase?.caseNumber }}</h3>
+            <button class="modal-close" (click)="closeReviewModal()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body" *ngIf="selectedCase">
+            <div class="review-form">
+              <div class="form-section">
+                <h4>Évaluation juridique</h4>
+                <div class="form-group">
+                  <label>Recommandation</label>
+                  <select [(ngModel)]="legalReview.recommendation">
+                    <option value="continue">Poursuivre le recouvrement amiable</option>
+                    <option value="legal_action">Engager une action en justice</option>
+                    <option value="negotiation">Négocier un arrangement</option>
+                    <option value="close">Clôturer le dossier</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label>Analyse juridique</label>
+                  <textarea
+                    [(ngModel)]="legalReview.analysis"
+                    rows="4"
+                    placeholder="Analysez la situation juridique du dossier..."
+                  ></textarea>
+                </div>
+                
+                <div class="form-group">
+                  <label>Prochaines étapes</label>
+                  <textarea
+                    [(ngModel)]="legalReview.nextSteps"
+                    rows="3"
+                    placeholder="Décrivez les prochaines actions à entreprendre..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeReviewModal()">Annuler</button>
+            <button class="btn btn-primary" (click)="saveLegalReview()">Enregistrer la révision</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal ajout de note juridique -->
+      <div class="modal-overlay" *ngIf="showNoteModal" (click)="closeNoteModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>Ajouter une note juridique</h3>
+            <button class="modal-close" (click)="closeNoteModal()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="note-form">
+              <div class="form-group">
+                <label>Type d'intervention</label>
+                <select [(ngModel)]="newNote.type">
+                  <option value="legal">Analyse juridique</option>
+                  <option value="call">Consultation téléphonique</option>
+                  <option value="meeting">Rendez-vous client</option>
+                  <option value="correspondence">Correspondance</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label>Contenu de la note</label>
+                <textarea
+                  [(ngModel)]="newNote.content"
+                  rows="5"
+                  placeholder="Décrivez votre intervention ou analyse..."
+                ></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" [(ngModel)]="newNote.isPrivate">
+                  <span class="checkmark"></span>
+                  Note confidentielle (visible uniquement par les avocats)
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeNoteModal()">Annuler</button>
+            <button class="btn btn-primary" (click)="saveNote()">Ajouter la note</button>
+          </div>
+        </div>
+      </div>
 </div>
