@@ -282,9 +282,9 @@
 
 
 
-   <!-- Modal révision de dossier -->
-      <div class="modal-overlay" *ngIf="showReviewModal" (click)="closeReviewModal()">
-        <div class="modal-content large" (click)="$event.stopPropagation()">
+   <!-- Tiroir révision de dossier -->
+      <div class="drawer-overlay-reviser" *ngIf="showReviewModal">
+        <div class="drawer-reviser" [class.open]="showReviewModal" (click)="$event.stopPropagation()">
           <div class="modal-header">
             <h3>Révision juridique - {{ selectedCase?.caseNumber }}</h3>
             <button class="modal-close" (click)="closeReviewModal()">

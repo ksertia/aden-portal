@@ -594,3 +594,33 @@
   padding: 6px 12px;
   font-size: 12px;
 }
+
+/*  Tiroir réviser avocat start */
+.drawer-reviser {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 50%; /* Largeur du tiroir */
+  height: 100%;
+  background-color: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  transform: translateX(100%); /* Tiroir caché à droite */
+}
+
+.drawer-reviser.open {
+  transform: translateX(0); /* Ouvre le tiroir */
+}
+
+/* Overlay pour le fond quand le tiroir est ouvert */
+.drawer-overlay-reviser {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background: rgba(0, 0, 0, 0.5); */
+  z-index: 999;
+}
+/* Tiroir réviser avocat end */
