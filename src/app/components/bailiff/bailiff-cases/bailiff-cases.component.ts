@@ -121,7 +121,9 @@ export class BailiffCasesComponent implements OnInit {
 
   // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
   getDebiteurForDossier(dossier: any): DebtorInfo | undefined {
-      return this.debiteurs.find(d => d.nodeId === dossier.debiteurNodeId);
+    const debiteurNodeId = dossier.debiteurNodeId?.trim(); // <-- on supprime les espaces
+    return this.debiteurs.find(d => String(d.nodeId).trim() === String(debiteurNodeId));
+    // return this.debiteurs.find(d => d.nodeId === dossier.debiteurNodeId);
   }
 
   // Réinitialiser tous les filtres

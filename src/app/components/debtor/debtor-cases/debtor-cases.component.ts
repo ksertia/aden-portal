@@ -128,7 +128,7 @@ export class DebtorCasesComponent implements OnInit {
     this.i18nService.currentLocale$.subscribe(() => {
     this.loadTranslations();
     // Ajout
-    this.loadData();
+    // this.loadData();
     });
 
 
@@ -163,6 +163,10 @@ export class DebtorCasesComponent implements OnInit {
         console.log('Réponse API dossiers :', response);
         this.dossiers = response.data?.map((item: any) => item.map) || [];
         this.filteredDossiers = [...this.dossiers];
+
+      // IMPORTANT: Extraire les documents après avoir chargé les dossiers
+      this.extractDocuments();
+
         this.isLoading = false;
       },
       error: (error) => {
@@ -249,10 +253,6 @@ export class DebtorCasesComponent implements OnInit {
   }
    downloadCaseReport(case_: DebtCase) {
     console.log('Télécharger rapport pour:', case_.caseNumber);
-  }
-
-  downloadDocument(doc: any) {
-    console.log('Télécharger document:', doc.name);
   }
 
   // Réinitialiser tous les filtres
@@ -346,7 +346,7 @@ export class DebtorCasesComponent implements OnInit {
     const labels: { [key: string]: string } = {
       [ActivityType.REMINDER_SENT]: 'Relance',
       [ActivityType.FORMAL_NOTICE_SENT]: 'Mise en demeure',
-      [ActivityType.CORRESPONDENCE_SENT]: 'Correspondance'
+      [ActivityType.CORRESPONDENCE_SENT]: 'Correspondant'
     };
     return labels[type] || 'Communication';
   }
@@ -627,106 +627,146 @@ getPenaltiesDetail(dossier: any): PenaltyDetail[] {
   return details;
 }
 
-// Formater la date
-formatDateShort(dateStr: string): string {
-  if (!dateStr) return '';
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
-  });
-}
-
-// Ouvrir le tiroir des relances
-openReminderHistory(dossier: any): void {
-  this.reminderHistory = this.getReminderHistoryForDossier(dossier);
-  this.showReminderHistoryModal = true;
-}
-
-// Fermer le tiroir des relances
-closeReminderHistory(): void {
-  this.showReminderHistoryModal = false;
-  this.reminderHistory = [];
-}
-
-// Récupérer l'historique des relances pour un dossier
-getReminderHistoryForDossier(dossier: any): ReminderHistory[] {
-  // Si ton backend envoie un historique
-  if (dossier.historiqueRelances && Array.isArray(dossier.historiqueRelances)) {
-    return dossier.historiqueRelances;
-  }
-  
-  // Sinon, créer un historique par défaut basé sur les données disponibles
-  const history: ReminderHistory[] = [];
-  
-  // Exemple : créer des relances basées sur la phase du dossier
-  if (dossier.phaseCode === 'MISE_EN_DEMEURE') {
-    history.push({
-      type: 'Mise en demeure',
-      description: 'Mise en demeure formelle envoyée au débiteur',
-      date: dossier.dateCreation,
-      status: 'Envoyée',
-      sentBy: 'Système'
+  // Formater la date
+  formatDateShort(dateStr: string): string {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
     });
   }
-  
-  if (dossier.commentaires) {
-    history.push({
-      type: 'Relance',
-      description: dossier.commentaires,
-      date: dossier.dateCreation,
-      status: 'Envoyée',
-      sentBy: dossier.createurUsername || 'Admin'
-    });
-  }
-  
-  // Si pas d'historique
-  if (history.length === 0) {
-    history.push({
-      type: 'Information',
-      description: 'Aucune relance enregistrée pour le moment',
-      date: dossier.dateCreation,
-      status: 'N/A'
-    });
-  }
-  
-  return history;
-}
 
-// Obtenir l'icône selon le type de relance
-getReminderIcon(type: string): string {
-  const icons: { [key: string]: string } = {
-    'Relance': 'email',
-    'Mise en demeure': 'legal',
-    'Appel téléphonique': 'phone',
-    'Courrier': 'mail',
-    'Information': 'info'
-  };
-  return icons[type] || 'email';
-}
+  // Ouvrir le tiroir des relances
+  openReminderHistory(dossier: any): void {
+    this.reminderHistory = this.getReminderHistoryForDossier(dossier);
+    this.showReminderHistoryModal = true;
+  }
+
+  // Fermer le tiroir des relances
+  closeReminderHistory(): void {
+    this.showReminderHistoryModal = false;
+    this.reminderHistory = [];
+  }
+
+  // Récupérer l'historique des relances pour un dossier
+  getReminderHistoryForDossier(dossier: any): ReminderHistory[] {
+    // Si ton backend envoie un historique
+    if (dossier.historiqueRelances && Array.isArray(dossier.historiqueRelances)) {
+      return dossier.historiqueRelances;
+    }
+    
+    // Sinon, créer un historique par défaut basé sur les données disponibles
+    const history: ReminderHistory[] = [];
+    
+    // Exemple : créer des relances basées sur la phase du dossier
+    if (dossier.phaseCode === 'MISE_EN_DEMEURE') {
+      history.push({
+        type: 'Mise en demeure',
+        description: 'Mise en demeure formelle envoyée au débiteur',
+        date: dossier.dateCreation,
+        status: 'Envoyée',
+        sentBy: 'Système'
+      });
+    }
+    
+    if (dossier.commentaires) {
+      history.push({
+        type: 'Relance',
+        description: dossier.commentaires,
+        date: dossier.dateCreation,
+        status: 'Envoyée',
+        sentBy: dossier.createurUsername || 'Admin'
+      });
+    }
+    
+    // Si pas d'historique
+    if (history.length === 0) {
+      history.push({
+        type: 'Information',
+        description: 'Aucune relance enregistrée pour le moment',
+        date: dossier.dateCreation,
+        status: 'N/A'
+      });
+    }
+    
+    return history;
+  }
+
+  // Obtenir l'icône selon le type de relance
+  getReminderIcon(type: string): string {
+    const icons: { [key: string]: string } = {
+      'Relance': 'email',
+      'Mise en demeure': 'legal',
+      'Appel téléphonique': 'phone',
+      'Courrier': 'mail',
+      'Information': 'info'
+    };
+    return icons[type] || 'email';
+  }
 
 
   // Ajout methode start
-  loadData() {
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
-
-    this.caseService.getCasesByUserId(currentUser.id, currentUser.role.name)
-      .subscribe(cases => {
-        this.cases = cases;
-        this.extractDocuments();
-      });
-  }
-
   extractDocuments() {
     this.allDocuments = [];
-    this.cases.forEach(case_ => {
-      case_.documents.forEach(doc => {
-        this.allDocuments.push({ ...doc, caseId: case_.id });
-      });
+    
+    console.log('Début extraction des documents...');
+    
+    // Parcourir tous les dossiers pour extraire leurs documents
+    this.dossiers.forEach(dossier => {
+      console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsDebiteur?.myArrayList);
+      
+      // Vérifier si le dossier a des documents débiteur
+      if (dossier.documentsDebiteur?.myArrayList && Array.isArray(dossier.documentsDebiteur.myArrayList)) {
+        dossier.documentsDebiteur.myArrayList.forEach((doc: any) => {
+          console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
+          
+          const mappedType = this.mapDocumentType(doc.typeDocument);
+          console.log('Type mappé:', mappedType);
+          
+          this.allDocuments.push({
+            id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
+            name: doc.fileName || doc.name || 'Document sans nom',
+            type: mappedType,
+            url: doc.url || doc.downloadUrl || '#',
+            uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
+            uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+            caseId: dossier.nodeId
+          });
+        });
+      }
     });
+    
     this.filteredDocuments = [...this.allDocuments];
+    console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
+  }
+
+  mapDocumentType(apiType: string): DocumentType {
+    console.log('Mapping du type:', apiType);
+    
+    // Normaliser le type (enlever espaces, mettre en majuscules)
+    const normalizedType = (apiType || '').trim().toUpperCase();
+    
+    const typeMapping: { [key: string]: DocumentType } = {
+      'FACTURE': DocumentType.INVOICE,
+      'INVOICE': DocumentType.INVOICE,
+      'CONTRAT': DocumentType.CONTRACT,
+      'CONTRACT': DocumentType.CONTRACT,
+      'CORRESPONDANCE': DocumentType.CORRESPONDENCE,
+      'CORRESPONDENCE': DocumentType.CORRESPONDENCE,
+      'MISE_EN_DEMEURE': DocumentType.LEGAL_NOTICE,
+      'LEGAL_NOTICE': DocumentType.LEGAL_NOTICE,
+      'PREUVE_PAIEMENT': DocumentType.PAYMENT_PROOF,
+      'PAYMENT_PROOF': DocumentType.PAYMENT_PROOF,
+      'DOCUMENT_JUDICIAIRE': DocumentType.COURT_DOCUMENT,
+      'COURT_DOCUMENT': DocumentType.COURT_DOCUMENT
+    };
+    
+    const result = typeMapping[normalizedType] || DocumentType.CORRESPONDENCE;
+    console.log('Résultat du mapping:', normalizedType, '->', result);
+    
+    return result;
   }
 
   filterDocuments() {
@@ -744,86 +784,66 @@ getReminderIcon(type: string): string {
 
   getLegalDocumentsCount(): number {
     return this.allDocuments.filter(doc => 
-      doc.type === 'legal_notice' || doc.type === 'court_document'
+      doc.type === DocumentType.LEGAL_NOTICE || 
+      doc.type === DocumentType.COURT_DOCUMENT
     ).length;
   }
 
   getPaymentProofsCount(): number {
-    return this.allDocuments.filter(doc => doc.type === 'payment_proof').length;
+    return this.allDocuments.filter(doc => 
+      doc.type === DocumentType.PAYMENT_PROOF
+    ).length;
   }
 
+
+  // Modifiez la méthode getCaseNumber pour utiliser nodeId
   getCaseNumber(caseId: string): string {
-    const case_ = this.cases.find(c => c.id === caseId);
-    return case_?.caseNumber || 'N/A';
+    const dossier = this.dossiers.find(d => d.nodeId === caseId);
+    return dossier?.numeroDossier || 'N/A';
   }
 
   getDocumentTypeLabel(type: string): string {
-    const labels: { [key: string]: string } = {
-      'invoice': 'Facture',
-      'contract': 'Contrat',
-      'correspondence': 'Correspondance',
-      'legal_notice': 'Mise en demeure',
-      'payment_proof': 'Preuve de paiement',
-      'court_document': 'Document judiciaire'
-    };
-    return labels[type] || type;
-  }
+  const labels: { [key: string]: string } = {
+    [DocumentType.INVOICE]: 'Facture',
+    [DocumentType.CONTRACT]: 'Contrat',
+    [DocumentType.CORRESPONDENCE]: 'Rapport',
+    [DocumentType.LEGAL_NOTICE]: 'Mise en demeure',
+    [DocumentType.PAYMENT_PROOF]: 'Preuve de paiement',
+    [DocumentType.COURT_DOCUMENT]: 'Document judiciaire'
+  };
+  return labels[type] || type;
+}
 
-  // formatDate(date: Date): string {
-  //   return new Date(date).toLocaleDateString('fr-FR', {
-  //     year: 'numeric',
-  //     month: 'long',
-  //     day: 'numeric'
-  //   });
-  // }
-
-  // onFileSelected(event: any) {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     this.selectedFile = file;
-  //     if (!this.newDocument.name) {
-  //       this.newDocument.name = file.name;
-  //     }
-  //   }
-  // }
 
   isUploadValid(): boolean {
     return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
   }
 
   uploadDocument() {
-    if (!this.isUploadValid()) return;
+  if (!this.isUploadValid()) return;
 
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
+  const currentUser = this.authService.getCurrentUser();
+  if (!currentUser) return;
 
-    // Simulation de l'upload
-    const newDoc: CaseDocument & { caseId: string } = {
-      id: Date.now().toString(),
-      name: this.newDocument.name,
-      type: this.newDocument.type as DocumentType,
-      url: '#',
-      uploadedAt: new Date(),
-      uploadedBy: `${currentUser.firstname} ${currentUser.lastname}`,
-      caseId: this.newDocument.caseId
-    };
+  // Utiliser le dossier sélectionné comme caseId
+  const caseId = this.selectedDetailCase?.nodeId || this.newDocument.caseId;
 
-    this.allDocuments.unshift(newDoc);
-    this.filterDocuments();
-    this.closeUploadModal();
+  const newDoc: CaseDocument & { caseId: string } = {
+    id: Date.now().toString(),
+    name: this.newDocument.name,
+    type: this.newDocument.type as DocumentType,
+    url: '#', // À remplacer par l'URL réelle après upload sur le serveur
+    uploadedAt: new Date(),
+    uploadedBy: `${currentUser.firstname} ${currentUser.lastname}`,
+    caseId: caseId
+  };
 
-    console.log('Document ajouté:', newDoc);
-  }
+  this.allDocuments.unshift(newDoc);
+  this.openDocumentsModal(); // Rafraîchir la liste filtrée
+  this.closeUploadModal();
 
-  viewDocument(doc: CaseDocument) {
-    console.log('Visualisation du document:', doc.name);
-    // TODO: Implémenter la visualisation
-  }
-
-  // downloadDocument(doc: CaseDocument) {
-  //   console.log('Téléchargement du document:', doc.name);
-  //   // TODO: Implémenter le téléchargement
-  // }
+  console.log('Document ajouté:', newDoc);
+}
 
   deleteDocument(doc: CaseDocument) {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
@@ -842,10 +862,6 @@ getReminderIcon(type: string): string {
       name: ''
     };
   }
-  // Fonction pour ouvrir la modal des documents
-  openDocumentsModal() {
-    this.showDocumentsModal = true;
-  }
 
   // Fonction pour fermer la modal des documents
   closeDocumentsModal() {
@@ -854,5 +870,44 @@ getReminderIcon(type: string): string {
 
 
   // Ajout methode end
+  // Méthode pour filtrer les documents du dossier sélectionné
+  openDocumentsModal() {
+    if (this.selectedDetailCase) {
+      // Filtrer uniquement les documents du dossier sélectionné
+      this.filteredDocuments = this.allDocuments.filter(
+        doc => doc.caseId === this.selectedDetailCase.nodeId
+      );
+    } else {
+      // Afficher tous les documents
+      this.filteredDocuments = [...this.allDocuments];
+    }
+    this.showDocumentsModal = true;
+  }
+
+  // Compter les documents d'un dossier
+  getDocumentsCount(dossier: any): number {
+    if (!dossier) return 0;
+    return dossier.documentsDebiteur?.myArrayList?.length || 0;
+  }
+
+  // Méthode pour télécharger un document
+  downloadDocument(doc: any) {
+    if (doc.url && doc.url !== '#') {
+      window.open(doc.url, '_blank');
+    } else {
+      console.log('URL de téléchargement non disponible pour:', doc.name);
+      alert('Le document n\'est pas disponible au téléchargement');
+    }
+  }
+
+  // Méthode pour visualiser un document
+  viewDocument(doc: any) {
+    if (doc.url && doc.url !== '#') {
+      window.open(doc.url, '_blank');
+    } else {
+      console.log('URL non disponible pour:', doc.name);
+      alert('Impossible de visualiser ce document');
+    }
+  }
 
 }

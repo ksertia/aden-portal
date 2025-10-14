@@ -31,6 +31,8 @@ export class CreditorCasesComponent implements OnInit {
 
   currentView: 'grid' | 'table' = 'table';
 
+  selectedDetailCase: any;
+
   // --- Filtres ---
   filters = {
     searchTerm: '',
@@ -77,13 +79,6 @@ export class CreditorCasesComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    
-    // Vérifier si on doit ouvrir un dossier spécifique depuis les notifications
-    // this.route.queryParams.subscribe(params => {
-    //   if (params['caseId']) {
-    //     this.openCaseFromNotification(params['caseId']);
-    //   }
-    // });
 
     this.loadDossiers();
   }
@@ -128,6 +123,9 @@ export class CreditorCasesComponent implements OnInit {
         this.filteredDossiers = [...this.dossiers];
         console.log('Dossiers filtrés pour ce créancier :', this.dossiers);
 
+        // IMPORTANT: Extraire les documents après avoir chargé les dossiers
+        this.extractDocuments();
+
         this.isLoading = false;
       },
       error: (error) => {
@@ -149,7 +147,9 @@ export class CreditorCasesComponent implements OnInit {
 
   // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
   getDebiteurForDossier(dossier: any): DebtorInfo | undefined {
-      return this.debiteurs.find(d => d.nodeId === dossier.debiteurNodeId);
+    const debiteurNodeId = dossier.debiteurNodeId?.trim(); // <-- on supprime les espaces
+    return this.debiteurs.find(d => String(d.nodeId).trim() === String(debiteurNodeId));
+    // return this.debiteurs.find(d => d.nodeId === dossier.debiteurNodeId);
   }
 
   // Réinitialiser tous les filtres
@@ -258,13 +258,26 @@ export class CreditorCasesComponent implements OnInit {
     return labels[priority] || priority;
   }
 
+  // viewCaseDetails(index: number): void {
+  //   this.selectedIndex = index;
+  //   const dossier = this.filteredDossiers[index];
+  //   this.selectedDebtor = this.getDebiteurForDossier(dossier);
+  //   console.log("selectedDebtor", this.selectedDebtor);
+  //   this.showDrawer  = true;
+  // }
   viewCaseDetails(index: number): void {
-    this.selectedIndex = index;
-    const dossier = this.filteredDossiers[index];
-    this.selectedDebtor = this.getDebiteurForDossier(dossier);
-    console.log("selectedDebtor", this.selectedDebtor);
-    this.showDrawer  = true;
-  }
+  this.selectedIndex = index;
+  const dossier = this.filteredDossiers[index];
+  
+  // IMPORTANT: Stocker le dossier sélectionné
+  this.selectedDetailCase = dossier;
+  
+  this.selectedDebtor = this.getDebiteurForDossier(dossier);
+  console.log("selectedDebtor", this.selectedDebtor);
+  console.log("selectedDetailCase", this.selectedDetailCase);
+  
+  this.showDrawer = true;
+}
 
 
   closeDrawer() {
@@ -284,10 +297,10 @@ export class CreditorCasesComponent implements OnInit {
     // TODO: Implémenter le téléchargement de rapport spécifique au dossier
   }
 
-  downloadDocument(doc: any) {
-    console.log('Télécharger document:', doc.name);
-    // TODO: Implémenter le téléchargement de document
-  }
+  // downloadDocument(doc: any) {
+  //   console.log('Télécharger document:', doc.name);
+    
+  // }
 
   generateCustomReport() {
     this.router.navigate(['/professional/reports']);
@@ -310,25 +323,87 @@ export class CreditorCasesComponent implements OnInit {
 
 
     // Ajout methode start
-  loadData() {
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
+  // loadData() {
+  //   const currentUser = this.authService.getCurrentUser();
+  //   if (!currentUser) return;
 
-    this.casesService.getCasesByUserId(currentUser.id, currentUser.role.name)
-      .subscribe(cases => {
-        this.cases = cases;
-        this.extractDocuments();
-      });
-  }
+  //   this.casesService.getCasesByUserId(currentUser.id, currentUser.role.name)
+  //     .subscribe(cases => {
+  //       this.cases = cases;
+  //       this.extractDocuments();
+  //     });
+  // }
 
+  // extractDocuments() {
+  //   this.allDocuments = [];
+  //   this.cases.forEach(case_ => {
+  //     case_.documents.forEach(doc => {
+  //       this.allDocuments.push({ ...doc, caseId: case_.id });
+  //     });
+  //   });
+  //   this.filteredDocuments = [...this.allDocuments];
+  // }
   extractDocuments() {
     this.allDocuments = [];
-    this.cases.forEach(case_ => {
-      case_.documents.forEach(doc => {
-        this.allDocuments.push({ ...doc, caseId: case_.id });
-      });
+    
+    console.log('Début extraction des documents...');
+    
+    // Parcourir tous les dossiers pour extraire leurs documents
+    this.dossiers.forEach(dossier => {
+      console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsCreancier?.myArrayList);
+      
+      // Vérifier si le dossier a des documents creéancier
+      if (dossier.documentsCreancier?.myArrayList && Array.isArray(dossier.documentsCreancier.myArrayList)) {
+        dossier.documentsCreancier.myArrayList.forEach((doc: any) => {
+          console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
+          
+          const mappedType = this.mapDocumentType(doc.typeDocument);
+          console.log('Type mappé:', mappedType);
+          
+          this.allDocuments.push({
+            id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
+            name: doc.fileName || doc.name || 'Document sans nom',
+            type: mappedType,
+            url: doc.url || doc.downloadUrl || '#',
+            uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
+            uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+            caseId: dossier.nodeId
+          });
+        });
+      }
     });
+    
     this.filteredDocuments = [...this.allDocuments];
+    console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
+  }
+
+  
+
+    mapDocumentType(apiType: string): DocumentType {
+    console.log('Mapping du type:', apiType);
+    
+    // Normaliser le type (enlever espaces, mettre en majuscules)
+    const normalizedType = (apiType || '').trim().toUpperCase();
+    
+    const typeMapping: { [key: string]: DocumentType } = {
+      'FACTURE': DocumentType.INVOICE,
+      'INVOICE': DocumentType.INVOICE,
+      'CONTRAT': DocumentType.CONTRACT,
+      'CONTRACT': DocumentType.CONTRACT,
+      'CORRESPONDANCE': DocumentType.CORRESPONDENCE,
+      'CORRESPONDENCE': DocumentType.CORRESPONDENCE,
+      'MISE_EN_DEMEURE': DocumentType.LEGAL_NOTICE,
+      'LEGAL_NOTICE': DocumentType.LEGAL_NOTICE,
+      'PREUVE_PAIEMENT': DocumentType.PAYMENT_PROOF,
+      'PAYMENT_PROOF': DocumentType.PAYMENT_PROOF,
+      'DOCUMENT_JUDICIAIRE': DocumentType.COURT_DOCUMENT,
+      'COURT_DOCUMENT': DocumentType.COURT_DOCUMENT
+    };
+    
+    const result = typeMapping[normalizedType] || DocumentType.CORRESPONDENCE;
+    console.log('Résultat du mapping:', normalizedType, '->', result);
+    
+    return result;
   }
 
   filterDocuments() {
@@ -344,41 +419,61 @@ export class CreditorCasesComponent implements OnInit {
     });
   }
 
-  getLegalDocumentsCount(): number {
+  // getLegalDocumentsCount(): number {
+  //   return this.allDocuments.filter(doc => 
+  //     doc.type === 'legal_notice' || doc.type === 'court_document'
+  //   ).length;
+  // }
+   getLegalDocumentsCount(): number {
     return this.allDocuments.filter(doc => 
-      doc.type === 'legal_notice' || doc.type === 'court_document'
+      doc.type === DocumentType.LEGAL_NOTICE || 
+      doc.type === DocumentType.COURT_DOCUMENT
     ).length;
   }
 
+  // getPaymentProofsCount(): number {
+  //   return this.allDocuments.filter(doc => doc.type === 'payment_proof').length;
+  // }
   getPaymentProofsCount(): number {
-    return this.allDocuments.filter(doc => doc.type === 'payment_proof').length;
+    return this.allDocuments.filter(doc => 
+      doc.type === DocumentType.PAYMENT_PROOF
+    ).length;
   }
 
+  // getCaseNumber(caseId: string): string {
+  //   const case_ = this.cases.find(c => c.id === caseId);
+  //   return case_?.caseNumber || 'N/A';
+  // }
+
+  // getDocumentTypeLabel(type: string): string {
+  //   const labels: { [key: string]: string } = {
+  //     'invoice': 'Facture',
+  //     'contract': 'Contrat',
+  //     'correspondence': 'Correspondance',
+  //     'legal_notice': 'Mise en demeure',
+  //     'payment_proof': 'Preuve de paiement',
+  //     'court_document': 'Document judiciaire'
+  //   };
+  //   return labels[type] || type;
+  // }
+
+  // Modifiez la méthode getCaseNumber pour utiliser nodeId
   getCaseNumber(caseId: string): string {
-    const case_ = this.cases.find(c => c.id === caseId);
-    return case_?.caseNumber || 'N/A';
+    const dossier = this.dossiers.find(d => d.nodeId === caseId);
+    return dossier?.numeroDossier || 'N/A';
   }
 
   getDocumentTypeLabel(type: string): string {
-    const labels: { [key: string]: string } = {
-      'invoice': 'Facture',
-      'contract': 'Contrat',
-      'correspondence': 'Correspondance',
-      'legal_notice': 'Mise en demeure',
-      'payment_proof': 'Preuve de paiement',
-      'court_document': 'Document judiciaire'
-    };
-    return labels[type] || type;
-  }
-
-  // formatDate(date: Date): string {
-  //   return new Date(date).toLocaleDateString('fr-FR', {
-  //     year: 'numeric',
-  //     month: 'long',
-  //     day: 'numeric'
-  //   });
-  // }
-
+  const labels: { [key: string]: string } = {
+    [DocumentType.INVOICE]: 'Facture',
+    [DocumentType.CONTRACT]: 'Contrat',
+    [DocumentType.CORRESPONDENCE]: 'Rapport',
+    [DocumentType.LEGAL_NOTICE]: 'Mise en demeure',
+    [DocumentType.PAYMENT_PROOF]: 'Preuve de paiement',
+    [DocumentType.COURT_DOCUMENT]: 'Document judiciaire'
+  };
+  return labels[type] || type;
+}
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -393,34 +488,63 @@ export class CreditorCasesComponent implements OnInit {
     return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
   }
 
-  uploadDocument() {
-    if (!this.isUploadValid()) return;
+  // uploadDocument() {
+  //   if (!this.isUploadValid()) return;
 
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
+  //   const currentUser = this.authService.getCurrentUser();
+  //   if (!currentUser) return;
 
-    // Simulation de l'upload
-    const newDoc: CaseDocument & { caseId: string } = {
-      id: Date.now().toString(),
-      name: this.newDocument.name,
-      type: this.newDocument.type as DocumentType,
-      url: '#',
-      uploadedAt: new Date(),
-      uploadedBy: `${currentUser.firstname} ${currentUser.lastname}`,
-      caseId: this.newDocument.caseId
-    };
+  //   // Simulation de l'upload
+  //   const newDoc: CaseDocument & { caseId: string } = {
+  //     id: Date.now().toString(),
+  //     name: this.newDocument.name,
+  //     type: this.newDocument.type as DocumentType,
+  //     url: '#',
+  //     uploadedAt: new Date(),
+  //     uploadedBy: `${currentUser.firstname} ${currentUser.lastname}`,
+  //     caseId: this.newDocument.caseId
+  //   };
 
-    this.allDocuments.unshift(newDoc);
-    this.filterDocuments();
-    this.closeUploadModal();
+  //   this.allDocuments.unshift(newDoc);
+  //   this.filterDocuments();
+  //   this.closeUploadModal();
 
-    console.log('Document ajouté:', newDoc);
-  }
+  //   console.log('Document ajouté:', newDoc);
+  // }
+   uploadDocument() {
+  if (!this.isUploadValid()) return;
 
-  viewDocument(doc: CaseDocument) {
-    console.log('Visualisation du document:', doc.name);
-    // TODO: Implémenter la visualisation
-  }
+  const currentUser = this.authService.getCurrentUser();
+  if (!currentUser) return;
+
+  // Utiliser le dossier sélectionné comme caseId
+  const caseId = this.selectedDetailCase?.nodeId || this.newDocument.caseId;
+
+  const newDoc: CaseDocument & { caseId: string } = {
+    id: Date.now().toString(),
+    name: this.newDocument.name,
+    type: this.newDocument.type as DocumentType,
+    url: '#', // À remplacer par l'URL réelle après upload sur le serveur
+    uploadedAt: new Date(),
+    uploadedBy: `${currentUser.firstname} ${currentUser.lastname}`,
+    caseId: caseId
+  };
+
+  this.allDocuments.unshift(newDoc);
+  this.openDocumentsModal(); // Rafraîchir la liste filtrée
+  this.closeUploadModal();
+
+  console.log('Document ajouté:', newDoc);
+
+  console.log('Dossier sélectionné:', this.selectedDetailCase?.numeroDossier);
+  console.log('NodeId utilisé:', caseId);
+  console.log('Documents filtrés après ajout:', this.filteredDocuments);
+}
+
+  // viewDocument(doc: CaseDocument) {
+  //   console.log('Visualisation du document:', doc.name);
+  //   // TODO: Implémenter la visualisation
+  // }
 
   // downloadDocument(doc: CaseDocument) {
   //   console.log('Téléchargement du document:', doc.name);
@@ -445,9 +569,9 @@ export class CreditorCasesComponent implements OnInit {
     };
   }
   // Fonction pour ouvrir la modal des documents
-  openDocumentsModal() {
-    this.showDocumentsModal = true;
-  }
+  // openDocumentsModal() {
+  //   this.showDocumentsModal = true;
+  // }
 
   // Fonction pour fermer la modal des documents
   closeDocumentsModal() {
@@ -456,4 +580,66 @@ export class CreditorCasesComponent implements OnInit {
 
 
   // Ajout methode end
+
+  // Méthode pour filtrer les documents du dossier sélectionné
+  // openDocumentsModal() {
+  //   if (this.selectedDetailCase) {
+  //     // Filtrer uniquement les documents du dossier sélectionné
+  //     this.filteredDocuments = this.allDocuments.filter(
+  //       doc => doc.caseId === this.selectedDetailCase.nodeId
+  //     );
+  //   } 
+  //   else {
+  //     // Afficher tous les documents
+  //     this.filteredDocuments = [...this.allDocuments];
+  //   }
+  //   this.showDocumentsModal = true;
+  // }
+  openDocumentsModal() {
+  // Stocker le dossier sélectionné
+  if (this.selectedIndex !== null) {
+    this.selectedDetailCase = this.filteredDossiers[this.selectedIndex];
+  }
+  
+  if (this.selectedDetailCase) {
+    // Filtrer uniquement les documents du dossier sélectionné
+    this.filteredDocuments = this.allDocuments.filter(
+      doc => doc.caseId === this.selectedDetailCase.nodeId
+    );
+    
+    console.log('Documents du dossier', this.selectedDetailCase.numeroDossier, ':', this.filteredDocuments);
+  } else {
+    // Afficher tous les documents si aucun dossier n'est sélectionné
+    this.filteredDocuments = [...this.allDocuments];
+  }
+  
+  this.showDocumentsModal = true;
+}
+
+  // Compter les documents d'un dossier
+  getDocumentsCount(dossier: any): number {
+    if (!dossier) return 0;
+    return dossier.documentsCreancier?.myArrayList?.length || 0;
+  }
+
+  // Méthode pour télécharger un document
+  downloadDocument(doc: any) {
+    if (doc.url && doc.url !== '#') {
+      window.open(doc.url, '_blank');
+    } else {
+      console.log('URL de téléchargement non disponible pour:', doc.name);
+      alert('Le document n\'est pas disponible au téléchargement');
+    }
+  }
+
+  // Méthode pour visualiser un document
+  viewDocument(doc: any) {
+    if (doc.url && doc.url !== '#') {
+      window.open(doc.url, '_blank');
+    } else {
+      console.log('URL non disponible pour:', doc.name);
+      alert('Impossible de visualiser ce document');
+    }
+  }
+
 }
