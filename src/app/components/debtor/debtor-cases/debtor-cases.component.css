@@ -1486,11 +1486,11 @@
       margin: 0 auto;
     }
 
-    .header-content {
+    /* .header-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
+    } */
 
     .documents-header h1 {
       font-size: 32px;
@@ -1591,12 +1591,12 @@
       gap: 24px;
     }
 
-    .list-header {
+    /* .list-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 24px;
-    }
+    } */
 
     .list-header h3 {
       font-size: 18px;
