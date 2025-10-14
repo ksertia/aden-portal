@@ -59,7 +59,7 @@
     .stat-icon.info { background: #3b82f6; }
 
     .stat-value {
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 700;
       color: var(--text);
       line-height: 1;

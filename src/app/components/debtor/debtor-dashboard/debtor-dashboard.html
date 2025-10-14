@@ -29,8 +29,9 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-value">-</div>
-        <div class="stat-label">Dossiers actifs</div>
+        <div class="stat-value">{{ ActiveCasesCount }}</div>
+        <div class="stat-label">Nouveau Dossiers </div>
+        <!-- <div class="stat-label">Dossiers actifs</div> -->
       </div>
     </div>
 
@@ -43,7 +44,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-value">-</div>
+        <div class="stat-value">{{PendingCasesCount }}</div>
         <div class="stat-label">En attente</div>
       </div>
     </div>
@@ -56,8 +57,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <!-- {{ dossiers.montantTotal | currency:'EUR' }} -->
-          <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div>
+          <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div> 
           <div class="stat-label">Montant total</div>
       </div>
     </div>

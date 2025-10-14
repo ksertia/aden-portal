@@ -11,6 +11,26 @@ import { AdminService } from '../../../services/admin.service';
 import { CreditorDetail } from '../../../models/case.model';
 import { CaseDocument, DocumentType } from '../../../models/case.model';
 
+interface InterestDetail {
+  type: string;
+  rate: number;
+  amount: number;
+}
+
+interface PenaltyDetail {
+  type: string;
+  date: string;
+  amount: number;
+}
+
+interface ReminderHistory {
+  type: string;
+  description: string;
+  date: string;
+  status?: string;
+  sentBy?: string;
+}
+
 @Component({
   selector: 'app-debtor-cases',
   standalone: true,
@@ -61,16 +81,7 @@ export class DebtorCasesComponent implements OnInit {
   };
    isSubmittingDispute = false;
 
-  // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
-  creditors: CreditorDetail[] = [];
-  filteredCreditors: CreditorDetail[] = [];
-
-  selectedcreditor: CreditorDetail | undefined;
-
-   selectedIndex: number | null = null;
-  // showCaseDetailsModal = false;
-
-  // Ajout start
+     // Ajout start
   cases: DebtCase[] = [];
   allDocuments: (CaseDocument & { caseId: string })[] = [];
   filteredDocuments: (CaseDocument & { caseId: string })[] = [];
@@ -91,8 +102,20 @@ export class DebtorCasesComponent implements OnInit {
   };
   // Ajout end
 
-  constructor(
-    private casesService: CaseService,
+  // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
+  creditors: CreditorDetail[] = [];
+  filteredCreditors: CreditorDetail[] = [];
+
+  selectedcreditor: CreditorDetail | undefined;
+
+   selectedIndex: number | null = null;
+  // showCaseDetailsModal = false;
+
+  showReminderHistoryModal = false;
+  reminderHistory: ReminderHistory[] = [];
+
+
+  constructor(private casesService: CaseService,
     private i18nService: I18nService,
     private authService: AuthService,
     private adminService: AdminService,
@@ -158,9 +181,8 @@ export class DebtorCasesComponent implements OnInit {
       error: (err) => console.error(err)
     });
   }
-    // Lorsque le bouton "Détails" est cliqué
+  // Lorsque le bouton "Détails" est cliqué
   viewDossierDetails(dossier: any): void {
-    // console.log("le dossier selectionner",dossier);
     this.selectedDetailCase = dossier;
     console.log("this.selectedDetailCase", this.selectedDetailCase);
     this.showCaseDetailsModal = true; // Afficher le tiroir
@@ -187,10 +209,12 @@ export class DebtorCasesComponent implements OnInit {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
+    if (!amount) return '0 FCFA';
+    return amount.toLocaleString('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(amount);
+      currency: 'XOF',
+      minimumFractionDigits: 0
+    });
   }
 
   getStatusLabel(status: string): string {
@@ -217,9 +241,6 @@ export class DebtorCasesComponent implements OnInit {
     return labels[priority] || priority;
   }
 
-  // viewCaseDetails(case_: DebtCase) {
-    
-  // }
   viewCaseDetails(index: number): void {
     this.selectedIndex = index;
     const dossier = this.filteredDossiers[index];
@@ -294,11 +315,11 @@ export class DebtorCasesComponent implements OnInit {
     return this.filteredDossiers.reduce((acc, d) => acc + (d.montantPaye || 0), 0);
   }
   getFormattedRemainingAmount(dossier: any): string {
-  const reste = (dossier.montantTotal || 0) - (dossier.montantPaye || 0);
-  return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
-}
+    const reste = (dossier.montantTotal || 0) - (dossier.montantPaye || 0);
+    return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'XOF' });
+  }
 
-getInterestTypeLabel(type: string): string {
+  getInterestTypeLabel(type: string): string {
     const labels: { [key: string]: string } = {
       'legal': 'Intérêts légaux',
       'contractual': 'Intérêts contractuels',
@@ -313,7 +334,7 @@ getInterestTypeLabel(type: string): string {
       activity.type === ActivityType.CORRESPONDENCE_SENT
     );
   }
-    getReminderIconClass(type: string): string {
+  getReminderIconClass(type: string): string {
     const classes: { [key: string]: string } = {
       [ActivityType.REMINDER_SENT]: 'email',
       [ActivityType.FORMAL_NOTICE_SENT]: 'legal',
@@ -329,7 +350,7 @@ getInterestTypeLabel(type: string): string {
     };
     return labels[type] || 'Communication';
   }
-   formatDate(date: Date): string {
+  formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('fr-FR', {
       year: 'numeric',
       month: 'long',
@@ -510,7 +531,180 @@ getInterestTypeLabel(type: string): string {
     };
     return labels[type] || type;
   }
+  
+  calculateTotalInterests(dossier: any): number {
+  // Tu peux adapter cette logique selon ta structure de données
+  // Pour l'instant, retourne 0 ou calcule depuis les données du dossier
+  return dossier.montantInterets || 0;
+}
 
+calculateTotalPenalties(dossier: any): number {
+  // Calcul des pénalités totales
+  return dossier.montantPenalites || 0;
+}
+
+calculateTotalFees(dossier: any): number {
+  // Calcul des frais (dossier, juridiques, etc.)
+  return dossier.montantFrais || 0;
+}
+
+
+calculateTotalDue(dossier: any): number {
+  // Montant total à payer = Principal + Intérêts + Pénalités + Frais
+  const principal = dossier.montantTotal || 0;
+  const interests = this.calculateTotalInterests(dossier);
+  const penalties = this.calculateTotalPenalties(dossier);
+  const fees = this.calculateTotalFees(dossier);
+  
+  return principal + interests + penalties + fees;
+}
+
+// Méthode pour calculer le reste à payer (inclut tout : intérêts, pénalités, frais)
+calculateRemainingAmount(dossier: any): number {
+  const totalDue = this.calculateTotalDue(dossier);
+  const paid = dossier.montantPaye || 0;
+  return totalDue - paid;
+}
+
+// Version formatée du reste à payer (utilise celle-ci dans ton template)
+getFormattedRemainingAmountWithDetails(dossier: any): string {
+  const remaining = this.calculateRemainingAmount(dossier);
+  return this.formatCurrency(remaining);
+}
+
+
+// Méthode pour obtenir le détail des intérêts
+getInterestsDetail(dossier: any): InterestDetail[] {
+  const totalInterests = dossier.montantInterets || 0;
+  
+  // Si ton backend envoie des détails, utilise-les
+  // Sinon, voici une répartition par défaut (à adapter selon tes besoins)
+  if (dossier.detailInterets && Array.isArray(dossier.detailInterets)) {
+    return dossier.detailInterets;
+  }
+  
+  // Répartition par défaut (tu peux ajuster les pourcentages)
+  const details: InterestDetail[] = [];
+  
+  if (totalInterests > 0) {
+    // Exemple : 40% intérêts légaux, 60% intérêts de retard
+    details.push({
+      type: 'Intérêts légaux',
+      rate: 3.5, // Taux légal en %
+      amount: totalInterests * 0.4
+    });
+    
+    details.push({
+      type: 'Intérêts de retard',
+      rate: 10, // Taux contractuel en %
+      amount: totalInterests * 0.6
+    });
+  }
+  
+  return details;
+}
+
+// Méthode pour obtenir le détail des pénalités
+getPenaltiesDetail(dossier: any): PenaltyDetail[] {
+  const totalPenalties = dossier.montantPenalites || 0;
+  
+  // Si ton backend envoie des détails
+  if (dossier.detailPenalites && Array.isArray(dossier.detailPenalites)) {
+    return dossier.detailPenalites;
+  }
+  
+  // Sinon, crée un détail par défaut
+  const details: PenaltyDetail[] = [];
+  
+  if (totalPenalties > 0) {
+    details.push({
+      type: 'Pénalité de retard',
+      date: dossier.dateEcheance || dossier.dateCreation,
+      amount: totalPenalties
+    });
+  }
+  
+  return details;
+}
+
+// Formater la date
+formatDateShort(dateStr: string): string {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
+// Ouvrir le tiroir des relances
+openReminderHistory(dossier: any): void {
+  this.reminderHistory = this.getReminderHistoryForDossier(dossier);
+  this.showReminderHistoryModal = true;
+}
+
+// Fermer le tiroir des relances
+closeReminderHistory(): void {
+  this.showReminderHistoryModal = false;
+  this.reminderHistory = [];
+}
+
+// Récupérer l'historique des relances pour un dossier
+getReminderHistoryForDossier(dossier: any): ReminderHistory[] {
+  // Si ton backend envoie un historique
+  if (dossier.historiqueRelances && Array.isArray(dossier.historiqueRelances)) {
+    return dossier.historiqueRelances;
+  }
+  
+  // Sinon, créer un historique par défaut basé sur les données disponibles
+  const history: ReminderHistory[] = [];
+  
+  // Exemple : créer des relances basées sur la phase du dossier
+  if (dossier.phaseCode === 'MISE_EN_DEMEURE') {
+    history.push({
+      type: 'Mise en demeure',
+      description: 'Mise en demeure formelle envoyée au débiteur',
+      date: dossier.dateCreation,
+      status: 'Envoyée',
+      sentBy: 'Système'
+    });
+  }
+  
+  if (dossier.commentaires) {
+    history.push({
+      type: 'Relance',
+      description: dossier.commentaires,
+      date: dossier.dateCreation,
+      status: 'Envoyée',
+      sentBy: dossier.createurUsername || 'Admin'
+    });
+  }
+  
+  // Si pas d'historique
+  if (history.length === 0) {
+    history.push({
+      type: 'Information',
+      description: 'Aucune relance enregistrée pour le moment',
+      date: dossier.dateCreation,
+      status: 'N/A'
+    });
+  }
+  
+  return history;
+}
+
+// Obtenir l'icône selon le type de relance
+getReminderIcon(type: string): string {
+  const icons: { [key: string]: string } = {
+    'Relance': 'email',
+    'Mise en demeure': 'legal',
+    'Appel téléphonique': 'phone',
+    'Courrier': 'mail',
+    'Information': 'info'
+  };
+  return icons[type] || 'email';
+}
 
 
   // Ajout methode start
@@ -610,7 +804,7 @@ getInterestTypeLabel(type: string): string {
       type: this.newDocument.type as DocumentType,
       url: '#',
       uploadedAt: new Date(),
-      uploadedBy: `${currentUser.username} ${currentUser.lastname}`,
+      uploadedBy: `${currentUser.firstname} ${currentUser.lastname}`,
       caseId: this.newDocument.caseId
     };
 
@@ -660,6 +854,5 @@ getInterestTypeLabel(type: string): string {
 
 
   // Ajout methode end
-
 
 }

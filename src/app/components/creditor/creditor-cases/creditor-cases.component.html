@@ -238,7 +238,7 @@
               <td>
                 <div class="debtor-cell">
                   <span>{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
-                  <div class="debtor-type">{{ dossier.typeCreance }}</div>
+                  <div class="debtor-type"> {{ getDebiteurForDossier(dossier)?.type}}</div>
                 </div>
               </td>
               <td>
@@ -367,7 +367,11 @@
                     </div>
                     <div class="detail-row">
                       <span class="label">Type :</span>
-                      <span class="value">{{ selectedDebtor?.type || dossiers[selectedIndex!].typeCreance }}</span>
+                      <span class="value">{{ selectedDebtor?.type}}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="label">Nom de l'entreprise :</span>
+                      <span class="value">{{ selectedDebtor?.companyName }}</span>
                     </div>
                   </div>
                 </div>
@@ -386,7 +390,7 @@
                     </svg>
                   </div>
                   <div class="card-content">
-                    <div class="card-value">{{ dossiers[selectedIndex!].montantTotal | currency:'EUR' }}</div>
+                    <div class="card-value">{{ formatCurrency(dossiers[selectedIndex!].montantTotal) }}</div> 
                     <div class="card-label">Montant total</div>
                   </div>
                 </div>
@@ -446,7 +450,7 @@
             </div> -->
 
             <!-- Documents -->
-            <div class="details-section" *ngIf="filteredDossiers.length > 0">
+            <!-- <div class="details-section" *ngIf="filteredDossiers.length > 0">
               <h4>Documents joints ({{ dossiers.length }})</h4>
               <div class="documents-list">
                 <div class="document-item" *ngFor="let doc of dossiers">
@@ -469,18 +473,18 @@
                   </button>
                 </div>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" (click)="closeDrawer()">Fermer</button>
           <button class="btn btn-primary" (click)="downloadCaseReport(selectedCase!)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7,10 12,15 17,10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Télécharger le rapport
+             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+              </svg>
+            <!-- Télécharger le rapport -->
+            Acceder aux documents
           </button>
         </div>
       </div>

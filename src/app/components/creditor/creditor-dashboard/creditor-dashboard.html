@@ -29,7 +29,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-value">--</div>
+        <div class="stat-value">{{ activeCount }}</div>
         <div class="stat-label">Dossiers actifs</div>
       </div>
     </div>
@@ -43,7 +43,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <div class="stat-value">--</div>
+        <div class="stat-value">{{ pendingCount }}</div>
         <div class="stat-label">En attente</div>
       </div>
     </div>
@@ -76,7 +76,8 @@
           <div class="case-header">
             <h3>{{ dossier.numeroDossier }}</h3>
             <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
-              {{ getStatusLabel(dossier.statutGlobal) }}
+              {{ getStatusLabel(dossier.statutGlobal) }} 
+              {{ getStatusLabel(dossier.stepGlobal) }}
             </span>
           </div>
           <div class="case-details">
