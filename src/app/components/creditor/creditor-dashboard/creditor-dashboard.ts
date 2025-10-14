@@ -17,6 +17,11 @@ import { DebtorInfo } from '../../../models/case.model';
 export class CreditorDashboard implements OnInit{
 
   currentUser: User | null = null;
+  selectedIndex: number | null = null;
+
+  activeCount: number = 0;
+  pendingCount: number = 0;
+
 
   dossiers: any[] = [];
   isLoading = true;
@@ -77,6 +82,9 @@ export class CreditorDashboard implements OnInit{
         );
         console.log('Dossiers filtrés pour ce créancier :', this.dossiers);
 
+        // Étape 3 : mise à jour des statistiques
+        this.updateCaseStatistics(); 
+
         this.isLoading = false;
       },
       error: (error) => {
@@ -101,9 +109,40 @@ export class CreditorDashboard implements OnInit{
       return this.debiteurs.find(d => d.nodeId === dossier.debiteurNodeId);
   }
 
-
   getTotalDebt(): number {
-    return this.filteredDossiers.reduce((acc, d) => acc + (d.montantTotal || 0), 0);
+    if (!this.dossiers || this.dossiers.length === 0) return 0;
+
+    // On additionne tous les montants totaux
+    return this.dossiers.reduce((total, dossier) => {
+      const montant = Number(dossier.montantTotal) || 0;
+      return total + montant;
+    }, 0);
+  }
+
+  updateCaseStatistics(): void {
+    if (!this.dossiers || this.dossiers.length === 0) {
+      this.activeCount = 0;
+      this.pendingCount = 0;
+      return;
+    }
+
+    this.activeCount = this.dossiers.filter((d) => {
+      const statut = d.stepGlobal?.toLowerCase().trim();
+      return statut === 'actif' || statut === 'active';
+    }).length;
+
+    this.pendingCount = this.dossiers.filter((d) => {
+      const statut = d.stepGlobal?.toLowerCase().trim();
+      return statut === 'en_attente' || statut === 'pending' || statut === 'attente';
+    }).length;
+  }
+
+
+
+
+  
+  getTotalPaid(): number {
+    return this.filteredDossiers.reduce((acc, d) => acc + (d.montantPaye || 0), 0);
   }
 
   getPaymentPercentage(dossier: any): number {
@@ -128,11 +167,14 @@ export class CreditorDashboard implements OnInit{
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
+    if (!amount) return '0FCFA';
+    return amount.toLocaleString('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(amount);
+      currency: 'XOF',
+      minimumFractionDigits: 0
+    });
   }
+
 
   getStatusLabel(status: string): string {
     const labels: { [key: string]: string } = {

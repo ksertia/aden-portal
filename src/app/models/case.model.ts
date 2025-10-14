@@ -71,6 +71,7 @@ export interface DebtorInfo {
   situation:string;
   dette:number;
   nodeId: string;
+
 }
 export interface ApiDebtorResponse {
   map: any;

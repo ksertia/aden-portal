@@ -192,14 +192,16 @@ export class CreditorCasesComponent implements OnInit {
   }
   getFormattedRemainingAmount(dossier: any): string {
     const reste = (dossier.montantTotal || 0) - (dossier.montantPaye || 0);
-    return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+    return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'XOF' });
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
+    if (!amount) return '0 FCFA';
+    return amount.toLocaleString('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(amount);
+      currency: 'XOF',
+      minimumFractionDigits: 0
+    });
   }
 
   formatDate(date: Date): string {

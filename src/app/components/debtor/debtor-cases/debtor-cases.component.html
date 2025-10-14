@@ -285,53 +285,6 @@
   </div>
 
   <!-- Details-->
-   <!-- <div class="cases-list" *ngIf="dossiers.length > 0">
-      <div class="cases-grid">
-        <div class="case-card"  *ngFor="let dossier of dossiers">
-          <div class="case-header">
-            <div class="case-info">
-              <h3> {{ dossier.numeroDossier }}</h3>
-              <p class="creditor-name">{{ dossier.objet }}</p>
-            </div>
-            <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
-              {{ getStatusLabel(dossier.statutGlobal) }}
-            </span>
-          </div> -->
-          
-          <!-- <div class="case-body"> -->
-            <!-- Détail de la dette -->
-            <!-- <div class="debt-breakdown">
-              <h4>{{ t('cases.debt.title') }}</h4>
-              <div class="breakdown-grid">
-                <div class="breakdown-item">
-                  <span class="label">{{ t('cases.debt.principal') }}</span>
-                  <span class="value">{{ dossier.montantTotal | currency:'EUR' }}</span>
-                </div>
-                <div class="breakdown-item">
-                  <span class="label">{{ t('cases.debt.interests') }}</span>
-                  <span class="value">---</span>
-                </div>
-                <div class="breakdown-item">
-                  <span class="label">{{ t('cases.debt.penalties') }}</span>
-                  <span class="value">---</span>
-                </div>
-                <div class="breakdown-item">
-                  <span class="label">{{ t('cases.debt.fees') }}</span>
-                  <span class="value">---</span>
-                </div>
-                <div class="breakdown-item total">
-                  <span class="label">{{ t('cases.debt.totalDue') }}</span>
-                  <span class="value">---</span>
-                </div>
-                <div class="breakdown-item paid">
-                  <span class="label">{{ t('cases.debt.alreadyPaid') }}</span>
-                  <span class="value">{{ formatCurrency(getTotalPaid()) }}</span>
-                </div>
-                <div class="breakdown-item remaining">
-                  <span class="label">{{ t('cases.debt.remaining') }}</span>
-                  <span class="value">{{ getFormattedRemainingAmount(dossier) }}</span>
-                </div> -->
-   <!-- Details-->
   <div class="drawer-overlay" *ngIf="showCaseDetailsModal">
   <!-- *ngIf="dossiers.length > 0; else noCases" -->
     <!-- <div class="cases-grid drawer-content" [class.open]="showCaseDetailsModal"> -->
@@ -365,23 +318,23 @@
                 <div class="breakdown-grid">
                   <div class="breakdown-item">
                     <span class="label">{{ t('cases.debt.principal') }}</span>
-                    <span class="value">{{ selectedDetailCase.montantTotal | currency:'EUR' }}</span>
+                    <span class="value">{{ formatCurrency(selectedDetailCase.montantTotal) }}</span> 
                   </div>
                   <div class="breakdown-item">
                     <span class="label">{{ t('cases.debt.interests') }}</span>
-                    <span class="value">---</span>
+                    <span class="value">{{ formatCurrency(calculateTotalInterests(selectedDetailCase)) }}</span>
                   </div>
                   <div class="breakdown-item">
                     <span class="label">{{ t('cases.debt.penalties') }}</span>
-                    <span class="value">---</span>
+                    <span class="value">{{ formatCurrency(calculateTotalPenalties(selectedDetailCase)) }}</span>
                   </div>
                   <div class="breakdown-item">
                     <span class="label">{{ t('cases.debt.fees') }}</span>
-                    <span class="value">---</span>
+                    <span class="value">{{ formatCurrency(calculateTotalFees(selectedDetailCase)) }}</span>
                   </div>
                   <div class="breakdown-item total">
                     <span class="label">{{ t('cases.debt.totalDue') }}</span>
-                    <span class="value">---</span>
+                    <span class="value">{{ formatCurrency(calculateTotalDue(selectedDetailCase)) }}</span>
                   </div>
                   <div class="breakdown-item paid">
                     <span class="label">{{ t('cases.debt.alreadyPaid') }}</span>
@@ -389,27 +342,35 @@
                   </div>
                   <div class="breakdown-item remaining">
                     <span class="label">{{ t('cases.debt.remaining') }}</span>
-                    <span class="value">{{ getFormattedRemainingAmount(selectedDetailCase) }}</span>
+                    <span class="value">{{ getFormattedRemainingAmountWithDetails(selectedDetailCase) }}</span>
                   </div>
                 </div>
               </div>
 
               <!-- Détail des intérêts -->
-              <div class="interests-detail" >
+              <!-- <div class="interests-detail" >
                 <h5>{{ t('cases.interestsDetail') }}</h5>
                 <div class="interests-list">
                   <div class="interest-item">
                     <div class="interest-info">
                       <span class="interest-type">Intérêts légaux</span>
-                      <span class="interest-rate">3.15% par an</span>
+                      <span class="interest-rate">0% par an</span>
                     </div>
-                    <div class="interest-amount">420,00€</div>
+                    <div class="interest-amount">0 FCFA</div>
+                  </div>
+
+                  <div class="interest-item">
+                    <div class="interest-info">
+                      <span class="interest-type">Intérêts de retard</span>
+                      <span class="interest-rate">0% par an</span>
+                    </div>
+                    <div class="interest-amount">0 FCFA</div>
                   </div>
                 </div>
-              </div>
+              </div> -->
 
               <!-- Détail des pénalités -->
-              <div class="penalties-detail">
+              <!-- <div class="penalties-detail">
                 <h5>{{ t('cases.penaltiesDetail') }}</h5>
                 <div class="penalties-list">
                   <div class="penalty-item" >
@@ -417,9 +378,49 @@
                       <span class="penalty-type">Pénalité de retard</span>
                       <span class="penalty-date">15 février 2024</span>
                     </div>
-                    <div class="penalty-amount">50,00 €</div>
+                    <div class="penalty-amount">0 FCFA</div>
                   </div>
                 </div>
+              </div> -->
+
+              <!-- Détail des intérêts -->
+              <div class="interests-detail" *ngIf="getInterestsDetail(selectedDetailCase).length > 0">
+                <h5>{{ t('cases.interestsDetail') }}</h5>
+                <div class="interests-list">
+                  <div class="interest-item" *ngFor="let interest of getInterestsDetail(selectedDetailCase)">
+                    <div class="interest-info">
+                      <span class="interest-type">{{ interest.type }}</span>
+                      <span class="interest-rate">{{ interest.rate }}% par an</span>
+                    </div>
+                    <div class="interest-amount">{{ formatCurrency(interest.amount) }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Message si pas d'intérêts -->
+              <div class="interests-detail" *ngIf="getInterestsDetail(selectedDetailCase).length === 0">
+                <h5>{{ t('cases.interestsDetail') }}</h5>
+                <p class="no-data">Aucun intérêt appliqué</p>
+              </div>
+
+              <!-- Détail des pénalités -->
+              <div class="penalties-detail" *ngIf="getPenaltiesDetail(selectedDetailCase).length > 0">
+                <h5>{{ t('cases.penaltiesDetail') }}</h5>
+                <div class="penalties-list">
+                  <div class="penalty-item" *ngFor="let penalty of getPenaltiesDetail(selectedDetailCase)">
+                    <div class="penalty-info">
+                      <span class="penalty-type">{{ penalty.type }}</span>
+                      <span class="penalty-date">{{ formatDateShort(penalty.date) }}</span>
+                    </div>
+                    <div class="penalty-amount">{{ formatCurrency(penalty.amount) }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Message si pas de pénalités -->
+              <div class="penalties-detail" *ngIf="getPenaltiesDetail(selectedDetailCase).length === 0">
+                <h5>{{ t('cases.penaltiesDetail') }}</h5>
+                <p class="no-data">Aucune pénalité appliquée</p>
               </div>
 
               <!-- Barre de progression -->
@@ -434,7 +435,7 @@
               </div>
 
               <!-- Historique des relances -->
-              <div class="reminder-history" >
+              <!-- <div class="reminder-history" >
                 <h5>{{ t('cases.reminderHistory') }}</h5>
                 <div class="reminder-list">
                   <div class="reminder-item" >
@@ -450,10 +451,10 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> -->
 
               <!-- Actions -->
-              <div class="case-actions">
+              <!-- <div class="case-actions">
                 <button class="btn btn-primary" (click)="makePayment(selectedDetailCase)">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
@@ -482,7 +483,106 @@
                     </svg>
                     Fermer
                 </button>
+              </div> -->
+
+           
+
+            <!-- Actions -->
+            <div class="case-actions">
+              <button class="btn btn-primary" (click)="makePayment(selectedDetailCase)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+                {{ t('cases.actions.makePayment') }}
+              </button>
+              <button class="btn btn-secondary" (click)="proposePaymentPlan(selectedDetailCase)" >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+                </svg>
+                {{ t('cases.actions.paymentPlan') }}
+              </button>
+              <button class="btn btn-warning" (click)="fileDispute(selectedDetailCase)" >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="15" y1="9" x2="9" y2="15"/>
+                  <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                {{ t('cases.actions.dispute') }}
+              </button>
+              <button class="btn btn-secondary" (click)="closeDrawer()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Fermer
+              </button>
+              <!-- Bouton pour accéder aux relances (à placer avant les Actions) -->
+                <button class="btn btn-info" (click)="openReminderHistory(selectedDetailCase)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  Accéder aux relances
+                </button>
+            </div>
+
+            <!-- TIROIR DE L'HISTORIQUE DES RELANCES (à placer à la fin de ton HTML, après le tiroir de contestation) -->
+            <div class="drawer-overlay-reminder" *ngIf="showReminderHistoryModal" (click)="closeReminderHistory()">
+              <div class="drawer-reminder" [class.open]="showReminderHistoryModal" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                  <h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    Historique des relances
+                  </h3>
+                  <button class="modal-close" (click)="closeReminderHistory()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                </div>
+                
+                <div class="modal-body">
+                  <div class="reminder-history">
+                    <div class="reminder-list">
+                      <div class="reminder-item" *ngFor="let reminder of reminderHistory">
+                        <div class="reminder-icon" [ngClass]="getReminderIcon(reminder.type)">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                          </svg>
+                        </div>
+                        <div class="reminder-content">
+                          <div class="reminder-header">
+                            <div class="reminder-type">{{ reminder.type }}</div>
+                            <div class="reminder-status" *ngIf="reminder.status">
+                              <span class="status-badge">{{ reminder.status }}</span>
+                            </div>
+                          </div>
+                          <div class="reminder-description">{{ reminder.description }}</div>
+                          <div class="reminder-meta">
+                            <span class="reminder-date">{{ formatDateShort(reminder.date) }}</span>
+                            <span class="reminder-by" *ngIf="reminder.sentBy">• Envoyé par {{ reminder.sentBy }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="no-reminders" *ngIf="reminderHistory.length === 0">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                      </svg>
+                      <p>Aucune relance enregistrée</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="modal-footer">
+                  <button class="btn btn-secondary" (click)="closeReminderHistory()">Fermer</button>
+                </div>
               </div>
+            </div>
             </div>
           </div>
         </div>

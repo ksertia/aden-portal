@@ -51,7 +51,8 @@ export class AdminService {
           city: '', // si dispo, ajouter ville
           country: '' // obligatoire pour respecter le type Address
         },
-        type: item.map.typeDebiteur 
+        type: item.map.typeDebiteur,
+       
       })))
     );
   }

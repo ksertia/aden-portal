@@ -24,6 +24,9 @@ export class DebtorDashboard implements OnInit {
 
   filteredDossiers: any[] = [];
 
+  ActiveCasesCount: number = 0;
+  PendingCasesCount: number = 0;
+
   // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
   creditors: CreditorDetail[] = [];
   filteredCreditors: CreditorDetail[] = [];
@@ -70,6 +73,10 @@ export class DebtorDashboard implements OnInit {
       next: (response) => {
         console.log('Réponse API dossiers :', response);
         this.dossiers = response.data?.map((item: any) => item.map) || [];
+
+        //  mise à jour des statistiques
+        this.updateCaseStatistics(); 
+
         this.isLoading = false;
       },
       error: (error) => {
@@ -123,15 +130,47 @@ export class DebtorDashboard implements OnInit {
     return labels[status] || status;
   }
 
+  // Calcule le montant total dû par le débiteur
   getTotalDebt(): number {
-    return this.filteredDossiers.reduce((acc, d) => acc + (d.montantTotal || 0), 0);
+    if (!this.dossiers || this.dossiers.length === 0) return 0;
+
+    // On additionne tous les montants totaux des dossiers
+    return this.dossiers.reduce((sum, dossier) => {
+      const montant = dossier.montantTotal || 0;
+      return sum + montant;
+    }, 0);
+  }
+
+  updateCaseStatistics(): void {
+    if (!this.dossiers || this.dossiers.length === 0) {
+      this.ActiveCasesCount = 0;
+      this.PendingCasesCount = 0;
+      return;
+    }
+
+    this.ActiveCasesCount = this.dossiers.filter((d) => {
+      const statut = d.statutGlobal?.toLowerCase().trim();
+      return statut === 'nouveau' || statut === 'new' || statut === 'active';
+    }).length;
+
+    this.PendingCasesCount = this.dossiers.filter((d) => {
+      const statut = d.statutGlobal?.toLowerCase().trim();
+      return (
+        statut === 'en_attente' ||
+        statut === 'pending' ||
+        statut === 'attente' ||
+        statut === 'waiting'
+      );
+    }).length;
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
+    if (!amount) return '0FCFA';
+    return amount.toLocaleString('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(amount);
+      currency: 'XOF',
+      minimumFractionDigits: 0
+    });
   }
 
   getPaymentPercentage(dossier: any): number {
