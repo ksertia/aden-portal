@@ -56,13 +56,6 @@ export class CreditorCasesComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    
-    // Vérifier si on doit ouvrir un dossier spécifique depuis les notifications
-    // this.route.queryParams.subscribe(params => {
-    //   if (params['caseId']) {
-    //     this.openCaseFromNotification(params['caseId']);
-    //   }
-    // });
 
     this.loadDossiers();
   }
@@ -128,7 +121,9 @@ export class CreditorCasesComponent implements OnInit {
 
   // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
   getDebiteurForDossier(dossier: any): DebtorInfo | undefined {
-      return this.debiteurs.find(d => d.nodeId === dossier.debiteurNodeId);
+    const debiteurNodeId = dossier.debiteurNodeId?.trim(); // <-- on supprime les espaces
+    return this.debiteurs.find(d => String(d.nodeId).trim() === String(debiteurNodeId));
+    // return this.debiteurs.find(d => d.nodeId === dossier.debiteurNodeId);
   }
 
   // Réinitialiser tous les filtres
