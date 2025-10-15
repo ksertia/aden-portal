@@ -18,6 +18,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/auth/login/login.component').then(c => c.LoginComponent)
   },
   {
+    path: 'register',
+    loadComponent: () => import('./components/auth/register/register').then(c => c.Register)
+  },
+  {
     path: 'unauthorized',
     loadComponent: () => import('./components/unauthorized/unauthorized.component').then(c => c.UnauthorizedComponent)
   },

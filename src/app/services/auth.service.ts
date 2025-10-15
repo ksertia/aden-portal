@@ -31,6 +31,12 @@ export class AuthService {
     );
   }
 
+//Inscription
+register(user: any): Observable<User> {
+    // user.role = ID du rôle
+    return this.http.post<User>(`${this.apiUrl}/register`, user);
+  }
+
   // Déconnexion
   logout(): void {
     localStorage.removeItem('currentUser');

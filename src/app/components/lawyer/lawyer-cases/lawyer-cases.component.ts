@@ -294,7 +294,6 @@ export class LawyerCasesComponent implements OnInit {
       case 'urgent':
       case 'urgente':
         return 'urgente';
-      case 'urgent':
       case 'normal':
       case 'normale':
         return 'normale';
