@@ -1,0 +1,232 @@
+/* === Container principal === */
+.register-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+}
+
+/* === Card === */
+.register-card {
+    background: var(--surface, #fff);
+    border-radius: 16px;
+    padding: 48px;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+    width: 100%;
+    max-width: 480px;
+    animation: fade-in-up 0.6s ease-out;
+}
+
+/* === Header === */
+.register-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.register-header .logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: var(--primary, #2b3a67);
+    color: white;
+    border-radius: 50%;
+    margin-bottom: 24px;
+}
+
+.register-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text, #fff);
+    margin-bottom: 8px;
+}
+
+.register-header p {
+    color: var(--text-secondary, #ddd);
+    font-size: 16px;
+}
+
+/* === Formulaire === */
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Nom + Prénom côte à côte */
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-group.half {
+    flex: 1;
+}
+
+/* === Champs === */
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--text, #333);
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 16px;
+    border: 1px solid var(--border, #ccc);
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    background: var(--surface, #fff);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary, #667eea);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input:disabled,
+.form-group select:disabled {
+    background: #f8fafc;
+    cursor: not-allowed;
+}
+
+/* === Boutons === */
+.ch {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.cancel-btn {
+    width: 100%;
+    padding: 10px;
+    background: var(--secondary, #ccc);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+}
+
+.cancel-btn:hover {
+    background: #bbb;
+}
+
+.register-btn{
+  width: 100%;
+    padding: 10px;
+    background: var(--primary, #667eea);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+}
+
+.register-btn:hover:not(:disabled) {
+    background: var(--primary-dark, #5563c1);
+    transform: translateY(-1px);
+}
+
+.register-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Étoiles rouges */
+.required {
+  color: red;
+  font-weight: bold;
+}
+
+/* Champs valides / invalides */
+input.ng-valid.ng-touched,
+select.ng-valid.ng-touched {
+  border-color: #28a745 !important; /* vert */
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched {
+  border-color: #dc3545 !important; /* rouge */
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+/* Transition douce */
+input, select {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+/* === Spinner === */
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* === Message d'erreur === */
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--error, #d9534f);
+    font-size: 14px;
+    margin-bottom: 24px;
+    padding: 12px;
+    background: #fee2e2;
+    border-radius: 8px;
+    border: 1px solid #fecaca;
+}
+
+/* === Animation === */
+@keyframes fade-in-up {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === Responsive === */
+@media (max-width: 640px) {
+    .register-card {
+        padding: 32px 24px;
+    }
+
+    .register-header h1 {
+        font-size: 24px;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+}

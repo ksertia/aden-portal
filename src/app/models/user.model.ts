@@ -38,6 +38,7 @@ allUser: any;
   firstname: string;
   lastname: string;
   username: string;
+  password:string;
   role: Role;  // Le rôle est un objet qui contient toutes les informations du rôle
   statut: string;
   avatar?: string;
