@@ -475,18 +475,18 @@
               </div>
             </div> -->
           </div>
+          </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="closeDrawer()">Fermer</button>
-          <button class="btn btn-primary" (click)="openDocumentsModal()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14,2 14,8 20,8"/>
-            </svg>
-            Acceder aux documents ({{ getDocumentsCount(selectedDetailCase) }})
-          </button>
+            <button class="btn btn-secondary" (click)="closeDrawer()">Fermer</button>
+            <button class="btn btn-primary" (click)="openDocumentsModal()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+              </svg>
+              Acceder aux documents ({{ getDocumentsCount(selectedDetailCase) }})
+            </button>
         </div>
-      </div>
     </div>
   </div>
 
@@ -505,63 +505,6 @@
           <div class="modal-body">
           <div class="documents-list">
               <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
-              <!-- <div class="list-header">
-                  <app-view-toggle [currentView]="currentView" (viewChange)="currentView = $event"></app-view-toggle>
-              </div> -->
-
-              <!-- Vue grille -->
-              <!-- <div class="documents-grid" *ngIf="currentView === 'grid'">
-                  <div class="document-card" *ngFor="let doc of filteredDocuments">
-                  <div class="document-header">
-                      <div class="document-icon" [ngClass]="'icon-' + doc.type">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                          <polyline points="14,2 14,8 20,8"/>
-                      </svg>
-                      </div>
-                      <div class="document-info">
-                      <h3>{{ doc.name }}</h3>
-                      <p class="document-type">{{ getDocumentTypeLabel(doc.type) }}</p>
-                      </div>
-                      <div class="document-actions">
-                      <button class="btn btn-primary small" (click)="downloadDocument(doc)">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                          <polyline points="7,10 12,15 17,10"/>
-                          <line x1="12" y1="15" x2="12" y2="3"/>
-                          </svg>
-                      </button>
-                      <button class="btn btn-secondary small" (click)="viewDocument(doc)">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                          <circle cx="12" cy="12" r="3"/>
-                          </svg>
-                      </button>
-                      <button class="btn btn-secondary small" (click)="deleteDocument(doc)">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="3,6 5,6 21,6"/>
-                          <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
-                          </svg>
-                      </button>
-                      </div>
-                  </div>
-
-                  <div class="document-details">
-                      <div class="detail-row">
-                      <span class="label">Dossier :</span>
-                      <span class="value">{{ getCaseNumber(doc.caseId) }}</span>
-                      </div>
-                      <div class="detail-row">
-                      <span class="label">Ajouté le :</span>
-                      <span class="value">{{ formatDate(doc.uploadedAt) }}</span>
-                      </div>
-                      <div class="detail-row">
-                      <span class="label">Par :</span>
-                      <span class="value">{{ doc.uploadedBy }}</span>
-                      </div>
-                  </div>
-                  </div>
-              </div> -->
 
               <!-- Vue tableau -->
               <div class="documents-table-container" *ngIf="currentViews === 'table'">
