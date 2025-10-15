@@ -22,9 +22,12 @@ export class LanguageSwitcherComponent implements OnInit {
   }
 
   switchLanguage(locale: SupportedLocale): void {
-    this.i18nService.setLocale(locale);
-    // Recharger la page pour appliquer la nouvelle langue
-    window.location.reload();
+    if (locale !== this.currentLocale) {
+      this.i18nService.setLocale(locale);
+      // Plus besoin de recharger la page !
+      // Le changement de langue déclenche automatiquement
+      // le rechargement du contenu via currentLocale$ dans landing.component.ts
+    }
   }
 
   getLanguageLabel(locale: SupportedLocale): string {
@@ -33,5 +36,13 @@ export class LanguageSwitcherComponent implements OnInit {
       'en': 'EN'
     };
     return labels[locale];
+  }
+
+  getFlagEmoji(locale: SupportedLocale): string {
+    const flags: { [key: string]: string } = {
+      'fr': '🇫🇷',
+      'en': '🇬🇧'
+    };
+    return flags[locale];
   }
 }

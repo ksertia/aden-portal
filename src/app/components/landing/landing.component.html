@@ -12,13 +12,12 @@
           <span>RecouvrePro</span>
         </div>
         <div class="nav-links" *ngIf="nav">
-  <a (click)="scrollToSection('services')">{{ nav?.services }}</a>
-  <a (click)="scrollToSection('advantages')">{{ nav?.advantages }}</a>
-  <a (click)="scrollToSection('contact')">{{ nav?.contact }}</a>
-  <app-language-switcher></app-language-switcher>
-  <a routerLink="/login" class="btn btn-primary">{{ nav?.login }}</a>
-</div>
-
+          <a (click)="scrollToSection('services')">{{ nav.services }}</a>
+          <a (click)="scrollToSection('advantages')">{{ nav.advantages }}</a>
+          <a (click)="scrollToSection('contact')">{{ nav.contact }}</a>
+          <app-language-switcher></app-language-switcher>
+          <a routerLink="/login" class="btn btn-primary">{{ nav.login }}</a>
+        </div>
       </div>
     </nav>
   </header>
@@ -27,16 +26,16 @@
   <section class="hero-section" *ngIf="hero">
     <div class="hero-container">
       <div class="hero-content fade-in-up">
-        <h1>{{ hero?.title }}</h1>
-        <p class="hero-subtitle">{{ hero?.subtitle }}</p>
+        <h1>{{ hero.title }}</h1>
+        <p class="hero-subtitle">{{ hero.subtitle }}</p>
         <div class="hero-actions">
           <a routerLink="/login" class="btn btn-primary large">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
               <polyline points="10,17 15,12 10,7"/>
               <line x1="15" y1="12" x2="3" y2="12"/>
             </svg>
-            <span>{{ hero?.cta?.portal }}</span>
+            <span>{{ hero.cta.portal }}</span>
           </a>
           <button class="btn btn-secondary large" (click)="scrollToSection('services')">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -44,13 +43,13 @@
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
               <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
-            <span>{{ hero?.cta?.learn }}</span>
+            <span>{{ hero.cta.learn }}</span>
           </button>
         </div>
       </div>
       <div class="hero-image fade-in-up">
         <div class="hero-illustration">
-          <div class="illustration-card">
+          <div class="illustration-card" *ngIf="common">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14,2 14,8 20,8"/>
@@ -58,8 +57,8 @@
               <line x1="16" y1="17" x2="8" y2="17"/>
               <polyline points="10,9 9,9 8,9"/>
             </svg>
-            <h3>{{ t('common.digital_management') }}</h3>
-            <p>{{ t('common.centralized_files') }}</p>
+            <h3>{{ common.digital_management }}</h3>
+            <p>{{ common.centralized_files }}</p>
           </div>
         </div>
       </div>
@@ -70,58 +69,37 @@
   <section id="services" class="services-section" *ngIf="services">
     <div class="section-container">
       <div class="section-header fade-in-up">
-        <h2>{{ services?.title }}</h2>
-        <p>{{ services?.subtitle }}</p>
+        <h2>{{ services.title }}</h2>
+        <p>{{ services.subtitle }}</p>
       </div>
       
       <div class="services-grid">
-        <div class="service-card fade-in-up" *ngFor="let item of services?.item">
+        <div class="service-card fade-in-up" *ngFor="let item of services.items">
           <div class="service-icon debtor">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
               <circle cx="12" cy="7" r="4"/>
             </svg>
           </div>
-          <!-- mise en places des logo sur strapi pour que chaque items puisse hériter-->
-          <h3>{{ item?.title }}</h3>
-          <p>{{ item?.description }}</p>
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Avantages Section -->
+  <!-- Benefits Section -->
   <section id="avantages" class="benefits-section" *ngIf="benefits">
     <div class="section-container">
       <div class="section-header fade-in-up">
-        <h2>{{ benefits?.title }}</h2>
-        <p>{{ benefits?.subtitle }}</p>
+        <h2>{{ benefits.title }}</h2>
+        <p>{{ benefits.subtitle }}</p>
       </div>
       
       <div class="benefits-grid">
-        <div class="benefit-item fade-in-up">
-          <h3>{{ benefits?.security?.title }}</h3>
-          <p>{{ benefits?.security?.description }}</p>
-        </div>
-        <div class="benefit-item fade-in-up">
-          <h3>{{ benefits?.time?.title }}</h3>
-          <p>{{ benefits?.time?.description }}</p>
-        </div>
-        <div class="benefit-item fade-in-up">
-          <h3>{{ benefits?.reports?.title }}</h3>
-          <p>{{ benefits?.reports?.description }}</p>
-        </div>
-        <div class="benefit-item fade-in-up">
-          <h3>{{ benefits?.communication?.title }}</h3>
-          <p>{{ benefits?.communication?.description }}</p>
-        </div>
-        <div class="benefit-item fade-in-up">
-          <h3>{{ benefits?.compliance?.title }}</h3>
-          <p>{{ benefits?.compliance?.description }}</p>
-        </div>
-        <div class="benefit-item fade-in-up">
-          <h3>{{ benefits?.support?.title }}</h3>
-          <p>{{ benefits?.support?.description }}</p>
+        <div class="benefit-item fade-in-up" *ngFor="let item of benefits.items">
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
         </div>
       </div>
     </div>
@@ -132,23 +110,19 @@
     <div class="section-container">
       <div class="stats-grid">
         <div class="stat-item fade-in-up">
-          <div class="stat-number">95%</div>
-          <div class="stat-number">{{ stats?.satisfaction }}</div>
+          <div class="stat-number">{{ stats.satisfaction }}</div>
           <div class="stat-label">Satisfaction</div>
         </div>
         <div class="stat-item fade-in-up">
-          <div class="stat-number">60%</div>
-          <div class="stat-number">{{ stats?.time_saving }}</div>
+          <div class="stat-number">{{ stats.time_saving }}</div>
           <div class="stat-label">Gain de temps</div>
         </div>
         <div class="stat-item fade-in-up">
-          <div class="stat-number">10k+</div>
-          <div class="stat-number">{{ stats?.cases_processed }}</div>
+          <div class="stat-number">{{ stats.cases_processed }}</div>
           <div class="stat-label">Dossiers traités</div>
         </div>
         <div class="stat-item fade-in-up">
-          <div class="stat-number">24/7</div>
-          <div class="stat-number">{{ stats?.support_available }}</div>
+          <div class="stat-number">{{ stats.support_available }}</div>
           <div class="stat-label">Support</div>
         </div>
       </div>
@@ -159,12 +133,12 @@
   <section class="cta-section" *ngIf="cta">
     <div class="section-container">
       <div class="cta-content fade-in-up">
-        <h2>{{ cta?.title }}</h2>
-        <p>{{ cta?.subtitle }}</p>
+        <h2>{{ cta.title }}</h2>
+        <p>{{ cta.subtitle }}</p>
         <div class="cta-actions">
-          <a routerLink="/login" class="btn btn-primary large">{{ cta?.start }}</a>
+          <a routerLink="/login" class="btn btn-primary large">{{ cta.start }}</a>
           <button class="btn btn-secondary large" (click)="scrollToSection('contact')">
-            {{ cta?.contact }}
+            {{ cta.contact }}
           </button>
         </div>
       </div>
@@ -175,23 +149,23 @@
   <section id="contact" class="contact-section" *ngIf="contact">
     <div class="section-container">
       <div class="section-header fade-in-up">
-        <h2>{{ contact?.title }}</h2>
-        <p>{{ contact?.subtitle }}</p>
+        <h2>{{ contact.title }}</h2>
+        <p>{{ contact.subtitle }}</p>
       </div>
       
       <div class="contact-grid">
         <div class="contact-info fade-in-up">
           <div class="contact-item">
             <h3>Adresse</h3>
-            <p>{{ contact?.address }}</p>
+            <p>{{ contact.address }}</p>
           </div>
           <div class="contact-item">
             <h3>Téléphone</h3>
-            <p>{{ contact?.phone }}</p>
+            <p>{{ contact.phone }}</p>
           </div>
           <div class="contact-item">
             <h3>Email</h3>
-            <p>{{ contact?.email }}</p>
+            <p>{{ contact.email }}</p>
           </div>
         </div>
         
@@ -199,33 +173,37 @@
           <form class="form" (ngSubmit)="submitContactForm()">
             <div class="form-row">
               <div class="form-group">
-                <label>{{ contact?.form?.firstName }}</label>
-                <input type="text" [(ngModel)]="contactForm.firstName" name="firstName" [placeholder]="contact?.form?.placeholder?.firstNamePlaceholder">
+                <label>{{ contact.form.firstName }}</label>
+                <input type="text" [(ngModel)]="contactForm.firstName" name="firstName" 
+                       [placeholder]="contact.form.placeholder.firstNamePlaceholder">
               </div>
               <div class="form-group">
-                <label>{{ contact?.form?.lastName }}</label>
-                <input type="text" [(ngModel)]="contactForm.lastName" name="lastName" [placeholder]="contact?.form?.placeholder?.lastNamePlaceholder">
+                <label>{{ contact.form.lastName }}</label>
+                <input type="text" [(ngModel)]="contactForm.lastName" name="lastName" 
+                       [placeholder]="contact.form.placeholder.lastNamePlaceholder">
               </div>
             </div>
             <div class="form-group">
-              <label>{{ contact?.form?.email }}</label>
-              <input type="email" [(ngModel)]="contactForm.email" name="email" [placeholder]="contact?.form?.placeholder?.emailPlaceholder">
+              <label>{{ contact.form.email }}</label>
+              <input type="email" [(ngModel)]="contactForm.email" name="email" 
+                     [placeholder]="contact.form.placeholder.emailPlaceholder">
             </div>
             <div class="form-group">
-              <label>{{ contact?.form?.profile }}</label>
+              <label>{{ contact.form.profile }}</label>
               <select [(ngModel)]="contactForm.profile" name="profile">
-                <option value="">{{ contact?.form?.profileOption?.selectProfile }}</option>
-                <option value="debtor">{{ contact?.form?.profileOption?.debtor }}</option>
-                <option value="bailiff">{{ contact?.form?.profileOption?.bailiff }}</option>
-                <option value="lawyer">{{ contact?.form?.profileOption?.lawyer }}</option>
-                <option value="creditor">{{ contact?.form?.profileOption?.creditor }}</option>
+                <option value="">{{ contact.form.profileOption.selectProfile }}</option>
+                <option value="debtor">{{ contact.form.profileOption.debtor }}</option>
+                <option value="bailiff">{{ contact.form.profileOption.bailiff }}</option>
+                <option value="lawyer">{{ contact.form.profileOption.lawyer }}</option>
+                <option value="creditor">{{ contact.form.profileOption.creditor }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label>{{ contact?.form?.message }}</label>
-              <textarea rows="4" [(ngModel)]="contactForm.message" name="message" [placeholder]="contact?.form?.placeholder?.messagePlaceholder"></textarea>
+              <label>{{ contact.form.message }}</label>
+              <textarea rows="4" [(ngModel)]="contactForm.message" name="message" 
+                        [placeholder]="contact.form.placeholder.messagePlaceholder"></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">{{ contact?.form?.send }}</button>
+            <button type="submit" class="btn btn-primary">{{ contact.form.send }}</button>
           </form>
         </div>
       </div>
@@ -248,15 +226,15 @@
         </div>
         
         <div class="footer-section">
-          <h3>{{ footer?.services }}</h3>
-          <p>{{ footer?.support }}</p>
-          <p>{{ footer?.legal }}</p>
-          <p>{{ footer?.contact }}</p>
+          <h3>{{ footer.services }}</h3>
+          <p>{{ footer.support }}</p>
+          <p>{{ footer.legal }}</p>
+          <p>{{ footer.contact }}</p>
         </div>
       </div>
       
       <div class="footer-bottom">
-        <p>{{ footer?.copyright }}</p>
+        <p>{{ footer.copyright }}</p>
       </div>
     </div>
   </footer>
