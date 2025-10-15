@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../services/admin.service';
 import { CreditorDetail } from '../../../models/case.model';
 import { CaseDocument, DocumentType } from '../../../models/case.model';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 interface InterestDetail {
   type: string;
@@ -102,6 +103,15 @@ export class DebtorCasesComponent implements OnInit {
   };
   // Ajout end
 
+
+  // Les propriétés pour la visualisation des documents
+  showDocumentViewer = false;
+  currentDocumentUrl: any = null;
+  currentDocument: any = null;
+  documentContentType = '';
+  isLoadingDocument = false;
+  safePdfUrl: SafeResourceUrl | null = null;
+
   // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
   creditors: CreditorDetail[] = [];
   filteredCreditors: CreditorDetail[] = [];
@@ -119,7 +129,8 @@ export class DebtorCasesComponent implements OnInit {
     private i18nService: I18nService,
     private authService: AuthService,
     private adminService: AdminService,
-    private caseService: CaseService
+    private caseService: CaseService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -127,8 +138,6 @@ export class DebtorCasesComponent implements OnInit {
     this.loadTranslations();
     this.i18nService.currentLocale$.subscribe(() => {
     this.loadTranslations();
-    // Ajout
-    // this.loadData();
     });
 
 
@@ -197,10 +206,10 @@ export class DebtorCasesComponent implements OnInit {
     this.showCaseDetailsModal = false; // Fermer le tiroir
   }
 
-   // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
-    getCreancierForDossier(dossier: any): CreditorDetail | undefined {
-        return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
-    }
+  // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
+  getCreancierForDossier(dossier: any): CreditorDetail | undefined {
+    return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
+  }
 
   private loadTranslations() {
     const locale = this.i18nService.getCurrentLocale();
@@ -401,24 +410,24 @@ export class DebtorCasesComponent implements OnInit {
     this.paymentAmount = Math.round(amount * 100) / 100;
   }
      processPayment() {
-    if (!this.selectedCase || this.paymentAmount <= 0) return;
+    // if (!this.selectedCase || this.paymentAmount <= 0) return;
 
-    this.isProcessingPayment = true;
+    // this.isProcessingPayment = true;
 
-    this.casesService.createPayment(this.selectedCase.id, this.paymentAmount)
-      .subscribe({
-        next: (updatedCase) => {
-          const caseIndex = this.userCases.findIndex(c => c.id === updatedCase.id);
-          if (caseIndex >= 0) {
-            this.userCases[caseIndex] = updatedCase;
-          }
-          this.closePaymentModal();
-        },
-        error: (error) => {
-          console.error('Erreur lors du paiement:', error);
-          this.isProcessingPayment = false;
-        }
-      });
+    // this.casesService.createPayment(this.selectedCase.id, this.paymentAmount)
+    //   .subscribe({
+    //     next: (updatedCase) => {
+    //       const caseIndex = this.userCases.findIndex(c => c.id === updatedCase.id);
+    //       if (caseIndex >= 0) {
+    //         this.userCases[caseIndex] = updatedCase;
+    //       }
+    //       this.closePaymentModal();
+    //     },
+    //     error: (error) => {
+    //       console.error('Erreur lors du paiement:', error);
+    //       this.isProcessingPayment = false;
+    //     }
+    //   });
   }
    closePaymentPlanModal() {
     this.showPaymentPlanModal = false;
@@ -447,15 +456,15 @@ export class DebtorCasesComponent implements OnInit {
       notes: this.paymentPlanProposal.notes
     };
 
-    this.casesService.createPaymentProposal(proposal)
-      .subscribe({
-        next: () => {
-          this.closePaymentPlanModal();
-        },
-        error: (error) => {
-          console.error('Erreur lors de la soumission:', error);
-        }
-      });
+    // this.casesService.createPaymentProposal(proposal)
+    //   .subscribe({
+    //     next: () => {
+    //       this.closePaymentPlanModal();
+    //     },
+    //     error: (error) => {
+    //       console.error('Erreur lors de la soumission:', error);
+    //     }
+    //   });
   }
    isPaymentPlanValid(): boolean {
     return this.paymentPlanProposal.monthlyAmount > 0 &&
@@ -508,16 +517,16 @@ export class DebtorCasesComponent implements OnInit {
       isPrivate: false
     };
 
-    this.casesService.addCaseNote(disputeNote).subscribe({
-      next: () => {
-        this.isSubmittingDispute = false;
-        this.closeDisputeModal();
-      },
-      error: (error) => {
-        console.error('Erreur lors de la contestation:', error);
-        this.isSubmittingDispute = false;
-      }
-    });
+    // this.casesService.addCaseNote(disputeNote).subscribe({
+    //   next: () => {
+    //     this.isSubmittingDispute = false;
+    //     this.closeDisputeModal();
+    //   },
+    //   error: (error) => {
+    //     console.error('Erreur lors de la contestation:', error);
+    //     this.isSubmittingDispute = false;
+    //   }
+    // });
   }
    isDisputeValid(): boolean {
     return this.disputeForm.reason !== '' && 
@@ -814,6 +823,87 @@ getPenaltiesDetail(dossier: any): PenaltyDetail[] {
   return labels[type] || type;
 }
 
+// Méthode pour visualiser un document
+  viewDocument(doc: any) {
+    console.log('Visualisation du document:', doc);
+
+    const documentIdentifier = doc.nodeId || doc.id; //  fallback si nodeId absent
+    
+    if (!documentIdentifier) {
+      alert('Identifiant du document manquant');
+      return;
+    }
+    
+    this.isLoadingDocument = true;
+    this.currentDocument = doc;
+  
+    // Récupérer le contenu du document depuis le backend
+    this.casesService.getDocumentContent(doc.id).subscribe({
+      next: (blob) => {
+        this.isLoadingDocument = false;
+
+        // Création de l'URL temporaire
+        const blobUrl = window.URL.createObjectURL(blob);
+        this.currentDocumentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+        this.documentContentType = blob.type;
+        
+        // Ouvrir la modale de visualisation
+        this.showDocumentViewer = true;
+        
+        console.log('Document chargé avec succès. Type:', blob.type);
+      },
+      error: (error) => {
+        this.isLoadingDocument = false;
+        console.error('Erreur lors du chargement du document:', error);
+        alert('Impossible de charger le document. Veuillez réessayer.');
+      }
+    });
+  }
+
+// Méthode pour fermer le visualiseur
+closeDocumentViewer() {
+  if (this.currentDocumentUrl) {
+    window.URL.revokeObjectURL(this.currentDocumentUrl);
+  }
+  this.showDocumentViewer = false;
+  this.currentDocumentUrl = null;
+  this.currentDocument = null;
+  this.documentContentType = '';
+}
+
+// Méthode pour télécharger un document
+downloadDocument(doc: any) {
+  console.log('Téléchargement du document:', doc);
+  
+  if (!doc.id) {
+    alert('Identifiant du document manquant');
+    return;
+  }
+
+  this.caseService.downloadDocument(doc.id, doc.name);
+}
+
+// Méthode pour vérifier si le document est un PDF
+isDocumentPDF(): boolean {
+  return this.documentContentType === 'application/pdf' || 
+         this.currentDocument?.name?.toLowerCase().endsWith('.pdf');
+}
+
+// Méthode pour vérifier si le document est une image
+isDocumentImage(): boolean {
+  return this.documentContentType?.startsWith('image/') ||
+    /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(this.currentDocument?.name);
+}
+
+// Méthode pour ouvrir le document dans un nouvel onglet
+ openInNewTab() {
+    if (this.currentDocumentUrl) {
+      // Si c’est un SafeResourceUrl, on le convertit
+      const url = (this.currentDocumentUrl as any).changingThisBreaksApplicationSecurity || this.currentDocumentUrl;
+      window.open(url, '_blank');
+    }
+  }
+
 
   isUploadValid(): boolean {
     return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
@@ -888,26 +978,6 @@ getPenaltiesDetail(dossier: any): PenaltyDetail[] {
   getDocumentsCount(dossier: any): number {
     if (!dossier) return 0;
     return dossier.documentsDebiteur?.myArrayList?.length || 0;
-  }
-
-  // Méthode pour télécharger un document
-  downloadDocument(doc: any) {
-    if (doc.url && doc.url !== '#') {
-      window.open(doc.url, '_blank');
-    } else {
-      console.log('URL de téléchargement non disponible pour:', doc.name);
-      alert('Le document n\'est pas disponible au téléchargement');
-    }
-  }
-
-  // Méthode pour visualiser un document
-  viewDocument(doc: any) {
-    if (doc.url && doc.url !== '#') {
-      window.open(doc.url, '_blank');
-    } else {
-      console.log('URL non disponible pour:', doc.name);
-      alert('Impossible de visualiser ce document');
-    }
   }
 
 }

@@ -1151,6 +1151,88 @@
           </div>
       </div>
   </div>
+
+  <!-- Modale de visualisation de document -->
+<div class="document-viewer-overlay" *ngIf="showDocumentViewer" (click)="closeDocumentViewer()">
+  <div class="document-viewer-modal" (click)="$event.stopPropagation()">
+    <!-- En-tête -->
+    <div class="document-viewer-header">
+      <div class="document-viewer-info">
+        <h3>{{ currentDocument?.name }}</h3>
+        <p class="document-meta">
+          <span class="document-type-badge" [ngClass]="'type-' + currentDocument?.type">
+            {{ getDocumentTypeLabel(currentDocument?.type) }}
+          </span>
+          <span class="document-size" *ngIf="currentDocument?.size">
+            • {{ formatFileSize(currentDocument.size) }}
+          </span>
+        </p>
+      </div>
+      <div class="document-viewer-actions">
+        <button class="btn-icon" (click)="openInNewTab()" title="Ouvrir dans un nouvel onglet">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15,3 21,3 21,9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </button>
+        <button class="btn-icon" (click)="downloadDocument(currentDocument)" title="Télécharger">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+        <button class="btn-icon close-btn" (click)="closeDocumentViewer()" title="Fermer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenu du document -->
+    <div class="document-viewer-content">
+      <!-- Chargement -->
+      <div class="document-loading" *ngIf="isLoadingDocument">
+        <div class="spinner"></div>
+        <p>Chargement du document...</p>
+      </div>
+
+      <!-- Affichage PDF -->
+      <iframe 
+        *ngIf="!isLoadingDocument && isDocumentPDF() && currentDocumentUrl"
+        [src]="currentDocumentUrl"
+        class="document-iframe"
+        frameborder="0">
+      </iframe>
+
+      <!-- Affichage Image -->
+      <div class="document-image-container" *ngIf="!isLoadingDocument && isDocumentImage() && currentDocumentUrl">
+        <img [src]="currentDocumentUrl" [alt]="currentDocument?.name" class="document-image">
+      </div>
+
+      <!-- Autres types de documents -->
+      <div class="document-unsupported" *ngIf="!isLoadingDocument && !isDocumentPDF() && !isDocumentImage()">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <h3>Aperçu non disponible</h3>
+        <p>Ce type de fichier ne peut pas être visualisé directement dans le navigateur.</p>
+        <button class="btn btn-primary" (click)="downloadDocument(currentDocument)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Télécharger le document
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
   
 </div>
 

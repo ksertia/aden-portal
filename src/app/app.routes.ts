@@ -225,6 +225,10 @@ export const routes: Routes = [
           { 
             path: 'partenaire',
             loadComponent: () => import('./components/admin/partenaire/partenaire').then(c => c.Partenaire)
+          },
+          { 
+            path: 'dashboard',
+            loadComponent: () => import('./components/admin/dashboard/dashboard').then(c => c.Dashboard)
           }
 
         ]

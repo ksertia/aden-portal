@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
 import { DebtCase, CaseDocument, DocumentType } from '../../../models/case.model';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-debtor-documents',
@@ -30,9 +31,19 @@ export class DebtorDocumentsComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
 
+  // Les propriétés pour les documents
+  showDocumentViewer = false;
+  currentDocumentUrl: any = null;
+  currentDocument: any = null;
+  documentContentType = '';
+  isLoadingDocument = false;
+  safePdfUrl: SafeResourceUrl | null = null;
+
+
   constructor(
     private caseService: CaseService,
-    private authService: AuthService
+    private authService: AuthService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
@@ -191,34 +202,34 @@ export class DebtorDocumentsComponent implements OnInit {
   }
 
   // Afficher le document dans un modal
-  viewDocument(doc: CaseDocument) {
-    if (doc.url && doc.url !== '#') {
-      // Ouvrir dans un nouvel onglet
-      window.open(doc.url, '_blank');
-    } else {
-      // Afficher dans le modal si pas d'URL
-      this.selectedDocument = doc;
-      this.showViewModal = true;
-    }
-  }
+  // viewDocument(doc: CaseDocument) {
+  //   if (doc.url && doc.url !== '#') {
+  //     // Ouvrir dans un nouvel onglet
+  //     window.open(doc.url, '_blank');
+  //   } else {
+  //     // Afficher dans le modal si pas d'URL
+  //     this.selectedDocument = doc;
+  //     this.showViewModal = true;
+  //   }
+  // }
 
   // Télécharger le document
-  downloadDocument(doc: CaseDocument) {
-    if (doc.url && doc.url !== '#') {
-      // Créer un lien temporaire pour télécharger
-      const link = document.createElement('a');
-      link.href = doc.url;
-      link.download = doc.name;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      console.log('Téléchargement du document:', doc.name);
-    } else {
-      console.log('URL de téléchargement non disponible pour:', doc.name);
-      alert('Le document n\'est pas disponible au téléchargement pour le moment');
-    }
-  }
+  // downloadDocument(doc: CaseDocument) {
+  //   if (doc.url && doc.url !== '#') {
+  //     // Créer un lien temporaire pour télécharger
+  //     const link = document.createElement('a');
+  //     link.href = doc.url;
+  //     link.download = doc.name;
+  //     link.target = '_blank';
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //     console.log('Téléchargement du document:', doc.name);
+  //   } else {
+  //     console.log('URL de téléchargement non disponible pour:', doc.name);
+  //     alert('Le document n\'est pas disponible au téléchargement pour le moment');
+  //   }
+  // }
 
   // Fermer le modal de visualisation
   closeViewModal() {
@@ -235,6 +246,99 @@ export class DebtorDocumentsComponent implements OnInit {
   getTotalDocumentsSize(): string {
     // TODO: Implémenter si la taille est disponible dans l'API
     return 'N/A';
+  }
+
+
+  /* ============================================
+   Pour la visualisation des  DOCUMENTS
+   ============================================ */
+  // Méthode pour visualiser un document
+ viewDocument(doc: any) {
+    console.log('Visualisation du document:', doc);
+
+    const documentIdentifier = doc.nodeId || doc.id; //  fallback si nodeId absent
+    
+    if (!documentIdentifier) {
+      alert('Identifiant du document manquant');
+      return;
+    }
+    
+    this.isLoadingDocument = true;
+    this.currentDocument = doc;
+  
+    // Récupérer le contenu du document depuis le backend
+    this.caseService.getDocumentContent(doc.id).subscribe({
+      next: (blob) => {
+        this.isLoadingDocument = false;
+
+        // Création de l'URL temporaire
+        const blobUrl = window.URL.createObjectURL(blob);
+        this.currentDocumentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+        this.documentContentType = blob.type;
+        
+        // Ouvrir la modale de visualisation
+        this.showDocumentViewer = true;
+        
+        console.log('Document chargé avec succès. Type:', blob.type);
+      },
+      error: (error) => {
+        this.isLoadingDocument = false;
+        console.error('Erreur lors du chargement du document:', error);
+        alert('Impossible de charger le document. Veuillez réessayer.');
+      }
+    });
+  }
+
+  // Méthode pour fermer le visualiseur
+  closeDocumentViewer() {
+    if (this.currentDocumentUrl) {
+      window.URL.revokeObjectURL(this.currentDocumentUrl);
+    }
+    this.showDocumentViewer = false;
+    this.currentDocumentUrl = null;
+    this.currentDocument = null;
+    this.documentContentType = '';
+  }
+
+  // Méthode pour télécharger un document
+  downloadDocument(doc: any) {
+    console.log('Téléchargement du document:', doc);
+    
+    if (!doc.id) {
+      alert('Identifiant du document manquant');
+      return;
+    }
+
+    this.caseService.downloadDocument(doc.id, doc.name);
+  }
+
+  // Méthode pour vérifier si le document est un PDF
+  isDocumentPDF(): boolean {
+    return this.documentContentType === 'application/pdf' || 
+    this.currentDocument?.name?.toLowerCase().endsWith('.pdf');
+  }
+
+  // Méthode pour vérifier si le document est une image
+  isDocumentImage(): boolean {
+    return this.documentContentType?.startsWith('image/') ||
+    /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(this.currentDocument?.name);
+  }
+
+  // Méthode pour ouvrir le document dans un nouvel onglet
+  openInNewTab() {
+    if (this.currentDocumentUrl) {
+      // Si c’est un SafeResourceUrl, on le convertit
+      const url = (this.currentDocumentUrl as any).changingThisBreaksApplicationSecurity || this.currentDocumentUrl;
+      window.open(url, '_blank');
+    }
+  }
+
+ formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
 }

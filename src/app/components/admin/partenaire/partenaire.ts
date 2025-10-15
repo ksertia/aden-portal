@@ -87,9 +87,9 @@ export class Partenaire implements OnInit {
   }
 
   loadStatistics() {
-    this.caseService.getStatistics().subscribe(stats => {
-      this.statistics = stats;
-    });
+    // this.caseService.getStatistics().subscribe(stats => {
+    //   this.statistics = stats;
+    // });
   }
 
   closeCaseDetailsModal() {

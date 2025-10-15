@@ -78,8 +78,8 @@ private redirectToDashboard(user: any): void {
       case 'debtor': // ← CORRIGÉ : 'debiteur' au lieu de 'adebtor'
         this.router.navigate(['/debtor/dashboard']);
         break;
-      case 'administrateur': // ← CORRIGÉ : 'administrateur' au lieu de 'manager'
-        this.router.navigate(['/Administrateur/user-list']); // Rediriger vers une page existante
+      case 'Administrateur': // ← CORRIGÉ : 'administrateur' au lieu de 'manager'
+        this.router.navigate(['/Administrateur/dashboard']); // Rediriger vers une page existante
         break;
       case 'bailiff':
         this.router.navigate(['/bailiff/dashboard']); // Rediriger vers une page existante

@@ -69,29 +69,29 @@ export class ReportsComponent implements OnInit {
       priority: this.reportConfig.priority.length > 0 ? this.reportConfig.priority as Priority[] : undefined
     };
 
-    this.caseService.generateReport(filters).subscribe({
-      next: (report) => {
-        this.isGenerating = false;
-        console.log('Rapport généré:', report);
+    // this.caseService.generateReport(filters).subscribe({
+    //   next: (report) => {
+    //     this.isGenerating = false;
+    //     console.log('Rapport généré:', report);
         
-        // Ajouter à l'historique
-        const newReport = {
-          id: Date.now().toString(),
-          name: `${this.getReportTypeLabel(this.reportConfig.type)} - ${this.formatDate(new Date())}`,
-          type: this.reportConfig.type,
-          generatedAt: new Date(),
-          url: '#'
-        };
-        this.reportHistory.unshift(newReport);
+    //     // Ajouter à l'historique
+    //     const newReport = {
+    //       id: Date.now().toString(),
+    //       name: `${this.getReportTypeLabel(this.reportConfig.type)} - ${this.formatDate(new Date())}`,
+    //       type: this.reportConfig.type,
+    //       generatedAt: new Date(),
+    //       url: '#'
+    //     };
+    //     this.reportHistory.unshift(newReport);
         
-        // Simuler le téléchargement
-        this.downloadReportData(report);
-      },
-      error: (error) => {
-        this.isGenerating = false;
-        console.error('Erreur lors de la génération:', error);
-      }
-    });
+    //     // Simuler le téléchargement
+    //     this.downloadReportData(report);
+    //   },
+    //   error: (error) => {
+    //     this.isGenerating = false;
+    //     console.error('Erreur lors de la génération:', error);
+    //   }
+    // });
   }
 
   previewReport() {
@@ -102,15 +102,15 @@ export class ReportsComponent implements OnInit {
       priority: this.reportConfig.priority.length > 0 ? this.reportConfig.priority as Priority[] : undefined
     };
 
-    this.caseService.generateReport(filters).subscribe({
-      next: (report) => {
-        this.previewData = report.summary;
-        this.showPreviewModal = true;
-      },
-      error: (error) => {
-        console.error('Erreur lors de l\'aperçu:', error);
-      }
-    });
+    // this.caseService.generateReport(filters).subscribe({
+    //   next: (report) => {
+    //     this.previewData = report.summary;
+    //     this.showPreviewModal = true;
+    //   },
+    //   error: (error) => {
+    //     console.error('Erreur lors de l\'aperçu:', error);
+    //   }
+    // });
   }
 
   generateFromPreview() {

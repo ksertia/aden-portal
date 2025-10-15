@@ -51,32 +51,32 @@ export class Cedant implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.caseService.getCases().subscribe(cases => {
-      // Filtrer les dossiers pour ce créancier
-      this.cases = cases.filter(c => 
-        c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
-      );
-      this.applyFilters();
-    });
+    // this.caseService.getCases().subscribe(cases => {
+    //   // Filtrer les dossiers pour ce créancier
+    //   this.cases = cases.filter(c => 
+    //     c.creditor.name === currentUser.companyName || 
+    //     c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
+    //   );
+    //   this.applyFilters();
+    // });
   }
 
   loadStatistics() {
-    this.caseService.getStatistics().subscribe(stats => {
-      this.statistics = stats;
-    });
+    // this.caseService.getStatistics().subscribe(stats => {
+    //   this.statistics = stats;
+    // });
   }
 
   applyFilters() {
-    this.caseService.getCasesWithFilter(this.filters).subscribe(cases => {
-      const currentUser = this.authService.getCurrentUser();
-      if (!currentUser) return;
+    // this.caseService.getCasesWithFilter(this.filters).subscribe(cases => {
+    //   const currentUser = this.authService.getCurrentUser();
+    //   if (!currentUser) return;
       
-      this.filteredCases = cases.filter(c => 
-        c.creditor.name === currentUser.companyName || 
-        c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
-      );
-    });
+    //   this.filteredCases = cases.filter(c => 
+    //     c.creditor.name === currentUser.companyName || 
+    //     c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
+    //   );
+    // });
   }
 
   updateStatusFilter() {

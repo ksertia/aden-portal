@@ -45,11 +45,11 @@ export class DocumentsComponent implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.caseService.getCasesByUserId(currentUser.id, currentUser.role.name)
-      .subscribe(cases => {
-        this.cases = cases;
-        this.extractDocuments();
-      });
+    // this.caseService.getCasesByUserId(currentUser.id, currentUser.role.name)
+    //   .subscribe(cases => {
+    //     this.cases = cases;
+    //     this.extractDocuments();
+    //   });
   }
 
   extractDocuments() {
