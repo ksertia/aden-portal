@@ -17,7 +17,7 @@
   <a (click)="scrollToSection('contact')">{{ nav?.contact }}</a>
   <app-language-switcher></app-language-switcher>
   <a routerLink="/login" class="btn btn-primary">{{ nav?.login }}</a>
-  <a routerLink="/register" class="btn btn-primary">Registe</a>
+  <a routerLink="/register" class="btn btn-primary">Register</a>
 </div>
 
       </div>
@@ -28,16 +28,16 @@
   <section class="hero-section" *ngIf="hero">
     <div class="hero-container">
       <div class="hero-content fade-in-up">
-        <h1>{{ hero?.title }}</h1>
-        <p class="hero-subtitle">{{ hero?.subtitle }}</p>
+        <h1>{{ hero.title }}</h1>
+        <p class="hero-subtitle">{{ hero.subtitle }}</p>
         <div class="hero-actions">
           <a routerLink="/login" class="btn btn-primary large">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
               <polyline points="10,17 15,12 10,7"/>
               <line x1="15" y1="12" x2="3" y2="12"/>
             </svg>
-            <span>{{ hero?.cta?.portal }}</span>
+            <span>{{ hero.cta.portal }}</span>
           </a>
           <button class="btn btn-secondary large" (click)="scrollToSection('services')">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -45,13 +45,13 @@
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
               <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
-            <span>{{ hero?.cta?.learn }}</span>
+            <span>{{ hero.cta.learn }}</span>
           </button>
         </div>
       </div>
       <div class="hero-image fade-in-up">
         <div class="hero-illustration">
-          <div class="illustration-card">
+          <div class="illustration-card" *ngIf="common">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14,2 14,8 20,8"/>
@@ -59,8 +59,8 @@
               <line x1="16" y1="17" x2="8" y2="17"/>
               <polyline points="10,9 9,9 8,9"/>
             </svg>
-            <h3>{{ t('common.digital_management') }}</h3>
-            <p>{{ t('common.centralized_files') }}</p>
+            <h3>{{ common.digital_management }}</h3>
+            <p>{{ common.centralized_files }}</p>
           </div>
         </div>
       </div>
@@ -71,21 +71,52 @@
   <section id="services" class="services-section" *ngIf="services">
     <div class="section-container">
       <div class="section-header fade-in-up">
-        <h2>{{ services?.title }}</h2>
-        <p>{{ services?.subtitle }}</p>
+        <h2>{{ services.title }}</h2>
+        <p>{{ services.subtitle }}</p>
       </div>
       
       <div class="services-grid">
-        <div class="service-card fade-in-up" *ngFor="let item of services?.item">
-          <div class="service-icon debtor">
+        <div class="service-card fade-in-up" *ngFor="let item of services.items; let i = index">
+          <div class="service-icon" [ngClass]="getServiceIconClass(i)">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
+              <ng-container [ngSwitch]="i">
+                <!-- Débiteur -->
+                <ng-container *ngSwitchCase="0">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </ng-container>
+                <!-- Huissier -->
+                <ng-container *ngSwitchCase="1">
+                  <path d="M9 12l2 2 4-4"/>
+                  <circle cx="12" cy="12" r="9"/>
+                </ng-container>
+                <!-- Avocat -->
+                <ng-container *ngSwitchCase="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14,2 14,8 20,8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                </ng-container>
+                <!-- Créancier -->
+                <ng-container *ngSwitchCase="3">
+                  <line x1="12" y1="1" x2="12" y2="23"/>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </ng-container>
+                <!-- Cédant -->
+                <ng-container *ngSwitchCase="4">
+                  <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                  <path d="M3 3v5h5"/>
+                  <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                  <path d="M16 16h5v5"/>
+                </ng-container>
+              </ng-container>
             </svg>
           </div>
-          <!-- mise en places des logo sur strapi pour que chaque items puisse hériter-->
-          <h3>{{ item?.title }}</h3>
-          <p>{{ item?.description }}</p>
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+          <ul class="service-features" *ngIf="item.features && item.features.length > 0">
+            <li *ngFor="let feature of item.features">{{ feature }}</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -95,34 +126,52 @@
   <section id="avantages" class="benefits-section" *ngIf="benefits">
     <div class="section-container">
       <div class="section-header fade-in-up">
-        <h2>{{ benefits?.title }}</h2>
-        <p>{{ benefits?.subtitle }}</p>
+        <h2>{{ benefits.title }}</h2>
+        <p>{{ benefits.subtitle }}</p>
       </div>
       
       <div class="benefits-grid">
-        <div class="benefit-item fade-in-up">
-          <h3>{{ benefits?.security?.title }}</h3>
-          <p>{{ benefits?.security?.description }}</p>
-        </div>
-        <div class="benefit-item fade-in-up">
-          <h3>{{ benefits?.time?.title }}</h3>
-          <p>{{ benefits?.time?.description }}</p>
-        </div>
-        <div class="benefit-item fade-in-up">
-          <h3>{{ benefits?.reports?.title }}</h3>
-          <p>{{ benefits?.reports?.description }}</p>
-        </div>
-        <div class="benefit-item fade-in-up">
-          <h3>{{ benefits?.communication?.title }}</h3>
-          <p>{{ benefits?.communication?.description }}</p>
-        </div>
-        <div class="benefit-item fade-in-up">
-          <h3>{{ benefits?.compliance?.title }}</h3>
-          <p>{{ benefits?.compliance?.description }}</p>
-        </div>
-        <div class="benefit-item fade-in-up">
-          <h3>{{ benefits?.support?.title }}</h3>
-          <p>{{ benefits?.support?.description }}</p>
+        <div class="benefit-item fade-in-up" *ngFor="let item of benefits.items; let i = index">
+          <div class="benefit-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <ng-container [ngSwitch]="i">
+                <!-- Sécurité -->
+                <ng-container *ngSwitchCase="0">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </ng-container>
+                <!-- Temps -->
+                <ng-container *ngSwitchCase="1">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12,6 12,12 16,14"/>
+                </ng-container>
+                <!-- Rapports -->
+                <ng-container *ngSwitchCase="2">
+                  <path d="M9 2v6l3-3 3 3-3 3v6"/>
+                  <path d="M15 8h6"/>
+                  <path d="M15 16h6"/>
+                </ng-container>
+                <!-- Communication -->
+                <ng-container *ngSwitchCase="3">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </ng-container>
+                <!-- Conformité -->
+                <ng-container *ngSwitchCase="4">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                  <path d="M2 17l10 5 10-5"/>
+                  <path d="M2 12l10 5 10-5"/>
+                </ng-container>
+                <!-- Support -->
+                <ng-container *ngSwitchCase="5">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="8.5" cy="7" r="4"/>
+                  <path d="M20 8v6"/>
+                  <path d="M23 11h-6"/>
+                </ng-container>
+              </ng-container>
+            </svg>
+          </div>
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
         </div>
       </div>
     </div>
@@ -133,24 +182,20 @@
     <div class="section-container">
       <div class="stats-grid">
         <div class="stat-item fade-in-up">
-          <div class="stat-number">95%</div>
-          <div class="stat-number">{{ stats?.satisfaction }}</div>
-          <div class="stat-label">Satisfaction</div>
+          <div class="stat-number">{{ stats.satisfaction }}</div>
+          <div class="stat-label">Taux de satisfaction</div>
         </div>
         <div class="stat-item fade-in-up">
-          <div class="stat-number">60%</div>
-          <div class="stat-number">{{ stats?.time_saving }}</div>
-          <div class="stat-label">Gain de temps</div>
+          <div class="stat-number">{{ stats.time_saving }}</div>
+          <div class="stat-label">Gain de temps moyen</div>
         </div>
         <div class="stat-item fade-in-up">
-          <div class="stat-number">10k+</div>
-          <div class="stat-number">{{ stats?.cases_processed }}</div>
+          <div class="stat-number">{{ stats.cases_processed }}</div>
           <div class="stat-label">Dossiers traités</div>
         </div>
         <div class="stat-item fade-in-up">
-          <div class="stat-number">24/7</div>
-          <div class="stat-number">{{ stats?.support_available }}</div>
-          <div class="stat-label">Support</div>
+          <div class="stat-number">{{ stats.support_available }}</div>
+          <div class="stat-label">Support disponible</div>
         </div>
       </div>
     </div>
@@ -160,12 +205,12 @@
   <section class="cta-section" *ngIf="cta">
     <div class="section-container">
       <div class="cta-content fade-in-up">
-        <h2>{{ cta?.title }}</h2>
-        <p>{{ cta?.subtitle }}</p>
+        <h2>{{ cta.title }}</h2>
+        <p>{{ cta.subtitle }}</p>
         <div class="cta-actions">
-          <a routerLink="/login" class="btn btn-primary large">{{ cta?.start }}</a>
+          <a routerLink="/login" class="btn btn-primary large">{{ cta.start }}</a>
           <button class="btn btn-secondary large" (click)="scrollToSection('contact')">
-            {{ cta?.contact }}
+            {{ cta.contact }}
           </button>
         </div>
       </div>
@@ -176,23 +221,48 @@
   <section id="contact" class="contact-section" *ngIf="contact">
     <div class="section-container">
       <div class="section-header fade-in-up">
-        <h2>{{ contact?.title }}</h2>
-        <p>{{ contact?.subtitle }}</p>
+        <h2>{{ contact.title }}</h2>
+        <p>{{ contact.subtitle }}</p>
       </div>
       
       <div class="contact-grid">
         <div class="contact-info fade-in-up">
           <div class="contact-item">
-            <h3>Adresse</h3>
-            <p>{{ contact?.address }}</p>
+            <div class="contact-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Adresse</h3>
+              <p>{{ contact.address }}</p>
+            </div>
           </div>
+          
           <div class="contact-item">
-            <h3>Téléphone</h3>
-            <p>{{ contact?.phone }}</p>
+            <div class="contact-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Téléphone</h3>
+              <p>{{ contact.phone }}</p>
+            </div>
           </div>
+          
           <div class="contact-item">
-            <h3>Email</h3>
-            <p>{{ contact?.email }}</p>
+            <div class="contact-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Email</h3>
+              <p>{{ contact.email }}</p>
+            </div>
           </div>
         </div>
         
@@ -200,33 +270,37 @@
           <form class="form" (ngSubmit)="submitContactForm()">
             <div class="form-row">
               <div class="form-group">
-                <label>{{ contact?.form?.firstName }}</label>
-                <input type="text" [(ngModel)]="contactForm.firstName" name="firstName" [placeholder]="contact?.form?.placeholder?.firstNamePlaceholder">
+                <label>{{ contact.form.firstName }}</label>
+                <input type="text" [(ngModel)]="contactForm.firstName" name="firstName" 
+                       [placeholder]="contact.form.placeholder.firstNamePlaceholder">
               </div>
               <div class="form-group">
-                <label>{{ contact?.form?.lastName }}</label>
-                <input type="text" [(ngModel)]="contactForm.lastName" name="lastName" [placeholder]="contact?.form?.placeholder?.lastNamePlaceholder">
+                <label>{{ contact.form.lastName }}</label>
+                <input type="text" [(ngModel)]="contactForm.lastName" name="lastName" 
+                       [placeholder]="contact.form.placeholder.lastNamePlaceholder">
               </div>
             </div>
             <div class="form-group">
-              <label>{{ contact?.form?.email }}</label>
-              <input type="email" [(ngModel)]="contactForm.email" name="email" [placeholder]="contact?.form?.placeholder?.emailPlaceholder">
+              <label>{{ contact.form.email }}</label>
+              <input type="email" [(ngModel)]="contactForm.email" name="email" 
+                     [placeholder]="contact.form.placeholder.emailPlaceholder">
             </div>
             <div class="form-group">
-              <label>{{ contact?.form?.profile }}</label>
+              <label>{{ contact.form.profile }}</label>
               <select [(ngModel)]="contactForm.profile" name="profile">
-                <option value="">{{ contact?.form?.profileOption?.selectProfile }}</option>
-                <option value="debtor">{{ contact?.form?.profileOption?.debtor }}</option>
-                <option value="bailiff">{{ contact?.form?.profileOption?.bailiff }}</option>
-                <option value="lawyer">{{ contact?.form?.profileOption?.lawyer }}</option>
-                <option value="creditor">{{ contact?.form?.profileOption?.creditor }}</option>
+                <option value="">{{ contact.form.profileOption.selectProfile }}</option>
+                <option value="debtor">{{ contact.form.profileOption.debtor }}</option>
+                <option value="bailiff">{{ contact.form.profileOption.bailiff }}</option>
+                <option value="lawyer">{{ contact.form.profileOption.lawyer }}</option>
+                <option value="creditor">{{ contact.form.profileOption.creditor }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label>{{ contact?.form?.message }}</label>
-              <textarea rows="4" [(ngModel)]="contactForm.message" name="message" [placeholder]="contact?.form?.placeholder?.messagePlaceholder"></textarea>
+              <label>{{ contact.form.message }}</label>
+              <textarea rows="4" [(ngModel)]="contactForm.message" name="message" 
+                        [placeholder]="contact.form.placeholder.messagePlaceholder"></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">{{ contact?.form?.send }}</button>
+            <button type="submit" class="btn btn-primary">{{ contact.form.send }}</button>
           </form>
         </div>
       </div>
@@ -246,18 +320,30 @@
             </svg>
             <span>RecouvrePro</span>
           </div>
+          <p>La plateforme digitale qui révolutionne le recouvrement de créances.</p>
         </div>
         
         <div class="footer-section">
-          <h3>{{ footer?.services }}</h3>
-          <p>{{ footer?.support }}</p>
-          <p>{{ footer?.legal }}</p>
-          <p>{{ footer?.contact }}</p>
+          <h3>{{ footer.services }}</h3>
+          <ul>
+            <li><a (click)="scrollToSection('services')">Services</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>{{ footer.support }}</h3>
+          <ul>
+            <li><a (click)="scrollToSection('contact')">{{ footer.contact }}</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>{{ footer.legal }}</h3>
         </div>
       </div>
       
       <div class="footer-bottom">
-        <p>{{ footer?.copyright }}</p>
+        <p>{{ footer.copyright }}</p>
       </div>
     </div>
   </footer>
