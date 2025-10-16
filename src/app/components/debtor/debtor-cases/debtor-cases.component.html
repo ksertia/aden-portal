@@ -101,7 +101,7 @@
   
   <!-- Liste des créances -->
   <div class="cases-content fade-in-up">
-    <div class="cases-list" *ngIf="dossiers.length > 0; else noCases">
+    <div class="cases-list" *ngIf="filteredDossiers.length > 0; else noCases">
       <div class="list-header">
         <app-view-toggle 
           [currentView]="currentView" 
@@ -280,7 +280,7 @@
           <polyline points="14,2 14,8 20,8"/>
         </svg>
         <h3>{{ t('cases.noCases.title') }}</h3>
-        <p>{{ t('cases.noCases.description') }}</p>
+        <p>Aucun dossier ne correspond aux critères sélectionnés.</p>
       </div>
    </ng-template>
   </div>

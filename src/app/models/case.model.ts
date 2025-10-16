@@ -60,14 +60,14 @@ export interface FeeDetail {
   description: string;
 }
 export interface DebtorInfo {
-  id?: string | number; // ✅ ajouté
+  id?: string | number; 
   firstName: string;
   lastName: string;
   companyName?: string;
   email: string;
   phone: string;
   address: Address;
-  type: 'individual' | 'company';
+  type: 'individual' | 'company' | 'ENTREPRISE';
   situation:string;
   dette:number;
   nodeId: string;

@@ -117,7 +117,7 @@
 
   <!-- Liste des dossiers -->
   <div class="cases-content fade-in-up">
-    <div class="cases-list" *ngIf="dossiers.length > 0; else noCases">
+    <div class="cases-list" *ngIf="filteredDossiers.length > 0; else noCases">
       <div class="list-header">
         <app-view-toggle 
           [currentView]="currentView" 
@@ -180,7 +180,7 @@
               </div>
               <div class="meta-item">
                 <span class="meta-label">Créé le :</span>
-                <span class="meta-value">{{ dossier.dateCreation }}</span>
+                <span class="meta-value">{{ formatDate(dossier.dateCreation) }}</span>
               </div>
             </div>
             
@@ -217,19 +217,19 @@
                 <td>
                   <div class="case-cell">
                     <div class="case-number">{{ dossier.numeroDossier }}</div>
-                    <div class="case-date">{{ dossier.dateCreation }}</div>
+                    <div class="case-date">{{ formatDate(dossier.dateCreation) }}</div>
                   </div>
                 </td>
                 <td>
                   <div class="creditor-cell">
                     <div class="creditor-name">{{ getCreancierForDossier(dossier)?.contactPrincipal }}</div>
-                    <div class="creditor-contact">{{ getCreancierForDossier(dossier)?.raisonSociale }}</div>
+                    <div class="creditor-contact">{{ getCreancierForDossier(dossier)?.typeCreancier }}</div>
                   </div>
                 </td>
                 <td>
                   <div class="debtor-cell">
                     <div class="debtor-name">{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</div>
-                    <div class="debtor-type">{{ dossier.typeCreance }}</div>
+                    <div class="debtor-type">{{ dossier.type === 'company' ? 'ENTREPRISE' : 'Particulier' }}</div>
                   </div>
                 </td>
                 <td>

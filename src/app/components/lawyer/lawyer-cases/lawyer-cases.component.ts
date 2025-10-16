@@ -161,13 +161,13 @@ export class LawyerCasesComponent implements OnInit {
   }
   getFormattedRemainingAmount(dossier: any): string {
   const reste = (dossier.montantTotal || 0) - (dossier.montantPaye || 0);
-  return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+  return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'XOF' });
   }
 
   // Filtres dynamiques sur les dossiers 
   applyFilters() {
     this.filteredDossiers = this.dossiers.filter((dossier) => {
-       console.log('➡️ Statut dossier :', dossier.statutGlobal); // 👈 Ajoute ceci
+       console.log('➡️Statut dossier :', dossier.statutGlobal); 
       const searchTerm = this.filters.searchTerm?.toLowerCase() || '';
       const status = this.selectedStatus;
       const dateFrom = this.dateFrom ? new Date(this.dateFrom) : null;
@@ -251,11 +251,13 @@ export class LawyerCasesComponent implements OnInit {
     return Math.round(pourcentage);
   }
 
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
+   formatCurrency(amount: number): string {
+    if (!amount) return '0 FCFA';
+    return amount.toLocaleString('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(amount);
+      currency: 'XOF',
+      minimumFractionDigits: 0
+    });
   }
 
   formatDate(date: Date): string {

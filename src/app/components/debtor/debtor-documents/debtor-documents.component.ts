@@ -5,11 +5,12 @@ import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
 import { DebtCase, CaseDocument, DocumentType } from '../../../models/case.model';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 
 @Component({
   selector: 'app-debtor-documents',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ViewToggleComponent],
   templateUrl: './debtor-documents.component.html',
   styleUrls: ['./debtor-documents.component.css']
 })
@@ -20,6 +21,8 @@ export class DebtorDocumentsComponent implements OnInit {
   cases: DebtCase[] = [];
   allDocuments: (CaseDocument & { caseId: string })[] = [];
   filteredDocuments: (CaseDocument & { caseId: string })[] = [];
+
+  currentView: 'grid' | 'table' = 'table';
   
   searchTerm = '';
   selectedDocumentType = '';
@@ -159,7 +162,7 @@ export class DebtorDocumentsComponent implements OnInit {
     console.log('Documents filtrés:', this.filteredDocuments.length);
   }
 
-    // Appliquer les filtres (appelé lors de la saisie dans le champ de recherche)
+  // Appliquer les filtres (appelé lors de la saisie dans le champ de recherche)
   applyFilters() {
     this.filterDocuments();
   }
@@ -184,7 +187,7 @@ export class DebtorDocumentsComponent implements OnInit {
     const labels: { [key: string]: string } = {
       [DocumentType.INVOICE]: 'Facture',
       [DocumentType.CONTRACT]: 'Contrat',
-      [DocumentType.CORRESPONDENCE]: 'Rapport',
+      [DocumentType.CORRESPONDENCE]: 'Correspondance',
       [DocumentType.LEGAL_NOTICE]: 'Mise en demeure',
       [DocumentType.PAYMENT_PROOF]: 'Preuve de paiement',
       [DocumentType.COURT_DOCUMENT]: 'Document judiciaire'

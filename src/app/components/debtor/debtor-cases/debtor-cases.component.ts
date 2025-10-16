@@ -815,7 +815,7 @@ getPenaltiesDetail(dossier: any): PenaltyDetail[] {
   const labels: { [key: string]: string } = {
     [DocumentType.INVOICE]: 'Facture',
     [DocumentType.CONTRACT]: 'Contrat',
-    [DocumentType.CORRESPONDENCE]: 'Rapport',
+    [DocumentType.CORRESPONDENCE]: 'Correspondance',
     [DocumentType.LEGAL_NOTICE]: 'Mise en demeure',
     [DocumentType.PAYMENT_PROOF]: 'Preuve de paiement',
     [DocumentType.COURT_DOCUMENT]: 'Document judiciaire'

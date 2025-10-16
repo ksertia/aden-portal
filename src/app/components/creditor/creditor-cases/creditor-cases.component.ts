@@ -174,26 +174,36 @@ export class CreditorCasesComponent implements OnInit {
     this.filteredDossiers = [...this.dossiers];
   }
 
-  // Appliquer les filtres (recherche, statut, priorité)
+  // Appliquer les filtres (nom, prénom, nom d’entreprise, numéro ou objet de dossier)
   applyFilters(): void {
-    const term = this.filters.searchTerm.toLowerCase().trim();
-    const status = this.filters.status;
-    const priority = this.filters.priority;
+  const term = this.filters.searchTerm.toLowerCase().trim();
+  const status = this.filters.status;
+  const priority = this.filters.priority;
 
-    this.filteredDossiers = this.dossiers.filter((dossier) => {
-      const matchesTerm =
+  this.filteredDossiers = this.dossiers.filter((dossier) => {
+    const debiteur = this.getDebiteurForDossier(dossier); 
+    const fullName = `${debiteur?.firstName || ''} ${debiteur?.lastName || ''}`.toLowerCase();
+    const company = debiteur?.companyName?.toLowerCase() || '';
+
+    const matchesTerm =
       !term ||
       dossier.numeroDossier?.toLowerCase().includes(term) ||
       dossier.objet?.toLowerCase().includes(term) ||
-      dossier.nomDebiteur?.toLowerCase().includes(term);
+      fullName.includes(term) ||            
+      company.includes(term);               
 
-      const matchesStatus =!status ||dossier.statutGlobal === status ||
-      this.getStatusLabel(dossier.statutGlobal).toLowerCase() === this.getStatusLabel(status).toLowerCase();
-      const matchesPriority = !priority || dossier.priorite === priority;
+    const matchesStatus =
+      !status ||
+      dossier.statutGlobal === status ||
+      this.getStatusLabel(dossier.statutGlobal).toLowerCase() ===
+        this.getStatusLabel(status).toLowerCase();
 
-      return matchesTerm && matchesStatus && matchesPriority;
-    });
-  }
+    const matchesPriority = !priority || dossier.priorite === priority;
+
+    return matchesTerm && matchesStatus && matchesPriority;
+  });
+}
+
 
   // Lorsqu’on change le filtre de statut
   updateStatusFilter(): void {
@@ -233,6 +243,7 @@ export class CreditorCasesComponent implements OnInit {
       minimumFractionDigits: 0
     });
   }
+
 
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('fr-FR', {

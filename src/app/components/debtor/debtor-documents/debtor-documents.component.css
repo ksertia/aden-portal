@@ -337,7 +337,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1.5rem;
+  padding: 20px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -622,3 +622,112 @@
     justify-content: flex-end;
   }
 }
+
+ .list-header {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .list-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0;
+    }
+
+
+
+    .documents-table-container {
+      background: var(--surface);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    .documents-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .documents-table th {
+      background: #f8fafc;
+      padding: 16px 12px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .documents-table td {
+      padding: 16px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+
+    .document-row:hover {
+      background: #f8fafc;
+    }
+
+    .document-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .document-icon-small {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .document-icon-small.icon-invoice { background: var(--primary); }
+    .document-icon-small.icon-contract { background: #3b82f6; }
+    .document-icon-small.icon-correspondence { background: #6366f1; }
+    .document-icon-small.icon-legal_notice { background: var(--warning); }
+    .document-icon-small.icon-payment_proof { background: var(--success); }
+    .document-icon-small.icon-court_document { background: #7c3aed; }
+
+    .document-name {
+      font-weight: 500;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .document-type-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .document-type-badge.type-invoice { background: #dbeafe; color: #1e40af; }
+    .document-type-badge.type-contract { background: #e0e7ff; color: #3730a3; }
+    .document-type-badge.type-correspondence { background: #f3e8ff; color: #6b21a8; }
+    .document-type-badge.type-legal_notice { background: #fef3c7; color: #92400e; }
+    .document-type-badge.type-payment_proof { background: #d1fae5; color: #065f46; }
+    .document-type-badge.type-court_document { background: #fdf2f8; color: #be185d; }
+
+    .case-link {
+      font-weight: 500;
+      color: var(--primary);
+      font-size: 14px;
+    }
+
+    .date-cell, .user-cell {
+      font-size: 14px;
+      color: var(--text);
+    }
+ .table-actions {
+      display: flex;
+      gap: 8px;
+    }

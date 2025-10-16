@@ -6,16 +6,6 @@
         <h1>Mes Créances</h1>
         <p>Gérez et suivez vos créances en cours de recouvrement</p>
       </div>
-      <!-- <div class="header-actions">
-        <button class="btn btn-secondary" (click)="generateCustomReport()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 2v6l3-3 3 3-3 3v6"/>
-            <path d="M15 8h6"/>
-            <path d="M15 16h6"/>
-          </svg>
-          Rapport personnalisé
-        </button>
-      </div> -->
     </div>
   </div>
 
@@ -97,10 +87,14 @@
       
       <div class="stat-card">
         <div class="stat-icon warning">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <!-- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="1" x2="12" y2="23"/>
             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
+          </svg> -->
+          <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960"
+            width="25" fill="#FFFFFF"><path 
+            d="M275-99v-128h-88v-91h88v-544h460v92H366v244h329v91H366v117h160v91H366v128h-91Z"/>
+        </svg>
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div>
@@ -125,9 +119,8 @@
 
   <!-- Liste des créances -->
   <div class="cases-content fade-in-up">
-    <div class="cases-list" *ngIf="dossiers.length > 0; else noCases">
+    <div class="cases-list" *ngIf="filteredDossiers.length > 0; else noCases">
       <div class="list-header">
-        <!-- <h3>Créances ({{ filteredDossiers.length }})</h3> -->
         <app-view-toggle 
           [currentView]="currentView" 
           (viewChange)="currentView = $event">
@@ -157,7 +150,6 @@
               <div class="amount-item">
                 <span class="amount-label">Montant total</span>
                 <span class="amount-value">{{ formatCurrency(dossier.montantTotal) }}</span>
-                <!-- <span class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</span> -->
               </div>
               <div class="amount-item">
                 <span class="amount-label">Recouvré</span>
@@ -182,11 +174,11 @@
             <div class="case-meta">
               <div class="meta-item">
                 <span class="meta-label">Échéance :</span>
-                <span class="meta-value">{{ dossier.dateEcheance }}</span>
+                <span class="meta-value">{{ formatDate(dossier.dateEcheance) }}</span>
               </div>
               <div class="meta-item">
                 <span class="meta-label">Créé le :</span>
-                <span class="meta-value">{{ dossier.dateCreation }}</span>
+                <span class="meta-value"> {{ formatDate(dossier.dateCreation) }} </span>
               </div>
             </div>
             
@@ -232,7 +224,7 @@
               <td>
                 <div class="case-cell">
                   <div class="case-number">{{ dossier.numeroDossier }}</div> 
-                  <div class="case-date">{{ dossier.dateCreation }}</div>
+                  <div class="case-date">{{ formatDate(dossier.dateCreation) }}</div>
                 </div>
               </td>
               <td>
@@ -244,7 +236,6 @@
               <td>
                 <div class="amount-cell">
                   <div class="amount-value">{{ formatCurrency(dossier.montantTotal) }}</div>
-                  <!-- <div class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</div> -->
                 </div>
               </td>
               <td>
@@ -271,7 +262,7 @@
                 </div>
               </td>
               <td>
-                <div class="date-cell">{{ dossier.dateEcheance }}</div>
+                <div class="date-cell">{{ formatDate(dossier.dateEcheance) }}</div>
               </td>
               <td>
                 <div class="table-actions">
@@ -332,11 +323,11 @@
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Date de création</span>
-                  <span class="detail-value">{{ dossiers[selectedIndex!].dateCreation }}</span>
+                  <span class="detail-value">{{ formatDate(dossiers[selectedIndex!].dateCreation) }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Échéance</span>
-                  <span class="detail-value">{{ dossiers[selectedIndex!].dateEcheance }}</span>
+                  <span class="detail-value">{{ formatDate(dossiers[selectedIndex!].dateEcheance) }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Statut</span>
@@ -384,9 +375,9 @@
               <div class="financial-cards">
                 <div class="financial-card total">
                   <div class="card-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="12" y1="1" x2="12" y2="23"/>
-                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960"
+                      width="25" fill="#FFFFFF"><path 
+                      d="M275-99v-128h-88v-91h88v-544h460v92H366v244h329v91H366v117h160v91H366v128h-91Z"/>
                     </svg>
                   </div>
                   <div class="card-content">
