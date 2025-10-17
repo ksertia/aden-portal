@@ -22,6 +22,9 @@ export class Creancier implements OnInit {
 
   creditors: CreditorDetail[] = [];
   filteredCreditors: CreditorDetail[] = [];
+
+  // 🆕 Map pour stocker le statut d'inscription de chaque créancier
+  userStatusMap: Map<string, boolean> = new Map();
   
   // Gestion des filtres
   filters = {
@@ -46,9 +49,32 @@ export class Creancier implements OnInit {
       next: (data: CreditorDetail[]) => {
         this.creditors = data;
         this.filteredCreditors = [...this.creditors];
+        // 🆕 Charger le statut d'inscription pour chaque créancier
+        this.loadUserStatuses();
       },
       error: (err) => console.error(err)
     });
+  }
+
+  // 🆕 Charge le statut d'inscription pour tous les créanciers
+  loadUserStatuses() {
+    this.creditors.forEach(creditor => {
+      this.adminService.getUserByEmail(creditor.emailProfessionnel).subscribe({
+        next: (user) => {
+          // Si un user existe, marquer comme inscrit
+          this.userStatusMap.set(creditor.emailProfessionnel, !!user);
+        },
+        error: () => {
+          // Si erreur ou pas de user, marquer comme non inscrit
+          this.userStatusMap.set(creditor.emailProfessionnel, false);
+        }
+      });
+    });
+  }
+
+  // 🆕 Vérifie si un créancier est inscrit sur Strapi
+  isUserRegistered(email: string): boolean {
+    return this.userStatusMap.get(email) || false;
   }
 
   // filtrage par recherche
@@ -93,8 +119,13 @@ export class Creancier implements OnInit {
     this.selectedUser = null;
   }
 
+  // 🆕 Mise à jour après création d'utilisateur
   onUserCreated(user: any) {
     console.log('Utilisateur Strapi créé:', user);
     this.selectedUser = user;
+    // Mettre à jour le statut dans la map
+    if (this.selectedCreditor) {
+      this.userStatusMap.set(this.selectedCreditor.emailProfessionnel, true);
+    }
   }
 }

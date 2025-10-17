@@ -25,6 +25,9 @@ export class Partenaire implements OnInit {
   partenaire: PartenaireInfo[] = [];
   filteredPartenaire: PartenaireInfo[] = [];
 
+  // 🆕 Map pour stocker le statut d'inscription de chaque partenaire
+  userStatusMap: Map<string, boolean> = new Map();
+
   // Gestion des filtres
   filters = {
     searchTerm: ''
@@ -62,9 +65,32 @@ export class Partenaire implements OnInit {
       next: (data: PartenaireInfo[]) => {
         this.partenaire = data;
         this.filteredPartenaire = [...this.partenaire];
+        // 🆕 Charger le statut d'inscription pour chaque partenaire
+        this.loadUserStatuses();
       },
       error: (err) => console.error(err)
     });
+  }
+
+  // 🆕 Charge le statut d'inscription pour tous les partenaires
+  loadUserStatuses() {
+    this.partenaire.forEach(partenaire => {
+      this.adminService.getUserByEmail(partenaire.emailProfessionnel).subscribe({
+        next: (user) => {
+          // Si un user existe, marquer comme inscrit
+          this.userStatusMap.set(partenaire.emailProfessionnel, !!user);
+        },
+        error: () => {
+          // Si erreur ou pas de user, marquer comme non inscrit
+          this.userStatusMap.set(partenaire.emailProfessionnel, false);
+        }
+      });
+    });
+  }
+
+  // 🆕 Vérifie si un partenaire est inscrit sur Strapi
+  isUserRegistered(email: string): boolean {
+    return this.userStatusMap.get(email) || false;
   }
 
   // filtrage par recherche
@@ -135,8 +161,13 @@ export class Partenaire implements OnInit {
     this.selectedUser = null;
   }
 
+  // 🆕 Mise à jour après création d'utilisateur
   onUserCreated(user: any) {
     console.log('Utilisateur Strapi créé:', user);
     this.selectedUser = user;
+    // Mettre à jour le statut dans la map
+    if (this.selectedPartenaire) {
+      this.userStatusMap.set(this.selectedPartenaire.emailProfessionnel, true);
+    }
   }
 }

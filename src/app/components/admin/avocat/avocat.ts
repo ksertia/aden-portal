@@ -23,6 +23,9 @@ export class Avocat implements OnInit {
   selectedAvocat: AvocatInfo | null = null;
   selectedUser: any | null = null; // données Strapi User
 
+  // 🆕 Map pour stocker le statut d'inscription de chaque avocat
+  userStatusMap: Map<string, boolean> = new Map();
+
   // Gestion des filtres
   filters = {
     searchTerm: ''
@@ -57,9 +60,32 @@ export class Avocat implements OnInit {
       next: (data: AvocatInfo[]) => {
         this.avocat = data;
         this.filteredAvocat = [...this.avocat];
+        // 🆕 Charger le statut d'inscription pour chaque avocat
+        this.loadUserStatuses();
       },
       error: (err) => console.error(err)
     });
+  }
+
+  // 🆕 Charge le statut d'inscription pour tous les avocats
+  loadUserStatuses() {
+    this.avocat.forEach(avocat => {
+      this.adminService.getUserByEmail(avocat.emailProfessionnel).subscribe({
+        next: (user) => {
+          // Si un user existe, marquer comme inscrit
+          this.userStatusMap.set(avocat.emailProfessionnel, !!user);
+        },
+        error: () => {
+          // Si erreur ou pas de user, marquer comme non inscrit
+          this.userStatusMap.set(avocat.emailProfessionnel, false);
+        }
+      });
+    });
+  }
+
+  // 🆕 Vérifie si un avocat est inscrit sur Strapi
+  isUserRegistered(email: string): boolean {
+    return this.userStatusMap.get(email) || false;
   }
 
   // filtrage par recherche
@@ -136,8 +162,13 @@ export class Avocat implements OnInit {
     this.selectedUser = null;
   }
 
+  // 🆕 Mise à jour après création d'utilisateur
   onUserCreated(user: any) {
     console.log('Utilisateur Strapi créé:', user);
     this.selectedUser = user;
+    // Mettre à jour le statut dans la map
+    if (this.selectedAvocat) {
+      this.userStatusMap.set(this.selectedAvocat.emailProfessionnel, true);
+    }
   }
 }

@@ -99,6 +99,11 @@ export interface Footer {
   support: string;
   legal: string;
   contact: string;
+  documentation: string;
+  faq: string;
+  terms: string;
+  privacy: string;
+  cgu: string;
   copyright: string;
 }
 

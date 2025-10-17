@@ -16,7 +16,7 @@ import { LandingService } from '../../services/landing.service';
   styleUrls: ['./landing.component.css']
 })
 export class LandingComponent implements OnInit {
-  // Données depuis Strapi
+  // Données depuis Strapi (labels, textes, traductions)
   nav?: Nav;
   hero?: Hero;
   services?: Services;
@@ -27,6 +27,7 @@ export class LandingComponent implements OnInit {
   footer?: Footer;
   common?: Common;
 
+  // VALEURS du formulaire (ce que l'utilisateur saisit)
   contactForm = {
     firstName: '',
     lastName: '',
@@ -63,12 +64,12 @@ export class LandingComponent implements OnInit {
 
     this.landingService.getServices(locale).subscribe(data => {
       this.services = data || undefined;
-      console.log('Services loaded:', this.services); // Debug
+      console.log('Services loaded:', this.services);
     });
 
     this.landingService.getBenefits(locale).subscribe(data => {
       this.benefits = data || undefined;
-      console.log('Benefits loaded:', this.benefits); // Debug
+      console.log('Benefits loaded:', this.benefits);
     });
 
     this.landingService.getStats(locale).subscribe(data => {
@@ -81,7 +82,7 @@ export class LandingComponent implements OnInit {
 
     this.landingService.getContact(locale).subscribe(data => {
       this.contact = data || undefined;
-      console.log('Contact loaded:', this.contact); // Debug
+      console.log('Contact loaded:', this.contact);
     });
 
     this.landingService.getFooter(locale).subscribe(data => {

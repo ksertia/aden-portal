@@ -17,12 +17,14 @@ export class Debiteur implements OnInit {
   // État du tiroir
   showDrawer = false;
   selectedDebtor: DebtorInfo | null = null;
-  selectedUser: any | null = null; // données Strapi User
-
+  selectedUser: any | null = null;
 
   // Liste brute et filtrée
   debiteurs: DebtorInfo[] = [];
   filteredDebiteurs: DebtorInfo[] = [];
+  
+  // Map pour stocker le statut d'inscription de chaque débiteur
+  userStatusMap: Map<string, boolean> = new Map();
 
   // Gestion des filtres
   filters = {
@@ -44,9 +46,36 @@ export class Debiteur implements OnInit {
       next: (data: DebtorInfo[]) => {
         this.debiteurs = data;
         this.filteredDebiteurs = [...this.debiteurs];
+        // Charger le statut d'inscription pour chaque débiteur
+        this.loadUserStatuses();
       },
       error: (err) => console.error(err)
     });
+  }
+
+  /**
+   * Charge le statut d'inscription pour tous les débiteurs
+   */
+  loadUserStatuses() {
+    this.debiteurs.forEach(debtor => {
+      this.adminService.getUserByEmail(debtor.email).subscribe({
+        next: (user) => {
+          // Si un user existe, marquer comme inscrit
+          this.userStatusMap.set(debtor.email, !!user);
+        },
+        error: () => {
+          // Si erreur ou pas de user, marquer comme non inscrit
+          this.userStatusMap.set(debtor.email, false);
+        }
+      });
+    });
+  }
+
+  /**
+   * Vérifie si un débiteur est inscrit sur Strapi
+   */
+  isUserRegistered(email: string): boolean {
+    return this.userStatusMap.get(email) || false;
   }
 
   applyFilters() {
@@ -72,22 +101,24 @@ export class Debiteur implements OnInit {
     }
   }
 
- // --- Gestion du tiroir ---
-openDrawer(debtor: DebtorInfo) {
-  this.selectedDebtor = debtor;
-  this.showDrawer = true;
+  /**
+   * Ouvre le tiroir avec les détails du débiteur
+   */
+  openDrawer(debtor: DebtorInfo) {
+    this.selectedDebtor = debtor;
+    this.showDrawer = true;
 
-  // ⚡ On appelle Strapi pour récupérer le user associé au débiteur
-  this.adminService.getUserByEmail(debtor.email).subscribe({
-    next: (user) => {
-      this.selectedUser = user;
-    },
-    error: (err) => {
-      console.error("Erreur récupération user:", err);
-      this.selectedUser = null;
-    }
-  });
-}
+    // Récupérer le user associé au débiteur
+    this.adminService.getUserByEmail(debtor.email).subscribe({
+      next: (user) => {
+        this.selectedUser = user;
+      },
+      error: (err) => {
+        console.error("Erreur récupération user:", err);
+        this.selectedUser = null;
+      }
+    });
+  }
 
   closeDrawer() {
     this.showDrawer = false;
@@ -95,8 +126,11 @@ openDrawer(debtor: DebtorInfo) {
   }
 
   onUserCreated(user: any) {
-  console.log('Utilisateur Strapi créé:', user);
-  this.selectedUser = user;
-}
-
+    console.log('Utilisateur Strapi créé:', user);
+    this.selectedUser = user;
+    // Mettre à jour le statut dans la map
+    if (this.selectedDebtor) {
+      this.userStatusMap.set(this.selectedDebtor.email, true);
+    }
+  }
 }

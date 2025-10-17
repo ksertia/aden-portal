@@ -25,6 +25,9 @@ export class Huissier implements OnInit {
   huisier: HuissierInfo[] = [];
   filteredHuisier: HuissierInfo[] = [];
 
+  // 🆕 Map pour stocker le statut d'inscription de chaque huissier
+  userStatusMap: Map<string, boolean> = new Map();
+
   // Gestion des filtres
   filters = {
     searchTerm: ''
@@ -52,9 +55,32 @@ export class Huissier implements OnInit {
       next: (data: HuissierInfo[]) => {
         this.huisier = data;
         this.filteredHuisier = [...this.huisier];
+        // 🆕 Charger le statut d'inscription pour chaque huissier
+        this.loadUserStatuses();
       },
       error: (err) => console.error(err)
     });
+  }
+
+  // 🆕 Charge le statut d'inscription pour tous les huissiers
+  loadUserStatuses() {
+    this.huisier.forEach(huissier => {
+      this.adminService.getUserByEmail(huissier.emailProfessionnel).subscribe({
+        next: (user) => {
+          // Si un user existe, marquer comme inscrit
+          this.userStatusMap.set(huissier.emailProfessionnel, !!user);
+        },
+        error: () => {
+          // Si erreur ou pas de user, marquer comme non inscrit
+          this.userStatusMap.set(huissier.emailProfessionnel, false);
+        }
+      });
+    });
+  }
+
+  // 🆕 Vérifie si un huissier est inscrit sur Strapi
+  isUserRegistered(email: string): boolean {
+    return this.userStatusMap.get(email) || false;
   }
 
   // filtrage par recherche
@@ -99,8 +125,13 @@ export class Huissier implements OnInit {
     this.selectedUser = null;
   }
 
+  // 🆕 Mise à jour après création d'utilisateur
   onUserCreated(user: any) {
     console.log('Utilisateur Strapi créé:', user);
     this.selectedUser = user;
+    // Mettre à jour le statut dans la map
+    if (this.selectedHuissier) {
+      this.userStatusMap.set(this.selectedHuissier.emailProfessionnel, true);
+    }
   }
 }
