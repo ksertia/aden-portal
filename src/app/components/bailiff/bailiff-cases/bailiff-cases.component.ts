@@ -7,7 +7,8 @@ import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
 import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case.model';
 import { AdminService } from '../../../services/admin.service';
-import { DebtorInfo } from '../../../models/case.model';
+import { DebtorInfo, CaseDocument, DocumentType } from '../../../models/case.model';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-bailiff-cases',
@@ -18,7 +19,7 @@ import { DebtorInfo } from '../../../models/case.model';
 })
 export class BailiffCasesComponent implements OnInit {
 
-   selectedCase: DebtCase | null = null;
+  selectedCase: DebtCase | null = null;
 
   selectedIndex: number | null = null;
   showDrawer  = false;
@@ -29,6 +30,8 @@ export class BailiffCasesComponent implements OnInit {
   errorMessage = '';
 
   currentView: 'grid' | 'table' = 'table';
+
+  selectedDetailCase: any;
 
   // --- Filtres ---
   filters = {
@@ -47,12 +50,44 @@ export class BailiffCasesComponent implements OnInit {
 
   selectedDebtor: DebtorInfo | undefined;
 
+
+  // Ajout start
+  cases: DebtCase[] = [];
+  allDocuments: (CaseDocument & { caseId: string })[] = [];
+  filteredDocuments: (CaseDocument & { caseId: string })[] = [];
+  currentViews: 'grid' | 'table' = 'table';
+  showDocumentsModal: boolean = false;
+    
+  searchTerm = '';
+  selectedDocumentType = '';
+  selectedCaseId = '';
+    
+  showUploadModal = false;
+  selectedFile: File | null = null;
+    
+  newDocument = {
+    caseId: '',
+    type: '',
+    name: ''
+  };
+  // Ajout end
+
+
+  // Les propriétés pour la visualisation des documents
+  showDocumentViewer = false;
+  currentDocumentUrl: any = null;
+  currentDocument: any = null;
+  documentContentType = '';
+  isLoadingDocument = false;
+  safePdfUrl: SafeResourceUrl | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private casesService: CaseService,
     private authService: AuthService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
@@ -99,6 +134,9 @@ export class BailiffCasesComponent implements OnInit {
         // Étape 3 : initialisation du tableau filtré
         this.filteredDossiers = [...this.dossiers];
         console.log('Dossiers filtrés pour ce huissier :', this.dossiers);
+
+        // IMPORTANT: Extraire les documents après avoir chargé les dossiers
+        this.extractDocuments();
 
         this.isLoading = false;
       },
@@ -202,7 +240,7 @@ export class BailiffCasesComponent implements OnInit {
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('fr-FR', {
       year: 'numeric',
-      month: 'short',
+      month: 'long',
       day: 'numeric'
     });
   }
@@ -232,14 +270,26 @@ export class BailiffCasesComponent implements OnInit {
     return labels[priority] || priority;
   }
 
+  // viewCaseDetails(index: number): void {
+  //   this.selectedIndex = index;
+  //   const dossier = this.filteredDossiers[index];
+  //   this.selectedDebtor = this.getDebiteurForDossier(dossier);
+  //   console.log("selectedDebtor", this.selectedDebtor);
+  //   this.showDrawer  = true;
+  // }
   viewCaseDetails(index: number): void {
     this.selectedIndex = index;
     const dossier = this.filteredDossiers[index];
+    
+    // IMPORTANT: Stocker le dossier sélectionné
+    this.selectedDetailCase = dossier;
+    
     this.selectedDebtor = this.getDebiteurForDossier(dossier);
     console.log("selectedDebtor", this.selectedDebtor);
-    this.showDrawer  = true;
+    console.log("selectedDetailCase", this.selectedDetailCase);
+    
+    this.showDrawer = true;
   }
-
 
   closeDrawer() {
     this.showDrawer  = false;
@@ -255,12 +305,6 @@ export class BailiffCasesComponent implements OnInit {
 
   downloadCaseReport(case_: DebtCase) {
     console.log('Télécharger rapport pour:', case_.caseNumber);
-    // TODO: Implémenter le téléchargement de rapport spécifique au dossier
-  }
-
-  downloadDocument(doc: any) {
-    console.log('Télécharger document:', doc.name);
-    // TODO: Implémenter le téléchargement de document
   }
 
   generateCustomReport() {
@@ -281,5 +325,368 @@ export class BailiffCasesComponent implements OnInit {
     };
     return typeMap[type] || 'status';
   }
+
+  // Ajout methode start
+    // extractDocuments() {
+    //   this.allDocuments = [];
+      
+    //   console.log('Début extraction des documents...');
+      
+    //   // Parcourir tous les dossiers pour extraire leurs documents
+    //   this.dossiers.forEach(dossier => {
+    //     console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsHuissier?.myArrayList);
+        
+    //     // Vérifier si le dossier a des documents creéancier
+    //     if (dossier.documentsHuissier?.myArrayList && Array.isArray(dossier.documentsHuissier.myArrayList)) {
+    //       dossier.documentsHuissier.myArrayList.forEach((doc: any) => {
+    //         console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
+            
+    //         const mappedType = this.mapDocumentType(doc.typeDocument);
+    //         console.log('Type mappé:', mappedType);
+            
+    //         this.allDocuments.push({
+    //           id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
+    //           name: doc.fileName || doc.name || 'Document sans nom',
+    //           type: mappedType,
+    //           url: doc.url || doc.downloadUrl || '#',
+    //           uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
+    //           uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+    //           caseId: dossier.nodeId
+    //         });
+    //       });
+    //     }
+    //   });
+      
+    //   this.filteredDocuments = [...this.allDocuments];
+    //   console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
+    // }
+
+    extractDocuments() {
+  this.allDocuments = [];
+  
+  console.log('=== DÉBUT EXTRACTION DES DOCUMENTS ===');
+  console.log('Nombre de dossiers à traiter:', this.dossiers.length);
+  
+  // Parcourir tous les dossiers pour extraire leurs documents
+  this.dossiers.forEach((dossier, index) => {
+    console.log(`\n--- Dossier ${index + 1}/${this.dossiers.length}: ${dossier.numeroDossier} ---`);
+    console.log('Structure complète du dossier:', dossier);
+    
+    // Vérifier toutes les sources possibles de documents
+    const documentSources = [
+      'documentsHuissier',
+      'documentsDebiteur', 
+      'documentsCreancier',
+      'documentsAvocat',
+      'documentsPartage'
+    ];
+    
+    documentSources.forEach(source => {
+      const documentsContainer = dossier[source];
+      console.log(`Source ${source}:`, documentsContainer);
+      
+      if (documentsContainer?.myArrayList && Array.isArray(documentsContainer.myArrayList)) {
+        console.log(`✓ ${source}: ${documentsContainer.myArrayList.length} document(s)`);
+        
+        documentsContainer.myArrayList.forEach((doc: any, docIndex: number) => {
+          console.log(`  Document ${docIndex + 1}:`, doc);
+          
+          const mappedType = this.mapDocumentType(doc.typeDocument);
+          
+          this.allDocuments.push({
+            id: doc.documentNodeId || doc.id || `${doc.fileName}_${Date.now()}`,
+            name: doc.fileName || doc.name || 'Document sans nom',
+            type: mappedType,
+            url: doc.url || doc.downloadUrl || '#',
+            uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
+            uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+            caseId: dossier.nodeId,
+            // source: source 
+          });
+        });
+      }
+    });
+  });
+  
+  this.filteredDocuments = [...this.allDocuments];
+  console.log('\n=== RÉSULTAT FINAL ===');
+  console.log('Total documents extraits:', this.allDocuments.length);
+  console.log('Détail des documents:', this.allDocuments);
+}
+  
+    
+  
+      mapDocumentType(apiType: string): DocumentType {
+      console.log('Mapping du type:', apiType);
+      
+      // Normaliser le type (enlever espaces, mettre en majuscules)
+      const normalizedType = (apiType || '').trim().toUpperCase();
+      
+      const typeMapping: { [key: string]: DocumentType } = {
+        'FACTURE': DocumentType.INVOICE,
+        'INVOICE': DocumentType.INVOICE,
+        'CONTRAT': DocumentType.CONTRACT,
+        'CONTRACT': DocumentType.CONTRACT,
+        'CORRESPONDANCE': DocumentType.CORRESPONDENCE,
+        'CORRESPONDENCE': DocumentType.CORRESPONDENCE,
+        'MISE_EN_DEMEURE': DocumentType.LEGAL_NOTICE,
+        'LEGAL_NOTICE': DocumentType.LEGAL_NOTICE,
+        'PREUVE_PAIEMENT': DocumentType.PAYMENT_PROOF,
+        'PAYMENT_PROOF': DocumentType.PAYMENT_PROOF,
+        'DOCUMENT_JUDICIAIRE': DocumentType.COURT_DOCUMENT,
+        'COURT_DOCUMENT': DocumentType.COURT_DOCUMENT
+      };
+      
+      const result = typeMapping[normalizedType] || DocumentType.CORRESPONDENCE;
+      console.log('Résultat du mapping:', normalizedType, '->', result);
+      
+      return result;
+    }
+  
+    filterDocuments() {
+      this.filteredDocuments = this.allDocuments.filter(doc => {
+        const matchesSearch = !this.searchTerm || 
+          doc.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+          this.getCaseNumber(doc.caseId).toLowerCase().includes(this.searchTerm.toLowerCase());
+        
+        const matchesType = !this.selectedDocumentType || doc.type === this.selectedDocumentType;
+        const matchesCase = !this.selectedCaseId || doc.caseId === this.selectedCaseId;
+        
+        return matchesSearch && matchesType && matchesCase;
+      });
+    }
+  
+     getLegalDocumentsCount(): number {
+      return this.allDocuments.filter(doc => 
+        doc.type === DocumentType.LEGAL_NOTICE || 
+        doc.type === DocumentType.COURT_DOCUMENT
+      ).length;
+    }
+  
+    getPaymentProofsCount(): number {
+      return this.allDocuments.filter(doc => 
+        doc.type === DocumentType.PAYMENT_PROOF
+      ).length;
+    }
+  
+    // Modifiez la méthode getCaseNumber pour utiliser nodeId
+    getCaseNumber(caseId: string): string {
+      const dossier = this.dossiers.find(d => d.nodeId === caseId);
+      return dossier?.numeroDossier || 'N/A';
+    }
+  
+    getDocumentTypeLabel(type: string): string {
+      const labels: { [key: string]: string } = {
+        [DocumentType.INVOICE]: 'Facture',
+        [DocumentType.CONTRACT]: 'Contrat',
+        [DocumentType.CORRESPONDENCE]: 'Rapport',
+        [DocumentType.LEGAL_NOTICE]: 'Mise en demeure',
+        [DocumentType.PAYMENT_PROOF]: 'Preuve de paiement',
+        [DocumentType.COURT_DOCUMENT]: 'Document judiciaire'
+      };
+      return labels[type] || type;
+    }
+    onFileSelected(event: any) {
+      const file = event.target.files[0];
+      if (file) {
+        this.selectedFile = file;
+        if (!this.newDocument.name) {
+          this.newDocument.name = file.name;
+        }
+      }
+    }
+  
+    isUploadValid(): boolean {
+      return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
+    }
+  
+    uploadDocument() {
+  
+      if (!this.isUploadValid()) {
+        alert('Veuillez remplir tous les champs obligatoires');
+        return;
+      }
+  
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser) {
+        alert('Utilisateur non connecté');
+        return;
+      }
+  
+    }
+  
+    deleteDocument(doc: CaseDocument) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
+        this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
+        this.filterDocuments();
+        console.log('Document supprimé:', doc.name);
+      }
+    }
+  
+    closeUploadModal() {
+      console.log('🔒 Fermeture de la modal d\'upload');
+      this.showUploadModal = false;
+      this.selectedFile = null;
+      this.newDocument = {
+        caseId: '',
+        type: '',
+        name: ''
+      };
+    }
+    
+  
+    // Fonction pour fermer la modal des documents
+    closeDocumentsModal() {
+      this.showDocumentsModal = false;
+    }
+  
+  
+    // Ajout methode end
+  
+  //   openDocumentsModal() {
+  //   if (this.selectedIndex !== null) {
+  //     this.selectedDetailCase = this.filteredDossiers[this.selectedIndex];
+  //   }
+    
+  //   if (this.selectedDetailCase) {
+  //     // Filtrer uniquement les documents du dossier sélectionné
+  //     this.filteredDocuments = this.allDocuments.filter(
+  //       doc => doc.caseId === this.selectedDetailCase.nodeId
+  //     );
+      
+  //     console.log('Documents du dossier', this.selectedDetailCase.numeroDossier, ':', this.filteredDocuments);
+  //   } else {
+  //     // Afficher tous les documents si aucun dossier n'est sélectionné
+  //     this.filteredDocuments = [...this.allDocuments];
+  //   }
+    
+  //   this.showDocumentsModal = true;
+  // }
+  openDocumentsModal() {
+  if (this.selectedIndex !== null) {
+    this.selectedDetailCase = this.filteredDossiers[this.selectedIndex];
+  }
+  
+  console.log('=== OUVERTURE MODAL DOCUMENTS ===');
+  console.log('Dossier sélectionné:', this.selectedDetailCase);
+  console.log('NodeId du dossier:', this.selectedDetailCase?.nodeId);
+  console.log('Tous les documents disponibles:', this.allDocuments);
+  
+  if (this.selectedDetailCase) {
+    // Filtrer uniquement les documents du dossier sélectionné
+    this.filteredDocuments = this.allDocuments.filter(
+      doc => {
+        const matches = doc.caseId === this.selectedDetailCase.nodeId;
+        console.log(`Document ${doc.name} - caseId: ${doc.caseId}, dossierNodeId: ${this.selectedDetailCase.nodeId}, correspond: ${matches}`);
+        return matches;
+      }
+    );
+    
+    console.log('Documents filtrés pour ce dossier:', this.filteredDocuments);
+  } else {
+    // Afficher tous les documents si aucun dossier n'est sélectionné
+    this.filteredDocuments = [...this.allDocuments];
+    console.log('Aucun dossier sélectionné, affichage de tous les documents');
+  }
+  
+  this.showDocumentsModal = true;
+}
+  
+    // Compter les documents d'un dossier
+    getDocumentsCount(dossier: any): number {
+      if (!dossier) return 0;
+      return dossier.documentsHuissier?.myArrayList?.length || 0;
+    }
+  
+    // Méthode pour visualiser un document
+    viewDocument(doc: any) {
+      console.log('Visualisation du document:', doc);
+  
+      const documentIdentifier = doc.nodeId || doc.id; //  fallback si nodeId absent
+      
+      if (!documentIdentifier) {
+        alert('Identifiant du document manquant');
+        return;
+      }
+      
+      this.isLoadingDocument = true;
+      this.currentDocument = doc;
+    
+      // Récupérer le contenu du document depuis le backend
+      this.casesService.getDocumentContent(doc.id).subscribe({
+        next: (blob) => {
+          this.isLoadingDocument = false;
+  
+          // Création de l'URL temporaire
+          const blobUrl = window.URL.createObjectURL(blob);
+          this.currentDocumentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+          this.documentContentType = blob.type;
+          
+          // Ouvrir la modale de visualisation
+          this.showDocumentViewer = true;
+          
+          console.log('Document chargé avec succès. Type:', blob.type);
+        },
+        error: (error) => {
+          this.isLoadingDocument = false;
+          console.error('Erreur lors du chargement du document:', error);
+          alert('Impossible de charger le document. Veuillez réessayer.');
+        }
+      });
+    }
+  
+    // Méthode pour fermer le visualiseur
+    closeDocumentViewer() {
+      if (this.currentDocumentUrl) {
+        window.URL.revokeObjectURL(this.currentDocumentUrl);
+      }
+      this.showDocumentViewer = false;
+      this.currentDocumentUrl = null;
+      this.currentDocument = null;
+      this.documentContentType = '';
+    }
+  
+    // Méthode pour télécharger un document
+    downloadDocument(doc: any) {
+      console.log('Téléchargement du document:', doc);
+      
+      if (!doc.id) {
+        alert('Identifiant du document manquant');
+        return;
+      }
+  
+      this.casesService.downloadDocument(doc.id, doc.name);
+    }
+  
+    // Méthode pour vérifier si le document est un PDF
+    isDocumentPDF(): boolean {
+      return this.documentContentType === 'application/pdf' || 
+        this.currentDocument?.name?.toLowerCase().endsWith('.pdf');
+      }
+  
+    // Méthode pour vérifier si le document est une image
+    isDocumentImage(): boolean {
+      return this.documentContentType?.startsWith('image/') ||
+      /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(this.currentDocument?.name);
+    }
+  
+    // Méthode pour ouvrir le document dans un nouvel onglet
+    openInNewTab() {
+      if (this.currentDocumentUrl) {
+        // Si c’est un SafeResourceUrl, on le convertit
+        const url = (this.currentDocumentUrl as any).changingThisBreaksApplicationSecurity || this.currentDocumentUrl;
+        window.open(url, '_blank');
+      }
+    }
+  
+   formatFileSize(bytes: number): string {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+  
+
  
 }

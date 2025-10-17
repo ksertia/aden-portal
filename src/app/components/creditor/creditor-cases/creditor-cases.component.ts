@@ -248,7 +248,7 @@ export class CreditorCasesComponent implements OnInit {
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('fr-FR', {
       year: 'numeric',
-      month: 'short',
+      month: 'long',
       day: 'numeric'
     });
   }
@@ -279,18 +279,18 @@ export class CreditorCasesComponent implements OnInit {
   }
 
   viewCaseDetails(index: number): void {
-  this.selectedIndex = index;
-  const dossier = this.filteredDossiers[index];
-  
-  // IMPORTANT: Stocker le dossier sélectionné
-  this.selectedDetailCase = dossier;
-  
-  this.selectedDebtor = this.getDebiteurForDossier(dossier);
-  console.log("selectedDebtor", this.selectedDebtor);
-  console.log("selectedDetailCase", this.selectedDetailCase);
-  
-  this.showDrawer = true;
-}
+    this.selectedIndex = index;
+    const dossier = this.filteredDossiers[index];
+    
+    // IMPORTANT: Stocker le dossier sélectionné
+    this.selectedDetailCase = dossier;
+    
+    this.selectedDebtor = this.getDebiteurForDossier(dossier);
+    console.log("selectedDebtor", this.selectedDebtor);
+    console.log("selectedDetailCase", this.selectedDetailCase);
+    
+    this.showDrawer = true;
+  }
 
 
   closeDrawer() {

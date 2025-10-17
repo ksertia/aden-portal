@@ -446,45 +446,301 @@
                 </div>
               </div>
             </div> -->
-
-            <!-- Documents -->
-            <div class="details-section" *ngIf="filteredDossiers.length > 0">
-              <h4>Documents joints ({{ dossiers.length }})</h4>
-              <div class="documents-list">
-                <div class="document-item" *ngFor="let doc of dossiers">
-                  <div class="document-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                      <polyline points="14,2 14,8 20,8"/>
-                    </svg>
-                  </div>
-                  <div class="document-info">
-                    <div class="document-name">{{ doc.name }}</div>
-                    <div class="document-meta">{{ formatDate(doc.uploadedAt) }} • {{ doc.uploadedBy }}</div>
-                  </div>
-                  <button class="btn btn-secondary small" (click)="downloadDocument(doc)">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="7,10 12,15 17,10"/>
-                      <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" (click)="closeDrawer()">Fermer</button>
-          <button class="btn btn-primary" (click)="downloadCaseReport(selectedCase!)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7,10 12,15 17,10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Télécharger le rapport
-          </button>
+          <button class="btn btn-primary" (click)="openDocumentsModal()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+              </svg>
+              Acceder aux documents ({{ getDocumentsCount(selectedDetailCase) }})
+            </button>
         </div>
       </div>
     </div>
+
+
+
+
+  <!-- Tiroir document -->
+  <div class="drawer-overlay-document" *ngIf="showDocumentsModal" (click)="closeDocumentsModal()">
+      <div class="drawer-document" [class.open]="showDocumentsModal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+          <h3>Documents ({{ filteredDocuments.length }})</h3>
+          <button class="modal-close" (click)="closeDocumentsModal()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+          </button>
+          </div>
+          <div class="modal-body">
+          <div class="documents-list">
+              <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
+
+              <!-- Vue tableau -->
+              <div class="documents-table-container" *ngIf="currentViews === 'table'">
+                  <table class="documents-table">
+                  <thead>
+                      <tr>
+                      <th>Document</th>
+                      <th>Type</th>
+                      <!-- <th>Dossier</th> -->
+                      <th>Ajouté le</th>
+                      <!-- <th>Ajouté par</th> -->
+                      <th>Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngFor="let doc of filteredDocuments" class="document-row">
+                      <td>
+                          <div class="document-cell">
+                          <div class="document-icon-small" [ngClass]="'icon-' + doc.type">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                              <polyline points="14,2 14,8 20,8"/>
+                              </svg>
+                          </div>
+                          <div class="document-name">{{ doc.name }}</div>
+                          </div>
+                      </td>
+                      <td>
+                          <span class="document-type-badge" [ngClass]="'type-' + doc.type">
+                          {{ getDocumentTypeLabel(doc.type) }}
+                          </span>
+                      </td>
+                      <!-- <td>
+                          <div class="case-link">{{ getCaseNumber(doc.caseId) }}</div>
+                      </td> -->
+                      <td>
+                          <div class="date-cell">{{ formatDate(doc.uploadedAt) }}</div>
+                      </td>
+                      <!-- <td>
+                          <div class="user-cell">{{ doc.uploadedBy }}</div>
+                      </td> -->
+                      <td>
+                          <div class="table-actions">
+                          <button class="btn btn-primary small" (click)="downloadDocument(doc)" title="Télécharger">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                              <polyline points="7,10 12,15 17,10"/>
+                              <line x1="12" y1="15" x2="12" y2="3"/>
+                              </svg>
+                          </button>
+                          <button class="btn btn-secondary small" (click)="viewDocument(doc)" title="Voir">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                              <circle cx="12" cy="12" r="3"/>
+                              </svg>
+                          </button>
+                          <button class="btn btn-secondary small" (click)="deleteDocument(doc)" title="Supprimer">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <polyline points="3,6 5,6 21,6"/>
+                              <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
+                              </svg>
+                          </button>
+                          </div>
+                      </td>
+                      </tr>
+                  </tbody>
+                  </table>
+              </div>
+              </div>
+
+              <ng-template #noDocuments>
+              <div class="no-documents">
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14,2 14,8 20,8"/>
+                  </svg>
+                  <h3>Aucun document trouvé</h3>
+                  <p>Aucun document ne correspond aux critères sélectionnés.</p>
+              </div>
+              </ng-template>
+          </div>
+          </div>
+          <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeDocumentsModal()">Fermer</button>
+          <button class="btn btn-primary" (click)="showUploadModal = true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17,8 12,3 7,8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Ajouter un document
+        </button>
+          </div>
+      </div>
+  </div>
+
+
+  <!-- tiroir d'upload -->
+  <div class="drawer-overlay-upload" *ngIf="showUploadModal">
+      <div class="drawer-upload" [class.open]="showUploadModal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+          <h3>Ajouter un document</h3>
+          <button class="modal-close" (click)="closeUploadModal()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+          </button>
+          </div>
+          <div class="modal-body">
+          <div class="upload-form">
+              <!-- <div class="form-group">
+                  <label>Dossier associé</label>
+                  <select [(ngModel)]="newDocument.caseId" required>
+                      <option value="">Sélectionner un dossier</option>
+                      <option *ngFor="let case of cases" [value]="case.id">
+                      {{ case.caseNumber }} - {{ case.debtor.firstName }} {{ case.debtor.lastName }}
+                      </option>
+                  </select>
+              </div> -->
+              
+              <div class="form-group">
+              <label>Type de document</label>
+              <select [(ngModel)]="newDocument.type" required>
+                  <option value="">Sélectionner un type</option>
+                  <option value="invoice">Facture</option>
+                  <option value="contract">Contrat</option>
+                  <option value="correspondence">Correspondance</option>
+                  <option value="legal_notice">Mise en demeure</option>
+                  <option value="payment_proof">Preuve de paiement</option>
+                  <option value="court_document">Document judiciaire</option>
+              </select>
+              </div>
+              
+              <div class="form-group">
+              <label>Nom du document</label>
+              <input
+                  type="text"
+                  [(ngModel)]="newDocument.name"
+                  placeholder="Nom du fichier"
+                  required
+                  
+              >
+              <!-- (input)="logFormState()" -->
+              </div>
+              
+              <div class="form-group">
+              <label>Fichier</label>
+              <div class="file-upload">
+                  <input type="file" id="fileInput" (change)="onFileSelected($event)" accept=".pdf,.doc,.docx,.jpg,.png">
+                  <label for="fileInput" class="file-upload-label">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17,8 12,3 7,8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  <span>{{ selectedFile ? selectedFile.name : 'Choisir un fichier' }}</span>
+                  </label>
+              </div>
+              </div>
+          </div>
+          </div>
+          <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeUploadModal()">Annuler</button>
+          <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="!isUploadValid() || isLoading">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17,8 12,3 7,8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span *ngIf="isLoading" class="spinner"></span>
+            {{ isLoading ? 'Envoi en cours...' : 'Ajouter le document' }}
+          </button>
+          </div>
+      </div>
+  </div>
+
+
+
+  <!-- Modale de visualisation de document -->
+<div class="document-viewer-overlay" *ngIf="showDocumentViewer" (click)="closeDocumentViewer()">
+  <div class="document-viewer-modal" (click)="$event.stopPropagation()">
+    <!-- En-tête -->
+    <div class="document-viewer-header">
+      <div class="document-viewer-info">
+        <h3>{{ currentDocument?.name }}</h3>
+        <p class="document-meta">
+          <span class="document-type-badge" [ngClass]="'type-' + currentDocument?.type">
+            {{ getDocumentTypeLabel(currentDocument?.type) }}
+          </span>
+          <span class="document-size" *ngIf="currentDocument?.size">
+            • {{ formatFileSize(currentDocument.size) }}
+          </span>
+        </p>
+      </div>
+      <div class="document-viewer-actions">
+        <button class="btn-icon" (click)="openInNewTab()" title="Ouvrir dans un nouvel onglet">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15,3 21,3 21,9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </button>
+        <button class="btn-icon" (click)="downloadDocument(currentDocument)" title="Télécharger">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+        <button class="btn-icon close-btn" (click)="closeDocumentViewer()" title="Fermer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenu du document -->
+    <div class="document-viewer-content">
+      <!-- Chargement -->
+      <div class="document-loading" *ngIf="isLoadingDocument">
+        <div class="spinner"></div>
+        <p>Chargement du document...</p>
+      </div>
+
+      <!-- Affichage PDF -->
+      <iframe 
+        *ngIf="!isLoadingDocument && isDocumentPDF() && currentDocumentUrl"
+        [src]="currentDocumentUrl"
+        class="document-iframe"
+        width="100%"
+        height="600"
+        frameborder="0">
+      </iframe>
+
+      <!-- Affichage Image -->
+      <div class="document-image-container" *ngIf="!isLoadingDocument && isDocumentImage() && currentDocumentUrl">
+        <img [src]="currentDocumentUrl" [alt]="currentDocument?.name" class="document-image">
+      </div>
+
+      <!-- Autres types de documents -->
+      <div class="document-unsupported" *ngIf="!isLoadingDocument && !isDocumentPDF() && !isDocumentImage()">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <h3>Aperçu non disponible</h3>
+        <p>Ce type de fichier ne peut pas être visualisé directement dans le navigateur.</p>
+        <button class="btn btn-primary" (click)="downloadDocument(currentDocument)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Télécharger le document
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+
   </div>

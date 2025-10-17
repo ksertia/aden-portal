@@ -7,6 +7,7 @@ import { AuthService } from '../../../services/auth.service';
 import { DebtCase, CaseDocument, DocumentType } from '../../../models/case.model';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { forkJoin } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-documents',
@@ -57,7 +58,8 @@ export class DocumentsComponent implements OnInit {
   constructor(
     private caseService: CaseService,
     private authService: AuthService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private router: Router 
   ) {}
 
   ngOnInit() {
@@ -639,5 +641,58 @@ get uniqueDossiers(): any[] {
   getDisplayCaseNumber(dossier: any): string {
     return dossier.numeroDossier || dossier.nodeId || 'Dossier sans identifiant';
   }
+
+  // Fonction pour rediriger l\'utilisateur connecté vers son dashboard
+  goBackToDashboard(): void {
+  const currentUser = this.authService.getCurrentUser();
+  
+  if (!currentUser) {
+    this.router.navigate(['/login']);
+    return;
+  }
+
+  const userRole = currentUser.role;
+  let roleType = '';
+
+  // Gestion sécurisée du type avec vérifications
+  if (typeof userRole === 'string') {
+    roleType = userRole;
+  } else if (userRole && typeof userRole === 'object') {
+    // Vérification plus sécurisée pour les propriétés
+    const roleObj = userRole as any; 
+    roleType = (roleObj.type || roleObj.name || '').toUpperCase();
+  } else {
+    roleType = '';
+  }
+
+  // Rediriger vers le dashboard approprié
+  switch (roleType) {
+    case 'AVOCAT':
+    case 'LAWYER':
+      this.router.navigate(['/lawyer/dashboard']);
+      break;
+
+    case 'DEBITEUR':
+    case 'DEBTOR':
+      this.router.navigate(['/debtor/dashboard']);
+      break;
+
+    case 'CREANCIER':
+    case 'CREDITOR':
+      this.router.navigate(['/creditor/dashboard']);
+      break;
+
+    case 'HUISSIER':
+    case 'BAILIFF':
+      this.router.navigate(['/bailiff/dashboard']);
+      break;
+
+    default:
+      // Redirection par défaut vers la page d'accueil
+      console.warn('Rôle non reconnu, redirection vers la page d\'accueil');
+      this.router.navigate(['/']);
+      break;
+  }
+}
 
 }
