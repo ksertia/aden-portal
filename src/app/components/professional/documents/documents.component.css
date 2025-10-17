@@ -9,6 +9,14 @@
       justify-content: space-between;
       align-items: center;
     }
+    .header-content1-1 {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .documents-header {
+      margin-bottom: 32px;
+    }
 
     .documents-header h1 {
       font-size: 32px;

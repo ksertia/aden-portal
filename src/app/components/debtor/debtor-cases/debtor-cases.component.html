@@ -121,8 +121,8 @@
               <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
                 {{ getStatusLabel(dossier.statutGlobal) }}
               </span>
-              <span class="priority-badge" [ngClass]="'priority-' + dossier.priority">
-                {{ getPriorityLabel(dossier.priority) }}
+              <span class="priority-badge" [ngClass]="'priority-' + dossier.priorite">
+                {{ getPriorityLabel(dossier.priorite) }}
               </span>
             </div>
           </div>
@@ -132,7 +132,6 @@
               <div class="amount-item">
                 <span class="amount-label">Montant total</span>
                 <span class="amount-value">{{ formatCurrency(dossier.montantTotal) }}</span>
-                <!-- <span class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</span> -->
               </div>
               <div class="amount-item">
                 <span class="amount-label">Déjà payé</span>
@@ -165,7 +164,7 @@
               </div>
               <div class="meta-item">
                 <span class="meta-label">Créé le :</span>
-                <span class="meta-value">{{ dossier.dateCreation }}</span>
+                <span class="meta-value">{{ formatDate(dossier.dateCreation) }}</span>
               </div>
             </div>
             
@@ -177,14 +176,14 @@
                 </svg>
                 Détails
               </button>
-              <button class="btn btn-secondary small" (click)="downloadCaseReport(dossier)">
+              <!-- <button class="btn btn-secondary small" (click)="downloadCaseReport(dossier)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                   <polyline points="7,10 12,15 17,10"/>
                   <line x1="12" y1="15" x2="12" y2="3"/>
                 </svg>
                 Rapport
-              </button>
+              </button> -->
             </div>
           </div>
         </div>
@@ -210,13 +209,11 @@
               <td>
                 <div class="case-cell">
                   <div class="case-number">{{ dossier.numeroDossier }}</div>
-                  <div class="case-date">{{ dossier.dateCreation }}</div>
-                  <!-- <div class="case-date">{{ dossier.documentsDebiteur.myArrayList.fileName }}</div> -->
+                  <div class="case-date">{{ formatDate(dossier.dateCreation) }}</div>
                 </div>
               </td>
               <td>
                 <div class="debtor-cell">
-                  <!-- <div class="debtor-name">{{ dossier.creancierNodeId}}</div> -->
                   <div class="debtor-name">{{ getCreancierForDossier(dossier)?.contactPrincipal }} </div>
                   <div class="debtor-type">{{ getCreancierForDossier(dossier)?.raisonSociale }}</div>
                 </div>
@@ -224,7 +221,6 @@
               <td>
                 <div class="amount-cell">
                   <div class="amount-value">{{ formatCurrency(dossier.montantTotal) }}</div>
-                  <!-- <div class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</div> -->
                 </div>
               </td>
               <td>
@@ -287,25 +283,11 @@
 
   <!-- Details-->
   <div class="drawer-overlay" *ngIf="showCaseDetailsModal">
-  <!-- *ngIf="dossiers.length > 0; else noCases" -->
-    <!-- <div class="cases-grid drawer-content" [class.open]="showCaseDetailsModal"> -->
     <div class="drawer" [class.open]="showCaseDetailsModal" (click)="$event.stopPropagation()">
       <!-- Bouton close -->
-       
-
-        <div class="drawer-content">
-          <div class="modal-header">
-                <button class="close-button" (click)="closeDrawer()">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
-                  </svg>
-                </button>
-             </div>
+      <div class="drawer-content">
+          <button class="close-button" (click)="closeDrawer()">X</button>
           <div class="case-card-drawer" *ngIf="selectedDetailCase">
-            <!-- *ngFor="let dossier of dossiers" -->
-            <!-- <button class="close-button" (click)="closeDrawer()">X</button> -->
-             
             <div class="case-header">
               <div class="case-info">
                 <h3> {{ selectedDetailCase.numeroDossier }}</h3>
@@ -507,7 +489,7 @@
               </div>
             </div>
           </div>
-        </div>
+      </div>
     </div>
   </div>
 
