@@ -123,21 +123,28 @@ export class LandingService {
             })
         );
     }
-
     getContact(locale: string): Observable<Contact | null> {
         return this.http.get<any>(
             `${this.apiUrl}/contact?locale=${locale}&populate=*`
         ).pipe(
             map(res => {
-                console.log('Contact response:', res); // Pour debug
-                // Single Type retourne { data: {...} } sans array
-                if (res.data) {
-                    return res.data.attributes || res.data;
-                }
-                return null;
+            console.log('Contact response:', res);
+            
+            if (!res || !res.data) return null;
+
+            // Pour Strapi v4 : data.attributes
+            const data = res.data.attributes ? res.data.attributes : res.data;
+
+            // Vérifier la locale renvoyée
+            if (data.locale !== locale) {
+                console.warn(`⚠️ Locale demandée (${locale}) différente de celle renvoyée (${data.locale})`);
+            }
+
+            return data;
             })
         );
     }
+
 
     getFooter(locale: string): Observable<Footer | null> {
         return this.http.get<StrapiResponse<Footer>>(

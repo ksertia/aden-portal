@@ -102,6 +102,13 @@
               <span class="status-badge" >
                 {{item.raisonSociale}}
               </span>
+                <!-- 🆕 Badge d'inscription ajouté -->
+            <span class="registration-badge" [ngClass]="isUserRegistered(item.emailProfessionnel) ? 'registered' : 'not-registered'">
+              <svg *ngIf="isUserRegistered(item.emailProfessionnel)" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+              {{ isUserRegistered(item.emailProfessionnel) ? 'Inscrit' : 'Non inscrit' }}
+            </span>
             </div>
           </div>
           <div class="case-body">
@@ -121,13 +128,26 @@
             </div>
             
             <div class="case-actions">
-              <button class="btn btn-primary small" title="Voir le profil" (click)="openDrawer(item)">
+              <!-- <button class="btn btn-primary small" title="Voir le profil" (click)="openDrawer(item)">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="8" r="4"/>
                   <path d="M6 20c0-4 12-4 12 0"/>
                 </svg> voir profil
-              </button>
-
+              </button> -->
+             <button 
+                    class="btn btn-primary small" 
+                    [class.registered]="isUserRegistered(item.emailProfessionnel)"
+                    (click)="openDrawer(item)">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="8" r="4"/>
+                      <path d="M6 20c0-4 12-4 12 0"/>
+                    </svg> 
+                    <span>Voir profil</span>
+                    <!-- 🆕 Tooltip ajouté -->
+                    <span class="registration-tooltip" *ngIf="isUserRegistered(item.emailProfessionnel)">
+                      Inscrit
+                    </span>
+                  </button>
             </div>
           </div>
         </div>
@@ -159,13 +179,26 @@
                <td>{{ item.chiffreAffaires }}</td>
               <td>
                 <div class="table-actions">
-                   <button class="btn btn-primary small" title="Voir le profil" (click)="openDrawer(item)">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="8" r="4"/>
-        <path d="M6 20c0-4 12-4 12 0"/>
-      </svg>
-    </button>
-                </div>
+                   <!-- <button class="btn btn-primary small" title="Voir le profil" (click)="openDrawer(item)">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="8" r="4"/>
+                          <path d="M6 20c0-4 12-4 12 0"/>
+                        </svg>
+                      </button> -->
+                      <button 
+                        class="btn btn-primary small" 
+                        [class.registered]="isUserRegistered(item.emailProfessionnel)"
+                        (click)="openDrawer(item)">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="8" r="4"/>
+                          <path d="M6 20c0-4 12-4 12 0"/>
+                        </svg>
+                        <!-- 🆕 Tooltip ajouté -->
+                        <span class="registration-tooltip" *ngIf="isUserRegistered(item.emailProfessionnel)">
+                          Inscrit
+                        </span>
+                      </button>
+                    </div>
               </td>
             </tr>
           </tbody>

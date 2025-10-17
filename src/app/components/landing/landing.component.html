@@ -266,80 +266,77 @@
           </div>
         </div>
         
-  <div class="contact-form fade-in-up" *ngIf="contact?.form">
-  <form class="form" (ngSubmit)="submitContactForm()">
-  <!-- Ligne Prénom / Nom -->
-  <div class="form-row">
-    <div class="form-group">
-      <label>{{ contact?.form?.firstName }}</label>
-      <input
-        type="text"
-        [(ngModel)]="contactForm.firstName"
-        name="firstName"
-        [placeholder]="contact?.form?.placeholder?.firstNamePlaceholder"
-        required
-      />
-    </div>
+        <div class="contact-form fade-in-up" *ngIf="contact?.form">
+        <form class="form" (ngSubmit)="submitContactForm()">
+        <!-- Ligne Prénom / Nom -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ contact?.form?.firstName }}</label>
+            <input
+              type="text"
+              [(ngModel)]="contactForm.firstName"
+              name="firstName"
+              [placeholder]="contact?.form?.placeholder?.firstNamePlaceholder"
+              required
+            />
+          </div>
 
-    <div class="form-group">
-      <label>{{ contact?.form?.lastName }}</label>
-      <input
-        type="text"
-        [(ngModel)]="contactForm.lastName"
-        name="lastName"
-        [placeholder]="contact?.form?.placeholder?.lastNamePlaceholder"
-        required
-      />
-    </div>
-  </div>
+          <div class="form-group">
+            <label>{{ contact?.form?.lastName }}</label>
+            <input
+              type="text"
+              [(ngModel)]="contactForm.lastName"
+              name="lastName"
+              [placeholder]="contact?.form?.placeholder?.lastNamePlaceholder"
+              required
+            />
+          </div>
+        </div>
 
-  <!-- Email -->
-  <div class="form-group">
-    <label>{{ contact?.form?.email }}</label>
-    <input
-      type="email"
-      [(ngModel)]="contactForm.email"
-      name="email"
-      [placeholder]="contact?.form?.placeholder?.emailPlaceholder"
-      required
-    />
-  </div>
+        <!-- Email -->
+        <div class="form-group">
+          <label>{{ contact?.form?.email }}</label>
+          <input
+            type="email"
+            [(ngModel)]="contactForm.email"
+            name="email"
+            [placeholder]="contact?.form?.placeholder?.emailPlaceholder"
+            required
+          />
+        </div>
 
-  <!-- Profil -->
-  <div class="form-group">
-    <label>{{ contact?.form?.profile }}</label>
-    <select [(ngModel)]="contactForm.profile" name="profile" required>
-      <option value="" disabled selected>
-        {{ contact?.form?.profileOption?.selectProfile }}
-      </option>
-      <option value="debtor">{{ contact?.form?.profileOption?.debtor }}</option>
-      <option value="bailiff">{{ contact?.form?.profileOption?.bailiff }}</option>
-      <option value="lawyer">{{ contact?.form?.profileOption?.lawyer }}</option>
-      <option value="creditor">{{ contact?.form?.profileOption?.creditor }}</option>
-    </select>
-  </div>
+        <!-- Profil -->
+        <div class="form-group">
+          <label>{{ contact?.form?.profile }}</label>
+          <select [(ngModel)]="contactForm.profile" name="profile" required>
+            <option value="" disabled selected>
+              {{ contact?.form?.profileOption?.selectProfile }}
+            </option>
+            <option value="debtor">{{ contact?.form?.profileOption?.debtor }}</option>
+            <option value="bailiff">{{ contact?.form?.profileOption?.bailiff }}</option>
+            <option value="lawyer">{{ contact?.form?.profileOption?.lawyer }}</option>
+            <option value="creditor">{{ contact?.form?.profileOption?.creditor }}</option>
+          </select>
+        </div>
 
-  <!-- Message -->
-  <div class="form-group">
-    <label>{{ contact?.form?.message }}</label>
-    <textarea
-      rows="4"
-      [(ngModel)]="contactForm.message"
-      name="message"
-      [placeholder]="contact?.form?.placeholder?.messagePlaceholder"
-      required
-    ></textarea>
-  </div>
+        <!-- Message -->
+        <div class="form-group">
+          <label>{{ contact?.form?.message }}</label>
+          <textarea
+            rows="4"
+            [(ngModel)]="contactForm.message"
+            name="message"
+            [placeholder]="contact?.form?.placeholder?.messagePlaceholder"
+            required
+          ></textarea>
+        </div>
 
-  <!-- Bouton -->
-  <button type="submit" class="btn btn-primary">
-    {{ contact?.form?.send }}
-  </button>
-</form>
-</div>
-
-
-        
+        <!-- Bouton -->
+        <button type="submit" class="btn btn-primary">
+          {{ contact?.form?.send }}
+        </button>
+      </form>
+      </div>
       </div>
     </div>
   </section>
