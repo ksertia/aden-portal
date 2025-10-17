@@ -12,12 +12,14 @@
           <span>RecouvrePro</span>
         </div>
         <div class="nav-links" *ngIf="nav">
-          <a (click)="scrollToSection('services')">{{ nav.services }}</a>
-          <a (click)="scrollToSection('avantages')">{{ nav.advantages }}</a>
-          <a (click)="scrollToSection('contact')">{{ nav.contact }}</a>
-          <app-language-switcher></app-language-switcher>
-          <a routerLink="/login" class="btn btn-primary">{{ nav.login }}</a>
-        </div>
+  <a (click)="scrollToSection('services')">{{ nav?.services }}</a>
+  <a (click)="scrollToSection('advantages')">{{ nav?.advantages }}</a>
+  <a (click)="scrollToSection('contact')">{{ nav?.contact }}</a>
+  <app-language-switcher></app-language-switcher>
+  <a routerLink="/login" class="btn btn-primary">{{ nav?.login }}</a>
+  <a routerLink="/register" class="btn btn-primary">Register</a>
+</div>
+
       </div>
     </nav>
   </header>

@@ -6,16 +6,6 @@
         <h1>Mes Créances</h1>
         <p>Gérez et suivez vos créances en cours de recouvrement</p>
       </div>
-      <!-- <div class="header-actions">
-        <button class="btn btn-secondary" (click)="generateCustomReport()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 2v6l3-3 3 3-3 3v6"/>
-            <path d="M15 8h6"/>
-            <path d="M15 16h6"/>
-          </svg>
-          Rapport personnalisé
-        </button>
-      </div> -->
     </div>
   </div>
 
@@ -97,10 +87,14 @@
       
       <div class="stat-card">
         <div class="stat-icon warning">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <!-- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="1" x2="12" y2="23"/>
             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
+          </svg> -->
+          <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960"
+            width="25" fill="#FFFFFF"><path 
+            d="M275-99v-128h-88v-91h88v-544h460v92H366v244h329v91H366v117h160v91H366v128h-91Z"/>
+        </svg>
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div>
@@ -110,9 +104,9 @@
       
       <div class="stat-card">
         <div class="stat-icon info">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="1" x2="12" y2="23"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960"
+            width="25" fill="#FFFFFF"><path 
+            d="M275-99v-128h-88v-91h88v-544h460v92H366v244h329v91H366v117h160v91H366v128h-91Z"/>
           </svg>
         </div>
         <div class="stat-content">
@@ -125,9 +119,8 @@
 
   <!-- Liste des créances -->
   <div class="cases-content fade-in-up">
-    <div class="cases-list" *ngIf="dossiers.length > 0; else noCases">
+    <div class="cases-list" *ngIf="filteredDossiers.length > 0; else noCases">
       <div class="list-header">
-        <!-- <h3>Créances ({{ filteredDossiers.length }})</h3> -->
         <app-view-toggle 
           [currentView]="currentView" 
           (viewChange)="currentView = $event">
@@ -157,7 +150,6 @@
               <div class="amount-item">
                 <span class="amount-label">Montant total</span>
                 <span class="amount-value">{{ formatCurrency(dossier.montantTotal) }}</span>
-                <!-- <span class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</span> -->
               </div>
               <div class="amount-item">
                 <span class="amount-label">Recouvré</span>
@@ -182,11 +174,11 @@
             <div class="case-meta">
               <div class="meta-item">
                 <span class="meta-label">Échéance :</span>
-                <span class="meta-value">{{ dossier.dateEcheance }}</span>
+                <span class="meta-value">{{ formatDate(dossier.dateEcheance) }}</span>
               </div>
               <div class="meta-item">
                 <span class="meta-label">Créé le :</span>
-                <span class="meta-value">{{ dossier.dateCreation }}</span>
+                <span class="meta-value"> {{ formatDate(dossier.dateCreation) }} </span>
               </div>
             </div>
             
@@ -232,7 +224,7 @@
               <td>
                 <div class="case-cell">
                   <div class="case-number">{{ dossier.numeroDossier }}</div> 
-                  <div class="case-date">{{ dossier.dateCreation }}</div>
+                  <div class="case-date">{{ formatDate(dossier.dateCreation) }}</div>
                 </div>
               </td>
               <td>
@@ -244,7 +236,6 @@
               <td>
                 <div class="amount-cell">
                   <div class="amount-value">{{ formatCurrency(dossier.montantTotal) }}</div>
-                  <!-- <div class="amount-value">{{ dossier.montantTotal | currency:'EUR' }}</div> -->
                 </div>
               </td>
               <td>
@@ -271,7 +262,7 @@
                 </div>
               </td>
               <td>
-                <div class="date-cell">{{ dossier.dateEcheance }}</div>
+                <div class="date-cell">{{ formatDate(dossier.dateEcheance) }}</div>
               </td>
               <td>
                 <div class="table-actions">
@@ -332,11 +323,11 @@
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Date de création</span>
-                  <span class="detail-value">{{ dossiers[selectedIndex!].dateCreation }}</span>
+                  <span class="detail-value">{{ formatDate(dossiers[selectedIndex!].dateCreation) }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Échéance</span>
-                  <span class="detail-value">{{ dossiers[selectedIndex!].dateEcheance }}</span>
+                  <span class="detail-value">{{ formatDate(dossiers[selectedIndex!].dateEcheance) }}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Statut</span>
@@ -384,9 +375,9 @@
               <div class="financial-cards">
                 <div class="financial-card total">
                   <div class="card-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="12" y1="1" x2="12" y2="23"/>
-                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960"
+                      width="25" fill="#FFFFFF"><path 
+                      d="M275-99v-128h-88v-91h88v-544h460v92H366v244h329v91H366v117h160v91H366v128h-91Z"/>
                     </svg>
                   </div>
                   <div class="card-content">
@@ -475,18 +466,18 @@
               </div>
             </div> -->
           </div>
+          </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="closeDrawer()">Fermer</button>
-          <button class="btn btn-primary" (click)="openDocumentsModal()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14,2 14,8 20,8"/>
-            </svg>
-            Acceder aux documents ({{ getDocumentsCount(selectedDetailCase) }})
-          </button>
+            <button class="btn btn-secondary" (click)="closeDrawer()">Fermer</button>
+            <button class="btn btn-primary" (click)="openDocumentsModal()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+              </svg>
+              Acceder aux documents ({{ getDocumentsCount(selectedDetailCase) }})
+            </button>
         </div>
-      </div>
     </div>
   </div>
 
@@ -505,63 +496,6 @@
           <div class="modal-body">
           <div class="documents-list">
               <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
-              <!-- <div class="list-header">
-                  <app-view-toggle [currentView]="currentView" (viewChange)="currentView = $event"></app-view-toggle>
-              </div> -->
-
-              <!-- Vue grille -->
-              <!-- <div class="documents-grid" *ngIf="currentView === 'grid'">
-                  <div class="document-card" *ngFor="let doc of filteredDocuments">
-                  <div class="document-header">
-                      <div class="document-icon" [ngClass]="'icon-' + doc.type">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                          <polyline points="14,2 14,8 20,8"/>
-                      </svg>
-                      </div>
-                      <div class="document-info">
-                      <h3>{{ doc.name }}</h3>
-                      <p class="document-type">{{ getDocumentTypeLabel(doc.type) }}</p>
-                      </div>
-                      <div class="document-actions">
-                      <button class="btn btn-primary small" (click)="downloadDocument(doc)">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                          <polyline points="7,10 12,15 17,10"/>
-                          <line x1="12" y1="15" x2="12" y2="3"/>
-                          </svg>
-                      </button>
-                      <button class="btn btn-secondary small" (click)="viewDocument(doc)">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                          <circle cx="12" cy="12" r="3"/>
-                          </svg>
-                      </button>
-                      <button class="btn btn-secondary small" (click)="deleteDocument(doc)">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="3,6 5,6 21,6"/>
-                          <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
-                          </svg>
-                      </button>
-                      </div>
-                  </div>
-
-                  <div class="document-details">
-                      <div class="detail-row">
-                      <span class="label">Dossier :</span>
-                      <span class="value">{{ getCaseNumber(doc.caseId) }}</span>
-                      </div>
-                      <div class="detail-row">
-                      <span class="label">Ajouté le :</span>
-                      <span class="value">{{ formatDate(doc.uploadedAt) }}</span>
-                      </div>
-                      <div class="detail-row">
-                      <span class="label">Par :</span>
-                      <span class="value">{{ doc.uploadedBy }}</span>
-                      </div>
-                  </div>
-                  </div>
-              </div> -->
 
               <!-- Vue tableau -->
               <div class="documents-table-container" *ngIf="currentViews === 'table'">
@@ -703,7 +637,9 @@
                   [(ngModel)]="newDocument.name"
                   placeholder="Nom du fichier"
                   required
+                  
               >
+              <!-- (input)="logFormState()" -->
               </div>
               
               <div class="form-group">
@@ -724,16 +660,102 @@
           </div>
           <div class="modal-footer">
           <button class="btn btn-secondary" (click)="closeUploadModal()">Annuler</button>
-          <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="!isUploadValid()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="!isUploadValid() || isLoading">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
               <polyline points="17,8 12,3 7,8"/>
               <line x1="12" y1="3" x2="12" y2="15"/>
-              </svg>
-              Ajouter le document
+            </svg>
+            <span *ngIf="isLoading" class="spinner"></span>
+            {{ isLoading ? 'Envoi en cours...' : 'Ajouter le document' }}
           </button>
           </div>
       </div>
+  </div>
+
+
+
+  <!-- Modale de visualisation de document -->
+<div class="document-viewer-overlay" *ngIf="showDocumentViewer" (click)="closeDocumentViewer()">
+  <div class="document-viewer-modal" (click)="$event.stopPropagation()">
+    <!-- En-tête -->
+    <div class="document-viewer-header">
+      <div class="document-viewer-info">
+        <h3>{{ currentDocument?.name }}</h3>
+        <p class="document-meta">
+          <span class="document-type-badge" [ngClass]="'type-' + currentDocument?.type">
+            {{ getDocumentTypeLabel(currentDocument?.type) }}
+          </span>
+          <span class="document-size" *ngIf="currentDocument?.size">
+            • {{ formatFileSize(currentDocument.size) }}
+          </span>
+        </p>
+      </div>
+      <div class="document-viewer-actions">
+        <button class="btn-icon" (click)="openInNewTab()" title="Ouvrir dans un nouvel onglet">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15,3 21,3 21,9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </button>
+        <button class="btn-icon" (click)="downloadDocument(currentDocument)" title="Télécharger">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+        <button class="btn-icon close-btn" (click)="closeDocumentViewer()" title="Fermer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenu du document -->
+    <div class="document-viewer-content">
+      <!-- Chargement -->
+      <div class="document-loading" *ngIf="isLoadingDocument">
+        <div class="spinner"></div>
+        <p>Chargement du document...</p>
+      </div>
+
+      <!-- Affichage PDF -->
+      <iframe 
+        *ngIf="!isLoadingDocument && isDocumentPDF() && currentDocumentUrl"
+        [src]="currentDocumentUrl"
+        class="document-iframe"
+        width="100%"
+        height="600"
+        frameborder="0">
+      </iframe>
+
+      <!-- Affichage Image -->
+      <div class="document-image-container" *ngIf="!isLoadingDocument && isDocumentImage() && currentDocumentUrl">
+        <img [src]="currentDocumentUrl" [alt]="currentDocument?.name" class="document-image">
+      </div>
+
+      <!-- Autres types de documents -->
+      <div class="document-unsupported" *ngIf="!isLoadingDocument && !isDocumentPDF() && !isDocumentImage()">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <h3>Aperçu non disponible</h3>
+        <p>Ce type de fichier ne peut pas être visualisé directement dans le navigateur.</p>
+        <button class="btn btn-primary" (click)="downloadDocument(currentDocument)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Télécharger le document
+        </button>
+      </div>
+    </div>
   </div>
 
 

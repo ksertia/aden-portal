@@ -168,13 +168,6 @@
   color: blue;
 }
 
-.nav-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  cursor: pointer;
-}
-
 .rotate-90 {
   transform: rotate(90deg);
   transition: transform 0.3s ease;

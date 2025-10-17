@@ -130,13 +130,14 @@ export class BailiffDashboard implements OnInit {
     }
   }
 
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
+   formatCurrency(amount: number): string {
+    if (!amount) return '0 FCFA';
+    return amount.toLocaleString('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(amount);
+      currency: 'XOF',
+      minimumFractionDigits: 0
+    });
   }
-
   getStatusLabel(status: string): string {
     const labels: { [key: string]: string } = {
       'pending': 'En attente',

@@ -73,9 +73,9 @@
         
       <div class="stat-card">
         <div class="stat-icon warning">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="1" x2="12" y2="23"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+         <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960"
+            width="25" fill="#FFFFFF"><path 
+            d="M275-99v-128h-88v-91h88v-544h460v92H366v244h329v91H366v117h160v91H366v128h-91Z"/>
           </svg>
         </div>
         <div class="stat-content">
@@ -101,7 +101,7 @@
   
   <!-- Liste des créances -->
   <div class="cases-content fade-in-up">
-    <div class="cases-list" *ngIf="dossiers.length > 0; else noCases">
+    <div class="cases-list" *ngIf="filteredDossiers.length > 0; else noCases">
       <div class="list-header">
         <app-view-toggle 
           [currentView]="currentView" 
@@ -280,7 +280,7 @@
           <polyline points="14,2 14,8 20,8"/>
         </svg>
         <h3>{{ t('cases.noCases.title') }}</h3>
-        <p>{{ t('cases.noCases.description') }}</p>
+        <p>Aucun dossier ne correspond aux critères sélectionnés.</p>
       </div>
    </ng-template>
   </div>
@@ -291,18 +291,22 @@
     <!-- <div class="cases-grid drawer-content" [class.open]="showCaseDetailsModal"> -->
     <div class="drawer" [class.open]="showCaseDetailsModal" (click)="$event.stopPropagation()">
       <!-- Bouton close -->
+       
+
         <div class="drawer-content">
-          <button class="close-button" (click)="closeDrawer()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
+          <div class="modal-header">
+                <button class="close-button" (click)="closeDrawer()">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+             </div>
           <div class="case-card-drawer" *ngIf="selectedDetailCase">
             <!-- *ngFor="let dossier of dossiers" -->
             <!-- <button class="close-button" (click)="closeDrawer()">X</button> -->
+             
             <div class="case-header">
-              
               <div class="case-info">
                 <h3> {{ selectedDetailCase.numeroDossier }}</h3>
                 <p class="creditor-name">{{ selectedDetailCase.objet }}</p>
@@ -347,43 +351,6 @@
                   </div>
                 </div>
               </div>
-
-              <!-- Détail des intérêts -->
-              <!-- <div class="interests-detail" >
-                <h5>{{ t('cases.interestsDetail') }}</h5>
-                <div class="interests-list">
-                  <div class="interest-item">
-                    <div class="interest-info">
-                      <span class="interest-type">Intérêts légaux</span>
-                      <span class="interest-rate">0% par an</span>
-                    </div>
-                    <div class="interest-amount">0 FCFA</div>
-                  </div>
-
-                  <div class="interest-item">
-                    <div class="interest-info">
-                      <span class="interest-type">Intérêts de retard</span>
-                      <span class="interest-rate">0% par an</span>
-                    </div>
-                    <div class="interest-amount">0 FCFA</div>
-                  </div>
-                </div>
-              </div> -->
-
-              <!-- Détail des pénalités -->
-              <!-- <div class="penalties-detail">
-                <h5>{{ t('cases.penaltiesDetail') }}</h5>
-                <div class="penalties-list">
-                  <div class="penalty-item" >
-                    <div class="penalty-info">
-                      <span class="penalty-type">Pénalité de retard</span>
-                      <span class="penalty-date">15 février 2024</span>
-                    </div>
-                    <div class="penalty-amount">0 FCFA</div>
-                  </div>
-                </div>
-              </div> -->
-
               <!-- Détail des intérêts -->
               <div class="interests-detail" *ngIf="getInterestsDetail(selectedDetailCase).length > 0">
                 <h5>{{ t('cases.interestsDetail') }}</h5>
@@ -433,29 +400,68 @@
                 <div class="progress-bar">
                   <div class="progress-fill" [style.width.%]="getPaymentPercentage(selectedDetailCase)"></div>
                 </div>
-              </div>
-
-              <!-- Historique des relances -->
-              <!-- <div class="reminder-history" >
-                <h5>{{ t('cases.reminderHistory') }}</h5>
-                <div class="reminder-list">
-                  <div class="reminder-item" >
-                    <div class="reminder-icon">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              </div>   
+              <!-- TIROIR DE L'HISTORIQUE DES RELANCES (à placer à la fin de ton HTML, après le tiroir de contestation) -->
+              <div class="drawer-overlay-reminder" *ngIf="showReminderHistoryModal" (click)="closeReminderHistory()">
+                <div class="drawer-reminder" [class.open]="showReminderHistoryModal" (click)="$event.stopPropagation()">
+                  <div class="modal-header">
+                    <h3>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                       </svg>
-                    </div>
-                    <div class="reminder-content">
-                      <div class="reminder-type">Relance</div>
-                      <div class="reminder-description">Première relance envoyée par email</div>
-                      <div class="reminder-date">25 janvier 2024</div>
+                      Historique des relances
+                    </h3>
+                    <button class="modal-close" (click)="closeReminderHistory()">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div class="modal-body">
+                    <div class="reminder-history">
+                      <div class="reminder-list">
+                        <div class="reminder-item" *ngFor="let reminder of reminderHistory">
+                          <div class="reminder-icon" [ngClass]="getReminderIcon(reminder.type)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                          </div>
+                          <div class="reminder-content">
+                            <div class="reminder-header">
+                              <div class="reminder-type">{{ reminder.type }}</div>
+                              <div class="reminder-status" *ngIf="reminder.status">
+                                <span class="status-badge">{{ reminder.status }}</span>
+                              </div>
+                            </div>
+                            <div class="reminder-description">{{ reminder.description }}</div>
+                            <div class="reminder-meta">
+                              <span class="reminder-date">{{ formatDateShort(reminder.date) }}</span>
+                              <span class="reminder-by" *ngIf="reminder.sentBy">• Envoyé par {{ reminder.sentBy }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="no-reminders" *ngIf="reminderHistory.length === 0">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <p>Aucune relance enregistrée</p>
+                      </div>
                     </div>
                   </div>
+                  
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" (click)="closeReminderHistory()">Fermer</button>
+                  </div>
                 </div>
-              </div> -->
-
-              <!-- Actions -->
-              <!-- <div class="case-actions">
+              </div>
+            </div>
+             <!-- Actions -->
+            <div class="modal-footer">
+              <div class="case-actions">
                 <button class="btn btn-primary" (click)="makePayment(selectedDetailCase)">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
@@ -477,120 +483,28 @@
                   </svg>
                   {{ t('cases.actions.dispute') }}
                 </button>
-                <button class="btn btn-secondary" (click)="closeDrawer()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                        <circle cx="12" cy="12" r="3"/>
+                <button class="btn btn-primary" (click)="openDocumentsModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14,2 14,8 20,8"/>
                     </svg>
-                    Fermer
+                    Acceder aux documents ({{ getDocumentsCount(selectedDetailCase) }})
                 </button>
-              </div> -->
-
-           
-
-            <!-- Actions -->
-            <div class="case-actions">
-              <button class="btn btn-primary" (click)="makePayment(selectedDetailCase)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                  <line x1="1" y1="10" x2="23" y2="10"/>
-                </svg>
-                {{ t('cases.actions.makePayment') }}
-              </button>
-              <button class="btn btn-secondary" (click)="proposePaymentPlan(selectedDetailCase)" >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
-                </svg>
-                {{ t('cases.actions.paymentPlan') }}
-              </button>
-              <button class="btn btn-warning" (click)="fileDispute(selectedDetailCase)" >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="15" y1="9" x2="9" y2="15"/>
-                  <line x1="9" y1="9" x2="15" y2="15"/>
-                </svg>
-                {{ t('cases.actions.dispute') }}
-              </button>
-              <button class="btn btn-primary" (click)="openDocumentsModal()">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14,2 14,8 20,8"/>
-                  </svg>
-                  Acceder aux documents ({{ getDocumentsCount(selectedDetailCase) }})
-              </button>
-              <button class="btn btn-secondary" (click)="closeDrawer()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-                Fermer
-              </button>
-              <!-- Bouton pour accéder aux relances (à placer avant les Actions) -->
-                <button class="btn btn-info" (click)="openReminderHistory(selectedDetailCase)">
+                <button class="btn btn-secondary" (click)="closeDrawer()">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
                   </svg>
-                  Accéder aux relances
+                  Fermer
                 </button>
-            </div>
-
-            <!-- TIROIR DE L'HISTORIQUE DES RELANCES (à placer à la fin de ton HTML, après le tiroir de contestation) -->
-            <div class="drawer-overlay-reminder" *ngIf="showReminderHistoryModal" (click)="closeReminderHistory()">
-              <div class="drawer-reminder" [class.open]="showReminderHistoryModal" (click)="$event.stopPropagation()">
-                <div class="modal-header">
-                  <h3>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <!-- Bouton pour accéder aux relances (à placer avant les Actions) -->
+                  <button class="btn btn-info" (click)="openReminderHistory(selectedDetailCase)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                     </svg>
-                    Historique des relances
-                  </h3>
-                  <button class="modal-close" (click)="closeReminderHistory()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
+                    Accéder aux relances
                   </button>
-                </div>
-                
-                <div class="modal-body">
-                  <div class="reminder-history">
-                    <div class="reminder-list">
-                      <div class="reminder-item" *ngFor="let reminder of reminderHistory">
-                        <div class="reminder-icon" [ngClass]="getReminderIcon(reminder.type)">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                          </svg>
-                        </div>
-                        <div class="reminder-content">
-                          <div class="reminder-header">
-                            <div class="reminder-type">{{ reminder.type }}</div>
-                            <div class="reminder-status" *ngIf="reminder.status">
-                              <span class="status-badge">{{ reminder.status }}</span>
-                            </div>
-                          </div>
-                          <div class="reminder-description">{{ reminder.description }}</div>
-                          <div class="reminder-meta">
-                            <span class="reminder-date">{{ formatDateShort(reminder.date) }}</span>
-                            <span class="reminder-by" *ngIf="reminder.sentBy">• Envoyé par {{ reminder.sentBy }}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div class="no-reminders" *ngIf="reminderHistory.length === 0">
-                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                      </svg>
-                      <p>Aucune relance enregistrée</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="modal-footer">
-                  <button class="btn btn-secondary" (click)="closeReminderHistory()">Fermer</button>
-                </div>
               </div>
-            </div>
             </div>
           </div>
         </div>
@@ -1151,6 +1065,88 @@
           </div>
       </div>
   </div>
+
+  <!-- Modale de visualisation de document -->
+<div class="document-viewer-overlay" *ngIf="showDocumentViewer" (click)="closeDocumentViewer()">
+  <div class="document-viewer-modal" (click)="$event.stopPropagation()">
+    <!-- En-tête -->
+    <div class="document-viewer-header">
+      <div class="document-viewer-info">
+        <h3>{{ currentDocument?.name }}</h3>
+        <p class="document-meta">
+          <span class="document-type-badge" [ngClass]="'type-' + currentDocument?.type">
+            {{ getDocumentTypeLabel(currentDocument?.type) }}
+          </span>
+          <span class="document-size" *ngIf="currentDocument?.size">
+            • {{ formatFileSize(currentDocument.size) }}
+          </span>
+        </p>
+      </div>
+      <div class="document-viewer-actions">
+        <button class="btn-icon" (click)="openInNewTab()" title="Ouvrir dans un nouvel onglet">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15,3 21,3 21,9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </button>
+        <button class="btn-icon" (click)="downloadDocument(currentDocument)" title="Télécharger">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+        <button class="btn-icon close-btn" (click)="closeDocumentViewer()" title="Fermer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenu du document -->
+    <div class="document-viewer-content">
+      <!-- Chargement -->
+      <div class="document-loading" *ngIf="isLoadingDocument">
+        <div class="spinner"></div>
+        <p>Chargement du document...</p>
+      </div>
+
+      <!-- Affichage PDF -->
+      <iframe 
+        *ngIf="!isLoadingDocument && isDocumentPDF() && currentDocumentUrl"
+        [src]="currentDocumentUrl"
+        class="document-iframe"
+        frameborder="0">
+      </iframe>
+
+      <!-- Affichage Image -->
+      <div class="document-image-container" *ngIf="!isLoadingDocument && isDocumentImage() && currentDocumentUrl">
+        <img [src]="currentDocumentUrl" [alt]="currentDocument?.name" class="document-image">
+      </div>
+
+      <!-- Autres types de documents -->
+      <div class="document-unsupported" *ngIf="!isLoadingDocument && !isDocumentPDF() && !isDocumentImage()">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <h3>Aperçu non disponible</h3>
+        <p>Ce type de fichier ne peut pas être visualisé directement dans le navigateur.</p>
+        <button class="btn btn-primary" (click)="downloadDocument(currentDocument)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Télécharger le document
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
   
 </div>
 

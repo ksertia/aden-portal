@@ -18,6 +18,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/auth/login/login.component').then(c => c.LoginComponent)
   },
   {
+    path: 'register',
+    loadComponent: () => import('./components/auth/register/register').then(c => c.Register)
+  },
+  {
     path: 'unauthorized',
     loadComponent: () => import('./components/unauthorized/unauthorized.component').then(c => c.UnauthorizedComponent)
   },
@@ -225,6 +229,10 @@ export const routes: Routes = [
           { 
             path: 'partenaire',
             loadComponent: () => import('./components/admin/partenaire/partenaire').then(c => c.Partenaire)
+          },
+          { 
+            path: 'dashboard',
+            loadComponent: () => import('./components/admin/dashboard/dashboard').then(c => c.Dashboard)
           }
 
         ]

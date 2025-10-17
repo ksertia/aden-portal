@@ -19,6 +19,10 @@
       <!-- Filtres -->
       <div class="filters-section fade-in-up">
         <div class="filters-card">
+          <div class="filters-header">
+          <h3>Filtres et recherche</h3>
+          <button class="btn btn-secondary small" (click)="resetFilters()">Réinitialiser</button>
+        </div>
           <div class="filters-grid">
             <div class="filter-group">
               <label>Rechercher</label>
@@ -26,7 +30,7 @@
                 type="text"
                 [(ngModel)]="searchTerm"
                 placeholder="Nom du document, dossier..."
-                (input)="filterDocuments()"
+                (input)="applyFilters()"
               >
             </div>
             
@@ -47,8 +51,8 @@
               <label>Dossier</label>
               <select [(ngModel)]="selectedCaseId" (change)="filterDocuments()">
                 <option value="">Tous les dossiers</option>
-                <option *ngFor="let case of cases" [value]="case.id">
-                  {{ case.caseNumber }} - {{ case.debtor.firstName }} {{ case.debtor.lastName }}
+                <option  *ngFor="let dossier of uniqueDossiers" [value]="dossier.nodeId">
+                  {{ dossier.numeroDossier }}
                 </option>
               </select>
             </div>
@@ -67,7 +71,7 @@
               </svg>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ allDocuments.length }}</div>
+              <div class="stat-value">{{ filteredDocuments.length }}</div>
               <div class="stat-label">Documents totaux</div>
             </div>
           </div>
@@ -81,21 +85,8 @@
               </svg>
             </div>
             <div class="stat-content">
-              <div class="stat-value">{{ getLegalDocumentsCount() }}</div>
-              <div class="stat-label">Documents légaux</div>
-            </div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon success">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                <line x1="1" y1="10" x2="23" y2="10"/>
-              </svg>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value">{{ getPaymentProofsCount() }}</div>
-              <div class="stat-label">Preuves de paiement</div>
+              <div class="stat-value">{{ dossiers.length }}</div>
+              <div class="stat-label">Dossiers totaux</div>
             </div>
           </div>
         </div>
@@ -105,7 +96,7 @@
       <div class="documents-list fade-in-up">
         <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
           <div class="list-header">
-            <h3>Documents ({{ filteredDocuments.length }})</h3>
+            <!-- <h3>Documents ({{ filteredDocuments.length }})</h3> -->
             <app-view-toggle 
               [currentView]="currentView" 
               (viewChange)="currentView = $event">
@@ -127,20 +118,20 @@
                   <p class="document-type">{{ getDocumentTypeLabel(doc.type) }}</p>
                 </div>
                 <div class="document-actions">
-                  <button class="btn btn-primary small" (click)="downloadDocument(doc)">
+                  <!-- <button class="btn btn-primary small" (click)="downloadDocument(doc)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                       <polyline points="7,10 12,15 17,10"/>
                       <line x1="12" y1="15" x2="12" y2="3"/>
                     </svg>
-                  </button>
-                  <button class="btn btn-secondary small" (click)="viewDocument(doc)">
+                  </button> -->
+                  <button class="btn btn-primary small" (click)="viewDocument(doc)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                       <circle cx="12" cy="12" r="3"/>
                     </svg>
                   </button>
-                  <button class="btn btn-secondary small" (click)="deleteDocument(doc)">
+                  <button class="btn btn-danger small" (click)="deleteDocument(doc)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <polyline points="3,6 5,6 21,6"/>
                       <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
@@ -208,20 +199,13 @@
                   </td>
                   <td>
                     <div class="table-actions">
-                      <button class="btn btn-primary small" (click)="downloadDocument(doc)" title="Télécharger">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                          <polyline points="7,10 12,15 17,10"/>
-                          <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                      </button>
-                      <button class="btn btn-secondary small" (click)="viewDocument(doc)" title="Voir">
+                      <button class="btn btn-primary small" (click)="viewDocument(doc)" title="Voir">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                           <circle cx="12" cy="12" r="3"/>
                         </svg>
                       </button>
-                      <button class="btn btn-secondary small" (click)="deleteDocument(doc)" title="Supprimer">
+                      <button class="btn btn-danger small" (click)="deleteDocument(doc)" title="Supprimer">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <polyline points="3,6 5,6 21,6"/>
                           <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
@@ -265,8 +249,8 @@
                 <label>Dossier associé</label>
                 <select [(ngModel)]="newDocument.caseId" required>
                   <option value="">Sélectionner un dossier</option>
-                  <option *ngFor="let case of cases" [value]="case.id">
-                    {{ case.caseNumber }} - {{ case.debtor.firstName }} {{ case.debtor.lastName }}
+                  <option *ngFor="let dossier of uniqueDossiers" [value]="dossier.nodeId">
+                     {{ getDisplayCaseNumber(dossier) }}
                   </option>
                 </select>
               </div>
@@ -275,12 +259,9 @@
                 <label>Type de document</label>
                 <select [(ngModel)]="newDocument.type" required>
                   <option value="">Sélectionner un type</option>
-                  <option value="invoice">Facture</option>
-                  <option value="contract">Contrat</option>
-                  <option value="correspondence">Correspondance</option>
-                  <option value="legal_notice">Mise en demeure</option>
-                  <option value="payment_proof">Preuve de paiement</option>
-                  <option value="court_document">Document judiciaire</option>
+                  <option *ngFor="let type of getDocumentTypes()" [value]="type.value">
+                    {{ type.label }}
+                  </option>
                 </select>
               </div>
               
@@ -289,7 +270,7 @@
                 <input
                   type="text"
                   [(ngModel)]="newDocument.name"
-                  placeholder="Nom du fichier"
+                  placeholder="Nom du document"
                   required
                 >
               </div>
@@ -312,7 +293,7 @@
           </div>
           <div class="modal-footer">
             <button class="btn btn-secondary" (click)="closeUploadModal()">Annuler</button>
-            <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="!isUploadValid()">
+            <button class="btn btn-primary" >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="17,8 12,3 7,8"/>
@@ -323,4 +304,126 @@
           </div>
         </div>
       </div>
+
+
+      <!-- Modal de visualisation (reste identique) -->
+  <div class="modal-overlay" *ngIf="showViewModal" (click)="closeViewModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ selectedDocument?.name }}</h3>
+        <button class="modal-close" (click)="closeViewModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" *ngIf="selectedDocument">
+        <div class="document-preview">
+          <div class="preview-placeholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+            </svg>
+            <p>Aperçu du document</p>
+            <p class="preview-note">{{ getDocumentTypeLabel(selectedDocument.type) }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeViewModal()">Fermer</button>
+        <button class="btn btn-primary" (click)="downloadDocument(selectedDocument!)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Télécharger
+        </button>
+      </div>
     </div>
+  </div>
+
+
+  <!-- Modale de visualisation de document -->
+<div class="document-viewer-overlay" *ngIf="showDocumentViewer" (click)="closeDocumentViewer()">
+  <div class="document-viewer-modal" (click)="$event.stopPropagation()">
+    <!-- En-tête -->
+    <div class="document-viewer-header">
+      <div class="document-viewer-info">
+        <h3>{{ currentDocument?.name }}</h3>
+        <p class="document-meta">
+          <span class="document-type-badge" [ngClass]="'type-' + currentDocument?.type">
+            {{ getDocumentTypeLabel(currentDocument?.type) }}
+          </span>
+          <span class="document-size" *ngIf="currentDocument?.size">
+            • {{ formatFileSize(currentDocument.size) }}
+          </span>
+        </p>
+      </div>
+      <div class="document-viewer-actions">
+        <button class="btn-icon" (click)="openInNewTab()" title="Ouvrir dans un nouvel onglet">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15,3 21,3 21,9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </button>
+        <button class="btn-icon" (click)="downloadDocument(currentDocument)" title="Télécharger">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+        <button class="btn-icon close-btn" (click)="closeDocumentViewer()" title="Fermer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenu du document -->
+    <div class="document-viewer-content">
+      <!-- Chargement -->
+      <div class="document-loading" *ngIf="isLoadingDocument">
+        <div class="spinner"></div>
+        <p>Chargement du document...</p>
+      </div>
+
+      <!-- Affichage PDF -->
+      <iframe 
+        *ngIf="!isLoadingDocument && isDocumentPDF() && currentDocumentUrl"
+        [src]="currentDocumentUrl "
+        class="document-iframe"
+        frameborder="0">
+      </iframe>
+
+      <!-- Affichage Image -->
+      <div class="document-image-container" *ngIf="!isLoadingDocument && isDocumentImage() && currentDocumentUrl">
+        <img [src]="currentDocumentUrl" [alt]="currentDocument?.name" class="document-image">
+      </div>
+
+      <!-- Autres types de documents -->
+      <div class="document-unsupported" *ngIf="!isLoadingDocument && !isDocumentPDF() && !isDocumentImage()">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <h3>Aperçu non disponible</h3>
+        <p>Ce type de fichier ne peut pas être visualisé directement dans le navigateur.</p>
+        <button class="btn btn-primary" (click)="downloadDocument(currentDocument)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Télécharger le document
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

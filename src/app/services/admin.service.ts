@@ -48,8 +48,8 @@ export class AdminService {
         address: {
           street: item.map.adresse,
           postalCode: item.map.codePostal,
-          city: '', // si dispo, ajouter ville
-          country: '' // obligatoire pour respecter le type Address
+          city: '', 
+          country: '' 
         },
         type: item.map.typeDebiteur,
        
@@ -101,33 +101,33 @@ export class AdminService {
   getUserByEmail(email: string): Observable<any> {
     const url = `http://localhost:3000/auth/users/search/${encodeURIComponent(email)}`;
 
-    console.log('🔍 Recherche utilisateur via BFF:', email);
+    console.log('Recherche utilisateur via BFF:', email);
 
     return this.http.get(url).pipe(
       map((response: any) => {
-        console.log('✅ Utilisateur trouvé:', response);
+        console.log(' Utilisateur trouvé:', response);
         return response;
       }),
       catchError((error) => {
         if (error.status === 404) {
-          console.log('ℹ️ Aucun utilisateur trouvé pour:', email);
+          console.log('ℹAucun utilisateur trouvé pour:', email);
           return of(null); // Retourne null si l'utilisateur n'existe pas
         }
-        console.error('❌ Erreur recherche utilisateur:', error);
+        console.error('Erreur recherche utilisateur:', error);
         return of(null);
       })
     );
   }
 
   // Récupérer la liste des rôles Strapi
-getStrapiRoles(): Observable<any> {
-  const url = `${environment.apiUrl}/users-permissions/roles`;
-  return this.http.get<any>(url);
-}
+  getStrapiRoles(): Observable<any> {
+    const url = `${environment.apiUrl}/users-permissions/roles`;
+    return this.http.get<any>(url);
+  }
 
   // créer un utilisateur dans Strapi
-// admin.service.ts
-createUserViaBFF(userData: any): Observable<any> {
+  // admin.service.ts
+  createUserViaBFF(userData: any): Observable<any> {
   const url = 'http://localhost:3000/auth/register';
 
   const payload = {
@@ -135,20 +135,20 @@ createUserViaBFF(userData: any): Observable<any> {
     email: userData.email,
     firstname: userData.firstName,
     lastname: userData.lastName,
-    nodeId: userData.nodeId, // ✅ Vérifie bien que ce champ existe
+    nodeId: userData.nodeId, // Vérifie bien que ce champ existe
     role: userData.role, // ID du rôle
   };
 
-  // 🔍 Log avant d’envoyer
-  console.log('📤 [Angular] Données envoyées au BFF:', payload);
+  // Log avant d’envoyer
+  console.log('[Angular] Données envoyées au BFF:', payload);
 
   return this.http.post(url, payload);
-}
+  }
 
 
-getDebiteurRole() {
-  return this.http.get(`${this.apiUrl}/roles/debiteur`);
-}
+  getDebiteurRole() {
+    return this.http.get(`${this.apiUrl}/roles/debiteur`);
+  }
 
 
 }

@@ -131,11 +131,13 @@ export class LawyerDashboard implements OnInit{
     return this.filteredDossiers.reduce((acc, d) => acc + (d.montantTotal || 0), 0);
   }
 
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
+   formatCurrency(amount: number): string {
+    if (!amount) return '0 FCFA';
+    return amount.toLocaleString('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(amount);
+      currency: 'XOF',
+      minimumFractionDigits: 0
+    });
   }
 
   getPaymentPercentage(dossier: any): number {
