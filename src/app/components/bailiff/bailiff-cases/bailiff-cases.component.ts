@@ -47,7 +47,6 @@ export class BailiffCasesComponent implements OnInit {
   // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
   debiteurs: DebtorInfo[] = [];
   filteredDebiteurs: DebtorInfo[] = [];
-
   selectedDebtor: DebtorInfo | undefined;
 
 
@@ -108,8 +107,8 @@ export class BailiffCasesComponent implements OnInit {
     }
 
     const huissierNodeId = currentUser.nodeId;
-    console.log('Créancier connecté :', currentUser);
-    console.log('creancierNodeId envoyé :', huissierNodeId);
+    console.log('Huissier connecté :', currentUser);
+    console.log('huissierNodeId envoyé :', huissierNodeId);
 
     // Verification si l'utilisateur connecté à un NodeId
     if (!huissierNodeId) {
@@ -189,9 +188,9 @@ export class BailiffCasesComponent implements OnInit {
       dossier.objet?.toLowerCase().includes(term) ||
       dossier.nomDebiteur?.toLowerCase().includes(term);
 
-      // const matchesStatus = !status || dossier.statutGlobal === status;
-      const matchesStatus =!status ||dossier.statutGlobal === status ||
-      this.getStatusLabel(dossier.statutGlobal).toLowerCase() === this.getStatusLabel(status).toLowerCase();
+      // const matchesStatus = !status || dossier.stepGlobal === status;
+      const matchesStatus =!status ||dossier.stepGlobal === status ||
+      this.getStatusLabel(dossier.stepGlobal).toLowerCase() === this.getStatusLabel(status).toLowerCase();
       const matchesPriority = !priority || dossier.priorite === priority;
 
       return matchesTerm && matchesStatus && matchesPriority;
@@ -259,24 +258,39 @@ export class BailiffCasesComponent implements OnInit {
     return labels[status] || status;
   }
 
-  getPriorityLabel(priority: string): string {
-    const labels: { [key: string]: string } = {
-      'FAIBLE': 'Faible',
-      'MOYENNE': 'Moyenne',
-      'Élevée': 'Élevée',
-      // 'HAUTE': 'Élevée',
-      'urgent': 'Urgente'
-    };
-    return labels[priority] || priority;
+  getPriorityClass(priority: string): string {
+    switch(priority.toLowerCase()) {
+      case 'low':
+      case 'faible':
+        return 'priorite-faible';
+      case 'medium':
+      case 'moyenne':
+        return 'moyenne';
+      case 'high':
+      case 'elevee':
+        return 'elevee';
+      case 'urgent':
+      case 'urgente':
+        return 'urgente';
+      case 'normal':
+      case 'normale':
+        return 'normale';
+      default:
+        return '';
+    }
   }
 
-  // viewCaseDetails(index: number): void {
-  //   this.selectedIndex = index;
-  //   const dossier = this.filteredDossiers[index];
-  //   this.selectedDebtor = this.getDebiteurForDossier(dossier);
-  //   console.log("selectedDebtor", this.selectedDebtor);
-  //   this.showDrawer  = true;
+  // getPriorityLabel(priority: string): string {
+  //   const labels: { [key: string]: string } = {
+  //     'FAIBLE': 'Faible',
+  //     'MOYENNE': 'Moyenne',
+  //     'Élevée': 'Élevée',
+  //     // 'HAUTE': 'Élevée',
+  //     'urgent': 'Urgente'
+  //   };
+  //   return labels[priority] || priority;
   // }
+
   viewCaseDetails(index: number): void {
     this.selectedIndex = index;
     const dossier = this.filteredDossiers[index];
@@ -327,102 +341,50 @@ export class BailiffCasesComponent implements OnInit {
   }
 
   // Ajout methode start
-    // extractDocuments() {
-    //   this.allDocuments = [];
-      
-    //   console.log('Début extraction des documents...');
-      
-    //   // Parcourir tous les dossiers pour extraire leurs documents
-    //   this.dossiers.forEach(dossier => {
-    //     console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsHuissier?.myArrayList);
-        
-    //     // Vérifier si le dossier a des documents creéancier
-    //     if (dossier.documentsHuissier?.myArrayList && Array.isArray(dossier.documentsHuissier.myArrayList)) {
-    //       dossier.documentsHuissier.myArrayList.forEach((doc: any) => {
-    //         console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
-            
-    //         const mappedType = this.mapDocumentType(doc.typeDocument);
-    //         console.log('Type mappé:', mappedType);
-            
-    //         this.allDocuments.push({
-    //           id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
-    //           name: doc.fileName || doc.name || 'Document sans nom',
-    //           type: mappedType,
-    //           url: doc.url || doc.downloadUrl || '#',
-    //           uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
-    //           uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
-    //           caseId: dossier.nodeId
-    //         });
-    //       });
-    //     }
-    //   });
-      
-    //   this.filteredDocuments = [...this.allDocuments];
-    //   console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
-    // }
-
-    extractDocuments() {
-  this.allDocuments = [];
-  
-  console.log('=== DÉBUT EXTRACTION DES DOCUMENTS ===');
-  console.log('Nombre de dossiers à traiter:', this.dossiers.length);
-  
-  // Parcourir tous les dossiers pour extraire leurs documents
-  this.dossiers.forEach((dossier, index) => {
-    console.log(`\n--- Dossier ${index + 1}/${this.dossiers.length}: ${dossier.numeroDossier} ---`);
-    console.log('Structure complète du dossier:', dossier);
+  extractDocuments() {
+    this.allDocuments = [];
     
-    // Vérifier toutes les sources possibles de documents
-    const documentSources = [
-      'documentsHuissier',
-      'documentsDebiteur', 
-      'documentsCreancier',
-      'documentsAvocat',
-      'documentsPartage'
-    ];
+    console.log('Début extraction des documents...');
+    console.log('Nombre de dossiers à traiter:', this.dossiers.length);
     
-    documentSources.forEach(source => {
-      const documentsContainer = dossier[source];
-      console.log(`Source ${source}:`, documentsContainer);
+    // Parcourir tous les dossiers pour extraire leurs documents
+    this.dossiers.forEach(dossier => {
+      console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsHuissier?.myArrayList);
       
-      if (documentsContainer?.myArrayList && Array.isArray(documentsContainer.myArrayList)) {
-        console.log(`✓ ${source}: ${documentsContainer.myArrayList.length} document(s)`);
-        
-        documentsContainer.myArrayList.forEach((doc: any, docIndex: number) => {
-          console.log(`  Document ${docIndex + 1}:`, doc);
+      // Vérifier si le dossier a des documents creéancier
+      if (dossier.documentsHuissier?.myArrayList && Array.isArray(dossier.documentsHuissier.myArrayList)) {
+        dossier.documentsHuissier.myArrayList.forEach((doc: any) => {
+          console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
           
           const mappedType = this.mapDocumentType(doc.typeDocument);
+          console.log('Type mappé:', mappedType);
           
           this.allDocuments.push({
-            id: doc.documentNodeId || doc.id || `${doc.fileName}_${Date.now()}`,
+            id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
             name: doc.fileName || doc.name || 'Document sans nom',
             type: mappedType,
             url: doc.url || doc.downloadUrl || '#',
             uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
             uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
-            caseId: dossier.nodeId,
-            // source: source 
+            caseId: dossier.nodeId
           });
         });
       }
     });
-  });
-  
-  this.filteredDocuments = [...this.allDocuments];
-  console.log('\n=== RÉSULTAT FINAL ===');
-  console.log('Total documents extraits:', this.allDocuments.length);
-  console.log('Détail des documents:', this.allDocuments);
-}
+    
+    this.filteredDocuments = [...this.allDocuments];
+    console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
+  }
   
     
   
-      mapDocumentType(apiType: string): DocumentType {
-      console.log('Mapping du type:', apiType);
+  mapDocumentType(apiType: string): DocumentType {
+    console.log('Mapping du type:', apiType);
       
-      // Normaliser le type (enlever espaces, mettre en majuscules)
-      const normalizedType = (apiType || '').trim().toUpperCase();
+    // Normaliser le type (enlever espaces, mettre en majuscules)
+    const normalizedType = (apiType || '').trim().toUpperCase();
       
-      const typeMapping: { [key: string]: DocumentType } = {
+    const typeMapping: { [key: string]: DocumentType } = {
         'FACTURE': DocumentType.INVOICE,
         'INVOICE': DocumentType.INVOICE,
         'CONTRAT': DocumentType.CONTRACT,
@@ -435,13 +397,13 @@ export class BailiffCasesComponent implements OnInit {
         'PAYMENT_PROOF': DocumentType.PAYMENT_PROOF,
         'DOCUMENT_JUDICIAIRE': DocumentType.COURT_DOCUMENT,
         'COURT_DOCUMENT': DocumentType.COURT_DOCUMENT
-      };
+    };
       
-      const result = typeMapping[normalizedType] || DocumentType.CORRESPONDENCE;
-      console.log('Résultat du mapping:', normalizedType, '->', result);
+    const result = typeMapping[normalizedType] || DocumentType.CORRESPONDENCE;
+    console.log('Résultat du mapping:', normalizedType, '->', result);
       
-      return result;
-    }
+    return result;
+  }
   
     filterDocuments() {
       this.filteredDocuments = this.allDocuments.filter(doc => {
@@ -534,63 +496,31 @@ export class BailiffCasesComponent implements OnInit {
       };
     }
     
-  
-    // Fonction pour fermer la modal des documents
-    closeDocumentsModal() {
+  // Fonction pour fermer la modal des documents
+  closeDocumentsModal() {
       this.showDocumentsModal = false;
-    }
+  }
   
-  
-    // Ajout methode end
-  
-  //   openDocumentsModal() {
-  //   if (this.selectedIndex !== null) {
-  //     this.selectedDetailCase = this.filteredDossiers[this.selectedIndex];
-  //   }
-    
-  //   if (this.selectedDetailCase) {
-  //     // Filtrer uniquement les documents du dossier sélectionné
-  //     this.filteredDocuments = this.allDocuments.filter(
-  //       doc => doc.caseId === this.selectedDetailCase.nodeId
-  //     );
-      
-  //     console.log('Documents du dossier', this.selectedDetailCase.numeroDossier, ':', this.filteredDocuments);
-  //   } else {
-  //     // Afficher tous les documents si aucun dossier n'est sélectionné
-  //     this.filteredDocuments = [...this.allDocuments];
-  //   }
-    
-  //   this.showDocumentsModal = true;
-  // }
+  // Ajout methode end
   openDocumentsModal() {
-  if (this.selectedIndex !== null) {
-    this.selectedDetailCase = this.filteredDossiers[this.selectedIndex];
-  }
-  
-  console.log('=== OUVERTURE MODAL DOCUMENTS ===');
-  console.log('Dossier sélectionné:', this.selectedDetailCase);
-  console.log('NodeId du dossier:', this.selectedDetailCase?.nodeId);
-  console.log('Tous les documents disponibles:', this.allDocuments);
-  
-  if (this.selectedDetailCase) {
-    // Filtrer uniquement les documents du dossier sélectionné
-    this.filteredDocuments = this.allDocuments.filter(
-      doc => {
-        const matches = doc.caseId === this.selectedDetailCase.nodeId;
-        console.log(`Document ${doc.name} - caseId: ${doc.caseId}, dossierNodeId: ${this.selectedDetailCase.nodeId}, correspond: ${matches}`);
-        return matches;
-      }
-    );
+    if (this.selectedIndex !== null) {
+      this.selectedDetailCase = this.filteredDossiers[this.selectedIndex];
+    }
     
-    console.log('Documents filtrés pour ce dossier:', this.filteredDocuments);
-  } else {
-    // Afficher tous les documents si aucun dossier n'est sélectionné
-    this.filteredDocuments = [...this.allDocuments];
-    console.log('Aucun dossier sélectionné, affichage de tous les documents');
+    if (this.selectedDetailCase) {
+      // Filtrer uniquement les documents du dossier sélectionné
+      this.filteredDocuments = this.allDocuments.filter(
+        doc => doc.caseId === this.selectedDetailCase.nodeId
+      );
+      
+      console.log('Documents du dossier', this.selectedDetailCase.numeroDossier, ':', this.filteredDocuments);
+    } else {
+      // Afficher tous les documents si aucun dossier n'est sélectionné
+      this.filteredDocuments = [...this.allDocuments];
+    }
+    
+    this.showDocumentsModal = true;
   }
-  
-  this.showDocumentsModal = true;
-}
   
     // Compter les documents d'un dossier
     getDocumentsCount(dossier: any): number {

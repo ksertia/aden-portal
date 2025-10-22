@@ -45,7 +45,6 @@ export class DocumentsComponent implements OnInit {
   isLoadingDocument = false;
   safePdfUrl: SafeResourceUrl | null = null;
 
-  // AJOUTEZ CES PROPRIÉTES MANQUANTES :
   newDocument: any = {
     name: '',
     type: '',
@@ -289,7 +288,7 @@ export class DocumentsComponent implements OnInit {
   extractAllDocuments() {
     this.allDocuments = [];
     
-    console.log('=== EXTRACTION DES DOCUMENTS ===');
+    console.log(' EXTRACTION DES DOCUMENTS');
     console.log('Nombre de dossiers à traiter:', this.dossiers.length);
     
     const processedDocumentIds = new Set<string>();
@@ -302,14 +301,17 @@ export class DocumentsComponent implements OnInit {
     }
     
     // Liste de toutes les sources de documents possibles
+    // const documentSources = [
+    //   { key: 'documentsDebiteur', label: 'Débiteur' },
+    //   { key: 'documentsCreancier', label: 'Créancier' },
+    //   { key: 'documentsAvocat', label: 'Avocat' },
+    //   { key: 'documentsHuissier', label: 'Huissier' },
+    //   { key: 'documentsPartage', label: 'Partagé' },
+    //   { key: 'documentsPartenaire', label: 'Partenaire' },
+    //   { key: 'documentsCedant', label: 'Cédant' }
+    // ];
     const documentSources = [
-      { key: 'documentsDebiteur', label: 'Débiteur' },
-      { key: 'documentsCreancier', label: 'Créancier' },
-      { key: 'documentsAvocat', label: 'Avocat' },
-      { key: 'documentsHuissier', label: 'Huissier' },
-      { key: 'documentsPartage', label: 'Partagé' },
-      { key: 'documentsPartenaire', label: 'Partenaire' },
-      { key: 'documentsCedant', label: 'Cédant' }
+      { key: 'documentsPartage', label: 'Partage' }
     ];
     
     // Parcourir tous les dossiers (déjà filtrés pour l'utilisateur)
@@ -367,7 +369,7 @@ export class DocumentsComponent implements OnInit {
     });
     
     this.filteredDocuments = [...this.allDocuments];
-    console.log('\n=== RÉSULTAT FINAL ===');
+    console.log('\n RÉSULTAT FINAL ');
     console.log('Total documents extraits (sans doublons):', this.allDocuments.length);
     console.log('Documents par source:', this.getDocumentsBySource());
     

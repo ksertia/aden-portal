@@ -8,7 +8,7 @@
 
   <!-- Statistiques générales -->
   <div class="stats-grid fade-in-up" *ngIf="dossiers" >
-    <div class="stat-card">
+    <a class="stat-card">
       <div class="stat-icon primary">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -17,9 +17,9 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ dossiers.length }}</div>
-        <div class="stat-label">Dossiers totaux</div>
+        <div class="stat-label">Portefeuilles totaux</div>
       </div>
-    </div>
+    </a>
 
     <div class="stat-card">
       <div class="stat-icon success">
@@ -30,7 +30,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ activeCount }}</div>
-        <div class="stat-label">Dossiers actifs </div>
+        <div class="stat-label">Portefeuilles actifs</div>
       </div>
     </div>
 
@@ -44,7 +44,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{pendingCount }}</div>
-        <div class="stat-label">En attente</div>
+        <div class="stat-label">En cours d'évaluation</div>
       </div>
     </div>
 
@@ -56,7 +56,7 @@
           </svg>
       </div>
       <div class="stat-content">
-          <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div> 
+          <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div>
           <div class="stat-label">Montant total</div>
       </div>
     </div>
@@ -66,12 +66,12 @@
   <div class="role-content fade-in-up">
     <div  class="debtor-dashboard" *ngIf="dossiers.length > 0; else noCases">
       <div class="section-header">
-        <h2>Mes Dossiers en Cours</h2>
-        <a routerLink="/debtor/cases" class="btn btn-primary">Voir tous les dossiers</a>
+        <h2>Dossiers Juridiques</h2>
+        <a routerLink="/lawyer/cases" class="btn btn-primary">Voir tous les dossiers</a>
       </div>
-      <!--Affichage des dossiers (trois afficher grace à .slice(0, 3)) -->
+      <!--Affichage de trois dossiers -->
       <div class="cases-grid" *ngIf="dossiers.length > 0">
-        <div class="case-card"  *ngFor="let dossier of dossiers.slice(0, 3)">
+        <div class="case-card"  *ngFor="let dossier of dossiers.slice(0, 6)">
           <div class="case-header">
             <h3>{{ dossier.numeroDossier }}</h3>
             <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">
@@ -84,7 +84,7 @@
               <span>{{ getCreancierForDossier(dossier)?.contactPrincipal }}</span>
             </div>
             <div class="case-amount">
-              <span class="label">Montant dû :</span>
+              <span class="label">Montant :</span>
               <span class="amount">{{ formatCurrency(dossier.montantTotal) }}</span>
             </div>
             <div class="case-progress">
@@ -103,8 +103,8 @@
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14,2 14,8 20,8"/>
         </svg>
-        <h3>Aucun dossier trouvé</h3>
-        <p>Vous n'avez actuellement aucun dossier de recouvrement.</p>
+        <h3>Aucun portefeuille trouvé</h3>
+        <p>Vous n'avez actuellement aucun portefeuille de recouvrement.</p>
       </div>
    </ng-template>
   </div>
@@ -113,25 +113,32 @@
   <div class="quick-actions">
     <h3>Actions Rapides</h3>
     <div class="actions-grid">
-      <a routerLink="/debtor/payments" class="action-card highlight1">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-          <line x1="1" y1="10" x2="23" y2="10"/>
-        </svg>
-        <span>Effectuer un paiement</span>
-      </a>
-      <a routerLink="/debtor/payments" class="action-card highlight2">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
-        </svg>
-        <span>Proposer échéancier</span>
-      </a>
-      <a routerLink="/debtor/documents" class="action-card highlight3">
+      <a routerLink="/cedant/portfolios" class="action-card highlight1">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14,2 14,8 20,8"/>
         </svg>
-        <span>Mes documents</span>
+        <span>Mes Portefeuilles</span>
+      </a>
+      <a routerLink="/cedant/invoices" class="action-card highlight2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <span>Suivi des factures</span>
+      </a>
+      <a routerLink="/cedant/sales" class="action-card highlight3">
+        <!-- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg> -->
+        <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960"
+            width="25" fill="#FFFFFF"><path 
+            d="M275-99v-128h-88v-91h88v-544h460v92H366v244h329v91H366v117h160v91H366v128h-91Z"/>
+        </svg>
+        <span>Processus de vente</span>
       </a>
     </div>
   </div>

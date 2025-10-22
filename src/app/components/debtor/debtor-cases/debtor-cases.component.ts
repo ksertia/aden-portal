@@ -244,15 +244,37 @@ export class DebtorCasesComponent implements OnInit {
     return labels[status] || status;
   }
 
-  getPriorityLabel(priority: string): string {
-    const labels: { [key: string]: string } = {
-      'low': 'Faible',
-      'medium': 'Moyenne',
-      'high': 'Élevée',
-      'urgent': 'Urgente'
-    };
-    return labels[priority] || priority;
+  getPriorityClass(priority: string): string {
+    switch(priority.toLowerCase()) {
+      case 'low':
+      case 'faible':
+        return 'priorite-faible';
+      case 'medium':
+      case 'moyenne':
+        return 'moyenne';
+      case 'high':
+      case 'elevee':
+        return 'elevee';
+      case 'urgent':
+      case 'urgente':
+        return 'urgente';
+      case 'normal':
+      case 'normale':
+        return 'normale';
+      default:
+        return '';
+    }
   }
+
+  // getPriorityLabel(priority: string): string {
+  //   const labels: { [key: string]: string } = {
+  //     'low': 'Faible',
+  //     'medium': 'Moyenne',
+  //     'high': 'Élevée',
+  //     'urgent': 'Urgente'
+  //   };
+  //   return labels[priority] || priority;
+  // }
 
   viewCaseDetails(index: number): void {
     this.selectedIndex = index;
@@ -289,9 +311,9 @@ export class DebtorCasesComponent implements OnInit {
         dossier.objet?.toLowerCase().includes(term) ||
         dossier.nomDebiteur?.toLowerCase().includes(term);
 
-      // const matchesStatus = !status || dossier.statutGlobal === status;
-      const matchesStatus =!status ||dossier.statutGlobal === status ||
-      this.getStatusLabel(dossier.statutGlobal).toLowerCase() === this.getStatusLabel(status).toLowerCase();
+      // const matchesStatus = !status || dossier.stepGlobal === status;
+      const matchesStatus =!status ||dossier.stepGlobal === status ||
+      this.getStatusLabel(dossier.stepGlobal).toLowerCase() === this.getStatusLabel(status).toLowerCase();
       const matchesPriority = !priority || dossier.priority === priority;
 
       return matchesTerm && matchesStatus && matchesPriority;

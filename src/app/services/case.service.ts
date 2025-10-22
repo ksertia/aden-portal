@@ -73,7 +73,7 @@ export class CaseService {
     });
   }
 
-  // 📤 Nouvelle méthode : Upload d'un document vers Alfresco
+  //  Nouvelle méthode : Upload d'un document vers Alfresco
   uploadDocument(file: File, metadata?: any): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);

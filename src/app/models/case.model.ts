@@ -375,7 +375,7 @@ export interface HuissierInfo {
   dateInstallation: string;
   adresseSiegeSocial: string;
   historiqueValidations: {
-    myArrayList: any[];   // à préciser si tu connais la structure exacte
+    myArrayList: any[];   
   };
   stepGlobal: string;
   tarifHoraireMoyen: number;
@@ -395,7 +395,7 @@ export interface HuissierInfo {
   rangObjet: number;
   owner: boolean;
   validateurs: {
-    myArrayList: any[];   // idem → tu peux affiner selon API
+    myArrayList: any[];   
   };
   isArchive: boolean;
   isArchiveRm: boolean;
@@ -501,7 +501,7 @@ export interface ApiPartenaireResponse {
   details: string;
   message: string;
   totalItemCount: number;
-   partenaires: any[];
+  partenaires: any[];
 }
 
 // Pour les Avocats
@@ -567,14 +567,52 @@ export interface AvocatInfo {
 export interface ApiResponseAvocat {
   map: any;
   code: number;
-  data: {
-    map: AvocatInfo;
-  }[];
+  data: { map: AvocatInfo;}[];
   details: string;
   message: string;
   totalItemCount: number;
   avocats: any[]; 
 }
+
+// Pour les cédants
+export interface CedantInfo {
+  id?: string;
+  nom: string;
+  prenom?: string;
+  email?: string;
+  telephone?: string;
+  adresse?: string;
+  societe?: string;
+  numeroIdentification?: string; 
+  pays?: string;
+  ville?: string;
+  dateCreation?: Date;
+  statut?: string; 
+
+  contactPrincipal: string;
+  emailProfessionnel: string;
+  adresseSiegeSocial: string;
+  delaiPaiementHabituel: string;
+  secteurActivite: string;
+  raisonSociale: string;
+  statutGlobal: string;
+  nodeId: string;
+
+
+}
+
+export interface ApiResponseCedant {
+  map: any;
+  code: number;
+  data: { map: CedantInfo;}[];
+  details: string;
+  message: string;
+  totalItemCount: number;
+  cedants: any[]; 
+}
+
+
+
 // Pour tout les profils
 
 export interface GlobalApiResponse {

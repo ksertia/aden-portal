@@ -118,11 +118,11 @@
               <p class="debtor-name">{{ dossier.objet }}</p>
             </div>
             <div class="case-badges">
-              <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
-                {{ getStatusLabel(dossier.statutGlobal) }}
+              <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">
+                {{ getStatusLabel(dossier.stepGlobal) }}
               </span>
-              <span class="priority-badge" [ngClass]="'priority-' + dossier.priorite">
-                {{ getPriorityLabel(dossier.priorite) }}
+              <span class="priority-badge" [ngClass]="getPriorityClass(dossier.priorite)">
+                {{ getPriorityClass(dossier.priorite) }}
               </span>
             </div>
           </div>
@@ -234,8 +234,8 @@
                 </div>
               </td>
               <td>
-                <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
-                  {{ getStatusLabel(dossier.statutGlobal) }}
+                <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">
+                  {{ getStatusLabel(dossier.stepGlobal) }}
                 </span>
               </td>
               <td>
@@ -293,8 +293,8 @@
                 <h3> {{ selectedDetailCase.numeroDossier }}</h3>
                 <p class="creditor-name">{{ selectedDetailCase.objet }}</p>
               </div>
-              <span class="status-badge" [ngClass]="'status-' + selectedDetailCase.statutGlobal">
-                {{ getStatusLabel(selectedDetailCase.statutGlobal) }}
+              <span class="status-badge" [ngClass]="'status-' + selectedDetailCase.stepGlobal">
+                {{ getStatusLabel(selectedDetailCase.stepGlobal) }}
               </span>
             </div>
             

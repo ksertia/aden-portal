@@ -23,6 +23,9 @@ export class LawyerDashboard implements OnInit{
 
   filteredDossiers: any[] = [];
 
+  activeCount: number = 0;
+  pendingCount: number = 0;
+
   // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
   creditors: CreditorDetail[] = [];
   filteredCreditors: CreditorDetail[] = [];
@@ -74,6 +77,9 @@ export class LawyerDashboard implements OnInit{
       this.dossiers = allDossiers.filter((d: any) => d.avocatNodeId === avocatNodeId);
       console.log('Réponse API dossiers :', this.dossiers);
 
+      //  mise à jour des statistiques
+      this.updateCaseStatistics(); 
+
       this.isLoading = false;
       },
       error: (error) => {
@@ -83,7 +89,7 @@ export class LawyerDashboard implements OnInit{
       }
     });
 
-     // Appel du web service pour la recuperation des données(extraction du lastname,firstname,email,telephone et type) du creancier 
+    // Appel du web service pour la recuperation des données(extraction du lastname,firstname,email,telephone et type) du creancier 
     this.adminService.getCreanciers(siteName).subscribe({
       next: (data: CreditorDetail[]) => {
         this.creditors = data;
@@ -95,7 +101,7 @@ export class LawyerDashboard implements OnInit{
 
    // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
     getCreancierForDossier(dossier: any): CreditorDetail | undefined {
-        return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
+      return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
     }
 
   getUserRoleLabel(): string {
@@ -146,5 +152,22 @@ export class LawyerDashboard implements OnInit{
     return total ? Math.round((paid / total) * 100) : 0;
   }
 
+   updateCaseStatistics(): void {
+    if (!this.dossiers || this.dossiers.length === 0) {
+      this.activeCount = 0;
+      this.pendingCount = 0;
+      return;
+    }
+
+    this.activeCount = this.dossiers.filter((d) => {
+      const statut = d.stepGlobal?.toLowerCase().trim();
+      return statut === 'actif' || statut === 'active';
+    }).length;
+
+    this.pendingCount = this.dossiers.filter((d) => {
+      const statut = d.stepGlobal?.toLowerCase().trim();
+      return statut === 'en_attente' || statut === 'pending' || statut === 'attente';
+    }).length;
+  }
 
 }

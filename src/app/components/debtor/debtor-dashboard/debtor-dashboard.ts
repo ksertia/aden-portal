@@ -24,8 +24,8 @@ export class DebtorDashboard implements OnInit {
 
   filteredDossiers: any[] = [];
 
-  ActiveCasesCount: number = 0;
-  PendingCasesCount: number = 0;
+  activeCount: number = 0;
+  pendingCount: number = 0;
 
   // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
   creditors: CreditorDetail[] = [];
@@ -143,24 +143,19 @@ export class DebtorDashboard implements OnInit {
 
   updateCaseStatistics(): void {
     if (!this.dossiers || this.dossiers.length === 0) {
-      this.ActiveCasesCount = 0;
-      this.PendingCasesCount = 0;
+      this.activeCount = 0;
+      this.pendingCount = 0;
       return;
     }
 
-    this.ActiveCasesCount = this.dossiers.filter((d) => {
-      const statut = d.statutGlobal?.toLowerCase().trim();
-      return statut === 'nouveau' || statut === 'new' || statut === 'active';
+    this.activeCount = this.dossiers.filter((d) => {
+      const statut = d.stepGlobal?.toLowerCase().trim();
+      return statut === 'actif' || statut === 'active';
     }).length;
 
-    this.PendingCasesCount = this.dossiers.filter((d) => {
-      const statut = d.statutGlobal?.toLowerCase().trim();
-      return (
-        statut === 'en_attente' ||
-        statut === 'pending' ||
-        statut === 'attente' ||
-        statut === 'waiting'
-      );
+    this.pendingCount = this.dossiers.filter((d) => {
+      const statut = d.stepGlobal?.toLowerCase().trim();
+      return statut === 'en_attente' || statut === 'pending' || statut === 'attente';
     }).length;
   }
 

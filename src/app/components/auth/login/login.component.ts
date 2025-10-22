@@ -91,7 +91,7 @@ private redirectToDashboard(user: any): void {
         this.router.navigate(['/creditor/dashboard']); // Rediriger vers une page existante
         break;
       case 'cedant':
-        this.router.navigate(['/cedant/portfolios']); // Rediriger vers une page existante
+        this.router.navigate(['/cedant/dashboard']); // Rediriger vers une page existante
         break;
       case 'partenaire':
         this.router.navigate(['/partner/cases']); // Rediriger vers une page existante

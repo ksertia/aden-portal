@@ -127,7 +127,7 @@ body {
   color: #92400e;
 }
 
-.status-active, .status-NOUVEAU {
+.status-active, .status-NOUVEAU, .status-ACTIF, .status-Actif {
   background: #dbeafe;
   color: #1e40af;
 }

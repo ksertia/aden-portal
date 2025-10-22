@@ -1,19 +1,12 @@
 <div class="cases-container">
   <div class="cases-header fade-in-up">
     <div class="header-content">
+      <button class="btn btn-secondary" routerLink="/lawyer/dashboard">Retour</button>
       <div>
         <h1>Dossiers Juridiques</h1>
         <p>Consultez et gérez vos dossiers juridiques</p>
       </div>
       <div class="header-actions">
-        <button class="btn btn-secondary" (click)="generateReport()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7,10 12,15 17,10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          Rapport d'activité
-        </button>
       </div>
     </div>
   </div>
@@ -134,8 +127,8 @@
               <p class="debtor-name">{{ dossier.objet }}</p>
             </div>
             <div class="case-badges">
-              <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
-                {{ getStatusLabel(dossier.statutGlobal) }}
+              <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">
+                {{ getStatusLabel(dossier.stepGlobal) }}
               </span>
               <span class="priority-badge" [ngClass]="getPriorityClass(dossier.priorite)">
                 {{ getPriorityClass(dossier.priorite) }}
@@ -240,8 +233,8 @@
                   </div>
                 </td>
                 <td>
-                  <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
-                    {{ getStatusLabel(dossier.statutGlobal) }}
+                  <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">
+                    {{ getStatusLabel(dossier.stepGlobal) }}
                   </span>
                 </td>
                 <td>

@@ -6,8 +6,9 @@ import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.compon
 import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
 import { AdminService } from '../../../services/admin.service';
-import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case.model';
+import { DebtCase, CaseFilter, CedantInfo } from '../../../models/case.model';
 import { UserCreateComponent } from '../user-create/user-create.component';
+
 
 @Component({
   selector: 'app-cedant',
@@ -17,14 +18,15 @@ import { UserCreateComponent } from '../user-create/user-create.component';
 })
 export class Cedant implements OnInit {
 
-  cases: DebtCase[] = [];
-  filteredCases: DebtCase[] = [];
-  statistics: any = null;
-  currentView: 'grid' | 'table' = 'grid';
+  // Liste brute et filtrée
+  cedants: CedantInfo[] = [];
+  filteredCedants: CedantInfo[] = [];
+
+  currentView: 'grid' | 'table' = 'table';
 
   // État du tiroir
   showDrawer = false;
-  selectedCedant: any | null = null;
+  selectedCedant: CedantInfo | null = null;
   selectedUser: any | null = null; // données Strapi User
   
   filters: CaseFilter = {};
@@ -43,57 +45,41 @@ export class Cedant implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadCases();
-    this.loadStatistics();
+
+    this.loadCedant();
   }
 
-  loadCases() {
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
-
-    // this.caseService.getCases().subscribe(cases => {
-    //   // Filtrer les dossiers pour ce créancier
-    //   this.cases = cases.filter(c => 
-    //     c.creditor.name === currentUser.companyName || 
-    //     c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
-    //   );
-    //   this.applyFilters();
-    // });
+  loadCedant() {
+    const sitename = 'portail-recouvrement';
+          
+    this.adminService.getCedants(sitename).subscribe({
+      next: (data: CedantInfo[]) => {
+        this.cedants = data;
+        this.filteredCedants = [...this.cedants];
+      },
+      error: (err) => console.error(err)
+    });
   }
 
-  loadStatistics() {
-    // this.caseService.getStatistics().subscribe(stats => {
-    //   this.statistics = stats;
-    // });
-  }
 
+  // filtrage par recherche
   applyFilters() {
-    // this.caseService.getCasesWithFilter(this.filters).subscribe(cases => {
-    //   const currentUser = this.authService.getCurrentUser();
-    //   if (!currentUser) return;
-      
-    //   this.filteredCases = cases.filter(c => 
-    //     c.creditor.name === currentUser.companyName || 
-    //     c.creditor.contactPerson === `${currentUser.firstname} ${currentUser.lastname}`
-    //   );
-    // });
-  }
-
-  updateStatusFilter() {
-    this.filters.status = this.selectedStatus ? [this.selectedStatus as CaseStatus] : undefined;
-    this.applyFilters();
-  }
-
-  updatePriorityFilter() {
-    this.filters.priority = this.selectedPriority ? [this.selectedPriority as Priority] : undefined;
-    this.applyFilters();
+    if (!this.filters.searchTerm) {
+      this.filteredCedants = [...this.cedants];
+      return;
+    }
+    const term = this.filters.searchTerm.toLowerCase();
+    this.filteredCedants = this.cedants.filter(c =>
+      c.contactPrincipal.toLowerCase().includes(term) ||
+      c.raisonSociale.toLowerCase().includes(term) ||
+      c.emailProfessionnel.toLowerCase().includes(term) ||
+      c.nodeId.toLowerCase().includes(term)
+    );
   }
 
   resetFilters() {
-    this.filters = {};
-    this.selectedStatus = '';
-    this.selectedPriority = '';
-    this.filteredCases = [...this.cases];
+    this.filters.searchTerm = '';
+    this.filteredCedants = [...this.cedants];
   }
 
   getStatusLabel(status: string): string {
@@ -118,52 +104,6 @@ export class Cedant implements OnInit {
     };
     return labels[priority] || priority;
   }
-
-  // données statique
-  filteredCase = [
-    {
-      creditorName: 'Débiteur Antony',
-      username: 'Computer Science',
-      email: 'Débiteur@gmail.com',
-      phone: '+91 123 456 7890',
-      status: 'Actif',
-    },
-    {
-      creditorName: 'Créancier Oliver',
-      username: 'Computer Science',
-      email: 'Créancierr@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Inactif'
-    },
-    {
-      creditorName: 'Huissier Oliver',
-      username: 'Computer Science',
-      email: 'Huissier@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Actif'
-    },
-    {
-      creditorName: 'Avocat Oliver',
-      username: 'Computer Science',
-      email: 'Avocat@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Inactif'
-    },
-    {
-      creditorName: 'Cédant Oliver',
-      username: 'Computer Science',
-      email: 'Cédant@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Actif'
-    },
-    {
-      creditorName: 'Partenaire Oliver',
-      username: 'Computer Science',
-      email: 'Partenaire@gmail.com',
-      phone: '+91 123 456 7891',
-      status: 'Inactif'
-    }
-  ];
 
   // retourne une classe CSS (string) à appliquer selon le status
   statusClass(status: string): string {

@@ -12,7 +12,7 @@
 
   <nav class="sidebar-nav">
     <ul>
-      <li *ngIf="!isDebtorUser && !isCreditorUser && !isBailiffUser && !isLawyerUser && !isAdministrateurUser">
+      <li *ngIf="!isCedantUser && !isDebtorUser && !isCreditorUser && !isBailiffUser && !isLawyerUser && !isAdministrateurUser">
         <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="7" height="7"/>
@@ -99,7 +99,7 @@
       </li>
 
       <!-- Avocat -->
-         <li *ngIf="isLawyerUser">
+        <li *ngIf="isLawyerUser">
         <a routerLink="/lawyer/dashboard" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="7" height="7"/>
@@ -129,17 +129,7 @@
         </a>
       </li>
 
-      <!-- Professional -->
-      <li *ngIf="isProfessionalUser">
-        <a routerLink="/professional/reports" routerLinkActive="active" class="nav-item">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 2v6l3-3 3 3-3 3v6"/>
-            <path d="M15 8h6"/>
-            <path d="M15 16h6"/>
-          </svg>
-          <span>{{ t('sidebar.reports') }}</span>
-        </a>
-      </li>
+
 
       <!-- Creancier -->
           <li *ngIf="isCreditorUser">
@@ -194,6 +184,17 @@
       </li>
 
       <!-- Cedant -->
+        <li *ngIf="isCedantUser">
+        <a routerLink="/cedant/dashboard" routerLinkActive="active" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          <span>{{ t('sidebar.dashboard') }}</span>
+        </a>
+      </li>
       <li *ngIf="isCedantUser">
         <a routerLink="/cedant/portfolios" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -222,7 +223,23 @@
             <line x1="12" y1="1" x2="12" y2="23"/>
             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
           </svg>
+           <!-- <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960"
+            width="25" fill="#6478b"><path 
+            d="M275-99v-128h-88v-91h88v-544h460v92H366v244h329v91H366v117h160v91H366v128h-91Z"/>
+          </svg> -->
           <span>{{ t('sidebar.salesProcess') }}</span>
+        </a>
+      </li>
+
+      <!-- Professional -->
+      <li *ngIf="isProfessionalUser">
+        <a routerLink="/professional/reports" routerLinkActive="active" class="nav-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 2v6l3-3 3 3-3 3v6"/>
+            <path d="M15 8h6"/>
+            <path d="M15 16h6"/>
+          </svg>
+          <span>{{ t('sidebar.reports') }}</span>
         </a>
       </li>
 

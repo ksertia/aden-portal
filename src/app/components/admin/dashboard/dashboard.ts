@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { CaseService } from '../../../services/case.service';
 import { User, StrapiRole } from '../../../models/user.model';
-import { DebtCase, CreditorDetail, DebtorInfo, HuissierInfo, AvocatInfo, PartenaireInfo } from '../../../models/case.model';
+import { DebtCase, CreditorDetail, DebtorInfo, HuissierInfo, AvocatInfo, PartenaireInfo, CedantInfo } from '../../../models/case.model';
 import { I18nService } from '../../../services/i18n.service';
 import { AdminService } from '../../../services/admin.service';
 
@@ -24,6 +24,8 @@ export class Dashboard implements OnInit {
   filteredHuisier: HuissierInfo[] = [];
   avocat: AvocatInfo[] = [];
   filteredAvocat: AvocatInfo[] = [];
+  cedants: CedantInfo[] = [];
+  filteredCedants: CedantInfo[] = [];
   partenaire: PartenaireInfo[] = [];
   filteredPartenaire: PartenaireInfo[] = [];
 
@@ -66,7 +68,6 @@ export class Dashboard implements OnInit {
 
    // Charger les données du tableau de bord
   loadDashboardData() {
-    // if (!this.currentUser) return;
 
     const sitename = 'portail-recouvrement';
 
@@ -101,6 +102,15 @@ export class Dashboard implements OnInit {
       next: (data: AvocatInfo[]) => {
         this.avocat = data;
         this.filteredAvocat = [...this.avocat];
+        this.buildHighlightedUsers(); // mise à jour
+      },
+      error: (err) => console.error(err)
+    });
+
+    this.adminService.getCedants(sitename).subscribe({
+      next: (data: CedantInfo[]) => {
+        this.cedants = data;
+        this.filteredCedants = [...this.cedants];
         this.buildHighlightedUsers(); // mise à jour
       },
       error: (err) => console.error(err)
@@ -165,6 +175,18 @@ export class Dashboard implements OnInit {
         phone: av.telephone,
         status: av.nomCabinet ? "Actif" : "Inactif",
         role: "Avocat"
+      });
+    }
+    
+    if (this.filteredCedants.length > 0) {
+      const av = this.filteredCedants[0];
+      this.highlightedUsers.push({
+        creditorName: av.contactPrincipal || "Avocat inconnu",
+        Secteur: av.secteurActivite,
+        email: av.emailProfessionnel,
+        phone: av.telephone,
+        status: av.statutGlobal ? "Actif" : "Inactif",
+        role: "Cedant"
       });
     }
 

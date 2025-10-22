@@ -19,7 +19,7 @@ import { DebtorInfo } from '../../../models/case.model';
 })
 export class LawyerCasesComponent implements OnInit {
   
-  filters: CaseFilter = {};
+  // filters: CaseFilter = {};
   
   showReviewModal = false;
   showNoteModal = false;
@@ -46,11 +46,11 @@ export class LawyerCasesComponent implements OnInit {
   currentView: 'grid' | 'table' = 'table';
 
     // --- Filtres ---
-  // filters = {
-  //   searchTerm: '',
-  //   status: '',
-  //   priority: ''
-  // };
+  filters = {
+    searchTerm: '',
+    status: '',
+    priority: ''
+  };
 
   selectedStatus = '';
   selectedPriority = '';
@@ -59,7 +59,7 @@ export class LawyerCasesComponent implements OnInit {
   dateFrom = '';
   dateTo = '';
 
-   // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du créancier (importer depuis AdminService)
+  // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du créancier (importer depuis AdminService)
   creditors: CreditorDetail[] = [];
   filteredCreditors: CreditorDetail[] = [];
 
@@ -151,9 +151,8 @@ export class LawyerCasesComponent implements OnInit {
 
   // Ici on compare le debiteurNodeId avec le nodeId du dossier qui correspond au debiteur 
   getDebiteurForDossier(dossier: any): DebtorInfo | undefined {
-    const debiteurNodeId = dossier.debiteurNodeId?.trim(); // <-- on supprime les espaces
+    const debiteurNodeId = dossier.debiteurNodeId?.trim(); // on supprime les espaces
     return this.debiteurs.find(d => String(d.nodeId).trim() === String(debiteurNodeId));
-    // return this.debiteurs.find(d => d.nodeId === dossier.debiteurNodeId);
   }
 
   getTotalPaid(): number {
@@ -167,23 +166,27 @@ export class LawyerCasesComponent implements OnInit {
   // Filtres dynamiques sur les dossiers 
   applyFilters() {
     this.filteredDossiers = this.dossiers.filter((dossier) => {
-       console.log('➡️Statut dossier :', dossier.statutGlobal); 
-      const searchTerm = this.filters.searchTerm?.toLowerCase() || '';
+      console.log('Statut dossier :', dossier.stepGlobal); 
+      const term = this.filters.searchTerm.toLowerCase().trim();
       const status = this.selectedStatus;
       const dateFrom = this.dateFrom ? new Date(this.dateFrom) : null;
       const dateTo = this.dateTo ? new Date(this.dateTo) : null;
 
       //  Filtre par mot-clé 
-      const matchesSearch =
-        !searchTerm ||
-        dossier.numeroDossier?.toLowerCase().includes(searchTerm) ||
-        this.getCreancierForDossier(dossier)?.contactPrincipal?.toLowerCase().includes(searchTerm) ||
-        this.getDebiteurForDossier(dossier)?.firstName?.toLowerCase().includes(searchTerm) ||
-        this.getDebiteurForDossier(dossier)?.lastName?.toLowerCase().includes(searchTerm);
+      const matchesTerm =
+        !term ||
+        dossier.numeroDossier?.toLowerCase().includes(term) ||
+        this.getCreancierForDossier(dossier)?.contactPrincipal?.toLowerCase().includes(term) ||
+        this.getDebiteurForDossier(dossier)?.firstName?.toLowerCase().includes(term) ||
+        this.getDebiteurForDossier(dossier)?.lastName?.toLowerCase().includes(term);
 
 
       // Filtre par statut
-      const matchesStatus = !status || dossier.statutGlobal === status;
+       const matchesStatus =
+      !status ||
+      dossier.stepGlobal === status ||
+      this.getStatusLabel(dossier.stepGlobal).toLowerCase() ===
+        this.getStatusLabel(status).toLowerCase();
 
       // Filtre par date de création 
       const dossierDate = dossier.dateCreation ? new Date(dossier.dateCreation) : null;
@@ -191,13 +194,17 @@ export class LawyerCasesComponent implements OnInit {
         (!dateFrom || (dossierDate && dossierDate >= dateFrom)) &&
         (!dateTo || (dossierDate && dossierDate <= dateTo));
 
-      return matchesSearch && matchesStatus && matchesDate;
+      return matchesTerm && matchesStatus && matchesDate;
     });
   }
 
   //  Réinitialiser tous les filtres 
   resetFilters() {
-    this.filters = { searchTerm: '' };
+     this.filters = {
+      searchTerm: '',
+      status: '',
+      priority: ''
+    };
     this.selectedStatus = '';
     this.dateFrom = '';
     this.dateTo = '';

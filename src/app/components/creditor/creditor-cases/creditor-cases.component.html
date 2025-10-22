@@ -136,11 +136,11 @@
               <span>{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
             </div>
             <div class="case-badges">
-              <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
-                {{ getStatusLabel(dossier.statutGlobal) }}
+              <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">
+                {{ getStatusLabel(dossier.stepGlobal) }}
               </span>
-              <span class="priority-badge" [ngClass]="'priority-' + dossier.priorite">
-                {{ getPriorityLabel(dossier.priorite) }}
+              <span class="priority-badge" [ngClass]="getPriorityClass(dossier.priorite)">
+               {{ getPriorityClass(dossier.priorite) }}
               </span>
             </div>
           </div>
@@ -249,8 +249,8 @@
                 </div>
               </td>
               <td>
-                <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
-                  {{ getStatusLabel(dossier.statutGlobal) }}
+                <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">
+                  {{ getStatusLabel(dossier.stepGlobal) }}
                 </span>
               </td>
               <td>
@@ -331,8 +331,8 @@
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Statut</span>
-                  <span class="status-badge"  [ngClass]="'status-' + dossiers[selectedIndex!].statutGlobal">
-                    {{ getStatusLabel(dossiers[selectedIndex!].statutGlobal) }}
+                  <span class="status-badge"  [ngClass]="'status-' + dossiers[selectedIndex!].stepGlobal">
+                    {{ getStatusLabel(dossiers[selectedIndex!].stepGlobal) }}
                   </span>
                 </div>
               </div>
@@ -457,19 +457,19 @@
 
 <!-- Tiroir document -->
   <div class="drawer-overlay-document" *ngIf="showDocumentsModal" (click)="closeDocumentsModal()">
-      <div class="drawer-document" [class.open]="showDocumentsModal" (click)="$event.stopPropagation()">
-          <div class="modal-header">
-          <h3>Documents ({{ filteredDocuments.length }})</h3>
-          <button class="modal-close" (click)="closeDocumentsModal()">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-          </button>
-          </div>
-          <div class="modal-body">
-          <div class="documents-list">
-              <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
+    <div class="drawer-document" [class.open]="showDocumentsModal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Documents ({{ filteredDocuments.length }})</h3>
+        <button class="modal-close" (click)="closeDocumentsModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="documents-list">
+          <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
 
               <!-- Vue tableau -->
               <div class="documents-table-container" *ngIf="currentViews === 'table'">
@@ -550,11 +550,12 @@
                   <p>Aucun document ne correspond aux critères sélectionnés.</p>
               </div>
               </ng-template>
-          </div>
-          </div>
-          <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="closeDocumentsModal()">Fermer</button>
-          <button class="btn btn-primary" (click)="showUploadModal = true">
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeDocumentsModal()">Fermer</button>
+        <button class="btn btn-primary" (click)="showUploadModal = true">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="17,8 12,3 7,8"/>
@@ -562,8 +563,8 @@
           </svg>
           Ajouter un document
         </button>
-          </div>
       </div>
+    </div>
   </div>
 
 

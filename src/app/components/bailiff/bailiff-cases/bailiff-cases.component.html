@@ -6,16 +6,6 @@
         <h1>Gestion des Dossiers</h1>
         <p>Gérez vos dossiers de recouvrement assignés</p>
       </div>
-      <!-- <div class="header-actions">
-        <button class="btn btn-secondary" (click)="generateCustomReport()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 2v6l3-3 3 3-3 3v6"/>
-            <path d="M15 8h6"/>
-            <path d="M15 16h6"/>
-          </svg>
-          Rapport personnalisé
-        </button>
-      </div> -->
     </div>
   </div>
 
@@ -58,7 +48,6 @@
             <option value="FAIBLE">Faible</option>
             <option value="MOYENNE">Moyenne</option>
             <option value="Élevée">Élevée</option>
-            <!-- <option value="HAUTE">Élevée</option> -->
             <option value="urgent">Urgente</option>
           </select>
         </div>
@@ -125,9 +114,8 @@
 
   <!-- Liste des créances -->
   <div class="cases-content fade-in-up">
-    <div class="cases-list" *ngIf="dossiers.length > 0; else noCases">
+    <div class="cases-list" *ngIf="filteredDossiers.length > 0; else noCases">
       <div class="list-header">
-        <!-- <h3>Créances ({{ filteredDossiers.length }})</h3> -->
         <app-view-toggle 
           [currentView]="currentView" 
           (viewChange)="currentView = $event">
@@ -143,11 +131,11 @@
               <span>{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
             </div>
             <div class="case-badges">
-              <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
-                {{ getStatusLabel(dossier.statutGlobal) }}
+              <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">
+                {{ getStatusLabel(dossier.stepGlobal) }}
               </span>
-              <span class="priority-badge" [ngClass]="'priority-' + dossier.priorite">
-                {{ getPriorityLabel(dossier.priorite) }}
+              <span class="priority-badge" [ngClass]="getPriorityClass(dossier.priorite)">
+               {{ getPriorityClass(dossier.priorite) }}
               </span>
             </div>
           </div>
@@ -256,8 +244,8 @@
                 </div>
               </td>
               <td>
-                <span class="status-badge" [ngClass]="'status-' + dossier.statutGlobal">
-                  {{ getStatusLabel(dossier.statutGlobal) }}
+                <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">
+                  {{ getStatusLabel(dossier.stepGlobal) }}
                 </span>
               </td>
               <td>
@@ -338,8 +326,8 @@
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Statut</span>
-                  <span class="status-badge"  [ngClass]="'status-' + dossiers[selectedIndex!].statutGlobal">
-                    {{ getStatusLabel(dossiers[selectedIndex!].statutGlobal) }}
+                  <span class="status-badge"  [ngClass]="'status-' + dossiers[selectedIndex!].stepGlobal">
+                    {{ getStatusLabel(dossiers[selectedIndex!].stepGlobal) }}
                   </span>
                 </div>
               </div>
@@ -460,41 +448,42 @@
         </div>
       </div>
     </div>
+  </div>
 
 
 
 
   <!-- Tiroir document -->
   <div class="drawer-overlay-document" *ngIf="showDocumentsModal" (click)="closeDocumentsModal()">
-      <div class="drawer-document" [class.open]="showDocumentsModal" (click)="$event.stopPropagation()">
-          <div class="modal-header">
-          <h3>Documents ({{ filteredDocuments.length }})</h3>
-          <button class="modal-close" (click)="closeDocumentsModal()">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-          </button>
-          </div>
-          <div class="modal-body">
-          <div class="documents-list">
-              <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
+    <div class="drawer-document" [class.open]="showDocumentsModal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Documents ({{ filteredDocuments.length }})</h3>
+        <button class="modal-close" (click)="closeDocumentsModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="documents-list">
+          <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
 
-              <!-- Vue tableau -->
-              <div class="documents-table-container" *ngIf="currentViews === 'table'">
-                  <table class="documents-table">
-                  <thead>
-                      <tr>
-                      <th>Document</th>
-                      <th>Type</th>
-                      <!-- <th>Dossier</th> -->
-                      <th>Ajouté le</th>
-                      <!-- <th>Ajouté par</th> -->
-                      <th>Actions</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr *ngFor="let doc of filteredDocuments" class="document-row">
+            <!-- Vue tableau -->
+            <div class="documents-table-container" *ngIf="currentViews === 'table'">
+              <table class="documents-table">
+                <thead>
+                  <tr>
+                  <th>Document</th>
+                  <th>Type</th>
+                  <!-- <th>Dossier</th> -->
+                  <th>Ajouté le</th>
+                  <!-- <th>Ajouté par</th> -->
+                  <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let doc of filteredDocuments" class="document-row">
                       <td>
                           <div class="document-cell">
                           <div class="document-icon-small" [ngClass]="'icon-' + doc.type">
@@ -520,50 +509,51 @@
                       <!-- <td>
                           <div class="user-cell">{{ doc.uploadedBy }}</div>
                       </td> -->
-                      <td>
-                          <div class="table-actions">
-                          <button class="btn btn-primary small" (click)="downloadDocument(doc)" title="Télécharger">
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                              <polyline points="7,10 12,15 17,10"/>
-                              <line x1="12" y1="15" x2="12" y2="3"/>
-                              </svg>
-                          </button>
-                          <button class="btn btn-secondary small" (click)="viewDocument(doc)" title="Voir">
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                              <circle cx="12" cy="12" r="3"/>
-                              </svg>
-                          </button>
-                          <button class="btn btn-secondary small" (click)="deleteDocument(doc)" title="Supprimer">
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <polyline points="3,6 5,6 21,6"/>
-                              <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
-                              </svg>
-                          </button>
-                          </div>
-                      </td>
-                      </tr>
-                  </tbody>
-                  </table>
-              </div>
-              </div>
+                    <td>
+                      <div class="table-actions">
+                        <button class="btn btn-primary small" (click)="downloadDocument(doc)" title="Télécharger">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary small" (click)="viewDocument(doc)" title="Voir">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                          </svg>
+                        </button>
+                        <button class="btn btn-secondary small" (click)="deleteDocument(doc)" title="Supprimer">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3,6 5,6 21,6"/>
+                            <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
+                            </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-              <ng-template #noDocuments>
-              <div class="no-documents">
-                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14,2 14,8 20,8"/>
-                  </svg>
-                  <h3>Aucun document trouvé</h3>
-                  <p>Aucun document ne correspond aux critères sélectionnés.</p>
-              </div>
-              </ng-template>
-          </div>
-          </div>
-          <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="closeDocumentsModal()">Fermer</button>
-          <button class="btn btn-primary" (click)="showUploadModal = true">
+          <ng-template #noDocuments>
+            <div class="no-documents">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+              </svg>
+              <h3>Aucun document trouvé</h3>
+              <p>Aucun document ne correspond aux critères sélectionnés.</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeDocumentsModal()">Fermer</button>
+        <button class="btn btn-primary" (click)="showUploadModal = true">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="17,8 12,3 7,8"/>
@@ -571,8 +561,8 @@
           </svg>
           Ajouter un document
         </button>
-          </div>
       </div>
+    </div>
   </div>
 
 
@@ -590,16 +580,6 @@
           </div>
           <div class="modal-body">
           <div class="upload-form">
-              <!-- <div class="form-group">
-                  <label>Dossier associé</label>
-                  <select [(ngModel)]="newDocument.caseId" required>
-                      <option value="">Sélectionner un dossier</option>
-                      <option *ngFor="let case of cases" [value]="case.id">
-                      {{ case.caseNumber }} - {{ case.debtor.firstName }} {{ case.debtor.lastName }}
-                      </option>
-                  </select>
-              </div> -->
-              
               <div class="form-group">
               <label>Type de document</label>
               <select [(ngModel)]="newDocument.type" required>

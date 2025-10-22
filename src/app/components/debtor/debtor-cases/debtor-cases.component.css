@@ -793,6 +793,12 @@
   text-transform: uppercase;
 }
 
+.faible { background: #f0f9ff; color: #0369a1; }
+.moyenne { background: #fef3c7; color: #92400e; }
+.elevee { background: #fee2e2; color: #991b1b; }
+.urgente { background: #fdf2f8; color: #be185d; }
+.normale  { background: #dbeafe; color: #1d4ed8; }
+
 .case-amounts {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1485,12 +1491,6 @@
       max-width: 1400px;
       margin: 0 auto;
     }
-
-    /* .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    } */
 
     .documents-header h1 {
       font-size: 32px;

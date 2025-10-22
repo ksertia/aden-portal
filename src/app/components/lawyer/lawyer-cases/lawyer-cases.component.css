@@ -6,8 +6,13 @@
 
 .header-content {
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   align-items: center;
+  gap: 25px;
+}
+
+.cases-header  {
+  margin-bottom: 32px;
 }
 
 .cases-header h1 {

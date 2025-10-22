@@ -138,10 +138,6 @@ export class CreditorDashboard implements OnInit{
       return statut === 'en_attente' || statut === 'pending' || statut === 'attente';
     }).length;
   }
-
-
-
-
   
   getTotalPaid(): number {
     return this.filteredDossiers.reduce((acc, d) => acc + (d.montantPaye || 0), 0);

@@ -8,7 +8,7 @@ import { User, StrapiRole, LoginRequest, LoginResponse } from '../models/user.mo
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/auth'; // 👉 Ton BFF Express
+  private apiUrl = 'http://localhost:3000/auth'; //  Mon BFF Express
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -33,9 +33,9 @@ export class AuthService {
 
 //Inscription
 register(user: any): Observable<User> {
-    // user.role = ID du rôle
-    return this.http.post<User>(`${this.apiUrl}/register`, user);
-  }
+  // user.role = ID du rôle
+  return this.http.post<User>(`${this.apiUrl}/register`, user);
+}
 
   // Déconnexion
   logout(): void {

@@ -33,9 +33,6 @@ export class Avocat implements OnInit {
 
   // Vue courante : 'grid' ou 'table'
   currentView: 'grid' | 'table' = 'table';
-
-  cases: DebtCase[] = [];
-  filteredCases: DebtCase[] = [];
   
   selectedStatus = '';
   selectedPriority = '';
@@ -162,7 +159,7 @@ export class Avocat implements OnInit {
     this.selectedUser = null;
   }
 
-  // 🆕 Mise à jour après création d'utilisateur
+  // Mise à jour après création d'utilisateur
   onUserCreated(user: any) {
     console.log('Utilisateur Strapi créé:', user);
     this.selectedUser = user;

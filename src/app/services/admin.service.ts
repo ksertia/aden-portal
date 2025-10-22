@@ -6,18 +6,8 @@ import { catchError } from 'rxjs/operators';
 import { Debiteurs } from '../models/user.model';
 import { map } from 'rxjs/operators';
 import { DebtorInfo } from '../models/case.model';
-import { 
-  ApiDebtorResponse,
-  CreditorDetail,
-  ApiCreditorResponse,
-  HuissierInfo,
-  ApiHuissierResponse,
-  PartenaireInfo,
-  ApiPartenaireResponse,
-  AvocatInfo,
-  ApiResponseAvocat,
-  GlobalApiResponse  
-} from '../models/case.model';
+import { ApiDebtorResponse, CreditorDetail, ApiCreditorResponse, HuissierInfo, ApiHuissierResponse, PartenaireInfo, 
+  ApiPartenaireResponse, AvocatInfo, ApiResponseAvocat, GlobalApiResponse, CedantInfo, ApiResponseCedant  } from '../models/case.model';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +19,7 @@ export class AdminService {
   private huissierUrl = `${environment.baseUrl}/huissiers`;
   private partenaireUrl = `${environment.baseUrl}/partenaires`;
   private avocatUrl = `${environment.baseUrl}/avocats`;
+  private cedantUrl = `${environment.baseUrl}/cedants`;
   private allUrl = `${environment.baseUrl}/get_all_users`;
 
   constructor(private http: HttpClient) {}
@@ -86,6 +77,13 @@ export class AdminService {
   // récupérer les avocats
   getAvocats(sitename: string): Observable<AvocatInfo[]> {
     return this.http.get<ApiResponseAvocat>(`${this.avocatUrl}/${sitename}`).pipe(
+      map(res => res.data.map(item => item.map))
+    );
+  }
+
+  // récupérer les Cedants
+  getCedants(sitename: string): Observable<CedantInfo[]> {
+    return this.http.get<ApiResponseCedant>(`${this.cedantUrl}/${sitename}`).pipe(
       map(res => res.data.map(item => item.map))
     );
   }

@@ -31,7 +31,7 @@
   </div>
 
   <!-- Statistiques -->
-  <div class="stats-section fade-in-up" *ngIf="statistics">
+  <div class="stats-section fade-in-up" *ngIf="cedants">
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon primary">
@@ -44,7 +44,7 @@
             </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ filteredCases.length }}</div>
+          <div class="stat-value">{{ filteredCedants.length }}</div>
           <div class="stat-label">Tous les cédants</div>
         </div>
       </div>
@@ -83,205 +83,208 @@
     </div>
   </div>
 
-  <!-- Liste des créances -->
+  <!-- Liste des cédants -->
     <div class="cases-content fade-in-up">
-    <div class="cases-list" *ngIf="filteredCase.length > 0; else noCases">
-        <div class="list-header">
+    <div class="cases-list" *ngIf="filteredCedants.length > 0; else noCases">
+      <div class="list-header">
         <app-view-toggle 
-            [currentView]="currentView" 
-            (viewChange)="currentView = $event">
+          [currentView]="currentView" 
+          (viewChange)="currentView = $event">
         </app-view-toggle>
-        </div>
+      </div>
         
-        <!-- Vue grille -->
-        <div class="cases-grid" *ngIf="currentView === 'grid'">
-        <div class="case-card" *ngFor="let item of filteredCase">
-            <div class="case-header">
+      <!-- Vue grille -->
+      <div class="cases-grid" *ngIf="currentView === 'grid'">
+        <div class="case-card" *ngFor="let item of filteredCedants">
+          <div class="case-header">
             <div class="case-info">
-                <p class="debtor-name">{{ item.creditorName }}</p>
+                <p class="debtor-name">{{ item.contactPrincipal }}</p>
             </div>
             <div class="case-badges">
-                <span class="status-badge" [ngClass]="statusClass(item.status)">
-                {{ item.status }}
+                <span class="status-badge" [ngClass]="statusClass(item.statutGlobal)">
+                {{ item.statutGlobal }}
                 </span>
             </div>
-            </div>
+          </div>
             
             <div class="case-body">
             <div class="case-amounts">
                 <div class="amount-item">
-                <span class="amount-label">Username</span>
-                <span class="amount-value">{{ item.username }}</span>
+                <span class="amount-label">Raison Sociale</span>
+                <span class="amount-value">{{ item.raisonSociale }}</span>
                 </div>
                 <div class="amount-item">
                 <span class="amount-label">Email</span>
-                <span class="amount-value">{{ item.email }}</span>
+                <span class="amount-value">{{ item.emailProfessionnel }}</span>
                 </div>
                 <div class="amount-item">
                 <span class="amount-label">Téléphone</span>
-                <span class="amount-value">{{ item.phone }}</span>
+                <span class="amount-value">{{ item.telephone }}</span>
                 </div>
             </div>
             
             <div class="case-actions">
-                <button class="btn btn-primary small" title="Voir le profil" (click)="openDrawer(item)">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="8" r="4"/>
-      <path d="M6 20c0-4 12-4 12 0"/>
-    </svg> voir profil
-  </button>
-
+              <button class="btn btn-primary small" title="Voir le profil" (click)="openDrawer(item)">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="8" r="4"/>
+                  <path d="M6 20c0-4 12-4 12 0"/>
+                </svg> voir profil
+              </button>
             </div>
-            </div>
+          </div>
         </div>
-        </div>
+      </div>
         
-        <!-- Vue table -->
-        <div class="cases-table-container" *ngIf="currentView === 'table'">
+      <!-- Vue table -->
+      <div class="cases-table-container" *ngIf="currentView === 'table'">
         <table class="cases-table">
-            <thead>
+          <thead>
             <tr>
-                <th>Nom complet</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Téléphone</th>
-                <th>Status</th>
-                <th>Actions</th>
+              <th>Nom complet</th>
+              <th>Raison Sociale</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let item of filteredCase" class="case-row">
-                <td>{{ item.creditorName }}</td>
-                <td>{{ item.username }}</td>
-                <td>{{ item.email }}</td>
-                <td>{{ item.phone }}</td>
-                <td>
-                <span class="status-badge" [ngClass]="statusClass(item.status)" >
-                    {{ item.status }}
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of filteredCedants" class="case-row">
+              <td>{{ item.contactPrincipal }}</td>
+              <td>{{ item.raisonSociale }}</td>
+              <td>{{ item.emailProfessionnel }}</td>
+              <td>{{ item.telephone }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="statusClass(item.statutGlobal)" >
+                  {{ item.statutGlobal }}
                 </span>
-                </td>
-                <td>
+              </td>
+              <td>
                 <div class="table-actions">
-                    <button class="btn btn-primary small" title="Voir le profil" (click)="openDrawer(item)">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="8" r="4"/>
-        <path d="M6 20c0-4 12-4 12 0"/>
-      </svg>
-    </button>
+                  <button class="btn btn-primary small" title="Voir le profil" (click)="openDrawer(item)">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="8" r="4"/>
+                      <path d="M6 20c0-4 12-4 12 0"/>
+                    </svg>
+                  </button>
                 </div>
-                </td>
+              </td>
             </tr>
-            </tbody>
+          </tbody>
         </table>
-        </div>
+      </div>
     </div>
 
-   <!-- Remplace l'ancien drawer par ce nouveau code -->
+    <!-- Remplace l'ancien drawer par ce nouveau code -->
 
-<!-- Drawer Overlay -->
-<div class="drawer-overlay" *ngIf="showDrawer">
-  <div class="drawer-content" (click)="$event.stopPropagation()">
-    
-    <!-- Header -->
-    <div class="drawer-header">
-      <h3>Profil du cédant</h3>
-      <button class="drawer-close" (click)="closeDrawer()">✕</button>
-    </div>
-
-    <!-- Body -->
-    <div class="drawer-body" *ngIf="selectedCedant">
-
-      <!-- Profil résumé centré -->
-      <div class="debtor-profile centered">
-        <div class="debtor-avatar">
-          {{ selectedCedant.creditorName[0] }}{{ selectedCedant.creditorName.split(' ')[1]?.[0] || '' }}
+    <!-- Drawer Overlay -->
+    <div class="drawer-overlay" *ngIf="showDrawer">
+      <div class="drawer-content" (click)="$event.stopPropagation()">
+        
+        <!-- Header -->
+        <div class="drawer-header">
+          <h3>Profil du cédant</h3>
+          <button class="drawer-close" (click)="closeDrawer()">✕</button>
         </div>
-        <div class="debtor-info">
-          <h2 class="debtor-name">
-            {{ selectedCedant.creditorName }}
-          </h2>
-          <p class="debtor-role">Cédant</p>
+
+        <!-- Body -->
+        <div class="drawer-body" *ngIf="selectedCedant">
+
+          <!-- Profil résumé centré -->
+          <div class="debtor-profile centered">
+            <div class="debtor-avatar">
+              {{ selectedCedant.contactPrincipal[0] }}{{ selectedCedant.contactPrincipal.split(' ')[1]?.[0] || '' }}
+            </div>
+            <div class="debtor-info">
+              <h2 class="debtor-name">
+                {{ selectedCedant.contactPrincipal }}
+              </h2>
+              <p class="debtor-role">Cédant</p>
+            </div>
+          </div>
+
+          <!-- Informations personnelles -->
+          <div class="details-section">
+            <h4>Informations personnelles</h4>
+            <div class="details-grid">
+              <div class="detail-item">
+                <span class="detail-label">Nom complet</span>
+                <span class="detail-value">{{ selectedCedant.contactPrincipal }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Nom d'utilisateur</span>
+                <span class="detail-value">{{ selectedCedant.contactPrincipal }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Adresse e-mail</span>
+                <span class="detail-value">{{ selectedCedant.emailProfessionnel }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Téléphone</span>
+                <span class="detail-value">{{ selectedCedant.telephone }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Statut</span>
+                <span class="detail-value">
+                  <span class="status-badge" [ngClass]="statusClass(selectedCedant.statutGlobal)">
+                    {{ selectedCedant.statutGlobal }}
+                  </span>
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">nodeId</span>
+                <span class="detail-value">{{ selectedCedant.nodeId }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informations du compte Strapi -->
+          <div class="details-section">
+            <h4>Informations du compte</h4>
+
+            <ng-container *ngIf="selectedUser; else noStrapiUser">
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="detail-label">Nom d'utilisateur</span>
+                  <span class="detail-value">{{ selectedUser.username }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Adresse e-mail</span>
+                  <span class="detail-value">{{ selectedUser.email }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Rôle</span>
+                  <span class="detail-value">{{ selectedUser.role }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Statut</span>
+                  <span class="detail-value">{{ selectedUser.blocked ? 'Bloqué' : 'Actif' }}</span>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- Aucun compte -->
+            <ng-template #noStrapiUser>
+              <p class="no-account">Aucun compte utilisateur.</p>
+              <app-user-create
+                *ngIf="selectedCedant"
+                [prefillData]="{
+                  email: selectedCedant.emailProfessionnel,
+                  firstName: selectedCedant.contactPrincipal.split(' ')[0],
+                  lastName: selectedCedant.contactPrincipal.split(' ')[1] || '',
+                  userType: 'cedant',
+                  nodeId: selectedCedant.id
+                }"
+                (userCreated)="onUserCreated($event)">
+              </app-user-create>
+            </ng-template>
+
+            <button class="btn btn-primary" *ngIf="selectedUser">Reset Password</button>
+          </div>
         </div>
       </div>
 
-      <!-- Informations personnelles -->
-      <div class="details-section">
-        <h4>Informations personnelles</h4>
-        <div class="details-grid">
-          <div class="detail-item">
-            <span class="detail-label">Nom complet</span>
-            <span class="detail-value">{{ selectedCedant.creditorName }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Nom d'utilisateur</span>
-            <span class="detail-value">{{ selectedCedant.username }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Adresse e-mail</span>
-            <span class="detail-value">{{ selectedCedant.email }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Téléphone</span>
-            <span class="detail-value">{{ selectedCedant.phone }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Statut</span>
-            <span class="detail-value">
-              <span class="status-badge" [ngClass]="statusClass(selectedCedant.status)">
-                {{ selectedCedant.status }}
-              </span>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Informations du compte Strapi -->
-      <div class="details-section">
-        <h4>Informations du compte</h4>
-
-        <ng-container *ngIf="selectedUser; else noStrapiUser">
-          <div class="details-grid">
-            <div class="detail-item">
-              <span class="detail-label">Nom d'utilisateur</span>
-              <span class="detail-value">{{ selectedUser.username }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Adresse e-mail</span>
-              <span class="detail-value">{{ selectedUser.email }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Rôle</span>
-              <span class="detail-value">{{ selectedUser.role }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">Statut</span>
-              <span class="detail-value">{{ selectedUser.blocked ? 'Bloqué' : 'Actif' }}</span>
-            </div>
-          </div>
-        </ng-container>
-
-        <!-- Aucun compte -->
-        <ng-template #noStrapiUser>
-          <p class="no-account">Aucun compte utilisateur.</p>
-          <app-user-create
-            *ngIf="selectedCedant"
-            [prefillData]="{
-              email: selectedCedant.email,
-              firstName: selectedCedant.creditorName.split(' ')[0],
-              lastName: selectedCedant.creditorName.split(' ')[1] || '',
-               userType: 'cedant',
-              nodeId: selectedCedant.id
-            }"
-            (userCreated)="onUserCreated($event)">
-          </app-user-create>
-        </ng-template>
-
-        <button class="btn btn-primary" *ngIf="selectedUser">Reset Password</button>
-      </div>
     </div>
-  </div>
-
-</div>
 
 
     <ng-template #noCases>

@@ -170,6 +170,10 @@ export const routes: Routes = [
           {
             path: 'ceded-cases',
             loadComponent: () => import('./components/cedant/cedant-ceded-cases/cedant-ceded-cases.component').then(c => c.CedantCededCasesComponent)
+          },
+           {
+            path: 'dashboard',
+            loadComponent: () => import('./components/cedant/cedant-dashboard/cedant-dashboard').then(c => c.CedantDashboard)
           }
         ]
       },
