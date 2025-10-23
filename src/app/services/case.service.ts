@@ -31,6 +31,12 @@ export class CaseService {
       params: { creancierNodeId } // Ajout du paramètre de requête
     });
   }
+
+  getDossiersCedant(siteName: string, cedantNodeId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
+      params: { cedantNodeId } // Ajout du paramètre de requête
+    });
+  }
   getDossiersHuissier(siteName: string, huissierNodeId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
       params: { huissierNodeId } // Ajout du paramètre de requête

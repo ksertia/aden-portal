@@ -146,6 +146,12 @@ export class DocumentsComponent implements OnInit {
         serviceCall = this.caseService.getDossiersCreancier(siteName, nodeId);
         break;
 
+      case 'CEDANT':
+      case 'ASSYGNOR':
+        console.log('Chargement des dossiers du cédant:', nodeId);
+        serviceCall = this.caseService.getDossiersCedant(siteName, nodeId);
+        break;
+
       case 'HUISSIER':
       case 'BAILIFF':
         console.log('Chargement des dossiers de l\'huissier:', nodeId);
@@ -230,6 +236,15 @@ export class DocumentsComponent implements OnInit {
           console.log(`Dossier ${dossier.numeroDossier || dossier.nodeId} - Créancier correspond:`, isCreancier);
           return isCreancier;
 
+        case 'CEDANT':
+        case 'ASSYGNOR':
+          // Pour un cédant, vérifier s'il est le cedant du dossier
+          const isCedant = dossier.CedantNodeId === userNodeId || 
+          dossier.idCedant === userNodeId ||
+          (dossier.Cedant && (dossier.Cedant.nodeId === userNodeId || dossier.Cedant.id === userNodeId));
+          console.log(`Dossier ${dossier.numeroDossier || dossier.nodeId} - Cédant correspond:`, isCedant);
+          return isCedant;
+
         case 'HUISSIER':
         case 'BAILIFF':
           // Pour un huissier, vérifier s'il est l'huissier du dossier
@@ -260,6 +275,7 @@ export class DocumentsComponent implements OnInit {
         dossier.huissierNodeId === userNodeId ||
         dossier.idDebiteur === userNodeId ||
         dossier.idCreancier === userNodeId ||
+        dossier.idCedant === userNodeId ||
         dossier.idAvocat === userNodeId ||
         dossier.idHuissier === userNodeId) {
       return true;

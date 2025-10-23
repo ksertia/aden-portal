@@ -739,39 +739,82 @@ getPenaltiesDetail(dossier: any): PenaltyDetail[] {
 
 
   // Ajout methode start
-  extractDocuments() {
-    this.allDocuments = [];
+  // extractDocuments() {
+  //   this.allDocuments = [];
     
-    console.log('Début extraction des documents...');
+  //   console.log('Début extraction des documents...');
+  //   console.log('Nombre de dossiers à traiter:', this.dossiers.length);
     
-    // Parcourir tous les dossiers pour extraire leurs documents
-    this.dossiers.forEach(dossier => {
-      console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsDebiteur?.myArrayList);
+  //   // Parcourir tous les dossiers pour extraire leurs documents
+  //   this.dossiers.forEach(dossier => {
+  //     console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsDebiteur?.myArrayList);
       
-      // Vérifier si le dossier a des documents débiteur
-      if (dossier.documentsDebiteur?.myArrayList && Array.isArray(dossier.documentsDebiteur.myArrayList)) {
-        dossier.documentsDebiteur.myArrayList.forEach((doc: any) => {
-          console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
+  //     // Vérifier si le dossier a des documents débiteur
+  //     if (dossier.documentsDebiteur?.myArrayList && Array.isArray(dossier.documentsDebiteur.myArrayList)) {
+  //       dossier.documentsDebiteur.myArrayList.forEach((doc: any) => {
+  //         console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
           
-          const mappedType = this.mapDocumentType(doc.typeDocument);
-          console.log('Type mappé:', mappedType);
+  //         const mappedType = this.mapDocumentType(doc.typeDocument);
+  //         console.log('Type mappé:', mappedType);
           
-          this.allDocuments.push({
-            id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
-            name: doc.fileName || doc.name || 'Document sans nom',
-            type: mappedType,
-            url: doc.url || doc.downloadUrl || '#',
-            uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
-            uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
-            caseId: dossier.nodeId
-          });
-        });
-      }
-    });
+  //         this.allDocuments.push({
+  //           id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
+  //           name: doc.fileName || doc.name || 'Document sans nom',
+  //           type: mappedType,
+  //           url: doc.url || doc.downloadUrl || '#',
+  //           uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
+  //           uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+  //           caseId: dossier.nodeId
+  //         });
+  //       });
+  //     }
+  //   });
     
-    this.filteredDocuments = [...this.allDocuments];
-    console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
-  }
+  //   this.filteredDocuments = [...this.allDocuments];
+  //   console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
+  // }
+  extractDocuments() {
+  this.allDocuments = [];
+  
+  console.log('Début extraction des documents...');
+  console.log('Nombre de dossiers à traiter:', this.dossiers.length);
+  
+  // Parcourir tous les dossiers pour extraire leurs documents
+  this.dossiers.forEach(dossier => {
+    console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsDebiteur?.myArrayList);
+    
+    // Vérifier si le dossier a des documents débiteur
+    if (dossier.documentsDebiteur?.myArrayList && Array.isArray(dossier.documentsDebiteur.myArrayList)) {
+      dossier.documentsDebiteur.myArrayList.forEach((doc: any) => {
+        // VÉRIFICATION CRITIQUE : s'assurer que doc n'est pas null
+        if (!doc) {
+          console.log('Document null ignoré');
+          return; // Passer au document suivant
+        }
+        
+        console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
+        
+        const mappedType = this.mapDocumentType(doc.typeDocument);
+        console.log('Type mappé:', mappedType);
+        
+        this.allDocuments.push({
+          id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
+          name: doc.fileName || doc.name || 'Document sans nom',
+          type: mappedType,
+          url: doc.url || doc.downloadUrl || '#',
+          uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
+          uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+          caseId: dossier.nodeId
+        });
+      });
+    } else {
+      console.log('Aucun document trouvé pour le dossier:', dossier.numeroDossier);
+    }
+  });
+  
+  this.filteredDocuments = [...this.allDocuments];
+  console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
+}
 
   mapDocumentType(apiType: string): DocumentType {
     console.log('Mapping du type:', apiType);

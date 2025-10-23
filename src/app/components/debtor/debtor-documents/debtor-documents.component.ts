@@ -103,6 +103,16 @@ export class DebtorDocumentsComponent implements OnInit {
       // Vérifier si le dossier a des documents débiteur
       if (dossier.documentsDebiteur?.myArrayList && Array.isArray(dossier.documentsDebiteur.myArrayList)) {
         dossier.documentsDebiteur.myArrayList.forEach((doc: any) => {
+
+        // VÉRIFICATION CRITIQUE : s'assurer que doc n'est pas null
+        if (!doc) {
+          console.log('Document null ignoré');
+          return; // Passer au document suivant
+        }
+        
+        console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
+
+
           const mappedType = this.mapDocumentType(doc.typeDocument);
           
           this.allDocuments.push({
