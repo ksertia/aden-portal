@@ -681,3 +681,82 @@
   }
 }
 
+/* ===== INDICATEURS D'INSCRIPTION ===== */
+
+/* Bouton vert pour utilisateurs inscrits */
+.btn.registered {
+  background: #10b981 !important;
+  border-color: #10b981 !important;
+}
+
+.btn.registered:hover {
+  background: #059669 !important;
+  border-color: #059669 !important;
+}
+
+/* Tooltip "Inscrit" au survol */
+.btn {
+  position: relative;
+}
+
+.registration-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f2937;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  margin-bottom: 8px;
+  z-index: 1000;
+}
+
+.registration-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1f2937;
+}
+
+.btn:hover .registration-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* Badge d'inscription */
+.registration-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.registration-badge.registered {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.registration-badge.not-registered {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.registration-badge svg {
+  width: 12px;
+  height: 12px;
+}

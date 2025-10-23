@@ -24,6 +24,9 @@ export class Cedant implements OnInit {
 
   currentView: 'grid' | 'table' = 'table';
 
+   // 🆕 Map pour stocker le statut d'inscription de chaque avocat
+  userStatusMap: Map<string, boolean> = new Map();
+
   // État du tiroir
   showDrawer = false;
   selectedCedant: CedantInfo | null = null;
@@ -56,11 +59,32 @@ export class Cedant implements OnInit {
       next: (data: CedantInfo[]) => {
         this.cedants = data;
         this.filteredCedants = [...this.cedants];
+        this.loadUserStatuses();
       },
       error: (err) => console.error(err)
     });
   }
 
+   // 🆕 Charge le statut d'inscription pour tous les cedants
+  loadUserStatuses() {
+    this.cedants.forEach(cedant => {
+      this.adminService.getUserByEmail(cedant.emailProfessionnel).subscribe({
+        next: (user) => {
+          // Si un user existe, marquer comme inscrit
+          this.userStatusMap.set(cedant.emailProfessionnel, !!user);
+        },
+        error: () => {
+          // Si erreur ou pas de user, marquer comme non inscrit
+          this.userStatusMap.set(cedant.emailProfessionnel, false);
+        }
+      });
+    });
+  }
+
+  // 🆕 Vérifie si un cedant est inscrit sur Strapi
+  isUserRegistered(email: string): boolean {
+    return this.userStatusMap.get(email) || false;
+  }
 
   // filtrage par recherche
   applyFilters() {
@@ -114,12 +138,12 @@ export class Cedant implements OnInit {
   }
 
   // --- Gestion du tiroir ---
-  openDrawer(cedant: any) {
+  openDrawer(cedant: CedantInfo) {
     this.selectedCedant = cedant;
     this.showDrawer = true;
 
     // ⚡ On appelle Strapi pour récupérer le user associé au cédant
-    this.adminService.getUserByEmail(cedant.email).subscribe({
+    this.adminService.getUserByEmail(cedant.emailProfessionnel).subscribe({
       next: (user) => {
         this.selectedUser = user;
       },
@@ -130,14 +154,20 @@ export class Cedant implements OnInit {
     });
   }
 
+
   closeDrawer() {
     this.showDrawer = false;
     this.selectedCedant = null;
     this.selectedUser = null;
   }
 
+   // Mise à jour après création d'utilisateur
   onUserCreated(user: any) {
     console.log('Utilisateur Strapi créé:', user);
     this.selectedUser = user;
+    // Mettre à jour le statut dans la map
+    if (this.selectedCedant) {
+      this.userStatusMap.set(this.selectedCedant.emailProfessionnel, true);
+    }
   }
 }
