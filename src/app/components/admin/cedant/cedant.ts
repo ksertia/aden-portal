@@ -24,7 +24,7 @@ export class Cedant implements OnInit {
 
   currentView: 'grid' | 'table' = 'table';
 
-   // 🆕 Map pour stocker le statut d'inscription de chaque avocat
+   // Map pour stocker le statut d'inscription de chaque avocat
   userStatusMap: Map<string, boolean> = new Map();
 
   // État du tiroir
@@ -65,7 +65,7 @@ export class Cedant implements OnInit {
     });
   }
 
-   // 🆕 Charge le statut d'inscription pour tous les cedants
+   // Charge le statut d'inscription pour tous les cedants
   loadUserStatuses() {
     this.cedants.forEach(cedant => {
       this.adminService.getUserByEmail(cedant.emailProfessionnel).subscribe({
@@ -81,7 +81,7 @@ export class Cedant implements OnInit {
     });
   }
 
-  // 🆕 Vérifie si un cedant est inscrit sur Strapi
+  // Vérifie si un cedant est inscrit sur Strapi
   isUserRegistered(email: string): boolean {
     return this.userStatusMap.get(email) || false;
   }
@@ -142,7 +142,7 @@ export class Cedant implements OnInit {
     this.selectedCedant = cedant;
     this.showDrawer = true;
 
-    // ⚡ On appelle Strapi pour récupérer le user associé au cédant
+    // On appelle Strapi pour récupérer le user associé au cédant
     this.adminService.getUserByEmail(cedant.emailProfessionnel).subscribe({
       next: (user) => {
         this.selectedUser = user;
@@ -170,4 +170,19 @@ export class Cedant implements OnInit {
       this.userStatusMap.set(this.selectedCedant.emailProfessionnel, true);
     }
   }
+
+  // Méthode pour obtenir le nombre de cedants inscrits
+getRegisteredCount(): number {
+  return this.cedants.filter(cedants => 
+    this.isUserRegistered(cedants.emailProfessionnel)
+  ).length;
+}
+
+// Méthode pour obtenir le nombre de cedants non-inscrits
+getNonRegisteredCount(): number {
+  return this.cedants.filter(cedants => 
+    !this.isUserRegistered(cedants.emailProfessionnel)
+  ).length;
+}
+
 }

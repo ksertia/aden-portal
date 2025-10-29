@@ -9,7 +9,7 @@ import { LanguageSwitcherComponent } from '../../shared/language-switcher/langua
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, LanguageSwitcherComponent],
+  imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
@@ -102,8 +102,6 @@ export class SidebarComponent implements OnInit {
         return 'Créancier';
       case StrapiRole.CEDANT:
         return 'Cédant';
-      case StrapiRole.PARTNER:
-        return 'Partenaire';
       case StrapiRole.RECOVERY_PARTNER:
         return 'Partenaire de recouvrement';
       case StrapiRole.ADMINISTRATEUR:

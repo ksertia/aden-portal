@@ -112,7 +112,6 @@ export class LawyerDashboard implements OnInit{
       case StrapiRole.LAWYER: return 'Avocat';
       case StrapiRole.CREDITOR: return 'Créancier';
       case StrapiRole.CEDANT: return 'Cédant';
-      case StrapiRole.PARTNER: return 'Partenaire';
       case StrapiRole.RECOVERY_PARTNER: return 'Partenaire de recouvrement';
       case StrapiRole.ADMINISTRATEUR: return 'Administrateur';
       default: return 'Rôle inconnu';

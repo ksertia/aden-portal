@@ -23,7 +23,7 @@ export class Avocat implements OnInit {
   selectedAvocat: AvocatInfo | null = null;
   selectedUser: any | null = null; // données Strapi User
 
-  // 🆕 Map pour stocker le statut d'inscription de chaque avocat
+  // Map pour stocker le statut d'inscription de chaque avocat
   userStatusMap: Map<string, boolean> = new Map();
 
   // Gestion des filtres
@@ -57,14 +57,14 @@ export class Avocat implements OnInit {
       next: (data: AvocatInfo[]) => {
         this.avocat = data;
         this.filteredAvocat = [...this.avocat];
-        // 🆕 Charger le statut d'inscription pour chaque avocat
+        // Charger le statut d'inscription pour chaque avocat
         this.loadUserStatuses();
       },
       error: (err) => console.error(err)
     });
   }
 
-  // 🆕 Charge le statut d'inscription pour tous les avocats
+  // Charge le statut d'inscription pour tous les avocats
   loadUserStatuses() {
     this.avocat.forEach(avocat => {
       this.adminService.getUserByEmail(avocat.emailProfessionnel).subscribe({
@@ -80,7 +80,7 @@ export class Avocat implements OnInit {
     });
   }
 
-  // 🆕 Vérifie si un avocat est inscrit sur Strapi
+  // Vérifie si un avocat est inscrit sur Strapi
   isUserRegistered(email: string): boolean {
     return this.userStatusMap.get(email) || false;
   }
@@ -141,7 +141,7 @@ export class Avocat implements OnInit {
     this.selectedAvocat = avocat;
     this.showDrawer = true;
 
-    // ⚡ On appelle Strapi pour récupérer le user associé à l'avocat
+    // On appelle Strapi pour récupérer le user associé à l'avocat
     this.adminService.getUserByEmail(avocat.emailProfessionnel).subscribe({
       next: (user) => {
         this.selectedUser = user;
@@ -168,4 +168,19 @@ export class Avocat implements OnInit {
       this.userStatusMap.set(this.selectedAvocat.emailProfessionnel, true);
     }
   }
+
+  // Méthode pour obtenir le nombre d'avocats inscrits
+getRegisteredCount(): number {
+  return this.avocat.filter(avocat => 
+    this.isUserRegistered(avocat.emailProfessionnel)
+  ).length;
+}
+
+// Méthode pour obtenir le nombre d'avocats non-inscrits
+getNonRegisteredCount(): number {
+  return this.avocat.filter(avocat => 
+    !this.isUserRegistered(avocat.emailProfessionnel)
+  ).length;
+}
+
 }

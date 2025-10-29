@@ -45,25 +45,10 @@ export class LoginComponent {
     });
     
   }
-  // private redirectBasedOnUserRole(user: any) {
-  //   // Supposons que l'utilisateur ait une propriété 'role'
-  //   switch (user.role) {
-  //     case 'adebtor':
-  //       this.router.navigate(['/debtor/dashboard']);
-  //       break;
-  //     case 'manager':
-  //       this.router.navigate(['/manager/dashboard']);
-  //       break;
-  //     case 'user':
-  //       this.router.navigate(['/user/dashboard']);
-  //       break;
-  //     default:
-  //       this.router.navigate(['/dashboard']);
-  //   }
-  // }
-private redirectToDashboard(user: any): void {
+
+  private redirectToDashboard(user: any): void {
     console.log('Structure complète user:', JSON.stringify(user, null, 2));
-    
+      
     if (!user || !user.role) {
       console.warn('Utilisateur ou rôle manquant');
       this.router.navigate(['/dashboard']);
@@ -75,35 +60,34 @@ private redirectToDashboard(user: any): void {
     console.log('Nom du rôle détecté:', roleName);
 
     switch (roleName) {
-      case 'debtor': // ← CORRIGÉ : 'debiteur' au lieu de 'adebtor'
-        this.router.navigate(['/debtor/dashboard']);
-        break;
-      case 'Administrateur': // ← CORRIGÉ : 'administrateur' au lieu de 'manager'
-        this.router.navigate(['/Administrateur/dashboard']); // Rediriger vers une page existante
-        break;
+      case 'debtor':
+        this.router.navigate(['/debtor/dashboard']); // Rediriger vers le dashboard du débiteur
+      break;
+      case 'Administrateur':
+        this.router.navigate(['/Administrateur/dashboard']); // Rediriger vers le dashboard de l'adminstrateur
+      break;
       case 'bailiff':
-        this.router.navigate(['/bailiff/dashboard']); // Rediriger vers une page existante
-        break;
+        this.router.navigate(['/bailiff/dashboard']); // Rediriger vers le dashboard de l'huissier
+      break;
       case 'lawyer':
-        this.router.navigate(['/lawyer/dashboard']); // Rediriger vers une page existante
-        break;
+        this.router.navigate(['/lawyer/dashboard']); // Rediriger vers le dashboard de l'avocat
+      break;
       case 'creditor':
-        this.router.navigate(['/creditor/dashboard']); // Rediriger vers une page existante
-        break;
+        this.router.navigate(['/creditor/dashboard']); // Rediriger vers une le dashboard du creancier 
+      break;
       case 'cedant':
-        this.router.navigate(['/cedant/dashboard']); // Rediriger vers une page existante
-        break;
-      case 'partenaire':
-        this.router.navigate(['/partner/cases']); // Rediriger vers une page existante
-        break;
+        this.router.navigate(['/cedant/dashboard']); // Rediriger vers le dashboard du cédant
+      break;
+      case 'partner':
+        this.router.navigate(['/partner/dashboard']); // Rediriger vers le dashboard du partenaire
+      break;
       default:
         this.router.navigate(['/dashboard']);
         console.warn(`Rôle non géré: ${roleName}`);
-        break;
+      break;
     }
-}
+  }
   
-
   loginAsDemo(email: string) {
     this.credentials.email = email;
     this.credentials.password = 'password123';

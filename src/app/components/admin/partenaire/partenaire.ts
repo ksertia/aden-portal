@@ -25,7 +25,7 @@ export class Partenaire implements OnInit {
   partenaire: PartenaireInfo[] = [];
   filteredPartenaire: PartenaireInfo[] = [];
 
-  // 🆕 Map pour stocker le statut d'inscription de chaque partenaire
+  // Map pour stocker le statut d'inscription de chaque partenaire
   userStatusMap: Map<string, boolean> = new Map();
 
   // Gestion des filtres
@@ -65,14 +65,14 @@ export class Partenaire implements OnInit {
       next: (data: PartenaireInfo[]) => {
         this.partenaire = data;
         this.filteredPartenaire = [...this.partenaire];
-        // 🆕 Charger le statut d'inscription pour chaque partenaire
+        // Charger le statut d'inscription pour chaque partenaire
         this.loadUserStatuses();
       },
       error: (err) => console.error(err)
     });
   }
 
-  // 🆕 Charge le statut d'inscription pour tous les partenaires
+  // Charge le statut d'inscription pour tous les partenaires
   loadUserStatuses() {
     this.partenaire.forEach(partenaire => {
       this.adminService.getUserByEmail(partenaire.emailProfessionnel).subscribe({
@@ -88,7 +88,7 @@ export class Partenaire implements OnInit {
     });
   }
 
-  // 🆕 Vérifie si un partenaire est inscrit sur Strapi
+  // Vérifie si un partenaire est inscrit sur Strapi
   isUserRegistered(email: string): boolean {
     return this.userStatusMap.get(email) || false;
   }
@@ -110,12 +110,6 @@ export class Partenaire implements OnInit {
   resetFilters() {
     this.filters.searchTerm = '';
     this.filteredPartenaire = [...this.partenaire];
-  }
-
-  loadStatistics() {
-    // this.caseService.getStatistics().subscribe(stats => {
-    //   this.statistics = stats;
-    // });
   }
 
   closeCaseDetailsModal() {
@@ -161,7 +155,7 @@ export class Partenaire implements OnInit {
     this.selectedUser = null;
   }
 
-  // 🆕 Mise à jour après création d'utilisateur
+  // Mise à jour après création d'utilisateur
   onUserCreated(user: any) {
     console.log('Utilisateur Strapi créé:', user);
     this.selectedUser = user;
@@ -170,4 +164,19 @@ export class Partenaire implements OnInit {
       this.userStatusMap.set(this.selectedPartenaire.emailProfessionnel, true);
     }
   }
+
+  // Méthode pour obtenir le nombre de partenaires inscrits
+  getRegisteredCount(): number {
+    return this.partenaire.filter(partenaire => 
+      this.isUserRegistered(partenaire.emailProfessionnel)
+    ).length;
+  }
+
+  // Méthode pour obtenir le nombre de partenaires non-inscrits
+  getNonRegisteredCount(): number {
+    return this.partenaire.filter(creditor => 
+      !this.isUserRegistered(creditor.emailProfessionnel)
+    ).length;
+  }
+
 }

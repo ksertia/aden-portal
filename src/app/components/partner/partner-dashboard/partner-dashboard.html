@@ -17,7 +17,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ dossiers.length }}</div>
-        <div class="stat-label">Portefeuilles totaux</div>
+        <div class="stat-label">Dossiers totaux</div>
       </div>
     </a>
 
@@ -30,7 +30,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ activeCount }}</div>
-        <div class="stat-label">Portefeuilles actifs</div>
+        <div class="stat-label">Dossiers actifs</div>
       </div>
     </div>
 
@@ -44,7 +44,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{pendingCount }}</div>
-        <div class="stat-label">En cours d'évaluation</div>
+        <div class="stat-label">En attente</div>
       </div>
     </div>
 
@@ -66,8 +66,8 @@
   <div class="role-content fade-in-up">
     <div  class="debtor-dashboard" *ngIf="dossiers.length > 0; else noCases">
       <div class="section-header">
-        <h2>Mes Dossiers</h2>
-        <a routerLink="/cedant/portfolios" class="btn btn-primary">Voir tous les dossiers</a>
+        <h2>Mes Dossiers </h2>
+        <a routerLink="/partner/cases" class="btn btn-primary">Voir tous les dossiers</a>
       </div>
       <!--Affichage de trois dossiers -->
       <div class="cases-grid" *ngIf="dossiers.length > 0">
@@ -82,6 +82,10 @@
             <div class="case-info">
               <span class="label">Créancier :</span>
               <span>{{ getCreancierForDossier(dossier)?.contactPrincipal }}</span>
+            </div>
+            <div class="case-info">
+              <span class="label">Débiteur :</span>
+              <span>{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
             </div>
             <div class="case-amount">
               <span class="label">Montant :</span>
@@ -103,8 +107,8 @@
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14,2 14,8 20,8"/>
         </svg>
-        <h3>Aucun portefeuille trouvé</h3>
-        <p>Vous n'avez actuellement aucun portefeuille de recouvrement.</p>
+        <h3>Aucun dossier trouvé</h3>
+        <p>Vous n'avez actuellement aucun dossier de recouvrement.</p>
       </div>
    </ng-template>
   </div>
@@ -113,32 +117,26 @@
   <div class="quick-actions">
     <h3>Actions Rapides</h3>
     <div class="actions-grid">
-      <a routerLink="/cedant/portfolios" class="action-card highlight1">
+      <a routerLink="/professional/documents" class="action-card highlight1">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14,2 14,8 20,8"/>
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
-        <span>Mes Portefeuilles</span>
+        <span>Mes Documents</span>
       </a>
-      <a routerLink="/cedant/invoices" class="action-card highlight2">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14,2 14,8 20,8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
+      <a routerLink="/partner/cases" class="action-card highlight2">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4"/>
+            <circle cx="12" cy="12" r="9"/>
         </svg>
-        <span>Suivi des factures</span>
+        <span>Réviser un dossier</span>
       </a>
-      <a routerLink="/cedant/sales" class="action-card highlight3">
-        <!-- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="1" x2="12" y2="23"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-        </svg> -->
-        <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960"
-            width="25" fill="#FFFFFF"><path 
-            d="M275-99v-128h-88v-91h88v-544h460v92H366v244h329v91H366v117h160v91H366v128h-91Z"/>
+      <a routerLink="/professional/reports" class="action-card highlight3">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 2v6l3-3 3 3-3 3v6"/>
+            <path d="M15 8h6"/>
+            <path d="M15 16h6"/>
         </svg>
-        <span>Processus de vente</span>
+        <span>Rapports d'activité</span>
       </a>
     </div>
   </div>

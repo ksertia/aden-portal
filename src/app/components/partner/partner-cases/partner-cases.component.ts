@@ -3,83 +3,268 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PartnerService } from '../../../services/partner.service';
 import { AuthService } from '../../../services/auth.service';
-import { DebtCase, CaseStatus, Priority, CaseFilter, PartnerUpdate } from '../../../models/case.model';
+import { DebtCase, DebtorInfo, CaseDocument, DocumentType, CreditorDetail } from '../../../models/case.model';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
+import { CaseService } from '../../../services/case.service';
+import { AdminService } from '../../../services/admin.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-partner-cases',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ViewToggleComponent, RouterModule],
   templateUrl: './partner-cases.component.html',
   styleUrls: ['./partner-cases.component.css']
 })
 export class PartnerCasesComponent implements OnInit {
-  assignedCases: DebtCase[] = [];
-  statistics: any = null;
-  
-  showStatusModal = false;
-  showPaymentModal = false;
-  showNoteModal = false;
-  showDetailsModal = false;
+
   selectedCase: DebtCase | null = null;
-  
-  statusUpdate = {
-    newStatus: CaseStatus.ACTIVE,
-    description: ''
-  };
-  
-  paymentUpdate = {
-    amount: 0,
-    description: ''
-  };
-  
-  noteUpdate = {
-    type: 'action_taken' as 'action_taken' | 'note_added',
-    content: ''
+
+  selectedIndex: number | null = null;
+  showDrawer  = false;
+
+
+  dossiers: any[] = [];
+  isLoading = true;
+  errorMessage = '';
+
+  currentView: 'grid' | 'table' = 'table';
+
+  selectedDetailCase: any;
+
+  // --- Filtres ---
+  filters = {
+    searchTerm: '',
+    status: '',
+    priority: ''
   };
 
+  selectedStatus = '';
+  selectedPriority = '';
+  filteredDossiers: any[] = [];
+
+  // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
+  debiteurs: DebtorInfo[] = [];
+  filteredDebiteurs: DebtorInfo[] = [];
+  selectedDebtor: DebtorInfo | undefined;
+
+  // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du créancier (importer depuis AdminService)
+  creditors: CreditorDetail[] = [];
+  filteredCreditors: CreditorDetail[] = [];
+  selectedcreditor: CreditorDetail | undefined;
+
+  // Ajout start
+  cases: DebtCase[] = [];
+  allDocuments: (CaseDocument & { caseId: string })[] = [];
+  filteredDocuments: (CaseDocument & { caseId: string })[] = [];
+  currentViews: 'grid' | 'table' = 'table';
+  showDocumentsModal: boolean = false;
+  
+  searchTerm = '';
+  selectedDocumentType = '';
+  selectedCaseId = '';
+  
+  showUploadModal = false;
+  selectedFile: File | null = null;
+  
+  newDocument = {
+    caseId: '',
+    type: '',
+    name: ''
+  };
+  // Ajout end
+
+  // Les propriétés pour la visualisation des documents
+  showDocumentViewer = false;
+  currentDocumentUrl: any = null;
+  currentDocument: any = null;
+  documentContentType = '';
+  isLoadingDocument = false;
+  safePdfUrl: SafeResourceUrl | null = null;
+
   constructor(
-    private partnerService: PartnerService,
-    private authService: AuthService
+    private route: ActivatedRoute,
+    private router: Router,
+    private casesService: CaseService,
+    private authService: AuthService,
+    private adminService: AdminService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
-    this.loadAssignedCases();
-    this.loadStatistics();
+
+    this.loadDossiers();
   }
 
-  loadAssignedCases() {
+  // Fonction pour charger les dossiers
+  loadDossiers() {
+    const siteName = 'portail-recouvrement';
     const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
 
-    this.partnerService.getAssignedCases(currentUser.id).subscribe(cases => {
-      this.assignedCases = cases;
+    // Verification si l'utilisateur est connecté
+    if (!currentUser) {
+      this.errorMessage = 'Utilisateur non connecté.';
+      this.isLoading = false;
+      return;
+    }
+
+    const partenaireNodeId = currentUser.nodeId;
+    console.log('Partenaire connecté :', currentUser);
+    console.log('partenaireNodeId envoyé :', partenaireNodeId);
+
+    // Verification si l'utilisateur connecté à un NodeId
+    if (!partenaireNodeId) {
+      this.errorMessage = 'Identifiant du partenaire introuvable.';
+      this.isLoading = false;
+      return;
+    }
+
+    // Appel du web service pour la recuperation des dossiers du partenaire
+    this.casesService.getDossiersPartenaire(siteName, partenaireNodeId).subscribe({
+      next: (response) => {
+        console.log('Réponse API dossiers :', response);
+
+        // Étape 1 : extraction correcte du tableau de dossiers
+        const dossiers = response.data?.map((item: any) => item.map) || [];
+
+        // Étape 2 : filtrage local
+        this.dossiers = dossiers.filter(
+          (d: any) => d.partenaireNodeId === partenaireNodeId
+        );
+
+        // Étape 3 : initialisation du tableau filtré
+        this.filteredDossiers = [...this.dossiers];
+        console.log('Dossiers filtrés pour ce partenaire :', this.dossiers);
+
+        // Extraire les documents après avoir chargé les dossiers
+        this.extractDocuments();
+
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des dossiers :', error);
+        this.errorMessage = 'Impossible de récupérer les dossiers.';
+        this.isLoading = false;
+      }
+    });
+
+    // Appel du web service pour la recuperation des données(extraction du lastname,firstname,email,telephone et type) du débiteurs 
+    this.adminService.getDebiteurs(siteName).subscribe({
+        next: (data: DebtorInfo[]) => {
+          this.debiteurs = data;
+          this.filteredDebiteurs = [...this.debiteurs];
+        },
+        error: (err) => console.error(err)
+    });
+
+    // Appel du web service pour la recuperation des données(extraction du lastname,firstname,email,telephone et type) du creancier 
+    this.adminService.getCreanciers(siteName).subscribe({
+      next: (data: CreditorDetail[]) => {
+        this.creditors = data;
+        this.filteredCreditors = [...this.creditors];
+      },
+      error: (err) => console.error(err)
     });
   }
 
-  loadStatistics() {
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
-
-    this.partnerService.getPartnerStatistics(currentUser.id).subscribe(stats => {
-      this.statistics = stats;
-    });
+  // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
+  getDebiteurForDossier(dossier: any): DebtorInfo | undefined {
+    const debiteurNodeId = dossier.debiteurNodeId?.trim(); // <-- on supprime les espaces
+    return this.debiteurs.find(d => String(d.nodeId).trim() === String(debiteurNodeId));
   }
 
-  getPaymentPercentage(case_: DebtCase): number {
-    return Math.round((case_.amountPaid / case_.amount) * 100);
+  // Ici on compare le debiteurNodeId avec le nodeId du dossier qui correspond au créancier
+  getCreancierForDossier(dossier: any): CreditorDetail | undefined {
+    const creancierNodeId = dossier.creancierNodeId?.trim(); // <-- on supprime les espaces
+    return this.creditors.find(d => String(d.nodeId).trim() === String(creancierNodeId));
+  }
+
+  // Réinitialiser tous les filtres
+  resetFilters(): void {
+    this.filters = {
+      searchTerm: '',
+      status: '',
+      priority: ''
+    };
+    this.selectedStatus = '';
+    this.selectedPriority = '';
+    this.filteredDossiers = [...this.dossiers];
+  }
+
+  // Appliquer les filtres (nom, prénom, nom d’entreprise, numéro ou objet de dossier)
+  applyFilters(): void {
+  const term = this.filters.searchTerm.toLowerCase().trim();
+  const status = this.filters.status;
+  const priority = this.filters.priority;
+
+  this.filteredDossiers = this.dossiers.filter((dossier) => {
+    const debiteur = this.getDebiteurForDossier(dossier); 
+    const fullName = `${debiteur?.firstName || ''} ${debiteur?.lastName || ''}`.toLowerCase();
+    const company = debiteur?.companyName?.toLowerCase() || '';
+
+    const matchesTerm =
+      !term ||
+      dossier.numeroDossier?.toLowerCase().includes(term) ||
+      dossier.objet?.toLowerCase().includes(term) ||
+      fullName.includes(term) ||            
+      company.includes(term);               
+
+    const matchesStatus =
+      !status ||
+      dossier.stepGlobal === status ||
+      this.getStatusLabel(dossier.stepGlobal).toLowerCase() ===
+        this.getStatusLabel(status).toLowerCase();
+
+    const matchesPriority = !priority || dossier.priorite === priority;
+
+    return matchesTerm && matchesStatus && matchesPriority;
+  });
+}
+
+  // Lorsqu’on change le filtre de statut
+  updateStatusFilter(): void {
+    this.filters.status = this.selectedStatus;
+    this.applyFilters();
+  }
+
+  // Lorsqu’on change le filtre de priorité
+  updatePriorityFilter(): void {
+    this.filters.priority = this.selectedPriority;
+    this.applyFilters();
+  }
+
+  getPaymentPercentage(dossier: any): number {
+    const total = dossier.montantTotal || 0;
+    const paid = dossier.montantPaye || 0;
+    return total ? Math.round((paid / total) * 100) : 0;
+  }
+
+  getTotalDebt(): number {
+    return this.filteredDossiers.reduce((acc, d) => acc + (d.montantTotal || 0), 0);
+  }
+
+  getTotalPaid(): number {
+    return this.filteredDossiers.reduce((acc, d) => acc + (d.montantPaye || 0), 0);
+  }
+  getFormattedRemainingAmount(dossier: any): string {
+    const reste = (dossier.montantTotal || 0) - (dossier.montantPaye || 0);
+    return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'XOF' });
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
+    if (!amount) return '0 FCFA';
+    return amount.toLocaleString('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
-    }).format(amount);
+      currency: 'XOF',
+      minimumFractionDigits: 0
+    });
   }
 
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('fr-FR', {
       year: 'numeric',
-      month: 'short',
+      month: 'long',
       day: 'numeric'
     });
   }
@@ -92,123 +277,70 @@ export class PartnerCasesComponent implements OnInit {
       'legal_action': 'Action légale',
       'payment_plan': 'Plan de paiement',
       'completed': 'Terminé',
-      'closed': 'Fermé'
+      'closed': 'Fermé',
+      'new': 'Nouveau'
     };
     return labels[status] || status;
   }
 
-  updateCaseStatus(case_: DebtCase) {
-    this.selectedCase = case_;
-    this.statusUpdate = {
-      newStatus: case_.status,
-      description: ''
-    };
-    this.showStatusModal = true;
+  getPriorityClass(priority: string): string {
+    switch(priority.toLowerCase()) {
+      case 'low':
+      case 'faible':
+        return 'priorite-faible';
+      case 'medium':
+      case 'moyenne':
+        return 'moyenne';
+      case 'high':
+      case 'elevee':
+        return 'elevee';
+      case 'urgent':
+      case 'urgente':
+        return 'urgente';
+      case 'normal':
+      case 'normale':
+        return 'normale';
+      default:
+        return '';
+    }
   }
 
-  recordPayment(case_: DebtCase) {
-    this.selectedCase = case_;
-    this.paymentUpdate = {
-      amount: 0,
-      description: ''
-    };
-    this.showPaymentModal = true;
+  viewCaseDetails(index: number): void {
+    this.selectedIndex = index;
+    const dossier = this.filteredDossiers[index];
+    
+    // IMPORTANT: Stocker le dossier sélectionné
+    this.selectedDetailCase = dossier;
+    
+    this.selectedDebtor = this.getDebiteurForDossier(dossier);
+    console.log("selectedDebtor", this.selectedDebtor);
+    console.log("selectedDetailCase", this.selectedDetailCase);
+    
+    this.showDrawer = true;
   }
 
-  addNote(case_: DebtCase) {
-    this.selectedCase = case_;
-    this.noteUpdate = {
-      type: 'action_taken',
-      content: ''
-    };
-    this.showNoteModal = true;
-  }
-
-  viewCaseDetails(case_: DebtCase) {
-    this.selectedCase = case_;
-    this.showDetailsModal = true;
-  }
-
-  saveStatusUpdate() {
-    if (!this.selectedCase || !this.statusUpdate.description.trim()) return;
-
-    this.partnerService.updateCaseStatus(
-      this.selectedCase.id,
-      this.statusUpdate.newStatus,
-      this.statusUpdate.description
-    ).subscribe({
-      next: (updatedCase) => {
-        const caseIndex = this.assignedCases.findIndex(c => c.id === updatedCase.id);
-        if (caseIndex >= 0) {
-          this.assignedCases[caseIndex] = updatedCase;
-        }
-        this.closeStatusModal();
-      },
-      error: (error) => {
-        console.error('Erreur lors de la mise à jour:', error);
-      }
+  closeDrawer() {
+    this.showDrawer  = false;
+    this.selectedIndex  = null;
+      
+    // Nettoyer l'URL si on vient des notifications
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
+      replaceUrl: true
     });
   }
 
-  savePayment() {
-    if (!this.selectedCase || this.paymentUpdate.amount <= 0) return;
-
-    this.partnerService.recordPayment(
-      this.selectedCase.id,
-      this.paymentUpdate.amount,
-      this.paymentUpdate.description
-    ).subscribe({
-      next: (updatedCase) => {
-        const caseIndex = this.assignedCases.findIndex(c => c.id === updatedCase.id);
-        if (caseIndex >= 0) {
-          this.assignedCases[caseIndex] = updatedCase;
-        }
-        this.loadStatistics(); // Recharger les stats pour les commissions
-        this.closePaymentModal();
-      },
-      error: (error) => {
-        console.error('Erreur lors de l\'enregistrement:', error);
-      }
-    });
+  downloadCaseReport(case_: DebtCase) {
+    console.log('Télécharger rapport pour:', case_.caseNumber);
   }
 
-  saveNote() {
-    if (!this.selectedCase || !this.noteUpdate.content.trim()) return;
-
-    this.partnerService.addPartnerNote(
-      this.selectedCase.id,
-      this.noteUpdate.content,
-      this.noteUpdate.type
-    ).subscribe({
-      next: () => {
-        this.closeNoteModal();
-        // Recharger les données pour voir la nouvelle note
-        this.loadAssignedCases();
-      },
-      error: (error) => {
-        console.error('Erreur lors de l\'ajout de la note:', error);
-      }
-    });
+  generateCustomReport() {
+    this.router.navigate(['/professional/reports']);
   }
 
-  generatePartnerReport() {
-    console.log('Génération du rapport d\'activité partenaire');
-    // TODO: Implémenter la génération de rapport
-  }
-
-  closeStatusModal() {
-    this.showStatusModal = false;
-    this.selectedCase = null;
-  }
-
-  closePaymentModal() {
-    this.showPaymentModal = false;
-    this.selectedCase = null;
-  }
-
-  closeNoteModal() {
-    this.showNoteModal = false;
-    this.selectedCase = null;
+  getRecentActivities(index: number) {
+      
   }
 
   getActivityClass(type: string): string {
@@ -217,37 +349,290 @@ export class PartnerCasesComponent implements OnInit {
       'reminder_sent': 'reminder',
       'status_changed': 'status',
       'formal_notice_sent': 'legal',
-      'legal_action_initiated': 'legal',
-      'case_ceded': 'cession',
-      'partner_update': 'partner'
+      'legal_action_initiated': 'legal'
     };
     return typeMap[type] || 'status';
   }
+  
 
-  closeDetailsModal() {
-    this.showDetailsModal = false;
-    this.selectedCase = null;
+  // Ajout methode start
+  extractDocuments() {
+    this.allDocuments = [];
+    
+    console.log('Début extraction des documents...');
+    console.log('Nombre de dossiers à traiter:', this.dossiers.length);
+    
+    // Parcourir tous les dossiers pour extraire leurs documents
+    this.dossiers.forEach(dossier => {
+      console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsPartenaire?.myArrayList);
+      
+      // Vérifier si le dossier a des documents partenaire
+      if (dossier.documentsPartenaire?.myArrayList && Array.isArray(dossier.documentsPartenaire.myArrayList)) {
+        dossier.documentsPartenaire.myArrayList.forEach((doc: any) => {
+          console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
+          
+          const mappedType = this.mapDocumentType(doc.typeDocument);
+          console.log('Type mappé:', mappedType);
+          
+          this.allDocuments.push({
+            id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
+            name: doc.fileName || doc.name || 'Document sans nom',
+            type: mappedType,
+            url: doc.url || doc.downloadUrl || '#',
+            uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
+            uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+            caseId: dossier.nodeId
+          });
+        });
+      }
+    });
+    
+    this.filteredDocuments = [...this.allDocuments];
+    console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
   }
 
-  downloadDocument(doc: any) {
-    console.log('Télécharger document:', doc.name);
-    // TODO: Implémenter le téléchargement
+  
+
+  mapDocumentType(apiType: string): DocumentType {
+    console.log('Mapping du type:', apiType);
+    
+    // Normaliser le type (enlever espaces, mettre en majuscules)
+    const normalizedType = (apiType || '').trim().toUpperCase();
+    
+    const typeMapping: { [key: string]: DocumentType } = {
+      'FACTURE': DocumentType.INVOICE,
+      'INVOICE': DocumentType.INVOICE,
+      'CONTRAT': DocumentType.CONTRACT,
+      'CONTRACT': DocumentType.CONTRACT,
+      'CORRESPONDANCE': DocumentType.CORRESPONDENCE,
+      'CORRESPONDENCE': DocumentType.CORRESPONDENCE,
+      'MISE_EN_DEMEURE': DocumentType.LEGAL_NOTICE,
+      'LEGAL_NOTICE': DocumentType.LEGAL_NOTICE,
+      'PREUVE_PAIEMENT': DocumentType.PAYMENT_PROOF,
+      'PAYMENT_PROOF': DocumentType.PAYMENT_PROOF,
+      'DOCUMENT_JUDICIAIRE': DocumentType.COURT_DOCUMENT,
+      'COURT_DOCUMENT': DocumentType.COURT_DOCUMENT
+    };
+    
+    const result = typeMapping[normalizedType] || DocumentType.CORRESPONDENCE;
+    console.log('Résultat du mapping:', normalizedType, '->', result);
+    
+    return result;
   }
 
-  viewDocument(doc: any) {
-    console.log('Visualiser document:', doc.name);
-    // TODO: Implémenter la visualisation
+  filterDocuments() {
+    this.filteredDocuments = this.allDocuments.filter(doc => {
+      const matchesSearch = !this.searchTerm || 
+        doc.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        this.getCaseNumber(doc.caseId).toLowerCase().includes(this.searchTerm.toLowerCase());
+      
+      const matchesType = !this.selectedDocumentType || doc.type === this.selectedDocumentType;
+      const matchesCase = !this.selectedCaseId || doc.caseId === this.selectedCaseId;
+      
+      return matchesSearch && matchesType && matchesCase;
+    });
+  }
+
+   getLegalDocumentsCount(): number {
+    return this.allDocuments.filter(doc => 
+      doc.type === DocumentType.LEGAL_NOTICE || 
+      doc.type === DocumentType.COURT_DOCUMENT
+    ).length;
+  }
+
+  getPaymentProofsCount(): number {
+    return this.allDocuments.filter(doc => 
+      doc.type === DocumentType.PAYMENT_PROOF
+    ).length;
+  }
+
+  // Modifiez la méthode getCaseNumber pour utiliser nodeId
+  getCaseNumber(caseId: string): string {
+    const dossier = this.dossiers.find(d => d.nodeId === caseId);
+    return dossier?.numeroDossier || 'N/A';
   }
 
   getDocumentTypeLabel(type: string): string {
     const labels: { [key: string]: string } = {
-      'invoice': 'Facture',
-      'contract': 'Contrat',
-      'correspondence': 'Correspondance',
-      'legal_notice': 'Mise en demeure',
-      'payment_proof': 'Preuve de paiement',
-      'court_document': 'Document judiciaire'
+      [DocumentType.INVOICE]: 'Facture',
+      [DocumentType.CONTRACT]: 'Contrat',
+      [DocumentType.CORRESPONDENCE]: 'Rapport',
+      [DocumentType.LEGAL_NOTICE]: 'Mise en demeure',
+      [DocumentType.PAYMENT_PROOF]: 'Preuve de paiement',
+      [DocumentType.COURT_DOCUMENT]: 'Document judiciaire'
     };
     return labels[type] || type;
   }
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      if (!this.newDocument.name) {
+        this.newDocument.name = file.name;
+      }
+    }
+  }
+
+  isUploadValid(): boolean {
+    return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
+  }
+
+  uploadDocument() {
+
+    if (!this.isUploadValid()) {
+      alert('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      alert('Utilisateur non connecté');
+      return;
+    }
+
+  }
+
+  deleteDocument(doc: CaseDocument) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
+      this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
+      this.filterDocuments();
+      console.log('Document supprimé:', doc.name);
+    }
+  }
+
+  closeUploadModal() {
+    console.log('Fermeture de la modal d\'upload');
+    this.showUploadModal = false;
+    this.selectedFile = null;
+    this.newDocument = {
+      caseId: '',
+      type: '',
+      name: ''
+    };
+  }
+  
+
+  // Fonction pour fermer la modal des documents
+  closeDocumentsModal() {
+    this.showDocumentsModal = false;
+  }
+
+
+  // Ajout methode end
+  openDocumentsModal() {
+    if (this.selectedIndex !== null) {
+      this.selectedDetailCase = this.filteredDossiers[this.selectedIndex];
+    }
+    
+    if (this.selectedDetailCase) {
+      // Filtrer uniquement les documents du dossier sélectionné
+      this.filteredDocuments = this.allDocuments.filter(
+        doc => doc.caseId === this.selectedDetailCase.nodeId
+      );
+      
+      console.log('Documents du dossier', this.selectedDetailCase.numeroDossier, ':', this.filteredDocuments);
+    } else {
+      // Afficher tous les documents si aucun dossier n'est sélectionné
+      this.filteredDocuments = [...this.allDocuments];
+    }
+    
+    this.showDocumentsModal = true;
+  }
+
+  // Compter les documents d'un dossier
+  getDocumentsCount(dossier: any): number {
+    if (!dossier) return 0;
+    return dossier.documentsPartenaire?.myArrayList?.length || 0;
+  }
+
+  // Méthode pour visualiser un document
+  viewDocument(doc: any) {
+    console.log('Visualisation du document:', doc);
+
+    const documentIdentifier = doc.nodeId || doc.id; //  fallback si nodeId absent
+    
+    if (!documentIdentifier) {
+      alert('Identifiant du document manquant');
+      return;
+    }
+    
+    this.isLoadingDocument = true;
+    this.currentDocument = doc;
+  
+    // Récupérer le contenu du document depuis le backend
+    this.casesService.getDocumentContent(doc.id).subscribe({
+      next: (blob) => {
+        this.isLoadingDocument = false;
+
+        // Création de l'URL temporaire
+        const blobUrl = window.URL.createObjectURL(blob);
+        this.currentDocumentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+        this.documentContentType = blob.type;
+        
+        // Ouvrir la modale de visualisation
+        this.showDocumentViewer = true;
+        
+        console.log('Document chargé avec succès. Type:', blob.type);
+      },
+      error: (error) => {
+        this.isLoadingDocument = false;
+        console.error('Erreur lors du chargement du document:', error);
+        alert('Impossible de charger le document. Veuillez réessayer.');
+      }
+    });
+  }
+
+  // Méthode pour fermer le visualiseur
+  closeDocumentViewer() {
+    if (this.currentDocumentUrl) {
+      window.URL.revokeObjectURL(this.currentDocumentUrl);
+    }
+    this.showDocumentViewer = false;
+    this.currentDocumentUrl = null;
+    this.currentDocument = null;
+    this.documentContentType = '';
+  }
+
+  // Méthode pour télécharger un document
+  downloadDocument(doc: any) {
+    console.log('Téléchargement du document:', doc);
+    
+    if (!doc.id) {
+      alert('Identifiant du document manquant');
+      return;
+    }
+
+    this.casesService.downloadDocument(doc.id, doc.name);
+  }
+
+  // Méthode pour vérifier si le document est un PDF
+  isDocumentPDF(): boolean {
+    return this.documentContentType === 'application/pdf' || 
+      this.currentDocument?.name?.toLowerCase().endsWith('.pdf');
+    }
+
+  // Méthode pour vérifier si le document est une image
+  isDocumentImage(): boolean {
+    return this.documentContentType?.startsWith('image/') ||
+    /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(this.currentDocument?.name);
+  }
+
+  // Méthode pour ouvrir le document dans un nouvel onglet
+  openInNewTab() {
+    if (this.currentDocumentUrl) {
+      // Si c’est un SafeResourceUrl, on le convertit
+      const url = (this.currentDocumentUrl as any).changingThisBreaksApplicationSecurity || this.currentDocumentUrl;
+      window.open(url, '_blank');
+    }
+  }
+
+ formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+
 }

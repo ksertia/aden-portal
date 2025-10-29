@@ -28,23 +28,28 @@ export class CaseService {
   }
   getDossiersCreancier(siteName: string, creancierNodeId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
-      params: { creancierNodeId } // Ajout du paramètre de requête
+      params: { creancierNodeId } 
     });
   }
 
   getDossiersCedant(siteName: string, cedantNodeId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
-      params: { cedantNodeId } // Ajout du paramètre de requête
+      params: { cedantNodeId } 
     });
   }
   getDossiersHuissier(siteName: string, huissierNodeId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
-      params: { huissierNodeId } // Ajout du paramètre de requête
+      params: { huissierNodeId } 
     });
   }
   getDossiersAvocat(siteName: string, avocatNodeId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
-      params: { avocatNodeId } // Ajout du paramètre de requête
+      params: { avocatNodeId } 
+    });
+  }
+  getDossiersPartenaire(siteName: string, partenaireNodeId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${siteName}/dossiers`, {
+      params: { partenaireNodeId } 
     });
   }
 
@@ -62,7 +67,7 @@ export class CaseService {
     return this.http.get(`${this.documentApiUrl}/${nodeId}/metadata`);
   }
 
-   // Télécharger un document
+  // Télécharger un document
   downloadDocument(nodeId: string, fileName: string): void {
     this.getDocumentContent(nodeId).subscribe({
       next: (blob) => {
@@ -78,21 +83,5 @@ export class CaseService {
       }
     });
   }
-
-  //  Nouvelle méthode : Upload d'un document vers Alfresco
-  uploadDocument(file: File, metadata?: any): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    // Ajouter des métadonnées si nécessaire
-    if (metadata) {
-      Object.keys(metadata).forEach(key => {
-        formData.append(key, metadata[key]);
-      });
-    }
-
-    return this.http.post(`${this.documentApiUrl}/upload`, formData);
-  }
-
 
 }

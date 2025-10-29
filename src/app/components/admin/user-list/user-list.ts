@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { User } from '../../../models/user.model';
-import { DebtCase, GlobalApiResponse } from '../../../models/case.model';
+import { DebtCase} from '../../../models/case.model';
 import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
 import { AdminService } from '../../../services/admin.service';
@@ -25,6 +25,7 @@ export class UserList implements OnInit {
   partenaires: User[] = [];
   creanciers: User[] = [];
   avocats: User[] = [];
+  cedants: User[] = []
 
   // Tableau combiné pour l'affichage
   allUser: User[] = [];
@@ -48,6 +49,8 @@ export class UserList implements OnInit {
   showDrawer = false;
   selectedUser: User | null = null;
 
+  private userStatusMap: Map<string, boolean> = new Map();
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -60,7 +63,7 @@ export class UserList implements OnInit {
     this.loadAllUsers();
   }
 
-  // 🔑 Récupération des utilisateurs
+  // Récupération des utilisateurs
  loadAllUsers() {
   this.adminService.getAllUsers('portail-recouvrement').subscribe({
     next: (res: any) => {
@@ -119,16 +122,30 @@ export class UserList implements OnInit {
       ...p.map
     }));
 
+    this.cedants = (res.cedants || []).map((p: any) => ({
+      id: p.map.objetId,
+      prenom: p.map.prenomCedant,
+      nom: p.map.nomCedant,
+      email: p.map.emailCedant,
+      telephone: p.map.telephone,
+      role: "cedant",
+      ...p.map
+    }));
+
     // Combinaisons tous les utilisateurs
     this.allUser = [
       ...this.debiteurs,
       ...this.huissiers,
       ...this.avocats,
       ...this.creanciers,
-      ...this.partenaires
+      ...this.partenaires,
+      ...this.cedants
     ];
 
     this.filteredAllUser = [...this.allUser];
+
+    // Charger le statut d'inscription après avoir chargé tous les utilisateurs
+    this.loadUserRegistrationStatuses();
 
     console.log('Tous les utilisateurs:', this.allUser);
     },
@@ -161,13 +178,13 @@ export class UserList implements OnInit {
     this.filteredAllUser = [...this.allUser];
   }
 
-  // 🔄 Mise à jour du filtre par rôle (profil)
+  // Mise à jour du filtre par rôle (profil)
   updateStatusFilter() {
     this.applyFilters();
   }
 
 
-  // ✅ Ouvre le drawer avec mapping vers User
+  // Ouvre le drawer avec mapping vers User
   openDrawer(item: User) {
     this.selectedUser = item;
     this.showDrawer = true;
@@ -178,4 +195,39 @@ export class UserList implements OnInit {
     this.selectedUser = null;
   }
 
+    // Charge le statut d'inscription pour tous les utilisateurs
+  loadUserRegistrationStatuses() {
+    this.allUser.forEach(user => {
+      const email = user.email || user.emailProfessionnel;
+      if (email) {
+        this.adminService.getUserByEmail(email).subscribe({
+          next: (strapiUser) => {
+            this.userStatusMap.set(email, !!strapiUser);
+          },
+          error: () => {
+            this.userStatusMap.set(email, false);
+          }
+        });
+      }
+    });
+  }
+
+  // Vérifie si un utilisateur est inscrit
+  isUserRegistered(email: string): boolean {
+    if (!email) return false;
+    return this.userStatusMap.get(email) || false;
+  }
+
+  // Méthodes pour obtenir les compteurs
+  getRegisteredCount(): number {
+    return this.allUser.filter(user => 
+      this.isUserRegistered(user.email || user.emailProfessionnel)
+    ).length;
+  }
+
+  getNonRegisteredCount(): number {
+    return this.allUser.filter(user => 
+      !this.isUserRegistered(user.email || user.emailProfessionnel)
+    ).length;
+  }
 }

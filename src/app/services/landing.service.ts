@@ -137,7 +137,7 @@ export class LandingService {
 
             // Vérifier la locale renvoyée
             if (data.locale !== locale) {
-                console.warn(`⚠️ Locale demandée (${locale}) différente de celle renvoyée (${data.locale})`);
+                console.warn(` Locale demandée (${locale}) différente de celle renvoyée (${data.locale})`);
             }
 
             return data;

@@ -60,23 +60,23 @@ export class CedantDashboard implements OnInit {
       return;
     }
 
-    const avocatNodeId = currentUser.nodeId;
-    console.log('Avocat connecté :', currentUser);
-    console.log('avocatNodeId envoyé :', avocatNodeId);
+    const cedantNodeId = currentUser.nodeId;
+    console.log('Cédant connecté :', currentUser);
+    console.log('cedantNodeId envoyé :', cedantNodeId);
 
-    if (!avocatNodeId) {
-      this.errorMessage = 'Identifiant de lavocat introuvable.';
+    if (!cedantNodeId) {
+      this.errorMessage = 'Identifiant du cédant introuvable.';
       this.isLoading = false;
       return;
     }
 
-    this.casesService.getDossiersAvocat(siteName, avocatNodeId).subscribe({
+    this.casesService.getDossiersCedant(siteName, cedantNodeId).subscribe({
       next: (response) => {
 
       // Récupère tous les dossiers
       const allDossiers = response.data?.map((item: any) => item.map) || [];
-      // Filtre uniquement les dossiers de l'avocat connecté
-      this.dossiers = allDossiers.filter((d: any) => d.avocatNodeId === avocatNodeId);
+      // Filtre uniquement les dossiers du cédant connecté
+      this.dossiers = allDossiers.filter((d: any) => d.cedantNodeId === cedantNodeId);
       console.log('Réponse API dossiers :', this.dossiers);
 
       //  mise à jour des statistiques
@@ -114,7 +114,6 @@ export class CedantDashboard implements OnInit {
       case StrapiRole.LAWYER: return 'Avocat';
       case StrapiRole.CREDITOR: return 'Créancier';
       case StrapiRole.CEDANT: return 'Cédant';
-      case StrapiRole.PARTNER: return 'Partenaire';
       case StrapiRole.RECOVERY_PARTNER: return 'Partenaire de recouvrement';
       case StrapiRole.ADMINISTRATEUR: return 'Administrateur';
       default: return 'Rôle inconnu';

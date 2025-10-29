@@ -204,7 +204,6 @@ export class CreditorCasesComponent implements OnInit {
   });
 }
 
-
   // Lorsqu’on change le filtre de statut
   updateStatusFilter(): void {
     this.filters.status = this.selectedStatus;

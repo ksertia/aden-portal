@@ -34,7 +34,7 @@
             <option value="créancier">Créancier</option>
             <option value="débiteur">Débiteur</option>
             <option value="huissier">Huissier</option>
-            <option value="cédant">Cédant</option>
+            <option value="cedant">Cédant</option>
             <option value="avocat">Avocat</option>
             <option value="partenaire">Partenaire</option>
           </select>
@@ -84,8 +84,8 @@
         </div>
         <div class="stat-content">
           <div class="stat-value"></div>
-          <div class="stat-value">-</div>
-          <div class="stat-label">Profils actifs</div>
+          <div class="stat-value">{{ getRegisteredCount() }}</div>
+          <div class="stat-label">Profils inscrits</div>
         </div>
       </div>
 
@@ -97,8 +97,8 @@
           </svg>
         </div>
         <div class="stat-content">
-          <div class="stat-value">-</div>
-          <div class="stat-label">Profils inactifs</div>
+          <div class="stat-value">{{ getNonRegisteredCount() }}</div>
+          <div class="stat-label">Profils non-inscrits</div>
         </div>
         </div>
       </div>
@@ -121,7 +121,6 @@
             <p class="debtor-name">
             <div class="case-badges">
               <span class="status-badge">{{ user.role }}</span>
-              <!-- <span class="priority-badge">{{ item.role?.name ? item.role.name : item.role || 'Non défini' }}</span> -->
             </div>
           </div>
 
@@ -163,7 +162,7 @@
             <th>Email</th>
             <th>Téléphone</th>
             <th>Secteur</th>
-            <th>Status</th>
+            <!-- <th>Status</th> -->
             <th>Rôle</th>
             <th>Actions</th>
           </tr>
@@ -175,7 +174,7 @@
           <td>{{ user.telephone }}</td>
           <td>{{ user.secteurActivite }} {{ user.raisonSociale }} {{ user.chambreDepartementale }} 
             {{ user.nomCabinet }} {{ user.typePartenaire }}</td>
-          <td>-</td>
+          <!-- <td>-</td> -->
           <td>{{ user.role }}</td>
           <td>
             <button class="btn btn-primary small">
@@ -188,7 +187,7 @@
         </tr>
 
         </tbody>
-        </table>
+      </table>
 
     </div>
   </div>

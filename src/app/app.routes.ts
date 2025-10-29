@@ -54,10 +54,10 @@ export const routes: Routes = [
             path: 'payments',
             loadComponent: () => import('./components/debtor/debtor-payments/debtor-payments.component').then(c => c.DebtorPaymentsComponent)
           },
-          {
-            path: 'documents',
-            loadComponent: () => import('./components/debtor/debtor-documents/debtor-documents.component').then(c => c.DebtorDocumentsComponent)
-          },
+          // {
+          //   path: 'documents',
+          //   loadComponent: () => import('./components/debtor/debtor-documents/debtor-documents.component').then(c => c.DebtorDocumentsComponent)
+          // },
           {
             path: 'dashboard',
             loadComponent: () => import('./components/debtor/debtor-dashboard/debtor-dashboard').then(c => c.DebtorDashboard)
@@ -145,6 +145,10 @@ export const routes: Routes = [
           {
             path: 'tracking',
             loadComponent: () => import('./components/partner/partner-tracking/partner-tracking.component').then(c => c.PartnerTrackingComponent)
+          },
+          {
+            path: 'dashboard',
+            loadComponent: () => import('./components/partner/partner-dashboard/partner-dashboard').then(c => c.PartnerDashboard)
           }
         ]
       },
@@ -182,7 +186,7 @@ export const routes: Routes = [
       {
         path: 'professional',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [StrapiRole.BAILIFF, StrapiRole.LAWYER, StrapiRole.CREDITOR, StrapiRole.CEDANT, StrapiRole.RECOVERY_PARTNER] },
+        data: { roles: [StrapiRole.BAILIFF, StrapiRole.LAWYER, StrapiRole.CREDITOR, StrapiRole.DEBTOR, StrapiRole.CEDANT, StrapiRole.RECOVERY_PARTNER] },
         children: [
           {
             path: 'reports',

@@ -133,4 +133,19 @@ export class Debiteur implements OnInit {
       this.userStatusMap.set(this.selectedDebtor.email, true);
     }
   }
+
+  // Méthode pour obtenir le nombre de debiteurs inscrits
+  getRegisteredCount(): number {
+    return this.debiteurs.filter(debiteurs => 
+      this.isUserRegistered(debiteurs.email)
+    ).length;
+  }
+
+  // Méthode pour obtenir le nombre de debiteurs non-inscrits
+  getNonRegisteredCount(): number {
+    return this.debiteurs.filter(debiteurs => 
+      !this.isUserRegistered(debiteurs.email)
+    ).length;
+  }
+
 }

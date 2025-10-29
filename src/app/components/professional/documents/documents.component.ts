@@ -158,6 +158,12 @@ export class DocumentsComponent implements OnInit {
         serviceCall = this.caseService.getDossiersHuissier(siteName, nodeId);
         break;
 
+      case 'PARTENAIRE':
+      case 'PARTNER':
+        console.log('Chargement des dossiers du partenaire:', nodeId);
+        serviceCall = this.caseService.getDossiersPartenaire(siteName, nodeId);
+        break;
+
       default:
         console.warn('Rôle non reconnu:', roleType, 'tentative avec avocat par défaut');
         serviceCall = this.caseService.getDossiersAvocat(siteName, nodeId);
@@ -239,9 +245,9 @@ export class DocumentsComponent implements OnInit {
         case 'CEDANT':
         case 'ASSYGNOR':
           // Pour un cédant, vérifier s'il est le cedant du dossier
-          const isCedant = dossier.CedantNodeId === userNodeId || 
+          const isCedant = dossier.cedantNodeId === userNodeId || 
           dossier.idCedant === userNodeId ||
-          (dossier.Cedant && (dossier.Cedant.nodeId === userNodeId || dossier.Cedant.id === userNodeId));
+          (dossier.cedant && (dossier.cedant.nodeId === userNodeId || dossier.cedant.id === userNodeId));
           console.log(`Dossier ${dossier.numeroDossier || dossier.nodeId} - Cédant correspond:`, isCedant);
           return isCedant;
 
@@ -253,6 +259,15 @@ export class DocumentsComponent implements OnInit {
           (dossier.huissier && (dossier.huissier.nodeId === userNodeId || dossier.huissier.id === userNodeId));
           console.log(`Dossier ${dossier.numeroDossier || dossier.nodeId} - Huissier correspond:`, isHuissier);
           return isHuissier;
+
+        case 'PARTENAIRE':
+        case 'PARTNER':
+          // Pour un partenaire, vérifier s'il est le partenaire du dossier
+          const ispartenaire = dossier.partenaireNodeId === userNodeId || 
+          dossier.idPartenaire === userNodeId ||
+          (dossier.partenaire && (dossier.partenaire.nodeId === userNodeId || dossier.partenaire.id === userNodeId));
+          console.log(`Dossier ${dossier.numeroDossier || dossier.nodeId} - Partenaire correspond:`, ispartenaire);
+          return ispartenaire;
 
         default:
           // Vérification générique
@@ -277,6 +292,7 @@ export class DocumentsComponent implements OnInit {
         dossier.idCreancier === userNodeId ||
         dossier.idCedant === userNodeId ||
         dossier.idAvocat === userNodeId ||
+        dossier.idPartenaire === userNodeId ||
         dossier.idHuissier === userNodeId) {
       return true;
     }
@@ -562,17 +578,15 @@ export class DocumentsComponent implements OnInit {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-get uniqueDossiers(): any[] {
-  const uniqueMap = new Map();
-  this.dossiers.forEach(dossier => {
-    if (dossier.nodeId && !uniqueMap.has(dossier.nodeId)) {
-      uniqueMap.set(dossier.nodeId, dossier);
-    }
-  });
-  return Array.from(uniqueMap.values());
-}
-
- // AJOUTEZ CES MÉTHODES MANQUANTES :
+  get uniqueDossiers(): any[] {
+    const uniqueMap = new Map();
+    this.dossiers.forEach(dossier => {
+      if (dossier.nodeId && !uniqueMap.has(dossier.nodeId)) {
+        uniqueMap.set(dossier.nodeId, dossier);
+      }
+    });
+    return Array.from(uniqueMap.values());
+  }
 
   // Gestion de la sélection de fichier
   onFileSelected(event: any): void {
@@ -611,37 +625,6 @@ get uniqueDossiers(): any[] {
     this.isUploading = false;
   }
 
-  // Uploader le document
-  uploadDocument(): void {
-    if (!this.selectedFile || !this.newDocument.name || !this.newDocument.type || !this.newDocument.caseId) {
-      alert('Veuillez remplir tous les champs et sélectionner un fichier');
-      return;
-    }
-
-    this.isUploading = true;
-
-    // Ici vous devrez appeler votre service d'upload
-    // Exemple :
-    this.caseService.uploadDocument(
-      this.newDocument.caseId,
-      this.selectedFile,
-    ).subscribe({
-      next: (response) => {
-        this.isUploading = false;
-        console.log('Document uploadé avec succès:', response);
-        alert('Document uploadé avec succès');
-        
-        // Fermer le modal et recharger les documents
-        this.closeUploadModal();
-        this.loadData(); // Ou une méthode de rafraîchissement plus légère
-      },
-      error: (error) => {
-        this.isUploading = false;
-        console.error('Erreur lors de l\'upload:', error);
-        alert('Erreur lors de l\'upload du document');
-      }
-    });
-  }
 
   // Méthode pour obtenir les types de documents pour le select
   getDocumentTypes(): { value: string; label: string }[] {
@@ -662,55 +645,65 @@ get uniqueDossiers(): any[] {
 
   // Fonction pour rediriger l\'utilisateur connecté vers son dashboard
   goBackToDashboard(): void {
-  const currentUser = this.authService.getCurrentUser();
-  
-  if (!currentUser) {
-    this.router.navigate(['/login']);
-    return;
+    const currentUser = this.authService.getCurrentUser();
+    
+    if (!currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const userRole = currentUser.role;
+    let roleType = '';
+
+    // Gestion sécurisée du type avec vérifications
+    if (typeof userRole === 'string') {
+      roleType = userRole;
+    } else if (userRole && typeof userRole === 'object') {
+      // Vérification plus sécurisée pour les propriétés
+      const roleObj = userRole as any; 
+      roleType = (roleObj.type || roleObj.name || '').toUpperCase();
+    } else {
+      roleType = '';
+    }
+
+    // Rediriger vers le dashboard approprié
+    switch (roleType) {
+      case 'AVOCAT':
+      case 'LAWYER':
+        this.router.navigate(['/lawyer/dashboard']);
+      break;
+
+      case 'DEBITEUR':
+      case 'DEBTOR':
+        this.router.navigate(['/debtor/dashboard']);
+      break;
+
+      case 'CREANCIER':
+      case 'CREDITOR':
+        this.router.navigate(['/creditor/dashboard']);
+      break;
+
+      case 'CEDANT':
+      case 'CéDANT':
+        this.router.navigate(['/cedant/dashboard']);
+      break;
+
+      case 'HUISSIER':
+      case 'BAILIFF':
+        this.router.navigate(['/bailiff/dashboard']);
+      break;
+
+      case 'PARTENAIRE':
+      case 'PARTNER':
+        this.router.navigate(['/partner/dashboard']);
+      break;
+
+      default:
+        // Redirection par défaut vers la page d'accueil
+        console.warn('Rôle non reconnu, redirection vers la page d\'accueil');
+        this.router.navigate(['/']);
+      break;
+    }
   }
-
-  const userRole = currentUser.role;
-  let roleType = '';
-
-  // Gestion sécurisée du type avec vérifications
-  if (typeof userRole === 'string') {
-    roleType = userRole;
-  } else if (userRole && typeof userRole === 'object') {
-    // Vérification plus sécurisée pour les propriétés
-    const roleObj = userRole as any; 
-    roleType = (roleObj.type || roleObj.name || '').toUpperCase();
-  } else {
-    roleType = '';
-  }
-
-  // Rediriger vers le dashboard approprié
-  switch (roleType) {
-    case 'AVOCAT':
-    case 'LAWYER':
-      this.router.navigate(['/lawyer/dashboard']);
-      break;
-
-    case 'DEBITEUR':
-    case 'DEBTOR':
-      this.router.navigate(['/debtor/dashboard']);
-      break;
-
-    case 'CREANCIER':
-    case 'CREDITOR':
-      this.router.navigate(['/creditor/dashboard']);
-      break;
-
-    case 'HUISSIER':
-    case 'BAILIFF':
-      this.router.navigate(['/bailiff/dashboard']);
-      break;
-
-    default:
-      // Redirection par défaut vers la page d'accueil
-      console.warn('Rôle non reconnu, redirection vers la page d\'accueil');
-      this.router.navigate(['/']);
-      break;
-  }
-}
 
 }

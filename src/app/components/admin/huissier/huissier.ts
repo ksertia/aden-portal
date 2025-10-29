@@ -25,7 +25,7 @@ export class Huissier implements OnInit {
   huisier: HuissierInfo[] = [];
   filteredHuisier: HuissierInfo[] = [];
 
-  // 🆕 Map pour stocker le statut d'inscription de chaque huissier
+  // Map pour stocker le statut d'inscription de chaque huissier
   userStatusMap: Map<string, boolean> = new Map();
 
   // Gestion des filtres
@@ -55,14 +55,14 @@ export class Huissier implements OnInit {
       next: (data: HuissierInfo[]) => {
         this.huisier = data;
         this.filteredHuisier = [...this.huisier];
-        // 🆕 Charger le statut d'inscription pour chaque huissier
+        // Charger le statut d'inscription pour chaque huissier
         this.loadUserStatuses();
       },
       error: (err) => console.error(err)
     });
   }
 
-  // 🆕 Charge le statut d'inscription pour tous les huissiers
+  // Charge le statut d'inscription pour tous les huissiers
   loadUserStatuses() {
     this.huisier.forEach(huissier => {
       this.adminService.getUserByEmail(huissier.emailProfessionnel).subscribe({
@@ -78,7 +78,7 @@ export class Huissier implements OnInit {
     });
   }
 
-  // 🆕 Vérifie si un huissier est inscrit sur Strapi
+  // Vérifie si un huissier est inscrit sur Strapi
   isUserRegistered(email: string): boolean {
     return this.userStatusMap.get(email) || false;
   }
@@ -102,12 +102,12 @@ export class Huissier implements OnInit {
     this.filteredHuisier = [...this.huisier];
   }
 
-  // --- Gestion du tiroir ---
+  //Gestion du tiroir
   openDrawer(huissier: HuissierInfo) {
     this.selectedHuissier = huissier;
     this.showDrawer = true;
 
-    // ⚡ On appelle Strapi pour récupérer le user associé à l'huissier
+    //On appelle Strapi pour récupérer le user associé à l'huissier
     this.adminService.getUserByEmail(huissier.emailProfessionnel).subscribe({
       next: (user) => {
         this.selectedUser = user;
@@ -125,7 +125,7 @@ export class Huissier implements OnInit {
     this.selectedUser = null;
   }
 
-  // 🆕 Mise à jour après création d'utilisateur
+  // Mise à jour après création d'utilisateur
   onUserCreated(user: any) {
     console.log('Utilisateur Strapi créé:', user);
     this.selectedUser = user;
@@ -134,4 +134,19 @@ export class Huissier implements OnInit {
       this.userStatusMap.set(this.selectedHuissier.emailProfessionnel, true);
     }
   }
+
+  // Méthode pour obtenir le nombre de huisiers inscrits
+getRegisteredCount(): number {
+  return this.huisier.filter(huisier => 
+    this.isUserRegistered(huisier.emailProfessionnel)
+  ).length;
+}
+
+// Méthode pour obtenir le nombre de huisiers non-inscrits
+getNonRegisteredCount(): number {
+  return this.huisier.filter(huisier => 
+    !this.isUserRegistered(huisier.emailProfessionnel)
+  ).length;
+}
+
 }

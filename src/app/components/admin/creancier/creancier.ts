@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule} from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
-import { DebtCase, CaseStatus, Priority, CaseFilter, CreditorDetail } from '../../../models/case.model';
+import { CreditorDetail } from '../../../models/case.model';
 import { AdminService } from '../../../services/admin.service';
 import { UserCreateComponent } from '../user-create/user-create.component';
 
@@ -23,7 +23,7 @@ export class Creancier implements OnInit {
   creditors: CreditorDetail[] = [];
   filteredCreditors: CreditorDetail[] = [];
 
-  // 🆕 Map pour stocker le statut d'inscription de chaque créancier
+  // Map pour stocker le statut d'inscription de chaque créancier
   userStatusMap: Map<string, boolean> = new Map();
   
   // Gestion des filtres
@@ -49,14 +49,14 @@ export class Creancier implements OnInit {
       next: (data: CreditorDetail[]) => {
         this.creditors = data;
         this.filteredCreditors = [...this.creditors];
-        // 🆕 Charger le statut d'inscription pour chaque créancier
+        // Charger le statut d'inscription pour chaque créancier
         this.loadUserStatuses();
       },
       error: (err) => console.error(err)
     });
   }
 
-  // 🆕 Charge le statut d'inscription pour tous les créanciers
+  // Charge le statut d'inscription pour tous les créanciers
   loadUserStatuses() {
     this.creditors.forEach(creditor => {
       this.adminService.getUserByEmail(creditor.emailProfessionnel).subscribe({
@@ -72,7 +72,7 @@ export class Creancier implements OnInit {
     });
   }
 
-  // 🆕 Vérifie si un créancier est inscrit sur Strapi
+  // Vérifie si un créancier est inscrit sur Strapi
   isUserRegistered(email: string): boolean {
     return this.userStatusMap.get(email) || false;
   }
@@ -96,12 +96,12 @@ export class Creancier implements OnInit {
     this.filteredCreditors = [...this.creditors];
   }
   
-  // --- Gestion du tiroir ---
+  // Gestion du tiroir 
   openDrawer(creditor: CreditorDetail) {
     this.selectedCreditor = creditor;
     this.showDrawer = true;
 
-    // ⚡ On appelle Strapi pour récupérer le user associé au créancier
+    //On appelle Strapi pour récupérer le user associé au créancier
     this.adminService.getUserByEmail(creditor.emailProfessionnel).subscribe({
       next: (user) => {
         this.selectedUser = user;
@@ -119,7 +119,7 @@ export class Creancier implements OnInit {
     this.selectedUser = null;
   }
 
-  // 🆕 Mise à jour après création d'utilisateur
+  // Mise à jour après création d'utilisateur
   onUserCreated(user: any) {
     console.log('Utilisateur Strapi créé:', user);
     this.selectedUser = user;
@@ -128,4 +128,20 @@ export class Creancier implements OnInit {
       this.userStatusMap.set(this.selectedCreditor.emailProfessionnel, true);
     }
   }
+
+
+// Méthode pour obtenir le nombre de créanciers inscrits
+getRegisteredCount(): number {
+  return this.creditors.filter(creditor => 
+    this.isUserRegistered(creditor.emailProfessionnel)
+  ).length;
+}
+
+// Méthode pour obtenir le nombre de créanciers non-inscrits
+getNonRegisteredCount(): number {
+  return this.creditors.filter(creditor => 
+    !this.isUserRegistered(creditor.emailProfessionnel)
+  ).length;
+}
+
 }
