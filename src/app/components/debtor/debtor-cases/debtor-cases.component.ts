@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CaseService } from '../../../services/case.service';
 import { I18nService } from '../../../services/i18n.service';
-import { DebtCase, CaseStatus, Priority, ActivityType, PaymentProposal, CaseFilter  } from '../../../models/case.model';
+import { DebtCase, ActivityType, PaymentProposal  } from '../../../models/case.model';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { AuthService } from '../../../services/auth.service';
 import { RouterModule } from '@angular/router';
@@ -49,9 +49,8 @@ export class DebtorCasesComponent implements OnInit {
 
   currentView: 'grid' | 'table' = 'table';
   // tiroir variale start
-  // selectedDetailCase: DebtCase | null = null; // Case selected for details
   selectedDetailCase: any;
-  showCaseDetailsModal = false; // Control whether the drawer is shown
+  showCaseDetailsModal = false; 
 
   // tiroir variale end
 
@@ -80,9 +79,10 @@ export class DebtorCasesComponent implements OnInit {
     startDate: '',
     notes: ''
   };
-   isSubmittingDispute = false;
 
-     // Ajout start
+  isSubmittingDispute = false;
+
+  // Ajout start
   cases: DebtCase[] = [];
   allDocuments: (CaseDocument & { caseId: string })[] = [];
   filteredDocuments: (CaseDocument & { caseId: string })[] = [];
@@ -112,13 +112,12 @@ export class DebtorCasesComponent implements OnInit {
   isLoadingDocument = false;
   safePdfUrl: SafeResourceUrl | null = null;
 
-  // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
+  // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du créancier (importer depuis AdminService)
   creditors: CreditorDetail[] = [];
   filteredCreditors: CreditorDetail[] = [];
-
   selectedcreditor: CreditorDetail | undefined;
 
-   selectedIndex: number | null = null;
+  selectedIndex: number | null = null;
   // showCaseDetailsModal = false;
 
   showReminderHistoryModal = false;
@@ -166,15 +165,15 @@ export class DebtorCasesComponent implements OnInit {
       return;
     }
 
-    // Appel du web service pour la recuperation des dossiers du debiteur
+    // Appel du web service pour la récupération des dossiers du débiteur
     this.casesService.getDossiersDebiteur(siteName, debiteurNodeId).subscribe({
       next: (response) => {
         console.log('Réponse API dossiers :', response);
         this.dossiers = response.data?.map((item: any) => item.map) || [];
         this.filteredDossiers = [...this.dossiers];
 
-      // IMPORTANT: Extraire les documents après avoir chargé les dossiers
-      this.extractDocuments();
+        // Extraction des documents après avoir chargé les dossiers
+        this.extractDocuments();
 
         this.isLoading = false;
       },
@@ -185,7 +184,7 @@ export class DebtorCasesComponent implements OnInit {
       }
     });
 
-    // Appel du web service pour la recuperation des données(extraction du lastname,firstname,email,telephone et type) du creancier 
+    // Appel du web service pour la récupération des données(extraction du lastname,firstname,email,telephone et type) du créancier 
     this.adminService.getCreanciers(siteName).subscribe({
       next: (data: CreditorDetail[]) => {
         this.creditors = data;
@@ -211,6 +210,7 @@ export class DebtorCasesComponent implements OnInit {
     return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
   }
 
+  // Intégration de I18nService
   private loadTranslations() {
     const locale = this.i18nService.getCurrentLocale();
     this.i18nService.loadTranslations(locale).subscribe(translations => {
@@ -266,36 +266,15 @@ export class DebtorCasesComponent implements OnInit {
     }
   }
 
-  // getPriorityLabel(priority: string): string {
-  //   const labels: { [key: string]: string } = {
-  //     'low': 'Faible',
-  //     'medium': 'Moyenne',
-  //     'high': 'Élevée',
-  //     'urgent': 'Urgente'
-  //   };
-  //   return labels[priority] || priority;
-  // }
-
   viewCaseDetails(index: number): void {
     this.selectedIndex = index;
     const dossier = this.filteredDossiers[index];
     this.selectedcreditor = this.getCreancierForDossier(dossier);
     this.showCaseDetailsModal = true;
   }
-   downloadCaseReport(case_: DebtCase) {
-    console.log('Télécharger rapport pour:', case_.caseNumber);
-  }
 
-  // Réinitialiser tous les filtres
-  resetFilters(): void {
-    this.filters = {
-      searchTerm: '',
-      status: '',
-      priority: ''
-    };
-    this.selectedStatus = '';
-    this.selectedPriority = '';
-    this.filteredDossiers = [...this.dossiers];
+  downloadCaseReport(case_: DebtCase) {
+    console.log('Télécharger rapport pour:', case_.caseNumber);
   }
 
   // Appliquer les filtres (recherche, statut, priorité)
@@ -311,13 +290,24 @@ export class DebtorCasesComponent implements OnInit {
         dossier.objet?.toLowerCase().includes(term) ||
         dossier.nomDebiteur?.toLowerCase().includes(term);
 
-      // const matchesStatus = !status || dossier.stepGlobal === status;
       const matchesStatus =!status ||dossier.stepGlobal === status ||
       this.getStatusLabel(dossier.stepGlobal).toLowerCase() === this.getStatusLabel(status).toLowerCase();
       const matchesPriority = !priority || dossier.priority === priority;
 
       return matchesTerm && matchesStatus && matchesPriority;
     });
+  }
+
+  // Réinitialiser tous les filtres
+  resetFilters(): void {
+    this.filters = {
+      searchTerm: '',
+      status: '',
+      priority: ''
+    };
+    this.selectedStatus = '';
+    this.selectedPriority = '';
+    this.filteredDossiers = [...this.dossiers];
   }
 
   // Lorsqu’on change le filtre de statut
@@ -332,19 +322,24 @@ export class DebtorCasesComponent implements OnInit {
     this.applyFilters();
   }
 
+  // Fonction du pourcentage de payement
   getPaymentPercentage(dossier: any): number {
     const total = dossier.montantTotal || 0;
     const paid = dossier.montantPaye || 0;
     return total ? Math.round((paid / total) * 100) : 0;
   }
 
+  // Fonction de la somme total 
   getTotalDebt(): number {
     return this.filteredDossiers.reduce((acc, d) => acc + (d.montantTotal || 0), 0);
   }
 
+  // Fonction de la somme total à payé
   getTotalPaid(): number {
     return this.filteredDossiers.reduce((acc, d) => acc + (d.montantPaye || 0), 0);
   }
+
+  // Fonction du reste à payé
   getFormattedRemainingAmount(dossier: any): string {
     const reste = (dossier.montantTotal || 0) - (dossier.montantPaye || 0);
     return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'XOF' });
@@ -358,6 +353,7 @@ export class DebtorCasesComponent implements OnInit {
     };
     return labels[type] || type;
   }
+
   getReminderHistory(case_: DebtCase) {
     return case_.history.filter(activity => 
       activity.type === ActivityType.REMINDER_SENT || 
@@ -373,6 +369,7 @@ export class DebtorCasesComponent implements OnInit {
     };
     return classes[type] || 'email';
   }
+
   getReminderTypeLabel(type: string): string {
     const labels: { [key: string]: string } = {
       [ActivityType.REMINDER_SENT]: 'Relance',
@@ -381,6 +378,7 @@ export class DebtorCasesComponent implements OnInit {
     };
     return labels[type] || 'Communication';
   }
+
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('fr-FR', {
       year: 'numeric',
@@ -388,11 +386,13 @@ export class DebtorCasesComponent implements OnInit {
       day: 'numeric'
     });
   }
+
   makePayment(case_: DebtCase) {
     this.selectedCase = case_;
     this.paymentAmount = 0;
     this.showPaymentModal = true;
   }
+
   proposePaymentPlan(case_: DebtCase) {
     this.selectedCase = case_;
     this.paymentPlanProposal = {
@@ -403,11 +403,13 @@ export class DebtorCasesComponent implements OnInit {
     };
     this.showPaymentPlanModal = true;
   }
+
   getTomorrowDate(): string {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split('T')[0];
   }
+
   fileDispute(case_: DebtCase) {
     this.selectedCase = case_;
     this.disputeForm = {
@@ -422,78 +424,44 @@ export class DebtorCasesComponent implements OnInit {
     description: '',
     attachments: [] as File[]
   };
-   closePaymentModal() {
+
+  closePaymentModal() {
     this.showPaymentModal = false;
     this.selectedCase = null;
     this.paymentAmount = 0;
     this.isProcessingPayment = false;
   }
-   setPaymentAmount(amount: number) {
+
+  setPaymentAmount(amount: number) {
     this.paymentAmount = Math.round(amount * 100) / 100;
   }
-     processPayment() {
-    // if (!this.selectedCase || this.paymentAmount <= 0) return;
+  processPayment() {
 
-    // this.isProcessingPayment = true;
-
-    // this.casesService.createPayment(this.selectedCase.id, this.paymentAmount)
-    //   .subscribe({
-    //     next: (updatedCase) => {
-    //       const caseIndex = this.userCases.findIndex(c => c.id === updatedCase.id);
-    //       if (caseIndex >= 0) {
-    //         this.userCases[caseIndex] = updatedCase;
-    //       }
-    //       this.closePaymentModal();
-    //     },
-    //     error: (error) => {
-    //       console.error('Erreur lors du paiement:', error);
-    //       this.isProcessingPayment = false;
-    //     }
-    //   });
   }
-   closePaymentPlanModal() {
+
+  closePaymentPlanModal() {
     this.showPaymentPlanModal = false;
     this.selectedCase = null;
   }
-   calculatePaymentPlan() {
+
+  calculatePaymentPlan() {
     if (this.paymentPlanProposal.monthlyAmount > 0 && this.selectedCase) {
       const remainingAmount = this.selectedCase.amount - this.selectedCase.amountPaid;
       this.paymentPlanProposal.duration = Math.ceil(remainingAmount / this.paymentPlanProposal.monthlyAmount);
     }
   }
-   submitPaymentPlan() {
-    if (!this.selectedCase || !this.isPaymentPlanValid()) return;
 
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
-
-    const proposal: Omit<PaymentProposal, 'id' | 'createdAt'> = {
-      caseId: this.selectedCase.id,
-      proposedBy: currentUser.id,
-      totalAmount: this.selectedCase.amount - this.selectedCase.amountPaid,
-      monthlyAmount: this.paymentPlanProposal.monthlyAmount,
-      duration: this.paymentPlanProposal.duration,
-      startDate: new Date(this.paymentPlanProposal.startDate),
-      status: 'pending',
-      notes: this.paymentPlanProposal.notes
-    };
-
-    // this.casesService.createPaymentProposal(proposal)
-    //   .subscribe({
-    //     next: () => {
-    //       this.closePaymentPlanModal();
-    //     },
-    //     error: (error) => {
-    //       console.error('Erreur lors de la soumission:', error);
-    //     }
-    //   });
+  submitPaymentPlan() {
+  
   }
-   isPaymentPlanValid(): boolean {
+
+  isPaymentPlanValid(): boolean {
     return this.paymentPlanProposal.monthlyAmount > 0 &&
-           this.paymentPlanProposal.duration > 0 &&
-           this.paymentPlanProposal.startDate !== '' &&
-           this.paymentPlanProposal.notes.trim() !== '';
+    this.paymentPlanProposal.duration > 0 &&
+    this.paymentPlanProposal.startDate !== '' &&
+    this.paymentPlanProposal.notes.trim() !== '';
   }
+
   closeDisputeModal() {
     this.showDisputeModal = false;
     this.selectedCase = null;
@@ -503,58 +471,55 @@ export class DebtorCasesComponent implements OnInit {
       attachments: []
     };
   }
-   onFileSelected(event: any) {
-    const files = Array.from(event.target.files) as File[];
-    files.forEach(file => {
-      if (file.size <= 10 * 1024 * 1024) { // 10MB max
-        this.disputeForm.attachments.push(file);
-      }
+
+  // onFileSelected(event: any) {
+  //   const files = Array.from(event.target.files) as File[];
+  //   files.forEach(file => {
+  //     if (file.size <= 10 * 1024 * 1024) { // 10MB max
+  //       this.disputeForm.attachments.push(file);
+  //     }
+  //   });
+  // }
+
+  onFileSelected(event: any) {
+  const file = event.target.files[0];
+  if (file) {
+    this.selectedFile = file;
+    console.log('📄 Fichier sélectionné:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      extension: file.name.split('.').pop()
     });
+    
+    if (!this.newDocument.name) {
+      this.newDocument.name = file.name;
+    }
   }
-   formatFileSize(bytes: number): string {
+  }
+
+  formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
+
   removeFile(index: number) {
     this.disputeForm.attachments.splice(index, 1);
   }
+
   submitDispute() {
-    if (!this.selectedCase || !this.isDisputeValid()) return;
-
-    this.isSubmittingDispute = true;
-
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) return;
-
-    // Simulation de l'envoi de contestation
-    const disputeNote = {
-      caseId: this.selectedCase.id,
-      content: `Contestation déposée - Motif: ${this.disputeForm.reason} - Description: ${this.disputeForm.description}`,
-      type: 'legal' as const,
-      createdBy: currentUser.id,
-      createdByName: `${currentUser.firstname} ${currentUser.lastname}`,
-      isPrivate: false
-    };
-
-    // this.casesService.addCaseNote(disputeNote).subscribe({
-    //   next: () => {
-    //     this.isSubmittingDispute = false;
-    //     this.closeDisputeModal();
-    //   },
-    //   error: (error) => {
-    //     console.error('Erreur lors de la contestation:', error);
-    //     this.isSubmittingDispute = false;
-    //   }
-    // });
+  
   }
-   isDisputeValid(): boolean {
+
+  isDisputeValid(): boolean {
     return this.disputeForm.reason !== '' && 
-           this.disputeForm.description.trim() !== '';
+    this.disputeForm.description.trim() !== '';
   }
-   getPenaltyTypeLabel(type: string): string {
+
+  getPenaltyTypeLabel(type: string): string {
     const labels: { [key: string]: string } = {
       'late_payment': 'Pénalité de retard',
       'breach': 'Pénalité de rupture',
@@ -564,99 +529,98 @@ export class DebtorCasesComponent implements OnInit {
   }
   
   calculateTotalInterests(dossier: any): number {
-  // Tu peux adapter cette logique selon ta structure de données
   // Pour l'instant, retourne 0 ou calcule depuis les données du dossier
   return dossier.montantInterets || 0;
-}
-
-calculateTotalPenalties(dossier: any): number {
-  // Calcul des pénalités totales
-  return dossier.montantPenalites || 0;
-}
-
-calculateTotalFees(dossier: any): number {
-  // Calcul des frais (dossier, juridiques, etc.)
-  return dossier.montantFrais || 0;
-}
-
-
-calculateTotalDue(dossier: any): number {
-  // Montant total à payer = Principal + Intérêts + Pénalités + Frais
-  const principal = dossier.montantTotal || 0;
-  const interests = this.calculateTotalInterests(dossier);
-  const penalties = this.calculateTotalPenalties(dossier);
-  const fees = this.calculateTotalFees(dossier);
-  
-  return principal + interests + penalties + fees;
-}
-
-// Méthode pour calculer le reste à payer (inclut tout : intérêts, pénalités, frais)
-calculateRemainingAmount(dossier: any): number {
-  const totalDue = this.calculateTotalDue(dossier);
-  const paid = dossier.montantPaye || 0;
-  return totalDue - paid;
-}
-
-// Version formatée du reste à payer (utilise celle-ci dans ton template)
-getFormattedRemainingAmountWithDetails(dossier: any): string {
-  const remaining = this.calculateRemainingAmount(dossier);
-  return this.formatCurrency(remaining);
-}
-
-
-// Méthode pour obtenir le détail des intérêts
-getInterestsDetail(dossier: any): InterestDetail[] {
-  const totalInterests = dossier.montantInterets || 0;
-  
-  // Si ton backend envoie des détails, utilise-les
-  // Sinon, voici une répartition par défaut (à adapter selon tes besoins)
-  if (dossier.detailInterets && Array.isArray(dossier.detailInterets)) {
-    return dossier.detailInterets;
   }
-  
-  // Répartition par défaut (tu peux ajuster les pourcentages)
-  const details: InterestDetail[] = [];
-  
-  if (totalInterests > 0) {
-    // Exemple : 40% intérêts légaux, 60% intérêts de retard
-    details.push({
-      type: 'Intérêts légaux',
-      rate: 3.5, // Taux légal en %
-      amount: totalInterests * 0.4
-    });
+
+  calculateTotalPenalties(dossier: any): number {
+    // Calcul des pénalités totales
+    return dossier.montantPenalites || 0;
+  }
+
+  calculateTotalFees(dossier: any): number {
+    // Calcul des frais (dossier, juridiques, etc.)
+    return dossier.montantFrais || 0;
+  }
+
+
+  calculateTotalDue(dossier: any): number {
+    // Montant total à payer = Principal + Intérêts + Pénalités + Frais
+    const principal = dossier.montantTotal || 0;
+    const interests = this.calculateTotalInterests(dossier);
+    const penalties = this.calculateTotalPenalties(dossier);
+    const fees = this.calculateTotalFees(dossier);
     
-    details.push({
-      type: 'Intérêts de retard',
-      rate: 10, // Taux contractuel en %
-      amount: totalInterests * 0.6
-    });
+    return principal + interests + penalties + fees;
   }
-  
-  return details;
-}
 
-// Méthode pour obtenir le détail des pénalités
-getPenaltiesDetail(dossier: any): PenaltyDetail[] {
-  const totalPenalties = dossier.montantPenalites || 0;
-  
-  // Si ton backend envoie des détails
-  if (dossier.detailPenalites && Array.isArray(dossier.detailPenalites)) {
-    return dossier.detailPenalites;
+  // Méthode pour calculer le reste à payer (inclut tout : intérêts, pénalités, frais)
+  calculateRemainingAmount(dossier: any): number {
+    const totalDue = this.calculateTotalDue(dossier);
+    const paid = dossier.montantPaye || 0;
+    return totalDue - paid;
   }
-  
-  // Sinon, crée un détail par défaut
-  const details: PenaltyDetail[] = [];
-  
-  if (totalPenalties > 0) {
-    details.push({
-      type: 'Pénalité de retard',
-      date: dossier.dateEcheance || dossier.dateCreation,
-      amount: totalPenalties
-    });
+
+  // Version formatée du reste à payer (utilise celle-ci dans ton template)
+  getFormattedRemainingAmountWithDetails(dossier: any): string {
+    const remaining = this.calculateRemainingAmount(dossier);
+    return this.formatCurrency(remaining);
   }
-  
-  return details;
-}
+
+
+  // Méthode pour obtenir le détail des intérêts
+  getInterestsDetail(dossier: any): InterestDetail[] {
+    const totalInterests = dossier.montantInterets || 0;
+    
+    // Si le backend envoie des détails, utilise-les
+    // Sinon, voici une répartition par défaut (à adapter selon tes besoins)
+    if (dossier.detailInterets && Array.isArray(dossier.detailInterets)) {
+      return dossier.detailInterets;
+    }
+    
+    // Répartition par défaut (tu peux ajuster les pourcentages)
+    const details: InterestDetail[] = [];
+    
+    if (totalInterests > 0) {
+      // Exemple : 40% intérêts légaux, 60% intérêts de retard
+      details.push({
+        type: 'Intérêts légaux',
+        rate: 3.5, // Taux légal en %
+        amount: totalInterests * 0.4
+      });
+      
+      details.push({
+        type: 'Intérêts de retard',
+        rate: 10, // Taux contractuel en %
+        amount: totalInterests * 0.6
+      });
+    }
+    
+    return details;
+  }
+
+  // Méthode pour obtenir le détail des pénalités
+  getPenaltiesDetail(dossier: any): PenaltyDetail[] {
+    const totalPenalties = dossier.montantPenalites || 0;
+    
+    // Si le backend envoie des détails
+    if (dossier.detailPenalites && Array.isArray(dossier.detailPenalites)) {
+      return dossier.detailPenalites;
+    }
+    
+    // Sinon, crée un détail par défaut
+    const details: PenaltyDetail[] = [];
+    
+    if (totalPenalties > 0) {
+      details.push({
+        type: 'Pénalité de retard',
+        date: dossier.dateEcheance || dossier.dateCreation,
+        amount: totalPenalties
+      });
+    }
+    
+    return details;
+  }
 
   // Formater la date
   formatDateShort(dateStr: string): string {
@@ -683,7 +647,7 @@ getPenaltiesDetail(dossier: any): PenaltyDetail[] {
 
   // Récupérer l'historique des relances pour un dossier
   getReminderHistoryForDossier(dossier: any): ReminderHistory[] {
-    // Si ton backend envoie un historique
+    // Si le backend envoie un historique
     if (dossier.historiqueRelances && Array.isArray(dossier.historiqueRelances)) {
       return dossier.historiqueRelances;
     }
@@ -737,84 +701,67 @@ getPenaltiesDetail(dossier: any): PenaltyDetail[] {
     return icons[type] || 'email';
   }
 
+   // Méthode améliorée pour la validation
+  isUploadValid(): boolean {
+    return !!(
+      this.selectedDetailCase?.nodeId && 
+      this.newDocument.type && 
+      this.newDocument.name && 
+      this.selectedFile
+    );
+  }
 
-  // Ajout methode start
-  // extractDocuments() {
-  //   this.allDocuments = [];
-    
-  //   console.log('Début extraction des documents...');
-  //   console.log('Nombre de dossiers à traiter:', this.dossiers.length);
-    
-  //   // Parcourir tous les dossiers pour extraire leurs documents
-  //   this.dossiers.forEach(dossier => {
-  //     console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsDebiteur?.myArrayList);
-      
-  //     // Vérifier si le dossier a des documents débiteur
-  //     if (dossier.documentsDebiteur?.myArrayList && Array.isArray(dossier.documentsDebiteur.myArrayList)) {
-  //       dossier.documentsDebiteur.myArrayList.forEach((doc: any) => {
-  //         console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
-          
-  //         const mappedType = this.mapDocumentType(doc.typeDocument);
-  //         console.log('Type mappé:', mappedType);
-          
-  //         this.allDocuments.push({
-  //           id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
-  //           name: doc.fileName || doc.name || 'Document sans nom',
-  //           type: mappedType,
-  //           url: doc.url || doc.downloadUrl || '#',
-  //           uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
-  //           uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
-  //           caseId: dossier.nodeId
-  //         });
-  //       });
-  //     }
-  //   });
-    
-  //   this.filteredDocuments = [...this.allDocuments];
-  //   console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
-  // }
-  extractDocuments() {
-  this.allDocuments = [];
-  
-  console.log('Début extraction des documents...');
-  console.log('Nombre de dossiers à traiter:', this.dossiers.length);
-  
-  // Parcourir tous les dossiers pour extraire leurs documents
-  this.dossiers.forEach(dossier => {
-    console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsDebiteur?.myArrayList);
-    
-    // Vérifier si le dossier a des documents débiteur
-    if (dossier.documentsDebiteur?.myArrayList && Array.isArray(dossier.documentsDebiteur.myArrayList)) {
-      dossier.documentsDebiteur.myArrayList.forEach((doc: any) => {
-        // VÉRIFICATION CRITIQUE : s'assurer que doc n'est pas null
-        if (!doc) {
-          console.log('Document null ignoré');
-          return; // Passer au document suivant
-        }
-        
-        console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
-        
-        const mappedType = this.mapDocumentType(doc.typeDocument);
-        console.log('Type mappé:', mappedType);
-        
-        this.allDocuments.push({
-          id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
-          name: doc.fileName || doc.name || 'Document sans nom',
-          type: mappedType,
-          url: doc.url || doc.downloadUrl || '#',
-          uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
-          uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
-          caseId: dossier.nodeId
-        });
-      });
-    } else {
-      console.log('Aucun document trouvé pour le dossier:', dossier.numeroDossier);
+  // Méthode pour s'assurer qu'un dossier est sélectionné
+  ensureCaseSelected(): boolean {
+    if (!this.selectedDetailCase) {
+      alert('Veuillez d\'abord sélectionner un dossier');
+      return false;
     }
-  });
-  
-  this.filteredDocuments = [...this.allDocuments];
-  console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
-}
+    return true;
+  }
+
+  extractDocuments() {
+    this.allDocuments = [];
+    
+    console.log('Début extraction des documents...');
+    console.log('Nombre de dossiers à traiter:', this.dossiers.length);
+    
+    // Parcourir tous les dossiers pour extraire leurs documents
+    this.dossiers.forEach(dossier => {
+      console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsDebiteur?.myArrayList);
+      
+      // Vérifier si le dossier a des documents débiteur
+      if (dossier.documentsDebiteur?.myArrayList && Array.isArray(dossier.documentsDebiteur.myArrayList)) {
+        dossier.documentsDebiteur.myArrayList.forEach((doc: any) => {
+          // VÉRIFICATION CRITIQUE : s'assurer que doc n'est pas null
+          if (!doc) {
+            console.log('Document null ignoré');
+            return; // Passer au document suivant
+          }
+          
+          console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
+          
+          const mappedType = this.mapDocumentType(doc.typeDocument);
+          console.log('Type mappé:', mappedType);
+          
+          this.allDocuments.push({
+            id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
+            name: doc.fileName || doc.name || 'Document sans nom',
+            type: mappedType,
+            url: doc.url || doc.downloadUrl || '#',
+            uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
+            uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+            caseId: dossier.nodeId
+          });
+        });
+      } else {
+        console.log('Aucun document trouvé pour le dossier:', dossier.numeroDossier);
+      }
+    });
+    
+    this.filteredDocuments = [...this.allDocuments];
+    console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
+  }
 
   mapDocumentType(apiType: string): DocumentType {
     console.log('Mapping du type:', apiType);
@@ -925,43 +872,43 @@ getPenaltiesDetail(dossier: any): PenaltyDetail[] {
     });
   }
 
-// Méthode pour fermer le visualiseur
-closeDocumentViewer() {
-  if (this.currentDocumentUrl) {
-    window.URL.revokeObjectURL(this.currentDocumentUrl);
-  }
-  this.showDocumentViewer = false;
-  this.currentDocumentUrl = null;
-  this.currentDocument = null;
-  this.documentContentType = '';
-}
-
-// Méthode pour télécharger un document
-downloadDocument(doc: any) {
-  console.log('Téléchargement du document:', doc);
-  
-  if (!doc.id) {
-    alert('Identifiant du document manquant');
-    return;
+  // Méthode pour fermer le visualiseur
+  closeDocumentViewer() {
+    if (this.currentDocumentUrl) {
+      window.URL.revokeObjectURL(this.currentDocumentUrl);
+    }
+    this.showDocumentViewer = false;
+    this.currentDocumentUrl = null;
+    this.currentDocument = null;
+    this.documentContentType = '';
   }
 
-  this.caseService.downloadDocument(doc.id, doc.name);
-}
+  // Méthode pour télécharger un document
+  downloadDocument(doc: any) {
+    console.log('Téléchargement du document:', doc);
+    
+    if (!doc.id) {
+      alert('Identifiant du document manquant');
+      return;
+    }
 
-// Méthode pour vérifier si le document est un PDF
-isDocumentPDF(): boolean {
-  return this.documentContentType === 'application/pdf' || 
-         this.currentDocument?.name?.toLowerCase().endsWith('.pdf');
-}
+    this.caseService.downloadDocument(doc.id, doc.name);
+  }
 
-// Méthode pour vérifier si le document est une image
-isDocumentImage(): boolean {
-  return this.documentContentType?.startsWith('image/') ||
+  // Méthode pour vérifier si le document est un PDF
+  isDocumentPDF(): boolean {
+    return this.documentContentType === 'application/pdf' || 
+    this.currentDocument?.name?.toLowerCase().endsWith('.pdf');
+  }
+
+  // Méthode pour vérifier si le document est une image
+  isDocumentImage(): boolean {
+    return this.documentContentType?.startsWith('image/') ||
     /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(this.currentDocument?.name);
-}
+  }
 
-// Méthode pour ouvrir le document dans un nouvel onglet
- openInNewTab() {
+  // Méthode pour ouvrir le document dans un nouvel onglet
+  openInNewTab() {
     if (this.currentDocumentUrl) {
       // Si c’est un SafeResourceUrl, on le convertit
       const url = (this.currentDocumentUrl as any).changingThisBreaksApplicationSecurity || this.currentDocumentUrl;
@@ -969,36 +916,86 @@ isDocumentImage(): boolean {
     }
   }
 
+  // isUploadValid(): boolean {
+  //   return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
+  // }
 
-  isUploadValid(): boolean {
-    return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
-  }
+  // uploadDocument() {
+  //   if (!this.isUploadValid()) return;
 
+  //   const currentUser = this.authService.getCurrentUser();
+  //   if (!currentUser) return;
+
+  //   // Utiliser le dossier sélectionné comme caseId
+  //   const caseId = this.selectedDetailCase?.nodeId || this.newDocument.caseId;
+
+  //   const newDoc: CaseDocument & { caseId: string } = {
+  //     id: Date.now().toString(),
+  //     name: this.newDocument.name,
+  //     type: this.newDocument.type as DocumentType,
+  //     url: '#', // À remplacer par l'URL réelle après upload sur le serveur
+  //     uploadedAt: new Date(),
+  //     uploadedBy: `${currentUser.firstname} ${currentUser.lastname}`,
+  //     caseId: caseId
+  //   };
+
+  //   this.allDocuments.unshift(newDoc);
+  //   this.openDocumentsModal(); // Rafraîchir la liste filtrée
+  //   this.closeUploadModal();
+
+  //   console.log('Document ajouté:', newDoc);
+  // }
   uploadDocument() {
-  if (!this.isUploadValid()) return;
+  if (!this.isUploadValid() || this.isLoading) return;
 
-  const currentUser = this.authService.getCurrentUser();
-  if (!currentUser) return;
+  this.isLoading = true;
 
-  // Utiliser le dossier sélectionné comme caseId
-  const caseId = this.selectedDetailCase?.nodeId || this.newDocument.caseId;
+  const formData = new FormData();
+  formData.append('filedata', this.selectedFile!);
 
-  const newDoc: CaseDocument & { caseId: string } = {
-    id: Date.now().toString(),
-    name: this.newDocument.name,
-    type: this.newDocument.type as DocumentType,
-    url: '#', // À remplacer par l'URL réelle après upload sur le serveur
-    uploadedAt: new Date(),
-    uploadedBy: `${currentUser.firstname} ${currentUser.lastname}`,
-    caseId: caseId
+  const params = {
+    objetNodeId: this.selectedDetailCase.nodeId,
+    fieldName: 'documentsDebiteur', 
+    typeDocument: this.newDocument.type
   };
 
-  this.allDocuments.unshift(newDoc);
-  this.openDocumentsModal(); // Rafraîchir la liste filtrée
-  this.closeUploadModal();
+  // 🔥 SAUVEGARDER le nom original AVANT l'upload
+  const originalFileName = this.selectedFile!.name;
 
-  console.log('Document ajouté:', newDoc);
-}
+  this.casesService.uploadDocument(formData, params).subscribe({
+    next: (response) => {
+      this.isLoading = false;
+      console.log('✅ Document uploadé:', response);
+
+      const uploadedFile = response.files[0];
+      
+      // 🔥 FORCER le nom original peu importe ce que retourne Alfresco
+      const newDoc: CaseDocument & { caseId: string } = {
+        id: uploadedFile.documentNodeId,
+        name: originalFileName, // 🔥 TOUJOURS le nom original du fichier
+        type: this.mapDocumentType(uploadedFile.typeDocument),
+        url: '#',
+        uploadedAt: new Date(),
+        uploadedBy: 'Utilisateur actuel',
+        caseId: this.selectedDetailCase.nodeId,
+        // originalData: uploadedFile
+      };
+
+      this.allDocuments.push(newDoc);
+      this.filteredDocuments.push(newDoc);
+      
+      this.closeUploadModal();
+      this.filterDocuments();
+      alert('Document ajouté avec succès!');
+    },
+    error: (error) => {
+      this.isLoading = false;
+      console.error('Erreur lors de l\'upload:', error);
+      alert('Erreur lors de l\'upload du document. Veuillez réessayer.');
+    }
+  });
+  }
+  
 
   deleteDocument(doc: CaseDocument) {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {

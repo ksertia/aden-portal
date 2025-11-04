@@ -54,7 +54,6 @@ export class CaseService {
   }
 
 
-
   // Récupération du contenu d'un document (pour visualisation)
   getDocumentContent(nodeId: string): Observable<Blob> {
     return this.http.get(`${this.documentApiUrl}/${nodeId}/content`, {
@@ -81,6 +80,24 @@ export class CaseService {
       error: (error) => {
         console.error('Erreur lors du téléchargement:', error);
       }
+    });
+  }
+
+ // Upload d'un document
+  // uploadDocument(formData: FormData, params: any): Observable<any> {
+  //   return this.http.post(`${this.documentApiUrl}/upload`, formData, {
+  //     params: params,
+  //     headers: {
+  //     }
+  //   });
+  // }
+
+  // Dans case.service.ts
+  uploadDocument(formData: FormData, params: any): Observable<any> {
+    console.log('Envoi du fichier avec params:', params);
+    
+    return this.http.post(`${this.documentApiUrl}/upload`, formData, {
+      params: params
     });
   }
 

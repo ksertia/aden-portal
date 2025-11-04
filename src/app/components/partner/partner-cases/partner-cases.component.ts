@@ -128,6 +128,8 @@ export class PartnerCasesComponent implements OnInit {
         // Étape 1 : extraction correcte du tableau de dossiers
         const dossiers = response.data?.map((item: any) => item.map) || [];
 
+        console.log('🔍 STRUCTURE COMPLÈTE DU DOSSIER:', JSON.stringify(this.dossiers[0], null, 2));
+
         // Étape 2 : filtrage local
         this.dossiers = dossiers.filter(
           (d: any) => d.partenaireNodeId === partenaireNodeId
@@ -463,34 +465,95 @@ export class PartnerCasesComponent implements OnInit {
     };
     return labels[type] || type;
   }
+
   onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-      if (!this.newDocument.name) {
-        this.newDocument.name = file.name;
-      }
+  const file = event.target.files[0];
+  if (file) {
+    this.selectedFile = file;
+    console.log('📄 Fichier sélectionné:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      extension: file.name.split('.').pop()
+    });
+    
+    if (!this.newDocument.name) {
+      this.newDocument.name = file.name;
     }
   }
+  }
 
+  // Méthode améliorée pour la validation
   isUploadValid(): boolean {
-    return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
+    return !!(
+      this.selectedDetailCase?.nodeId && 
+      this.newDocument.type && 
+      this.newDocument.name && 
+      this.selectedFile
+    );
+  }
+
+  // Méthode pour s'assurer qu'un dossier est sélectionné
+  ensureCaseSelected(): boolean {
+    if (!this.selectedDetailCase) {
+      alert('Veuillez d\'abord sélectionner un dossier');
+      return false;
+    }
+    return true;
   }
 
   uploadDocument() {
+  if (!this.isUploadValid() || this.isLoading) return;
 
-    if (!this.isUploadValid()) {
-      alert('Veuillez remplir tous les champs obligatoires');
-      return;
+  this.isLoading = true;
+
+  const formData = new FormData();
+  formData.append('filedata', this.selectedFile!);
+
+  const params = {
+    objetNodeId: this.selectedDetailCase.nodeId,
+    fieldName: 'documentsPartenaire', 
+    typeDocument: this.newDocument.type
+  };
+
+  // 🔥 SAUVEGARDER le nom original AVANT l'upload
+  const originalFileName = this.selectedFile!.name;
+
+  this.casesService.uploadDocument(formData, params).subscribe({
+    next: (response) => {
+      this.isLoading = false;
+      console.log('✅ Document uploadé:', response);
+
+      const uploadedFile = response.files[0];
+      
+      // 🔥 FORCER le nom original peu importe ce que retourne Alfresco
+      const newDoc: CaseDocument & { caseId: string } = {
+        id: uploadedFile.documentNodeId,
+        name: originalFileName, // 🔥 TOUJOURS le nom original du fichier
+        type: this.mapDocumentType(uploadedFile.typeDocument),
+        url: '#',
+        uploadedAt: new Date(),
+        uploadedBy: 'Utilisateur actuel',
+        caseId: this.selectedDetailCase.nodeId,
+        // originalData: uploadedFile
+      };
+
+      this.allDocuments.push(newDoc);
+      this.filteredDocuments.push(newDoc);
+      
+      this.closeUploadModal();
+      this.filterDocuments();
+      alert('Document ajouté avec succès!');
+    },
+    error: (error) => {
+      this.isLoading = false;
+      console.error('Erreur lors de l\'upload:', error);
+      alert('Erreur lors de l\'upload du document. Veuillez réessayer.');
     }
+  });
+}
 
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) {
-      alert('Utilisateur non connecté');
-      return;
-    }
 
-  }
 
   deleteDocument(doc: CaseDocument) {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
