@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 
 @Component({
@@ -18,7 +20,7 @@ export class ResetPassword {
   showNewPassword = false;
   showConfirmPassword = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.resetForm = this.fb.group({
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
@@ -26,11 +28,8 @@ export class ResetPassword {
   }
 
   togglePasswordVisibility(field: string): void {
-    if (field === 'newPassword') {
-      this.showNewPassword = !this.showNewPassword;
-    } else if (field === 'confirmPassword') {
-      this.showConfirmPassword = !this.showConfirmPassword;
-    }
+    if (field === 'newPassword') this.showNewPassword = !this.showNewPassword;
+    else if (field === 'confirmPassword') this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   onSubmit(): void {
@@ -46,12 +45,17 @@ export class ResetPassword {
     this.errorMessage = '';
     this.successMessage = '';
 
-    // Simulation d’appel backend
-    setTimeout(() => {
-      this.isSubmitting = false;
-      this.successMessage = 'Mot de passe réinitialisé avec succès !';
-      this.resetForm.reset();
-    }, 1500);
+    this.authService.resetPassword(newPassword, confirmPassword).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.successMessage = 'Mot de passe réinitialisé avec succès !';
+        this.resetForm.reset();
+        setTimeout(() => this.router.navigate(['/login']), 1500);
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        this.errorMessage = err?.error?.message || 'Erreur lors de la réinitialisation du mot de passe';
+      }
+    });
   }
-
 }

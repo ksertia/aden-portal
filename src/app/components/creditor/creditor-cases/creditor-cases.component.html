@@ -574,16 +574,6 @@
           </div>
           <div class="modal-body">
           <div class="upload-form">
-              <!-- <div class="form-group">
-                  <label>Dossier associé</label>
-                  <select [(ngModel)]="newDocument.caseId" required>
-                      <option value="">Sélectionner un dossier</option>
-                      <option *ngFor="let case of cases" [value]="case.id">
-                      {{ case.caseNumber }} - {{ case.debtor.firstName }} {{ case.debtor.lastName }}
-                      </option>
-                  </select>
-              </div> -->
-              
               <div class="form-group">
               <label>Type de document</label>
               <select [(ngModel)]="newDocument.type" required>
@@ -603,10 +593,8 @@
                   type="text"
                   [(ngModel)]="newDocument.name"
                   placeholder="Nom du fichier"
-                  required
-                  
+                  required   
               >
-              <!-- (input)="logFormState()" -->
               </div>
               
               <div class="form-group">
@@ -626,7 +614,7 @@
           </div>
           </div>
           <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="closeUploadModal()">Annuler</button>
+          <button class="btn btn-secondary" (click)="closeUploadModal()" [disabled]="isLoading">Annuler</button>
           <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="!isUploadValid() || isLoading">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -634,7 +622,7 @@
               <line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
             <span *ngIf="isLoading" class="spinner"></span>
-            {{ isLoading ? 'Envoi en cours...' : 'Ajouter le document' }}
+             {{ isLoading ? 'Envoi en cours...' : 'Ajouter le document' }}
           </button>
           </div>
       </div>
