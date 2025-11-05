@@ -1,0 +1,51 @@
+<div class="login-container">
+  <div class="login-card fade-in-up">
+    <div class="login-header">
+      <div class="logo">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2v6l3-3 3 3"/>
+          <path d="M12 8v8"/>
+          <path d="m8 14 4 4 4-4"/>
+        </svg>
+      </div>
+      <h1>RecouvrePro</h1>
+      <p>Vérification du code</p>
+    </div>
+
+    <form [formGroup]="codeForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="code">Code de vérification</label>
+        <input
+          type="text"
+          id="code"
+          formControlName="code"
+          placeholder="Entrez le code reçu par email"
+          maxlength="6"
+          required
+          [disabled]="isSubmitting"
+        >
+      </div>
+
+      <button type="submit" class="login-btn" [disabled]="codeForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Vérification en cours...' : 'Vérifier le code' }}
+      </button>
+
+      <div *ngIf="successMessage" class="success-message">
+        <p>{{ successMessage }}</p>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="15" y1="9" x2="9" y2="15"/>
+          <line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+        {{ errorMessage }}
+      </div>
+
+      <div class="back-to-login">
+        <a routerLink="/login">← Retour à la connexion</a>
+      </div>
+    </form>
+  </div>
+</div>
