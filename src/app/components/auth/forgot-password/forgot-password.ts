@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -12,11 +13,11 @@ import { Router } from '@angular/router';
 export class ForgotPassword {
   forgotForm: FormGroup;
   isSubmitting = false;
-  emailSent = false;
+  emailSent = false; 
   successMessage = '';
   errorMessage = '';
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.forgotForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
@@ -29,19 +30,19 @@ export class ForgotPassword {
     this.errorMessage = '';
     this.successMessage = '';
 
-    // Simulation d’un appel API
-    setTimeout(() => {
-      this.isSubmitting = false;
-      const email = this.forgotForm.value.email;
-
-      if (email === 'test@example.com') {
-        this.emailSent = true;
-        this.successMessage = 'Un lien de réinitialisation a été envoyé à votre adresse e-mail.';
-        setTimeout(() => this.router.navigate(['/reset-password']), 3000);
-      } else {
-        this.errorMessage = 'Aucun compte associé à cette adresse e-mail.';
+    const email = this.forgotForm.value.email;
+    this.authService.forgotPassword(email).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.successMessage = 'Un email de réinitialisation a été envoyé si le compte existe.';
+        // Redirige vers la page de saisie du code
+        setTimeout(() => this.router.navigate(['/reset-code']), 2000);
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        this.errorMessage = err?.error?.message || 'Erreur lors de la demande de réinitialisation';
       }
-    }, 2000);
+    });
   }
 
 }

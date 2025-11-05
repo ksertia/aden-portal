@@ -137,6 +137,8 @@ export class BailiffCasesComponent implements OnInit {
         // IMPORTANT: Extraire les documents après avoir chargé les dossiers
         this.extractDocuments();
 
+        this.uploadDocument();
+
         this.isLoading = false;
       },
       error: (error) => {
@@ -280,17 +282,6 @@ export class BailiffCasesComponent implements OnInit {
     }
   }
 
-  // getPriorityLabel(priority: string): string {
-  //   const labels: { [key: string]: string } = {
-  //     'FAIBLE': 'Faible',
-  //     'MOYENNE': 'Moyenne',
-  //     'Élevée': 'Élevée',
-  //     // 'HAUTE': 'Élevée',
-  //     'urgent': 'Urgente'
-  //   };
-  //   return labels[priority] || priority;
-  // }
-
   viewCaseDetails(index: number): void {
     this.selectedIndex = index;
     const dossier = this.filteredDossiers[index];
@@ -376,8 +367,6 @@ export class BailiffCasesComponent implements OnInit {
     console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
   }
   
-    
-  
   mapDocumentType(apiType: string): DocumentType {
     console.log('Mapping du type:', apiType);
       
@@ -448,34 +437,108 @@ export class BailiffCasesComponent implements OnInit {
       };
       return labels[type] || type;
     }
-    onFileSelected(event: any) {
-      const file = event.target.files[0];
-      if (file) {
-        this.selectedFile = file;
-        if (!this.newDocument.name) {
-          this.newDocument.name = file.name;
-        }
-      }
+    // onFileSelected(event: any) {
+    //   const file = event.target.files[0];
+    //   if (file) {
+    //     this.selectedFile = file;
+    //     if (!this.newDocument.name) {
+    //       this.newDocument.name = file.name;
+    //     }
+    //   }
+    // }
+  
+    // isUploadValid(): boolean {
+    //   return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
+    // }
+  
+    // uploadDocument() {
+    // }
+  onFileSelected(event: any) {
+  const file = event.target.files[0];
+  if (file) {
+    this.selectedFile = file;
+    console.log('Fichier sélectionné:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      extension: file.name.split('.').pop()
+    });
+    
+    if (!this.newDocument.name) {
+      this.newDocument.name = file.name;
     }
-  
-    isUploadValid(): boolean {
-      return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
+  }
+  }
+
+  // Méthode améliorée pour la validation
+  isUploadValid(): boolean {
+    return !!(
+      this.selectedDetailCase?.nodeId && 
+      this.newDocument.type && 
+      this.newDocument.name && 
+      this.selectedFile
+    );
+  }
+
+  // Méthode pour s'assurer qu'un dossier est sélectionné
+  ensureCaseSelected(): boolean {
+    if (!this.selectedDetailCase) {
+      alert('Veuillez d\'abord sélectionner un dossier');
+      return false;
     }
-  
-    uploadDocument() {
-  
-      if (!this.isUploadValid()) {
-        alert('Veuillez remplir tous les champs obligatoires');
-        return;
-      }
-  
-      const currentUser = this.authService.getCurrentUser();
-      if (!currentUser) {
-        alert('Utilisateur non connecté');
-        return;
-      }
-  
+    return true;
+  }
+
+  uploadDocument() {
+  if (!this.isUploadValid() || this.isLoading) return;
+
+  this.isLoading = true;
+
+  const formData = new FormData();
+  formData.append('filedata', this.selectedFile!);
+
+  const params = {
+    objetNodeId: this.selectedDetailCase.nodeId,
+    fieldName: 'documentsHuissier', 
+    typeDocument: this.newDocument.type
+  };
+
+  // SAUVEGARDER le nom original AVANT l'upload
+  const originalFileName = this.selectedFile!.name;
+
+  this.casesService.uploadDocument(formData, params).subscribe({
+    next: (response) => {
+      this.isLoading = false;
+      console.log('Document uploadé:', response);
+
+      const uploadedFile = response.files[0];
+      
+      // FORCER le nom original peu importe ce que retourne Alfresco
+      const newDoc: CaseDocument & { caseId: string } = {
+        id: uploadedFile.documentNodeId,
+        name: originalFileName, 
+        type: this.mapDocumentType(uploadedFile.typeDocument),
+        url: '#',
+        uploadedAt: new Date(),
+        uploadedBy: 'Utilisateur actuel',
+        caseId: this.selectedDetailCase.nodeId,
+
+      };
+
+      this.allDocuments.push(newDoc);
+      this.filteredDocuments.push(newDoc);
+      
+      this.closeUploadModal();
+      this.filterDocuments();
+      alert('Document ajouté avec succès!');
+    },
+    error: (error) => {
+      this.isLoading = false;
+      console.error('Erreur lors de l\'upload:', error);
+      alert('Erreur lors de l\'upload du document. Veuillez réessayer.');
     }
+  });
+}
   
     deleteDocument(doc: CaseDocument) {
       if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
@@ -486,7 +549,7 @@ export class BailiffCasesComponent implements OnInit {
     }
   
     closeUploadModal() {
-      console.log('🔒 Fermeture de la modal d\'upload');
+      console.log('Fermeture de la modal d\'upload');
       this.showUploadModal = false;
       this.selectedFile = null;
       this.newDocument = {

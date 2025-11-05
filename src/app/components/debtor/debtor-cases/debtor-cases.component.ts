@@ -452,7 +452,6 @@ export class DebtorCasesComponent implements OnInit {
   }
 
   submitPaymentPlan() {
-  
   }
 
   isPaymentPlanValid(): boolean {
@@ -472,20 +471,11 @@ export class DebtorCasesComponent implements OnInit {
     };
   }
 
-  // onFileSelected(event: any) {
-  //   const files = Array.from(event.target.files) as File[];
-  //   files.forEach(file => {
-  //     if (file.size <= 10 * 1024 * 1024) { // 10MB max
-  //       this.disputeForm.attachments.push(file);
-  //     }
-  //   });
-  // }
-
   onFileSelected(event: any) {
   const file = event.target.files[0];
   if (file) {
     this.selectedFile = file;
-    console.log('📄 Fichier sélectionné:', {
+    console.log('Fichier sélectionné:', {
       name: file.name,
       size: file.size,
       type: file.type,
@@ -916,35 +906,6 @@ export class DebtorCasesComponent implements OnInit {
     }
   }
 
-  // isUploadValid(): boolean {
-  //   return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
-  // }
-
-  // uploadDocument() {
-  //   if (!this.isUploadValid()) return;
-
-  //   const currentUser = this.authService.getCurrentUser();
-  //   if (!currentUser) return;
-
-  //   // Utiliser le dossier sélectionné comme caseId
-  //   const caseId = this.selectedDetailCase?.nodeId || this.newDocument.caseId;
-
-  //   const newDoc: CaseDocument & { caseId: string } = {
-  //     id: Date.now().toString(),
-  //     name: this.newDocument.name,
-  //     type: this.newDocument.type as DocumentType,
-  //     url: '#', // À remplacer par l'URL réelle après upload sur le serveur
-  //     uploadedAt: new Date(),
-  //     uploadedBy: `${currentUser.firstname} ${currentUser.lastname}`,
-  //     caseId: caseId
-  //   };
-
-  //   this.allDocuments.unshift(newDoc);
-  //   this.openDocumentsModal(); // Rafraîchir la liste filtrée
-  //   this.closeUploadModal();
-
-  //   console.log('Document ajouté:', newDoc);
-  // }
   uploadDocument() {
   if (!this.isUploadValid() || this.isLoading) return;
 
@@ -959,20 +920,20 @@ export class DebtorCasesComponent implements OnInit {
     typeDocument: this.newDocument.type
   };
 
-  // 🔥 SAUVEGARDER le nom original AVANT l'upload
+  // SAUVEGARDER le nom original AVANT l'upload
   const originalFileName = this.selectedFile!.name;
 
   this.casesService.uploadDocument(formData, params).subscribe({
     next: (response) => {
       this.isLoading = false;
-      console.log('✅ Document uploadé:', response);
+      console.log(' Document uploadé:', response);
 
       const uploadedFile = response.files[0];
       
-      // 🔥 FORCER le nom original peu importe ce que retourne Alfresco
+      // FORCER le nom original peu importe ce que retourne Alfresco
       const newDoc: CaseDocument & { caseId: string } = {
         id: uploadedFile.documentNodeId,
-        name: originalFileName, // 🔥 TOUJOURS le nom original du fichier
+        name: originalFileName, // TOUJOURS le nom original du fichier
         type: this.mapDocumentType(uploadedFile.typeDocument),
         url: '#',
         uploadedAt: new Date(),

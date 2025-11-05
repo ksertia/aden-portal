@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environment/environment';
 import { User, StrapiRole, LoginRequest, LoginResponse } from '../models/user.model';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -13,6 +12,10 @@ export class AuthService {
   private apiUrl = `${environment.baseUrl}/auth`; //  Mon BFF Express
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+
+  // Pour stocker temporairement le code de réinitialisation
+  private resetCodeSubject = new BehaviorSubject<string | null>(null);
+  public resetCode$ = this.resetCodeSubject.asObservable();
 
   constructor(private http: HttpClient) {
     // Récupérer l'utilisateur du localStorage au démarrage
@@ -78,5 +81,31 @@ register(user: any): Observable<User> {
       })
     );
   }
+  // ==================== RESET PASSWORD FLOW ====================
+
+  // Stocke temporairement le code reçu par email
+  setResetCode(code: string) {
+    this.resetCodeSubject.next(code);
+  }
+
+  // Récupère le code
+  getResetCode(): string | null {
+    return this.resetCodeSubject.value;
+  }
+
+  // Demande de réinitialisation (forgot-password)
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  // Réinitialisation du mot de passe (reset-password)
+  // ✅ Réinitialiser le mot de passe
+resetPassword(code: string, password: string, passwordConfirmation: string) {
+  return this.http.post(`${this.apiUrl}/reset-password`, {
+    code,
+    password,
+    passwordConfirmation
+  });
+}
 }
 
