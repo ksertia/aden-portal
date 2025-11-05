@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { CaseService } from '../../../services/case.service';
 import { AuthService } from '../../../services/auth.service';
-import { DebtCase, CaseStatus, Priority, CaseFilter } from '../../../models/case.model';
+import { DebtCase} from '../../../models/case.model';
 import { AdminService } from '../../../services/admin.service';
 import { DebtorInfo } from '../../../models/case.model';
 import { CaseDocument, DocumentType } from '../../../models/case.model';
@@ -287,17 +287,6 @@ export class CreditorCasesComponent implements OnInit {
     }
   }
 
-  // getPriorityLabel(priority: string): string {
-  //   const labels: { [key: string]: string } = {
-  //     'FAIBLE': 'Faible',
-  //     'MOYENNE': 'Moyenne',
-  //     'Élevée': 'Élevée',
-  //     // 'HAUTE': 'Élevée',
-  //     'urgent': 'Urgente'
-  //   };
-  //   return labels[priority] || priority;
-  // }
-
   viewCaseDetails(index: number): void {
     this.selectedIndex = index;
     const dossier = this.filteredDossiers[index];
@@ -384,8 +373,6 @@ export class CreditorCasesComponent implements OnInit {
     console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
   }
 
-  
-
   mapDocumentType(apiType: string): DocumentType {
     console.log('Mapping du type:', apiType);
     
@@ -456,34 +443,108 @@ export class CreditorCasesComponent implements OnInit {
     };
     return labels[type] || type;
   }
+  // onFileSelected(event: any) {
+  //   const file = event.target.files[0];
+  //   if (file) {
+  //     this.selectedFile = file;
+  //     if (!this.newDocument.name) {
+  //       this.newDocument.name = file.name;
+  //     }
+  //   }
+  // }
+
+  // isUploadValid(): boolean {
+  //   return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
+  // }
+
+  // uploadDocument() {
+  // }
   onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-      if (!this.newDocument.name) {
-        this.newDocument.name = file.name;
-      }
+  const file = event.target.files[0];
+  if (file) {
+    this.selectedFile = file;
+    console.log('Fichier sélectionné:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      extension: file.name.split('.').pop()
+    });
+    
+    if (!this.newDocument.name) {
+      this.newDocument.name = file.name;
     }
   }
+  }
 
+  // Méthode améliorée pour la validation
   isUploadValid(): boolean {
-    return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
+    return !!(
+      this.selectedDetailCase?.nodeId && 
+      this.newDocument.type && 
+      this.newDocument.name && 
+      this.selectedFile
+    );
+  }
+
+  // Méthode pour s'assurer qu'un dossier est sélectionné
+  ensureCaseSelected(): boolean {
+    if (!this.selectedDetailCase) {
+      alert('Veuillez d\'abord sélectionner un dossier');
+      return false;
+    }
+    return true;
   }
 
   uploadDocument() {
+  if (!this.isUploadValid() || this.isLoading) return;
 
-    if (!this.isUploadValid()) {
-      alert('Veuillez remplir tous les champs obligatoires');
-      return;
+  this.isLoading = true;
+
+  const formData = new FormData();
+  formData.append('filedata', this.selectedFile!);
+
+  const params = {
+    objetNodeId: this.selectedDetailCase.nodeId,
+    fieldName: 'documentsCreancier', 
+    typeDocument: this.newDocument.type
+  };
+
+  // SAUVEGARDER le nom original AVANT l'upload
+  const originalFileName = this.selectedFile!.name;
+
+  this.casesService.uploadDocument(formData, params).subscribe({
+    next: (response) => {
+      this.isLoading = false;
+      console.log('Document uploadé:', response);
+
+      const uploadedFile = response.files[0];
+      
+      // FORCER le nom original peu importe ce que retourne Alfresco
+      const newDoc: CaseDocument & { caseId: string } = {
+        id: uploadedFile.documentNodeId,
+        name: originalFileName, // TOUJOURS le nom original du fichier
+        type: this.mapDocumentType(uploadedFile.typeDocument),
+        url: '#',
+        uploadedAt: new Date(),
+        uploadedBy: 'Utilisateur actuel',
+        caseId: this.selectedDetailCase.nodeId,
+        // originalData: uploadedFile
+      };
+
+      this.allDocuments.push(newDoc);
+      this.filteredDocuments.push(newDoc);
+      
+      this.closeUploadModal();
+      this.filterDocuments();
+      alert('Document ajouté avec succès!');
+    },
+    error: (error) => {
+      this.isLoading = false;
+      console.error('Erreur lors de l\'upload:', error);
+      alert('Erreur lors de l\'upload du document. Veuillez réessayer.');
     }
-
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) {
-      alert('Utilisateur non connecté');
-      return;
-    }
-
-  }
+  });
+}
 
   deleteDocument(doc: CaseDocument) {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
@@ -494,7 +555,7 @@ export class CreditorCasesComponent implements OnInit {
   }
 
   closeUploadModal() {
-    console.log('🔒 Fermeture de la modal d\'upload');
+    console.log('Fermeture de la modal d\'upload');
     this.showUploadModal = false;
     this.selectedFile = null;
     this.newDocument = {
