@@ -3,6 +3,7 @@ import { AuthGuard, RoleGuard } from './guards/auth.guard';
 import { StrapiRole } from './models/user.model';
 
 
+
 export const routes: Routes = [
   {
     path: '',
@@ -16,6 +17,18 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () => import('./components/auth/login/login.component').then(c => c.LoginComponent)
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () => import('./components/auth/forgot-password/forgot-password').then(c => c.ForgotPassword)
+  },
+  {
+    path: 'reset-code',
+    loadComponent: () => import('./components/auth/reset-code/reset-code').then(c => c.ResetCode)
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./components/auth/reset-password/reset-password').then(c => c.ResetPassword)
   },
   {
     path: 'register',
