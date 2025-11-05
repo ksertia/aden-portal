@@ -36,7 +36,7 @@ export class ForgotPassword {
         this.isSubmitting = false;
         this.successMessage = 'Un email de réinitialisation a été envoyé si le compte existe.';
         // Redirige vers la page de saisie du code
-        setTimeout(() => this.router.navigate(['/reset-code']), 2000);
+        //setTimeout(() => this.router.navigate(['/reset-code']), 2000);
       },
       error: (err) => {
         this.isSubmitting = false;
