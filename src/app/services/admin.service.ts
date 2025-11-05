@@ -97,7 +97,7 @@ export class AdminService {
 
   // récupérer un user Strapi par email
   getUserByEmail(email: string): Observable<any> {
-    const url = `http://localhost:3000/auth/users/search/${encodeURIComponent(email)}`;
+    const url = `${environment.baseUrl}/auth/users/search/${encodeURIComponent(email)}`;
 
     console.log('Recherche utilisateur via BFF:', email);
 
@@ -126,7 +126,7 @@ export class AdminService {
   // créer un utilisateur dans Strapi
   // admin.service.ts
   createUserViaBFF(userData: any): Observable<any> {
-  const url = 'http://localhost:3000/auth/register';
+  const url = `${environment.baseUrl}/auth/register`;
 
   const payload = {
     username: userData.username,

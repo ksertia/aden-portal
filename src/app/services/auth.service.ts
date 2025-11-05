@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { environment } from '../../environment/environment';
 import { tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { User, StrapiRole, LoginRequest, LoginResponse } from '../models/user.model';
@@ -9,7 +8,7 @@ import { User, StrapiRole, LoginRequest, LoginResponse } from '../models/user.mo
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.baseUrl}/auth`; //  Mon BFF Express
+  private apiUrl = 'http://localhost:3000/auth'; //  Mon BFF Express
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
