@@ -34,14 +34,14 @@ export class PartnerTrackingComponent implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.partnerService.getAssignedCases(currentUser.id).subscribe(cases => {
-      this.allCededCases = cases;
-    });
+    // this.partnerService.getAssignedCases(currentUser.id).subscribe(cases => {
+    //   this.allCededCases = cases;
+    // });
 
-    this.partnerService.getPartnerUpdates().subscribe(updates => {
-      this.allUpdates = updates;
-      this.filteredUpdates = [...updates];
-    });
+    // this.partnerService.getPartnerUpdates().subscribe(updates => {
+    //   this.allUpdates = updates;
+    //   this.filteredUpdates = [...updates];
+    // });
   }
 
   filterUpdates() {

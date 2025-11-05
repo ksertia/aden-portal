@@ -41,24 +41,24 @@ export class CedantCededCasesComponent implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.partnerService.getCededCases(currentUser.id).subscribe(cases => {
-      this.cededCases = cases;
-    });
+    // this.partnerService.getCededCases(currentUser.id).subscribe(cases => {
+    //   this.cededCases = cases;
+    // });
   }
 
   loadPartnerUpdates() {
-    this.partnerService.getPartnerUpdates().subscribe(updates => {
-      this.partnerUpdates = updates;
-    });
+    // this.partnerService.getPartnerUpdates().subscribe(updates => {
+    //   this.partnerUpdates = updates;
+    // });
   }
 
   loadStatistics() {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.partnerService.getCedantStatistics(currentUser.id).subscribe(stats => {
-      this.statistics = stats;
-    });
+    // this.partnerService.getCedantStatistics(currentUser.id).subscribe(stats => {
+    //   this.statistics = stats;
+    // });
   }
 
   getPaymentPercentage(case_: DebtCase): number {
@@ -131,21 +131,21 @@ export class CedantCededCasesComponent implements OnInit {
   cedeCase() {
     if (!this.isCedeFormValid()) return;
 
-    this.partnerService.cedeCase(
-      this.cedeForm.caseId,
-      this.cedeForm.partnerId,
-      this.cedeForm.commission,
-      this.cedeForm.terms
-    ).subscribe({
-      next: (contract) => {
-        this.loadCededCases();
-        this.loadStatistics();
-        this.closeCedeModal();
-      },
-      error: (error) => {
-        console.error('Erreur lors de la cession:', error);
-      }
-    });
+    // this.partnerService.cedeCase(
+    //   this.cedeForm.caseId,
+    //   this.cedeForm.partnerId,
+    //   this.cedeForm.commission,
+    //   this.cedeForm.terms
+    // ).subscribe({
+    //   next: (contract) => {
+    //     this.loadCededCases();
+    //     this.loadStatistics();
+    //     this.closeCedeModal();
+    //   },
+    //   error: (error) => {
+    //     console.error('Erreur lors de la cession:', error);
+    //   }
+    // });
   }
 
   closeCedeModal() {

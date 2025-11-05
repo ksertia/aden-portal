@@ -48,18 +48,18 @@ export class CedantPortfoliosComponent implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.cedantService.getPortfolios(currentUser.id).subscribe(portfolios => {
-      this.portfolios = portfolios;
-    });
+    // this.cedantService.getPortfolios(currentUser.id).subscribe(portfolios => {
+    //   this.portfolios = portfolios;
+    // });
   }
 
   loadStatistics() {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.cedantService.getStatistics(currentUser.id).subscribe(stats => {
-      this.statistics = stats;
-    });
+    // this.cedantService.getStatistics(currentUser.id).subscribe(stats => {
+    //   this.statistics = stats;
+    // });
   }
 
   isCreateFormValid(): boolean {
@@ -79,16 +79,16 @@ export class CedantPortfoliosComponent implements OnInit {
       status: PortfolioStatus.DRAFT
     };
 
-    this.cedantService.createPortfolio(portfolioData).subscribe({
-      next: (portfolio) => {
-        this.portfolios.unshift(portfolio);
-        this.closeCreateModal();
-        this.loadStatistics();
-      },
-      error: (error) => {
-        console.error('Erreur lors de la création:', error);
-      }
-    });
+    // this.cedantService.createPortfolio(portfolioData).subscribe({
+    //   next: (portfolio) => {
+    //     this.portfolios.unshift(portfolio);
+    //     this.closeCreateModal();
+    //     this.loadStatistics();
+    //   },
+    //   error: (error) => {
+    //     console.error('Erreur lors de la création:', error);
+    //   }
+    // });
   }
 
   viewPortfolio(portfolio: CedantPortfolio) {
@@ -102,18 +102,18 @@ export class CedantPortfoliosComponent implements OnInit {
   }
 
   submitPortfolio(portfolio: CedantPortfolio) {
-    this.cedantService.submitPortfolio(portfolio.id).subscribe({
-      next: (updatedPortfolio) => {
-        const index = this.portfolios.findIndex(p => p.id === portfolio.id);
-        if (index >= 0) {
-          this.portfolios[index] = updatedPortfolio;
-        }
-        this.loadStatistics();
-      },
-      error: (error) => {
-        console.error('Erreur lors de la soumission:', error);
-      }
-    });
+    // this.cedantService.submitPortfolio(portfolio.id).subscribe({
+    //   next: (updatedPortfolio) => {
+    //     const index = this.portfolios.findIndex(p => p.id === portfolio.id);
+    //     if (index >= 0) {
+    //       this.portfolios[index] = updatedPortfolio;
+    //     }
+    //     this.loadStatistics();
+    //   },
+    //   error: (error) => {
+    //     console.error('Erreur lors de la soumission:', error);
+    //   }
+    // });
   }
 
   onFileSelected(event: any) {
@@ -143,17 +143,17 @@ export class CedantPortfoliosComponent implements OnInit {
       uploadedBy: `${currentUser.firstname} ${currentUser.lastname}`
     };
 
-    this.cedantService.uploadPortfolioDocument(this.selectedPortfolio.id, documentData).subscribe({
-      next: (document) => {
-        if (this.selectedPortfolio) {
-          this.selectedPortfolio.documents.push(document);
-        }
-        this.closeUploadModal();
-      },
-      error: (error) => {
-        console.error('Erreur lors de l\'upload:', error);
-      }
-    });
+    // this.cedantService.uploadPortfolioDocument(this.selectedPortfolio.id, documentData).subscribe({
+    //   next: (document) => {
+    //     if (this.selectedPortfolio) {
+    //       this.selectedPortfolio.documents.push(document);
+    //     }
+    //     this.closeUploadModal();
+    //   },
+    //   error: (error) => {
+    //     console.error('Erreur lors de l\'upload:', error);
+    //   }
+    // });
   }
 
   downloadDocument(doc: any) {
