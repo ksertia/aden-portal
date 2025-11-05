@@ -83,16 +83,7 @@ export class CaseService {
     });
   }
 
- // Upload d'un document
-  // uploadDocument(formData: FormData, params: any): Observable<any> {
-  //   return this.http.post(`${this.documentApiUrl}/upload`, formData, {
-  //     params: params,
-  //     headers: {
-  //     }
-  //   });
-  // }
-
-  // Dans case.service.ts
+  // Uploader un document
   uploadDocument(formData: FormData, params: any): Observable<any> {
     console.log('Envoi du fichier avec params:', params);
     
