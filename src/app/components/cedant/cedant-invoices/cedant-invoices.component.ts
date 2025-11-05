@@ -51,14 +51,14 @@ export class CedantInvoicesComponent implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.cedantService.getPortfolios(currentUser.id).subscribe(portfolios => {
-      this.portfolios = portfolios;
-    });
+    // this.cedantService.getPortfolios(currentUser.id).subscribe(portfolios => {
+    //   this.portfolios = portfolios;
+    // });
 
-    this.cedantService.getInvoices().subscribe(invoices => {
-      this.invoices = invoices;
-      this.filteredInvoices = [...invoices];
-    });
+    // this.cedantService.getInvoices().subscribe(invoices => {
+    //   this.invoices = invoices;
+    //   this.filteredInvoices = [...invoices];
+    // });
   }
 
   filterInvoices() {
@@ -106,16 +106,16 @@ export class CedantInvoicesComponent implements OnInit {
       dueDate: new Date(this.newInvoice.dueDate)
     };
 
-    this.cedantService.createInvoice(invoiceData).subscribe({
-      next: (invoice) => {
-        this.invoices.unshift(invoice);
-        this.filterInvoices();
-        this.closeCreateModal();
-      },
-      error: (error) => {
-        console.error('Erreur lors de la création:', error);
-      }
-    });
+    // this.cedantService.createInvoice(invoiceData).subscribe({
+    //   next: (invoice) => {
+    //     this.invoices.unshift(invoice);
+    //     this.filterInvoices();
+    //     this.closeCreateModal();
+    //   },
+    //   error: (error) => {
+    //     console.error('Erreur lors de la création:', error);
+    //   }
+    // });
   }
 
   viewInvoiceDetails(invoice: CedantInvoice) {
@@ -129,17 +129,17 @@ export class CedantInvoicesComponent implements OnInit {
   }
 
   deleteInvoice(invoice: CedantInvoice) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette facture ?')) {
-      this.cedantService.deleteInvoice(invoice.id).subscribe({
-        next: () => {
-          this.invoices = this.invoices.filter(i => i.id !== invoice.id);
-          this.filterInvoices();
-        },
-        error: (error) => {
-          console.error('Erreur lors de la suppression:', error);
-        }
-      });
-    }
+    // if (confirm('Êtes-vous sûr de vouloir supprimer cette facture ?')) {
+    //   this.cedantService.deleteInvoice(invoice.id).subscribe({
+    //     next: () => {
+    //       this.invoices = this.invoices.filter(i => i.id !== invoice.id);
+    //       this.filterInvoices();
+    //     },
+    //     error: (error) => {
+    //       console.error('Erreur lors de la suppression:', error);
+    //     }
+    //   });
+    // }
   }
 
   formatCurrency(amount: number): string {
