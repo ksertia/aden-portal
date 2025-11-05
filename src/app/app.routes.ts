@@ -149,6 +149,10 @@ export const routes: Routes = [
           {
             path: 'dashboard',
             loadComponent: () => import('./components/partner/partner-dashboard/partner-dashboard').then(c => c.PartnerDashboard)
+          },
+          {
+            path: 'payment-tracking',
+            loadComponent: () => import('./components/partner/partner-payment-tracking/partner-payment-tracking').then(c => c.PartnerPaymentTracking)
           }
         ]
       },

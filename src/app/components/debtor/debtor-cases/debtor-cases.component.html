@@ -176,14 +176,6 @@
                 </svg>
                 Détails
               </button>
-              <!-- <button class="btn btn-secondary small" (click)="downloadCaseReport(dossier)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="7,10 12,15 17,10"/>
-                  <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                Rapport
-              </button> -->
             </div>
           </div>
         </div>
@@ -479,7 +471,7 @@
                   </svg>
                   Fermer
                 </button>
-                <!-- Bouton pour accéder aux relances (à placer avant les Actions) -->
+                <!-- Bouton pour accéder aux relances  -->
                   <button class="btn btn-info" (click)="openReminderHistory(selectedDetailCase)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -507,19 +499,19 @@
         </div>
         <div class="modal-body" *ngIf="selectedCase">
           <div class="payment-summary">
-            <h4>{{ t('cases.paymentModal.case') }} {{ selectedCase.caseNumber }}</h4>
+            <h4> {{ selectedDetailCase.numeroDossier }}</h4>
             <div class="summary-grid">
               <div class="summary-item">
                 <span class="label">{{ t('cases.paymentModal.totalDue') }}</span>
-                <span class="value">{{ formatCurrency(selectedCase.amount) }}</span>
+                <span class="value">{{ formatCurrency(calculateTotalDue(selectedDetailCase)) }}</span> 
               </div>
-              <div class="summary-item">
+              <div class="summary-item breakdown-item paid">
                 <span class="label">{{ t('cases.paymentModal.alreadyPaid') }}</span>
-                <span class="value">{{ formatCurrency(selectedCase.amountPaid) }}</span>
+                <span class="value">{{ formatCurrency(getTotalPaid()) }}</span>
               </div>
-              <div class="summary-item highlight">
+              <div class="summary-item breakdown-item remaining">
                 <span class="label">{{ t('cases.paymentModal.remaining') }}</span>
-                <span class="value">{{ formatCurrency(selectedCase.amount - selectedCase.amountPaid) }}</span>
+                <span class="value">{{ getFormattedRemainingAmountWithDetails(selectedDetailCase) }}</span>
               </div>
             </div>
           </div>
@@ -532,7 +524,7 @@
                 [(ngModel)]="paymentAmount"
                 [max]="selectedCase.amount - selectedCase.amountPaid"
                 min="1"
-                step="0.01"
+                step="1"
                 placeholder="{{ t('cases.paymentModal.placeholder') }}"
               >
             </div>
@@ -583,12 +575,12 @@
             <h4>{{ t('cases.paymentPlanModal.caseInfo') }}</h4>
             <div class="case-summary">
               <div class="summary-item">
-                <span class="label">{{ t('cases.paymentPlanModal.case') }}</span>
-                <span class="value">{{ selectedCase.caseNumber }}</span>
+                <span class="label">Nom du {{ t('cases.paymentPlanModal.case') }}</span>
+                <span class="value">{{ selectedDetailCase.numeroDossier }}</span> 
               </div>
-              <div class="summary-item">
+              <div class="summary-item breakdown-item remaining">
                 <span class="label">{{ t('cases.paymentPlanModal.remainingAmount') }}</span>
-                <span class="value">{{ formatCurrency(selectedCase.amount - selectedCase.amountPaid) }}</span>
+                <span class="value">{{ getFormattedRemainingAmountWithDetails(selectedDetailCase) }}</span> 
               </div>
             </div>
           </div>
@@ -667,7 +659,7 @@
 
   <!-- Tiroir de contestation -->
   <div class="drawer-overlay-contestation" *ngIf="showDisputeModal">
-    <div class="drawer-contestation" [class.open]="showDisputeModal" (click)="$event.stopPropagation()">
+    <div class="drawer-contestation" [class.open]="showDisputeModal" (click)="$event.stopPropagation()" *ngFor="let dossier of filteredDossiers">
       <div class="modal-header">
         <h3>{{ t('cases.disputeModal.title') }}</h3>
         <button class="modal-close" (click)="closeDisputeModal()">
@@ -678,17 +670,17 @@
         </button>
       </div>
       <div class="modal-body" *ngIf="selectedCase">
-        <div class="dispute-form">
-          <div class="form-section">
+        <div class="dispute-form" >
+          <div class="form-section" >
             <h4>{{ t('cases.disputeModal.caseInfo') }}</h4>
             <div class="case-summary">
               <div class="summary-item">
                 <span class="label">Dossier</span>
-                <span class="value">{{ selectedCase.caseNumber }}</span>
+                <span class="value"> {{ selectedDetailCase.numeroDossier }}</span>
               </div>
               <div class="summary-item">
                 <span class="label">Créancier</span>
-                <span class="value">{{ selectedCase.creditor.name }}</span>
+                <span class="value"> {{ getCreancierForDossier(dossier)?.contactPrincipal }}</span>
               </div>
               <div class="summary-item">
                 <span class="label">Montant contesté</span>
@@ -817,64 +809,6 @@
           <div class="modal-body">
           <div class="documents-list">
               <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
-              <!-- <div class="list-header">
-                  <app-view-toggle [currentView]="currentView" (viewChange)="currentView = $event"></app-view-toggle>
-              </div> -->
-
-              <!-- Vue grille -->
-              <!-- <div class="documents-grid" *ngIf="currentView === 'grid'">
-                  <div class="document-card" *ngFor="let doc of filteredDocuments">
-                  <div class="document-header">
-                      <div class="document-icon" [ngClass]="'icon-' + doc.type">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                          <polyline points="14,2 14,8 20,8"/>
-                      </svg>
-                      </div>
-                      <div class="document-info">
-                      <h3>{{ doc.name }}</h3>
-                      <p class="document-type">{{ getDocumentTypeLabel(doc.type) }}</p>
-                      </div>
-                      <div class="document-actions">
-                      <button class="btn btn-primary small" (click)="downloadDocument(doc)">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                          <polyline points="7,10 12,15 17,10"/>
-                          <line x1="12" y1="15" x2="12" y2="3"/>
-                          </svg>
-                      </button>
-                      <button class="btn btn-secondary small" (click)="viewDocument(doc)">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                          <circle cx="12" cy="12" r="3"/>
-                          </svg>
-                      </button>
-                      <button class="btn btn-secondary small" (click)="deleteDocument(doc)">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="3,6 5,6 21,6"/>
-                          <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
-                          </svg>
-                      </button>
-                      </div>
-                  </div>
-
-                  <div class="document-details">
-                      <div class="detail-row">
-                      <span class="label">Dossier :</span>
-                      <span class="value">{{ getCaseNumber(doc.caseId) }}</span>
-                      </div>
-                      <div class="detail-row">
-                      <span class="label">Ajouté le :</span>
-                      <span class="value">{{ formatDate(doc.uploadedAt) }}</span>
-                      </div>
-                      <div class="detail-row">
-                      <span class="label">Par :</span>
-                      <span class="value">{{ doc.uploadedBy }}</span>
-                      </div>
-                  </div>
-                  </div>
-              </div> -->
-
               <!-- Vue tableau -->
               <div class="documents-table-container" *ngIf="currentViews === 'table'">
                   <table class="documents-table">
@@ -882,9 +816,7 @@
                       <tr>
                       <th>Document</th>
                       <th>Type</th>
-                      <!-- <th>Dossier</th> -->
                       <th>Ajouté le</th>
-                      <!-- <th>Ajouté par</th> -->
                       <th>Actions</th>
                       </tr>
                   </thead>
@@ -906,31 +838,25 @@
                           {{ getDocumentTypeLabel(doc.type) }}
                           </span>
                       </td>
-                      <!-- <td>
-                          <div class="case-link">{{ getCaseNumber(doc.caseId) }}</div>
-                      </td> -->
                       <td>
                           <div class="date-cell">{{ formatDate(doc.uploadedAt) }}</div>
                       </td>
-                      <!-- <td>
-                          <div class="user-cell">{{ doc.uploadedBy }}</div>
-                      </td> -->
                       <td>
                           <div class="table-actions">
-                          <button class="btn btn-primary small" (click)="downloadDocument(doc)" title="Télécharger">
+                          <!-- <button class="btn btn-primary small" (click)="downloadDocument(doc)" title="Télécharger">
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                               <polyline points="7,10 12,15 17,10"/>
                               <line x1="12" y1="15" x2="12" y2="3"/>
                               </svg>
-                          </button>
-                          <button class="btn btn-secondary small" (click)="viewDocument(doc)" title="Voir">
+                          </button> -->
+                          <button class="btn btn-primary small" (click)="viewDocument(doc)" title="Voir">
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                               <circle cx="12" cy="12" r="3"/>
                               </svg>
                           </button>
-                          <button class="btn btn-secondary small" (click)="deleteDocument(doc)" title="Supprimer">
+                          <button class="btn btn-danger small" (click)="deleteDocument(doc)" title="Supprimer">
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <polyline points="3,6 5,6 21,6"/>
                               <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
@@ -985,17 +911,7 @@
           </div>
           <div class="modal-body">
           <div class="upload-form">
-              <!-- <div class="form-group">
-                  <label>Dossier associé</label>
-                  <select [(ngModel)]="newDocument.caseId" required>
-                      <option value="">Sélectionner un dossier</option>
-                      <option *ngFor="let case of cases" [value]="case.id">
-                      {{ case.caseNumber }} - {{ case.debtor.firstName }} {{ case.debtor.lastName }}
-                      </option>
-                  </select>
-              </div> -->
-              
-              <div class="form-group">
+            <div class="form-group">
               <label>Type de document</label>
               <select [(ngModel)]="newDocument.type" required>
                   <option value="">Sélectionner un type</option>
@@ -1042,7 +958,7 @@
               <polyline points="17,8 12,3 7,8"/>
               <line x1="12" y1="3" x2="12" y2="15"/>
               </svg>
-              Ajouter le document
+             {{ isLoading ? 'Envoi en cours...' : 'Ajouter le document' }}
           </button>
           </div>
       </div>

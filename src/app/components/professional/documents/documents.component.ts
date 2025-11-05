@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
@@ -58,7 +58,9 @@ export class DocumentsComponent implements OnInit {
     private caseService: CaseService,
     private authService: AuthService,
     private sanitizer: DomSanitizer,
-    private router: Router 
+    private router: Router,
+     private ngZone: NgZone,
+     private cdr: ChangeDetectorRef, 
   ) {}
 
   ngOnInit() {
@@ -602,6 +604,7 @@ export class DocumentsComponent implements OnInit {
 
   // Ouvrir le modal d'upload
   openUploadModal(): void {
+    console.log('Ouverture modal upload');
     this.showUploadModal = true;
     // Réinitialiser le formulaire
     this.newDocument = {
@@ -611,6 +614,8 @@ export class DocumentsComponent implements OnInit {
     };
     this.selectedFile = null;
     this.isUploading = false;
+
+    console.log('newDocument après reset:', this.newDocument);
   }
 
   // Fermer le modal d'upload
@@ -705,5 +710,222 @@ export class DocumentsComponent implements OnInit {
       break;
     }
   }
+
+  // Méthode pour uploader le document
+  // uploadDocument(): void {
+  //   // Validation des champs
+  //   if (!this.validateUploadForm()) {
+  //     return;
+  //   }
+
+  //   this.isUploading = true;
+
+  //   const formData = new FormData();
+  //   formData.append('file', this.selectedFile!);
+
+  //   const params = {
+  //     objetNodeId: this.newDocument.caseId,
+  //     fieldName: 'documentsPartage',
+  //     typeDocument: this.newDocument.type
+  //   };
+
+  //   console.log('📤 Début upload avec params:', params);
+
+  //   this.caseService.uploadDocument(formData, params).subscribe({
+  //     next: (response) => {
+  //       this.handleUploadSuccess(response);
+  //     },
+  //     error: (error) => {
+  //       this.handleUploadError(error);
+  //     }
+  //   });
+  // }
+
+  // Méthode pour uploader le document - VERSION DEBUG
+uploadDocument(): void {
+  console.log('🚀 === DÉBUT UPLOAD ===');
+  
+  // Appeler le debug avant tout
+  this.debugUploadParams();
+
+  // Validation
+  if (!this.validateUploadForm()) {
+    console.log('❌ Validation échouée');
+    return;
+  }
+
+  // Vérification supplémentaire du dossier
+  if (!this.newDocument.caseId) {
+    console.error('❌ ERREUR: caseId est null/undefined');
+    alert('Erreur: Aucun dossier sélectionné');
+    return;
+  }
+
+  this.isUploading = true;
+
+  // Créer FormData
+  const formData = new FormData();
+  formData.append('file', this.selectedFile!);
+
+  const params = {
+    objetNodeId: this.newDocument.caseId,
+    fieldName: 'documentsPartage',
+    typeDocument: this.newDocument.type
+  };
+
+  console.log('📤 Envoi vers backend avec params:', params);
+  // console.log('🔗 URL complète:', `${environment.baseUrl}/documents/upload?objetNodeId=${this.newDocument.caseId}&fieldName=documentsPartage&typeDocument=${this.newDocument.type}`);
+
+  this.caseService.uploadDocument(formData, params).subscribe({
+    next: (response) => {
+      console.log('✅ Réponse backend reçue:', response);
+      this.handleUploadSuccess(response);
+    },
+    error: (error) => {
+      console.error('❌ Erreur backend:', error);
+      console.error('❌ Détails erreur:', {
+        status: error.status,
+        message: error.message,
+        error: error.error
+      });
+      this.handleUploadError(error);
+    },
+    complete: () => {
+      console.log('🏁 Upload complet');
+    }
+  });
+}
+
+  // Validation du formulaire d'upload
+  validateUploadForm(): boolean {
+    const errors = [];
+
+    if (!this.newDocument.caseId) {
+      errors.push('Veuillez sélectionner un dossier');
+    }
+    if (!this.newDocument.type) {
+      errors.push('Veuillez sélectionner un type de document');
+    }
+    if (!this.newDocument.name) {
+      errors.push('Veuillez saisir un nom pour le document');
+    }
+    if (!this.selectedFile) {
+      errors.push('Veuillez sélectionner un fichier');
+    }
+
+    if (errors.length > 0) {
+      alert('Erreurs dans le formulaire :\n' + errors.join('\n'));
+      return false;
+    }
+
+    return true;
+  }
+
+// Gestion du succès de l'upload - VERSION CORRIGÉE
+handleUploadSuccess(response: any): void {
+  console.log('✅ Upload réussi - Réponse complète:', response);
+  
+  // Utiliser NgZone pour exécuter dans le contexte Angular
+  this.ngZone.run(() => {
+    this.isUploading = false;
+
+    try {
+      // Vérifier la structure de la réponse
+      if (!response || !response.entry) {
+        console.error('❌ Structure de réponse invalide:', response);
+        alert('Erreur: structure de réponse invalide');
+        this.closeUploadModal();
+        return;
+      }
+
+      const alfrescoEntry = response.entry;
+      console.log('📄 Données Alfresco:', alfrescoEntry);
+
+      const currentUser = this.authService.getCurrentUser();
+      const userName = currentUser?.username || 'Utilisateur';
+
+      // Créer le nouveau document avec les données Alfresco
+      const newDoc: CaseDocument & { caseId: string; source: string } = {
+        id: alfrescoEntry.id, // Utiliser l'ID Alfresco
+        name: this.newDocument.name || alfrescoEntry.name, // Nom saisi ou nom du fichier
+        type: this.newDocument.type as DocumentType,
+        url: '#',
+        uploadedAt: new Date(alfrescoEntry.createdAt || Date.now()),
+        uploadedBy: userName,
+        caseId: this.newDocument.caseId,
+        source: 'Partage'
+      };
+
+      console.log('📝 Nouveau document créé:', newDoc);
+
+      // Mettre à jour les tableaux de manière immuable
+      this.allDocuments = [...this.allDocuments, newDoc];
+      this.filteredDocuments = [...this.allDocuments];
+
+      console.log('📊 Total documents après ajout:', this.allDocuments.length);
+
+      // Fermer le modal
+      this.closeUploadModal();
+
+      // Forcer la détection des changements
+      this.cdr.detectChanges();
+
+      // Message de succès
+      setTimeout(() => {
+        alert('Document uploadé avec succès !');
+      }, 100);
+
+    } catch (error) {
+      console.error('❌ Erreur lors du traitement de la réponse:', error);
+      this.isUploading = false;
+      this.closeUploadModal();
+      alert('Document uploadé mais erreur lors de l\'affichage. Actualisez la page.');
+    }
+  });
+}
+
+  // Gestion des erreurs d'upload
+  handleUploadError(error: any): void {
+    console.error('❌ Erreur upload:', error);
+    this.isUploading = false;
+    
+    let errorMessage = 'Erreur lors de l\'upload du document.';
+    
+    if (error.error?.message) {
+      errorMessage += `\nDétails: ${error.error.message}`;
+    }
+    
+    if (error.error?.details) {
+      console.error('Détails techniques:', error.error.details);
+    }
+    
+    alert(errorMessage);
+  }
+
+  // Méthode de debug pour vérifier TOUS les paramètres
+  debugUploadParams(): void {
+    console.log('🔍 === DEBUG UPLOAD PARAMÈTRES ===');
+    
+    console.log('1. 📁 Dossier sélectionné:', this.newDocument.caseId);
+    console.log('2. 📄 Fichier sélectionné:', this.selectedFile);
+    console.log('3. 🏷️ Type document:', this.newDocument.type);
+    console.log('4. 📝 Nom document:', this.newDocument.name);
+    
+    // Vérifier si le dossier existe dans la liste
+    const dossierSelectionne = this.dossiers.find(d => d.nodeId === this.newDocument.caseId);
+    console.log('5. ✅ Dossier trouvé dans la liste:', dossierSelectionne);
+    
+    // Vérifier FormData
+    const formData = new FormData();
+    formData.append('file', this.selectedFile!);
+    console.log('6. 📦 FormData créé:', formData);
+    
+    console.log('7. 🎯 Paramètres à envoyer:', {
+      objetNodeId: this.newDocument.caseId,
+      fieldName: 'documentsPartage', 
+      typeDocument: this.newDocument.type
+    });
+  }
+
 
 }
