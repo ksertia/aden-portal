@@ -13,6 +13,10 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
+  // Pour stocker temporairement le code de réinitialisation
+  private resetCodeSubject = new BehaviorSubject<string | null>(null);
+  public resetCode$ = this.resetCodeSubject.asObservable();
+
   constructor(private http: HttpClient) {
     // Récupérer l'utilisateur du localStorage au démarrage
     const storedUser = localStorage.getItem('currentUser');
@@ -95,17 +99,13 @@ register(user: any): Observable<User> {
   }
 
   // Réinitialisation du mot de passe (reset-password)
-  resetPassword(newPassword: string, confirmPassword: string): Observable<any> {
-    const code = this.getResetCode();
-    if (!code) {
-      return throwError(() => new Error('Aucun code de réinitialisation disponible'));
-    }
-
-    return this.http.post(`${this.apiUrl}/reset-password`, {
-      code,
-      password: newPassword,
-      passwordConfirmation: confirmPassword
-    });
-  }
+  // ✅ Réinitialiser le mot de passe
+resetPassword(code: string, password: string, passwordConfirmation: string) {
+  return this.http.post(`${this.apiUrl}/reset-password`, {
+    code,
+    password,
+    passwordConfirmation
+  });
+}
 }
 

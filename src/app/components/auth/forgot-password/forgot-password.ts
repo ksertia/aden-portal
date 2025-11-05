@@ -13,6 +13,7 @@ import { AuthService } from '../../../services/auth.service';
 export class ForgotPassword {
   forgotForm: FormGroup;
   isSubmitting = false;
+  emailSent = false; 
   successMessage = '';
   errorMessage = '';
 
