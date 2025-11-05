@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 
 @Component({
@@ -17,7 +18,7 @@ export class ResetCode {
   successMessage = '';
   errorMessage = '';
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.codeForm = this.fb.group({
       code: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(6)]]
     });
@@ -30,18 +31,12 @@ export class ResetCode {
     this.errorMessage = '';
     this.successMessage = '';
 
-    // Simulation d’un appel API de vérification du code
-    setTimeout(() => {
-      this.isSubmitting = false;
-      const enteredCode = this.codeForm.value.code;
+    const enteredCode = this.codeForm.value.code;
 
-      if (enteredCode === '123456') {
-        this.successMessage = 'Code vérifié avec succès ! Redirection vers la réinitialisation du mot de passe...';
-        setTimeout(() => this.router.navigate(['/new-password']), 3000);
-      } else {
-        this.errorMessage = 'Le code saisi est invalide ou expiré.';
-      }
-    }, 2000);
+    // On stocke le code dans AuthService pour ResetPassword
+    this.authService.setResetCode(enteredCode);
+    this.isSubmitting = false;
+    this.successMessage = 'Code enregistré avec succès ! Redirection...';
+    setTimeout(() => this.router.navigate(['/reset-password']), 1500);
   }
-
 }

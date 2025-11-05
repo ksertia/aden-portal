@@ -4,7 +4,6 @@ import { environment } from '../../environment/environment';
 import { tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { User, StrapiRole, LoginRequest, LoginResponse } from '../models/user.model';
-import { environment } from '../../environment/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -77,6 +76,36 @@ register(user: any): Observable<User> {
         this.currentUserSubject.next(user);
       })
     );
+  }
+  // ==================== RESET PASSWORD FLOW ====================
+
+  // Stocke temporairement le code reçu par email
+  setResetCode(code: string) {
+    this.resetCodeSubject.next(code);
+  }
+
+  // Récupère le code
+  getResetCode(): string | null {
+    return this.resetCodeSubject.value;
+  }
+
+  // Demande de réinitialisation (forgot-password)
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  // Réinitialisation du mot de passe (reset-password)
+  resetPassword(newPassword: string, confirmPassword: string): Observable<any> {
+    const code = this.getResetCode();
+    if (!code) {
+      return throwError(() => new Error('Aucun code de réinitialisation disponible'));
+    }
+
+    return this.http.post(`${this.apiUrl}/reset-password`, {
+      code,
+      password: newPassword,
+      passwordConfirmation: confirmPassword
+    });
   }
 }
 
