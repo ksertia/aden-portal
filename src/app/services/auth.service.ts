@@ -4,7 +4,7 @@ import { environment } from '../../environment/environment';
 import { tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { User, StrapiRole, LoginRequest, LoginResponse } from '../models/user.model';
-import { environment } from '../../environment/environment';
+// import { environment } from '../../environment/environment';
 
 @Injectable({
   providedIn: 'root'
