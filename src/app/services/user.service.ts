@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../models/user.model';
+import { environment } from '../../environment/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:1337/api/users'; // ton backend Strapi ou autre
+  private apiUrl = `${environment.baseUrl}/users`; // ton backend Strapi ou autre
 
   constructor(private http: HttpClient) {}
 
