@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { environment } from '../../environment/environment';
 import { tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environment/environment';
 import { User, StrapiRole, LoginRequest, LoginResponse } from '../models/user.model';
-// import { environment } from '../../environment/environment';
+
 
 @Injectable({
   providedIn: 'root'

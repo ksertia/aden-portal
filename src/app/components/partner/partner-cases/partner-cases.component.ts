@@ -470,7 +470,7 @@ export class PartnerCasesComponent implements OnInit {
   const file = event.target.files[0];
   if (file) {
     this.selectedFile = file;
-    console.log('📄 Fichier sélectionné:', {
+    console.log('Fichier sélectionné:', {
       name: file.name,
       size: file.size,
       type: file.type,
@@ -516,26 +516,26 @@ export class PartnerCasesComponent implements OnInit {
     typeDocument: this.newDocument.type
   };
 
-  // 🔥 SAUVEGARDER le nom original AVANT l'upload
+  // SAUVEGARDER le nom original AVANT l'upload
   const originalFileName = this.selectedFile!.name;
 
   this.casesService.uploadDocument(formData, params).subscribe({
     next: (response) => {
       this.isLoading = false;
-      console.log('✅ Document uploadé:', response);
+      console.log('Document uploadé:', response);
 
       const uploadedFile = response.files[0];
       
-      // 🔥 FORCER le nom original peu importe ce que retourne Alfresco
+      // FORCER le nom original peu importe ce que retourne Alfresco
       const newDoc: CaseDocument & { caseId: string } = {
         id: uploadedFile.documentNodeId,
-        name: originalFileName, // 🔥 TOUJOURS le nom original du fichier
+        name: originalFileName, 
         type: this.mapDocumentType(uploadedFile.typeDocument),
         url: '#',
         uploadedAt: new Date(),
         uploadedBy: 'Utilisateur actuel',
         caseId: this.selectedDetailCase.nodeId,
-        // originalData: uploadedFile
+
       };
 
       this.allDocuments.push(newDoc);
