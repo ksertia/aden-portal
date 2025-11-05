@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environment/environment';
 import { User, StrapiRole, LoginRequest, LoginResponse } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/auth'; //  Mon BFF Express
+  private apiUrl = `${environment.baseUrl}/auth`; //  Mon BFF Express
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
