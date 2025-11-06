@@ -83,6 +83,26 @@ export class PartnerCasesComponent implements OnInit {
   isLoadingDocument = false;
   safePdfUrl: SafeResourceUrl | null = null;
 
+
+  // Propriétés pour les messages temporaires ( ajout ou suppression reussi ou achouer d'un document)
+  showUploadSuccess = false;
+  uploadSuccessMessage = '';
+  showDeleteSuccess = false;
+  deleteSuccessMessage = '';
+
+  // Propriétés pour la validation des champs avec mise en évidence rouge et messages d'erreur
+  uploadFormErrors = {
+    type: false,
+    name: false,
+    file: false
+  };
+
+  uploadErrorMessages = {
+    type: '',
+    name: '',
+    file: ''
+  };
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -128,7 +148,7 @@ export class PartnerCasesComponent implements OnInit {
         // Étape 1 : extraction correcte du tableau de dossiers
         const dossiers = response.data?.map((item: any) => item.map) || [];
 
-        console.log('🔍 STRUCTURE COMPLÈTE DU DOSSIER:', JSON.stringify(this.dossiers[0], null, 2));
+        console.log(' STRUCTURE COMPLÈTE DU DOSSIER:', JSON.stringify(this.dossiers[0], null, 2));
 
         // Étape 2 : filtrage local
         this.dossiers = dossiers.filter(
@@ -480,7 +500,16 @@ export class PartnerCasesComponent implements OnInit {
     if (!this.newDocument.name) {
       this.newDocument.name = file.name;
     }
+
+    // Réinitialiser l'erreur du fichier si un fichier est sélectionné
+    this.uploadFormErrors.file = false;
+    this.uploadErrorMessages.file = '';
+  }else {
+    // Marquer comme erreur si aucun fichier n'est sélectionné
+    this.uploadFormErrors.file = true;
+    this.uploadErrorMessages.file = 'Veuillez sélectionner un fichier';
   }
+
   }
 
   // Méthode améliorée pour la validation
@@ -503,9 +532,46 @@ export class PartnerCasesComponent implements OnInit {
   }
 
   uploadDocument() {
-  if (!this.isUploadValid() || this.isLoading) return;
+
+  console.log('Début de la validation...');
+
+  // Réinitialiser les erreurs
+  this.resetUploadErrors();
+
+  // Valider les champs
+  let isValid = true;
+
+  if (!this.newDocument.type) {
+    this.uploadFormErrors.type = true;
+    this.uploadErrorMessages.type = 'Veuillez sélectionner un type de document';
+    isValid = false;
+    console.log('Erreur type');
+  }
+
+  if (!this.newDocument.name || this.newDocument.name.trim() === '') {
+    this.uploadFormErrors.name = true;
+    this.uploadErrorMessages.name = 'Veuillez saisir un nom pour le document';
+    isValid = false;
+    console.log('Erreur name');
+  }
+
+  if (!this.selectedFile) {
+    this.uploadFormErrors.file = true;
+    this.uploadErrorMessages.file = 'Veuillez sélectionner un fichier';
+    isValid = false;
+    console.log('Erreur file');
+  }
+
+  console.log('Validation résultat:', isValid, 'isLoading:', this.isLoading); 
+
+  if (!isValid || this.isLoading) {
+    console.log('Arrêt: validation échouée ou en cours de chargement');
+    return;
+  }
+  // if (!this.isUploadValid() || this.isLoading) return;
 
   this.isLoading = true;
+  console.log('Début de l\'upload...');
 
   const formData = new FormData();
   formData.append('filedata', this.selectedFile!);
@@ -540,10 +606,19 @@ export class PartnerCasesComponent implements OnInit {
 
       this.allDocuments.push(newDoc);
       this.filteredDocuments.push(newDoc);
+
+
+      // AFFICHER LE MESSAGE DE SUCCÈS DANS LA MODALE
+      this.showUploadSuccess = true;
+      this.uploadSuccessMessage = 'Document ajouté avec succès!';
       
-      this.closeUploadModal();
-      this.filterDocuments();
-      alert('Document ajouté avec succès!');
+      // Fermer la modale d'upload après 3 secondes
+      setTimeout(() => {
+        this.showUploadSuccess = false;
+        this.uploadSuccessMessage = '';
+        this.closeUploadModal();
+        this.filterDocuments();
+      }, 3000);
     },
     error: (error) => {
       this.isLoading = false;
@@ -553,15 +628,62 @@ export class PartnerCasesComponent implements OnInit {
   });
 }
 
-
-
-  deleteDocument(doc: CaseDocument) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
-      this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
-      this.filterDocuments();
-      console.log('Document supprimé:', doc.name);
-    }
+  // Ajoutez cette méthode pour réinitialiser les erreurs
+  resetUploadErrors(): void {
+    this.uploadFormErrors = {
+      type: false,
+      name: false,
+      file: false
+    };
+    this.uploadErrorMessages = {
+      type: '',
+      name: '',
+      file: ''
+    };
   }
+
+  deleteDocument(doc: CaseDocument & { caseId: string }) {
+  // Confirmation avant suppression
+  const confirmed = confirm(`Êtes-vous sûr de vouloir supprimer le document "${doc.name}" ?`);
+  
+  if (!confirmed) {
+    return;
+  }
+
+  console.log('Suppression du document:', doc);
+
+  // Vérifier que le document a un ID
+  if (!doc.id) {
+    alert('Impossible de supprimer le document : identifiant manquant');
+    return;
+  }
+
+  // Appel du service pour supprimer le document
+  this.casesService.deleteDocument(doc.id).subscribe({
+    next: (response) => {
+      console.log('Document supprimé avec succès:', response);
+      
+      // Supprimer le document des tableaux locaux
+      this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
+      this.filteredDocuments = this.filteredDocuments.filter(d => d.id !== doc.id);
+
+      // AFFICHER LE MESSAGE DE SUCCÈS POUR LA SUPPRESSION
+      this.showDeleteSuccess = true;
+      this.deleteSuccessMessage = 'Document supprimé avec succès!';
+
+      // Cacher le message après 3 secondes
+      setTimeout(() => {
+        this.showDeleteSuccess = false;
+        this.deleteSuccessMessage = '';
+        this.filterDocuments();
+      }, 3000);
+    },
+    error: (error) => {
+      console.error('Erreur lors de la suppression:', error);
+      alert('Erreur lors de la suppression du document. Veuillez réessayer.');
+    }
+  });
+}
 
   closeUploadModal() {
     console.log('Fermeture de la modal d\'upload');
@@ -572,12 +694,35 @@ export class PartnerCasesComponent implements OnInit {
       type: '',
       name: ''
     };
+    // RÉINITIALISER LE MESSAGE DE SUCCÈS
+    this.showUploadSuccess = false;
+    this.uploadSuccessMessage = '';
+    this.resetUploadErrors(); // Réinitialiser les erreurs
   }
-  
 
-  // Fonction pour fermer la modal des documents
   closeDocumentsModal() {
     this.showDocumentsModal = false;
+    // RÉINITIALISER LE MESSAGE DE SUPPRESSION
+    this.showDeleteSuccess = false;
+    this.deleteSuccessMessage = '';
+  }
+
+  // Ajoutez cette méthode pour valider en temps réel
+  validateField(fieldName: keyof typeof this.uploadFormErrors): void {
+    switch (fieldName) {
+      case 'type':
+        this.uploadFormErrors.type = !this.newDocument.type;
+        this.uploadErrorMessages.type = this.uploadFormErrors.type ? 'Veuillez sélectionner un type de document' : '';
+        break;
+      case 'name':
+        this.uploadFormErrors.name = !this.newDocument.name || this.newDocument.name.trim() === '';
+        this.uploadErrorMessages.name = this.uploadFormErrors.name ? 'Veuillez saisir un nom pour le document' : '';
+        break;
+      case 'file':
+        this.uploadFormErrors.file = !this.selectedFile;
+        this.uploadErrorMessages.file = this.uploadFormErrors.file ? 'Veuillez sélectionner un fichier' : '';
+        break;
+    }
   }
 
 

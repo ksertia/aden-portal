@@ -24,7 +24,7 @@ export class ProfileComponent implements OnInit {
   constructor(private authService: AuthService, private i18nService: I18nService) {}
 
   ngOnInit() {
-    // ⚠️ si user vient du parent (UserList), on l’utilise directement
+    // si user vient du parent (UserList), on l’utilise directement
     if (!this.user) {
       // sinon on fallback sur l’utilisateur connecté
       this.user = this.authService.getCurrentUser();

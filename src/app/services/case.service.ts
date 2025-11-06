@@ -92,4 +92,11 @@ export class CaseService {
     });
   }
 
+  // Supprimer un document
+  deleteDocument(documentNodeId: string): Observable<any> {
+    return this.http.delete(`${this.documentApiUrl}/delete`, { 
+      params: { documentNodeId }
+    });
+  }
+
 }

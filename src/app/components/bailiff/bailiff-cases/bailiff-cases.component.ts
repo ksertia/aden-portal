@@ -137,8 +137,6 @@ export class BailiffCasesComponent implements OnInit {
         // IMPORTANT: Extraire les documents après avoir chargé les dossiers
         this.extractDocuments();
 
-        this.uploadDocument();
-
         this.isLoading = false;
       },
       error: (error) => {
@@ -437,22 +435,7 @@ export class BailiffCasesComponent implements OnInit {
       };
       return labels[type] || type;
     }
-    // onFileSelected(event: any) {
-    //   const file = event.target.files[0];
-    //   if (file) {
-    //     this.selectedFile = file;
-    //     if (!this.newDocument.name) {
-    //       this.newDocument.name = file.name;
-    //     }
-    //   }
-    // }
-  
-    // isUploadValid(): boolean {
-    //   return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
-    // }
-  
-    // uploadDocument() {
-    // }
+
   onFileSelected(event: any) {
   const file = event.target.files[0];
   if (file) {
@@ -540,13 +523,43 @@ export class BailiffCasesComponent implements OnInit {
   });
 }
   
-    deleteDocument(doc: CaseDocument) {
-      if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
-        this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
-        this.filterDocuments();
-        console.log('Document supprimé:', doc.name);
-      }
+  deleteDocument(doc: CaseDocument & { caseId: string }) {
+  // Confirmation avant suppression
+  const confirmed = confirm(`Êtes-vous sûr de vouloir supprimer le document "${doc.name}" ?`);
+  
+  if (!confirmed) {
+    return;
+  }
+
+  console.log('Suppression du document:', doc);
+
+  // Vérifier que le document a un ID
+  if (!doc.id) {
+    alert('Impossible de supprimer le document : identifiant manquant');
+    return;
+  }
+
+  // Appel du service pour supprimer le document
+  this.casesService.deleteDocument(doc.id).subscribe({
+    next: (response) => {
+      console.log('Document supprimé avec succès:', response);
+      
+      // Supprimer le document des tableaux locaux
+      this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
+      this.filteredDocuments = this.filteredDocuments.filter(d => d.id !== doc.id);
+      
+      // Mettre à jour l'affichage
+      this.filterDocuments();
+      
+      // Afficher un message de succès
+      alert('Document supprimé avec succès!');
+    },
+    error: (error) => {
+      console.error('Erreur lors de la suppression:', error);
+      alert('Erreur lors de la suppression du document. Veuillez réessayer.');
     }
+  });
+}
   
     closeUploadModal() {
       console.log('Fermeture de la modal d\'upload');

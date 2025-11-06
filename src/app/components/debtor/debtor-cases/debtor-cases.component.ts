@@ -956,15 +956,44 @@ export class DebtorCasesComponent implements OnInit {
     }
   });
   }
-  
 
-  deleteDocument(doc: CaseDocument) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
-      this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
-      this.filterDocuments();
-      console.log('Document supprimé:', doc.name);
-    }
+  deleteDocument(doc: CaseDocument & { caseId: string }) {
+  // Confirmation avant suppression
+  const confirmed = confirm(`Êtes-vous sûr de vouloir supprimer le document "${doc.name}" ?`);
+  
+  if (!confirmed) {
+    return;
   }
+
+  console.log('Suppression du document:', doc);
+
+  // Vérifier que le document a un ID
+  if (!doc.id) {
+    alert('Impossible de supprimer le document : identifiant manquant');
+    return;
+  }
+
+  // Appel du service pour supprimer le document
+  this.casesService.deleteDocument(doc.id).subscribe({
+    next: (response) => {
+      console.log('Document supprimé avec succès:', response);
+      
+      // Supprimer le document des tableaux locaux
+      this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
+      this.filteredDocuments = this.filteredDocuments.filter(d => d.id !== doc.id);
+      
+      // Mettre à jour l'affichage
+      this.filterDocuments();
+      
+      // Afficher un message de succès
+      alert('Document supprimé avec succès!');
+    },
+    error: (error) => {
+      console.error('Erreur lors de la suppression:', error);
+      alert('Erreur lors de la suppression du document. Veuillez réessayer.');
+    }
+  });
+}
 
   closeUploadModal() {
     this.showUploadModal = false;
