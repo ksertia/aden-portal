@@ -83,6 +83,13 @@ export class PartnerCasesComponent implements OnInit {
   isLoadingDocument = false;
   safePdfUrl: SafeResourceUrl | null = null;
 
+
+  // Propriétés pour les messages temporaires ( ajout ou suppression reussi ou achouer d'un document)
+  showUploadSuccess = false;
+  uploadSuccessMessage = '';
+  showDeleteSuccess = false;
+  deleteSuccessMessage = '';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -128,7 +135,7 @@ export class PartnerCasesComponent implements OnInit {
         // Étape 1 : extraction correcte du tableau de dossiers
         const dossiers = response.data?.map((item: any) => item.map) || [];
 
-        console.log('🔍 STRUCTURE COMPLÈTE DU DOSSIER:', JSON.stringify(this.dossiers[0], null, 2));
+        console.log(' STRUCTURE COMPLÈTE DU DOSSIER:', JSON.stringify(this.dossiers[0], null, 2));
 
         // Étape 2 : filtrage local
         this.dossiers = dossiers.filter(
@@ -540,10 +547,17 @@ export class PartnerCasesComponent implements OnInit {
 
       this.allDocuments.push(newDoc);
       this.filteredDocuments.push(newDoc);
+
+
+      // AFFICHER LE MESSAGE DE SUCCÈS DANS LA MODALE
+      this.showUploadSuccess = true;
+      this.uploadSuccessMessage = 'Document ajouté avec succès!';
       
-      this.closeUploadModal();
-      this.filterDocuments();
-      alert('Document ajouté avec succès!');
+      // Fermer la modale d'upload après 2 secondes
+      setTimeout(() => {
+        this.closeUploadModal();
+        this.filterDocuments();
+      }, 2000);
     },
     error: (error) => {
       this.isLoading = false;
@@ -553,15 +567,50 @@ export class PartnerCasesComponent implements OnInit {
   });
 }
 
-
-
-  deleteDocument(doc: CaseDocument) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
-      this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
-      this.filterDocuments();
-      console.log('Document supprimé:', doc.name);
-    }
+  deleteDocument(doc: CaseDocument & { caseId: string }) {
+  // Confirmation avant suppression
+  const confirmed = confirm(`Êtes-vous sûr de vouloir supprimer le document "${doc.name}" ?`);
+  
+  if (!confirmed) {
+    return;
   }
+
+  console.log('Suppression du document:', doc);
+
+  // Vérifier que le document a un ID
+  if (!doc.id) {
+    alert('Impossible de supprimer le document : identifiant manquant');
+    return;
+  }
+
+  // Appel du service pour supprimer le document
+  this.casesService.deleteDocument(doc.id).subscribe({
+    next: (response) => {
+      console.log('Document supprimé avec succès:', response);
+      
+      // Supprimer le document des tableaux locaux
+      this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
+      this.filteredDocuments = this.filteredDocuments.filter(d => d.id !== doc.id);
+
+      // AFFICHER LE MESSAGE DE SUCCÈS POUR LA SUPPRESSION
+      this.showDeleteSuccess = true;
+      this.deleteSuccessMessage = 'Document supprimé avec succès!';
+      
+      // Mettre à jour l'affichage
+      this.filterDocuments();
+      
+      // Cacher le message après 3 secondes
+      setTimeout(() => {
+        this.showDeleteSuccess = false;
+        this.deleteSuccessMessage = '';
+      }, 3000);
+    },
+    error: (error) => {
+      console.error('Erreur lors de la suppression:', error);
+      alert('Erreur lors de la suppression du document. Veuillez réessayer.');
+    }
+  });
+}
 
   closeUploadModal() {
     console.log('Fermeture de la modal d\'upload');
@@ -572,13 +621,17 @@ export class PartnerCasesComponent implements OnInit {
       type: '',
       name: ''
     };
+    // RÉINITIALISER LE MESSAGE DE SUCCÈS
+    this.showUploadSuccess = false;
+    this.uploadSuccessMessage = '';
   }
-  
 
-  // Fonction pour fermer la modal des documents
   closeDocumentsModal() {
-    this.showDocumentsModal = false;
-  }
+  this.showDocumentsModal = false;
+  // RÉINITIALISER LE MESSAGE DE SUPPRESSION
+  this.showDeleteSuccess = false;
+  this.deleteSuccessMessage = '';
+}
 
 
   // Ajout methode end
