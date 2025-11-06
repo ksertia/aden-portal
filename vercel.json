@@ -1,0 +1,12 @@
+{
+  "buildCommand": "ng build --configuration production",
+  "outputDirectory": "dist/demo/browser",
+  "devCommand": "ng serve",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
