@@ -90,6 +90,19 @@ export class PartnerCasesComponent implements OnInit {
   showDeleteSuccess = false;
   deleteSuccessMessage = '';
 
+  // Propriétés pour la validation des champs avec mise en évidence rouge et messages d'erreur
+  uploadFormErrors = {
+    type: false,
+    name: false,
+    file: false
+  };
+
+  uploadErrorMessages = {
+    type: '',
+    name: '',
+    file: ''
+  };
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -487,7 +500,16 @@ export class PartnerCasesComponent implements OnInit {
     if (!this.newDocument.name) {
       this.newDocument.name = file.name;
     }
+
+    // Réinitialiser l'erreur du fichier si un fichier est sélectionné
+    this.uploadFormErrors.file = false;
+    this.uploadErrorMessages.file = '';
+  }else {
+    // Marquer comme erreur si aucun fichier n'est sélectionné
+    this.uploadFormErrors.file = true;
+    this.uploadErrorMessages.file = 'Veuillez sélectionner un fichier';
   }
+
   }
 
   // Méthode améliorée pour la validation
@@ -510,9 +532,46 @@ export class PartnerCasesComponent implements OnInit {
   }
 
   uploadDocument() {
-  if (!this.isUploadValid() || this.isLoading) return;
+
+  console.log('Début de la validation...');
+
+  // Réinitialiser les erreurs
+  this.resetUploadErrors();
+
+  // Valider les champs
+  let isValid = true;
+
+  if (!this.newDocument.type) {
+    this.uploadFormErrors.type = true;
+    this.uploadErrorMessages.type = 'Veuillez sélectionner un type de document';
+    isValid = false;
+    console.log('Erreur type');
+  }
+
+  if (!this.newDocument.name || this.newDocument.name.trim() === '') {
+    this.uploadFormErrors.name = true;
+    this.uploadErrorMessages.name = 'Veuillez saisir un nom pour le document';
+    isValid = false;
+    console.log('Erreur name');
+  }
+
+  if (!this.selectedFile) {
+    this.uploadFormErrors.file = true;
+    this.uploadErrorMessages.file = 'Veuillez sélectionner un fichier';
+    isValid = false;
+    console.log('Erreur file');
+  }
+
+  console.log('Validation résultat:', isValid, 'isLoading:', this.isLoading); 
+
+  if (!isValid || this.isLoading) {
+    console.log('Arrêt: validation échouée ou en cours de chargement');
+    return;
+  }
+  // if (!this.isUploadValid() || this.isLoading) return;
 
   this.isLoading = true;
+  console.log('Début de l\'upload...');
 
   const formData = new FormData();
   formData.append('filedata', this.selectedFile!);
@@ -553,11 +612,13 @@ export class PartnerCasesComponent implements OnInit {
       this.showUploadSuccess = true;
       this.uploadSuccessMessage = 'Document ajouté avec succès!';
       
-      // Fermer la modale d'upload après 2 secondes
+      // Fermer la modale d'upload après 3 secondes
       setTimeout(() => {
+        this.showUploadSuccess = false;
+        this.uploadSuccessMessage = '';
         this.closeUploadModal();
         this.filterDocuments();
-      }, 2000);
+      }, 3000);
     },
     error: (error) => {
       this.isLoading = false;
@@ -566,6 +627,20 @@ export class PartnerCasesComponent implements OnInit {
     }
   });
 }
+
+  // Ajoutez cette méthode pour réinitialiser les erreurs
+  resetUploadErrors(): void {
+    this.uploadFormErrors = {
+      type: false,
+      name: false,
+      file: false
+    };
+    this.uploadErrorMessages = {
+      type: '',
+      name: '',
+      file: ''
+    };
+  }
 
   deleteDocument(doc: CaseDocument & { caseId: string }) {
   // Confirmation avant suppression
@@ -595,14 +670,12 @@ export class PartnerCasesComponent implements OnInit {
       // AFFICHER LE MESSAGE DE SUCCÈS POUR LA SUPPRESSION
       this.showDeleteSuccess = true;
       this.deleteSuccessMessage = 'Document supprimé avec succès!';
-      
-      // Mettre à jour l'affichage
-      this.filterDocuments();
-      
+
       // Cacher le message après 3 secondes
       setTimeout(() => {
         this.showDeleteSuccess = false;
         this.deleteSuccessMessage = '';
+        this.filterDocuments();
       }, 3000);
     },
     error: (error) => {
@@ -624,14 +697,33 @@ export class PartnerCasesComponent implements OnInit {
     // RÉINITIALISER LE MESSAGE DE SUCCÈS
     this.showUploadSuccess = false;
     this.uploadSuccessMessage = '';
+    this.resetUploadErrors(); // Réinitialiser les erreurs
   }
 
   closeDocumentsModal() {
-  this.showDocumentsModal = false;
-  // RÉINITIALISER LE MESSAGE DE SUPPRESSION
-  this.showDeleteSuccess = false;
-  this.deleteSuccessMessage = '';
-}
+    this.showDocumentsModal = false;
+    // RÉINITIALISER LE MESSAGE DE SUPPRESSION
+    this.showDeleteSuccess = false;
+    this.deleteSuccessMessage = '';
+  }
+
+  // Ajoutez cette méthode pour valider en temps réel
+  validateField(fieldName: keyof typeof this.uploadFormErrors): void {
+    switch (fieldName) {
+      case 'type':
+        this.uploadFormErrors.type = !this.newDocument.type;
+        this.uploadErrorMessages.type = this.uploadFormErrors.type ? 'Veuillez sélectionner un type de document' : '';
+        break;
+      case 'name':
+        this.uploadFormErrors.name = !this.newDocument.name || this.newDocument.name.trim() === '';
+        this.uploadErrorMessages.name = this.uploadFormErrors.name ? 'Veuillez saisir un nom pour le document' : '';
+        break;
+      case 'file':
+        this.uploadFormErrors.file = !this.selectedFile;
+        this.uploadErrorMessages.file = this.uploadFormErrors.file ? 'Veuillez sélectionner un fichier' : '';
+        break;
+    }
+  }
 
 
   // Ajout methode end

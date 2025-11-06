@@ -601,7 +601,7 @@
       <div class="upload-form" *ngIf="!showUploadSuccess">
         <div class="form-group">
           <label>Type de document</label>
-          <select [(ngModel)]="newDocument.type" required>
+          <select [(ngModel)]="newDocument.type" [class.error]="uploadFormErrors.type" required>
             <option value="">Sélectionner un type</option>
             <option value="invoice">Facture</option>
             <option value="contract">Contrat</option>
@@ -610,6 +610,10 @@
             <option value="payment_proof">Preuve de paiement</option>
             <option value="court_document">Document judiciaire</option>
           </select>
+
+          <div class="error-message" *ngIf="uploadFormErrors.type">
+             {{ uploadErrorMessages.type }}
+          </div>
         </div>
           
         <div class="form-group">
@@ -618,15 +622,20 @@
             type="text"
             [(ngModel)]="newDocument.name"
             placeholder="Nom du fichier"
+            [class.error]="uploadFormErrors.name"
             required  
           >
+
+          <div class="error-message" *ngIf="uploadFormErrors.name">
+            {{ uploadErrorMessages.name }}
+        </div>
         </div>
           
         <div class="form-group">
           <label>Fichier</label>
           <div class="file-upload">
-            <input type="file" id="fileInput" (change)="onFileSelected($event)" accept=".pdf,.doc,.docx,.jpg,.png">
-            <label for="fileInput" class="file-upload-label">
+            <input type="file" id="fileInput" (change)="onFileSelected($event); validateField('file')" accept=".pdf,.doc,.docx,.jpg,.png" [class.error]="uploadFormErrors.file">
+            <label for="fileInput" class="file-upload-label" [class.error]="uploadFormErrors.file">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="17,8 12,3 7,8"/>
@@ -635,13 +644,17 @@
               <span>{{ selectedFile ? selectedFile.name : 'Choisir un fichier' }}</span>
             </label>
           </div>
+
+          <div class="error-message" *ngIf="uploadFormErrors.file">
+            {{ uploadErrorMessages.file }}
+          </div>
         </div>
       </div>
     </div>
 
     <div class="modal-footer" *ngIf="!showUploadSuccess">
       <button class="btn btn-secondary" (click)="closeUploadModal()" [disabled]="isLoading">Annuler</button>
-      <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="!isUploadValid() || isLoading">
+      <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="isLoading">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
           <polyline points="17,8 12,3 7,8"/>
