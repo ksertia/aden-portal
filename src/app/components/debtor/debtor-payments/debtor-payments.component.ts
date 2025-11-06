@@ -26,15 +26,52 @@ export class DebtorPaymentsComponent implements OnInit {
   remainingBalance = 0;
   dossiers: any[] = [];
   
-  // États du drawer de paiement
+  // États du drawer de paiement - ORDRE CORRIGÉ
   showPaymentDrawer = false;
-  currentStep: 'selection' | 'currency' | 'details' | 'confirmation' = 'selection';
+  currentStep: 'selection' | 'currency' | 'details' | 'paymentMethod' | 'confirmation' = 'selection';
+
+  // Mode de paiement sélectionné
+  selectedPaymentMethod: string = '';
+  selectedPaymentProvider: string = '';
+
+  // Modes de paiement disponibles
+  paymentMethods = [
+    {
+      id: 'mobile',
+      name: 'Paiement Mobile',
+      description: 'Payer via votre mobile money',
+      providers: [
+        { id: 'corisMoney', name: 'Coris Money', icon: '📱' },
+        { id: 'orangeMoney', name: 'Orange Money', icon: '🟠' },
+        { id: 'moovMoney', name: 'Moov Money', icon: '🔵' },
+        { id: 'telecelMoney', name: 'Telecel Money', icon: '🟡' }
+      ]
+    },
+    {
+      id: 'card',
+      name: 'Carte Bancaire',
+      description: 'Payer par carte de crédit/débit',
+      providers: [
+        { id: 'visa', name: 'Carte Visa', icon: '💳' },
+        { id: 'mastercard', name: 'Carte Mastercard', icon: '💳' },
+        { id: 'localCard', name: 'Carte Bancaire Locale', icon: '🏦' }
+      ]
+    },
+    {
+      id: 'paypal',
+      name: 'PayPal',
+      description: 'Payer via votre compte PayPal',
+      providers: [
+        { id: 'paypal', name: 'PayPal', icon: '🔵' }
+      ]
+    }
+  ];
   
   // Données pour le paiement
   paymentAmount = 0;
   selectedDossier: any = null;
   selectedDossierId: string = '';
-  selectedCurrency: string = 'EUR'; // Devise par défaut = EUR
+  selectedCurrency: string = 'XOF'; // Devise par défaut = XOF
   exchangeRate: number = 1;
   
   // Frais et calculs
@@ -42,16 +79,16 @@ export class DebtorPaymentsComponent implements OnInit {
   taxes = 0;
   transactionFees = 0;
   totalFees = 0;
-  totalToPay = 0; // En EUR
+  totalToPay = 0; // En XOF (devise de base)
   totalToPayInSelectedCurrency = 0; // Dans la devise sélectionnée
   
-  // Devises disponibles (taux de change simulés)
+  // Devises disponibles (taux de change depuis XOF)
   availableCurrencies = [
-    { code: 'EUR', name: 'Euro', symbol: '€', rate: 1 },
-    { code: 'USD', name: 'Dollar US', symbol: '$', rate: 1.08 },
-    { code: 'XOF', name: 'Franc CFA', symbol: 'FCFA', rate: 655.96 },
-    { code: 'GBP', name: 'Livre Sterling', symbol: '£', rate: 0.85 },
-    { code: 'CAD', name: 'Dollar Canadien', symbol: 'C$', rate: 1.47 }
+    { code: 'XOF', name: 'Franc CFA', symbol: 'FCFA', rate: 1 },
+    { code: 'EUR', name: 'Euro', symbol: '€', rate: 0.001524 }, // 1 XOF = 0.001524 EUR
+    { code: 'USD', name: 'Dollar US', symbol: '$', rate: 0.00165 }, // 1 XOF = 0.00165 USD
+    { code: 'GBP', name: 'Livre Sterling', symbol: '£', rate: 0.00130 }, // 1 XOF = 0.00130 GBP
+    { code: 'CAD', name: 'Dollar Canadien', symbol: 'C$', rate: 0.00224 } // 1 XOF = 0.00224 CAD
   ];
   
   // Loading states
@@ -136,53 +173,53 @@ export class DebtorPaymentsComponent implements OnInit {
     if (!amount) return `0 ${this.getCurrencySymbol()}`;
     
     const selectedCurrency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
-    const symbol = selectedCurrency?.symbol || '€';
+    const symbol = selectedCurrency?.symbol || 'FCFA';
     
     // Pour le XOF, on formate sans décimales
     if (this.selectedCurrency === 'XOF') {
-      return `${amount.toLocaleString('fr-FR')} ${symbol}`;
+      return `${Math.round(amount).toLocaleString('fr-FR')} ${symbol}`;
     }
     
-    // Pour les autres devises, on utilise le format standard
+    // Pour les autres devises, on utilise le format standard avec 2 décimales
     return amount.toLocaleString('fr-FR', {
-      style: 'currency',
-      currency: this.selectedCurrency,
-      minimumFractionDigits: this.selectedCurrency === 'EUR' || this.selectedCurrency === 'USD' ? 2 : 0,
-      maximumFractionDigits: this.selectedCurrency === 'EUR' || this.selectedCurrency === 'USD' ? 2 : 0
-    }).replace('EUR', symbol).replace('USD', symbol);
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + ` ${symbol}`;
   }
 
   // Obtenir le symbole de la devise sélectionnée
   getCurrencySymbol(): string {
     const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
-    return currency?.symbol || '€';
+    return currency?.symbol || 'FCFA';
   }
 
-  // Convertir un montant EUR vers la devise sélectionnée
-  convertToSelectedCurrency(amountInEUR: number): number {
-    if (this.selectedCurrency === 'EUR') return amountInEUR;
+  // Convertir un montant XOF vers la devise sélectionnée
+  convertToSelectedCurrency(amountInXOF: number): number {
+    if (this.selectedCurrency === 'XOF') return amountInXOF;
     
     const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
-    const converted = amountInEUR * (currency?.rate || 1);
+    const converted = amountInXOF * (currency?.rate || 1);
     
-    // Arrondir selon la devise
-    if (this.selectedCurrency === 'XOF') {
-      return Math.round(converted); // XOF sans décimales
-    } else if (this.selectedCurrency === 'EUR' || this.selectedCurrency === 'USD') {
-      return Math.round(converted * 100) / 100; // 2 décimales
-    } else {
-      return Math.round(converted * 100) / 100; // 2 décimales par défaut
-    }
+    // Arrondir à 2 décimales pour les devises autres que XOF
+    return Math.round(converted * 100) / 100;
   }
 
-  // Convertir un montant de la devise sélectionnée vers EUR
-  convertToEUR(amountInCurrency: number): number {
-    if (this.selectedCurrency === 'EUR') return amountInCurrency;
+  // Convertir un montant de la devise sélectionnée vers XOF
+  convertToXOF(amountInCurrency: number): number {
+    if (this.selectedCurrency === 'XOF') return amountInCurrency;
     
     const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
     const converted = amountInCurrency / (currency?.rate || 1);
     
-    return Math.round(converted * 100) / 100; // 2 décimales pour EUR
+    return Math.round(converted); // XOF sans décimales
+  }
+
+  // Obtenir le taux inverse (1 [devise] = ? XOF)
+  getInverseExchangeRate(): number {
+    if (this.selectedCurrency === 'XOF') return 1;
+    
+    const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
+    return 1 / (currency?.rate || 1);
   }
 
   // Ouvrir le drawer de paiement
@@ -190,7 +227,9 @@ export class DebtorPaymentsComponent implements OnInit {
     this.currentStep = 'selection';
     this.selectedDossier = null;
     this.selectedDossierId = '';
-    this.selectedCurrency = 'EUR'; // Toujours réinitialiser à EUR
+    this.selectedCurrency = 'XOF'; // Toujours réinitialiser à XOF
+    this.selectedPaymentMethod = '';
+    this.selectedPaymentProvider = '';
     this.exchangeRate = 1;
     this.paymentAmount = 0;
     this.resetFees();
@@ -203,7 +242,9 @@ export class DebtorPaymentsComponent implements OnInit {
     this.currentStep = 'selection';
     this.selectedDossier = null;
     this.selectedDossierId = '';
-    this.selectedCurrency = 'EUR'; // Réinitialiser à EUR
+    this.selectedCurrency = 'XOF'; // Réinitialiser à XOF
+    this.selectedPaymentMethod = '';
+    this.selectedPaymentProvider = '';
     this.paymentAmount = 0;
     this.resetFees();
   }
@@ -224,28 +265,42 @@ export class DebtorPaymentsComponent implements OnInit {
       const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
       this.exchangeRate = currency?.rate || 1;
       this.calculateFees();
-      this.currentStep = 'details';
+      this.currentStep = 'details'; // On va directement aux détails après la devise
     }
   }
 
-  // Calculer les frais (toujours en EUR d'abord)
+  // Aller au mode de paiement depuis les détails
+  goToPaymentMethod() {
+    if (this.paymentAmount > 0 && this.paymentAmount <= this.totalToPayInSelectedCurrency) {
+      this.currentStep = 'paymentMethod';
+    }
+  }
+
+  // Sélectionner un mode de paiement
+  onPaymentMethodSelect() {
+    if (this.selectedPaymentMethod && this.selectedPaymentProvider) {
+      this.currentStep = 'confirmation';
+    }
+  }
+
+  // Calculer les frais (toujours en XOF d'abord)
   calculateFees() {
     if (!this.selectedDossier) return;
 
-    // Pénalités si le dossier est en retard (en EUR)
+    // Pénalités si le dossier est en retard (en XOF)
     this.penalties = this.calculatePenalties(this.selectedDossier);
     
-    // Taxes (exemple: 20% de TVA sur les pénalités) en EUR
+    // Taxes (exemple: 20% de TVA sur les pénalités) en XOF
     this.taxes = this.penalties * 0.20;
     
-    // Frais de transaction (exemple: 1.5% du montant à payer) en EUR
+    // Frais de transaction (exemple: 1.5% du montant à payer) en XOF
     const baseAmount = this.calculateRemainingAmount(this.selectedDossier);
     this.transactionFees = baseAmount * 0.015;
     
-    // Total des frais en EUR
+    // Total des frais en XOF
     this.totalFees = this.penalties + this.taxes + this.transactionFees;
     
-    // Total à payer en EUR (montant de base + frais)
+    // Total à payer en XOF (montant de base + frais)
     this.totalToPay = baseAmount + this.totalFees;
     
     // Total à payer dans la devise sélectionnée
@@ -255,14 +310,14 @@ export class DebtorPaymentsComponent implements OnInit {
     this.paymentAmount = this.totalToPayInSelectedCurrency;
   }
 
-  // Calculer les pénalités (en EUR)
+  // Calculer les pénalités (en XOF)
   calculatePenalties(dossier: any): number {
     // Vérifier si le dossier est en retard
     const isOverdue = this.isDossierOverdue(dossier);
     
     if (!isOverdue) return 0;
     
-    // Calculer les pénalités (exemple: 10% du montant restant) en EUR
+    // Calculer les pénalités (exemple: 10% du montant restant) en XOF
     const remainingAmount = this.calculateRemainingAmount(dossier);
     return remainingAmount * 0.10;
   }
@@ -276,14 +331,14 @@ export class DebtorPaymentsComponent implements OnInit {
     return dueDate < today;
   }
 
-  // Calculer le montant restant pour un dossier (en EUR)
+  // Calculer le montant restant pour un dossier (en XOF)
   calculateRemainingAmount(dossier: any): number {
     const totalDue = this.calculateTotalDue(dossier);
     const paid = dossier.montantPaye || 0;
     return totalDue - paid;
   }
 
-  // Calculer le total dû pour un dossier (incluant intérêts et frais) en EUR
+  // Calculer le total dû pour un dossier (incluant intérêts et frais) en XOF
   calculateTotalDue(dossier: any): number {
     const principal = dossier.montantTotal || 0;
     const interests = dossier.montantInterets || 0;
@@ -315,7 +370,7 @@ export class DebtorPaymentsComponent implements OnInit {
     return total ? Math.round((paid / total) * 100) : 0;
   }
 
-  // Navigation dans le drawer
+  // Navigation dans le drawer - CORRIGÉ POUR LE NOUVEL ORDRE
   goBack() {
     if (this.currentStep === 'currency') {
       this.currentStep = 'selection';
@@ -324,14 +379,10 @@ export class DebtorPaymentsComponent implements OnInit {
       this.resetFees();
     } else if (this.currentStep === 'details') {
       this.currentStep = 'currency';
-    } else if (this.currentStep === 'confirmation') {
+    } else if (this.currentStep === 'paymentMethod') {
       this.currentStep = 'details';
-    }
-  }
-
-  goToConfirmation() {
-    if (this.paymentAmount > 0 && this.paymentAmount <= this.totalToPayInSelectedCurrency) {
-      this.currentStep = 'confirmation';
+    } else if (this.currentStep === 'confirmation') {
+      this.currentStep = 'paymentMethod';
     }
   }
 
@@ -342,13 +393,15 @@ export class DebtorPaymentsComponent implements OnInit {
       return;
     }
 
-    // Convertir le montant payé en Euro pour le traitement
-    const amountInEUR = this.convertToEUR(this.paymentAmount);
+    // Convertir le montant payé en XOF pour le traitement
+    const amountInXOF = this.convertToXOF(this.paymentAmount);
 
     console.log('Paiement en cours pour le dossier:', this.selectedDossier?.numeroDossier);
     console.log('Montant payé:', this.paymentAmount, this.selectedCurrency);
-    console.log('Montant converti en EUR:', amountInEUR);
+    console.log('Montant converti en XOF:', amountInXOF);
     console.log('Taux de change utilisé:', this.exchangeRate);
+    console.log('Mode de paiement:', this.selectedPaymentMethod);
+    console.log('Fournisseur:', this.selectedPaymentProvider);
     
     // Simulation de paiement
     setTimeout(() => {
@@ -405,6 +458,30 @@ export class DebtorPaymentsComponent implements OnInit {
   // Obtenir le nom complet de la devise
   getCurrencyName(): string {
     const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
-    return currency?.name || 'Euro';
+    return currency?.name || 'Franc CFA';
+  }
+
+  // Méthodes utilitaires pour les modes de paiement
+  getPaymentMethodName(): string {
+    const method = this.paymentMethods.find(m => m.id === this.selectedPaymentMethod);
+    return method?.name || '';
+  }
+
+  getPaymentProviderName(): string {
+    const method = this.paymentMethods.find(m => m.id === this.selectedPaymentMethod);
+    const provider = method?.providers.find(p => p.id === this.selectedPaymentProvider);
+    return provider?.name || '';
+  }
+
+  getPaymentMethodIcon(): string {
+    const method = this.paymentMethods.find(m => m.id === this.selectedPaymentMethod);
+    const provider = method?.providers.find(p => p.id === this.selectedPaymentProvider);
+    return provider?.icon || '💳';
+  }
+
+  // Réinitialiser le mode de paiement
+  resetPaymentMethod() {
+    this.selectedPaymentMethod = '';
+    this.selectedPaymentProvider = '';
   }
 }

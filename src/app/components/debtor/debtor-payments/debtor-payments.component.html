@@ -1,14 +1,4 @@
 <div class="payments-container">
-  <div class="payments-header fade-in-up">
-    <div class="header-content">
-      <button class="btn btn-secondary" routerLink="/debtor/dashboard">Retour</button>
-      <div>
-        <h1>{{ t('payments.title') }}</h1>
-        <p>{{ t('payments.subtitle') }}</p>
-      </div>
-    </div>
-  </div>
-
   <!-- Affichage principal des informations de paiement -->
   <div class="payments-content fade-in-up" *ngIf="!isLoading && !errorMessage">
     
@@ -145,6 +135,7 @@
           <h3>
             <span *ngIf="currentStep === 'selection'">Sélection du dossier</span>
             <span *ngIf="currentStep === 'currency'">Choix de la devise</span>
+            <span *ngIf="currentStep === 'paymentMethod'">Mode de paiement</span>
             <span *ngIf="currentStep === 'details'">Détails du paiement</span>
             <span *ngIf="currentStep === 'confirmation'">Confirmation</span>
           </h3>
@@ -167,6 +158,8 @@
               <div class="step">3</div>
               <div class="step-line"></div>
               <div class="step">4</div>
+              <div class="step-line"></div>
+              <div class="step">5</div>
             </div>
 
             <div class="form-section">
@@ -242,6 +235,8 @@
               <div class="step">3</div>
               <div class="step-line"></div>
               <div class="step">4</div>
+              <div class="step-line"></div>
+              <div class="step">5</div>
             </div>
 
             <div class="currency-selection">
@@ -261,8 +256,11 @@
                     <div class="currency-symbol">{{ currency.symbol }}</div>
                     <div class="currency-details">
                       <div class="currency-name">{{ currency.name }}</div>
-                      <div class="exchange-rate">
-                        1 EUR = {{ currency.rate }} {{ currency.code }}
+                      <div class="exchange-rate" *ngIf="currency.code !== 'XOF'">
+                        1 {{ currency.code }} = {{ getInverseExchangeRate() | number:'1.0-0' }} XOF
+                      </div>
+                      <div class="exchange-rate" *ngIf="currency.code === 'XOF'">
+                        Devise de base
                       </div>
                     </div>
                   </div>
@@ -291,8 +289,8 @@
           </div>
         </div>
 
-        <!-- ÉTAPE 3: Détails du paiement -->
-        <div class="drawer-body" *ngIf="currentStep === 'details' && selectedDossier">
+        <!-- ÉTAPE 3: Mode de paiement -->
+        <div class="drawer-body" *ngIf="currentStep === 'paymentMethod' && selectedDossier">
           <div class="step-content">
             <div class="step-indicator">
               <div class="step completed">1</div>
@@ -302,6 +300,90 @@
               <div class="step active">3</div>
               <div class="step-line"></div>
               <div class="step">4</div>
+              <div class="step-line"></div>
+              <div class="step">5</div>
+            </div>
+
+            <div class="payment-method-selection">
+              <h4>Choisissez votre mode de paiement</h4>
+              <p class="selection-description">
+                Sélectionnez comment vous souhaitez payer le dossier 
+                <strong>{{ selectedDossier.numeroDossier }}</strong> en 
+                <strong>{{ getCurrencySymbol() }}</strong>
+              </p>
+
+              <!-- Méthodes de paiement principales -->
+              <div class="payment-methods">
+                <div 
+                  *ngFor="let method of paymentMethods" 
+                  class="payment-method-card"
+                  [class.selected]="selectedPaymentMethod === method.id"
+                  (click)="selectedPaymentMethod = method.id; selectedPaymentProvider = ''">
+                  
+                  <div class="method-header">
+                    <div class="method-icon">{{ method.id === 'mobile' ? '📱' : method.id === 'card' ? '💳' : '🔵' }}</div>
+                    <div class="method-info">
+                      <h5>{{ method.name }}</h5>
+                      <p>{{ method.description }}</p>
+                    </div>
+                    <div class="method-check">
+                      <div class="checkmark" *ngIf="selectedPaymentMethod === method.id">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                          <polyline points="20,6 9,17 4,12"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Fournisseurs pour cette méthode -->
+                  <div class="providers-list" *ngIf="selectedPaymentMethod === method.id">
+                    <div class="providers-grid">
+                      <div 
+                        *ngFor="let provider of method.providers" 
+                        class="provider-card"
+                        [class.selected]="selectedPaymentProvider === provider.id"
+                        (click)="$event.stopPropagation(); selectedPaymentProvider = provider.id">
+                        
+                        <div class="provider-icon">{{ provider.icon }}</div>
+                        <div class="provider-name">{{ provider.name }}</div>
+                        <div class="provider-check">
+                          <div class="checkmark-small" *ngIf="selectedPaymentProvider === provider.id">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                              <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Informations de sécurité -->
+              <div class="security-info">
+                <div class="security-icon">🔒</div>
+                <div class="security-text">
+                  <strong>Paiement 100% sécurisé</strong>
+                  <span>Toutes vos transactions sont cryptées et protégées</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 4: Détails du paiement -->
+        <div class="drawer-body" *ngIf="currentStep === 'details' && selectedDossier">
+          <div class="step-content">
+            <div class="step-indicator">
+              <div class="step completed">1</div>
+              <div class="step-line completed"></div>
+              <div class="step completed">2</div>
+              <div class="step-line completed"></div>
+              <div class="step completed">3</div>
+              <div class="step-line completed"></div>
+              <div class="step active">4</div>
+              <div class="step-line"></div>
+              <div class="step">5</div>
             </div>
 
             <!-- Bannière de devise sélectionnée -->
@@ -312,7 +394,23 @@
                 </svg>
                 <span>
                   Paiement en <strong>{{ getCurrencySymbol() }}</strong> 
-                  (1 EUR = {{ getCurrentExchangeRate() }} {{ selectedCurrency }})
+                  <span *ngIf="selectedCurrency !== 'XOF'">
+                    (1 {{ selectedCurrency }} = {{ getInverseExchangeRate() | number:'1.0-0' }} XOF)
+                  </span>
+                  <span *ngIf="selectedCurrency === 'XOF'">
+                    (devise de base)
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Informations du mode de paiement -->
+            <div class="payment-method-info" *ngIf="selectedPaymentMethod && selectedPaymentProvider">
+              <h4>Mode de paiement sélectionné</h4>
+              <div class="method-badge">
+                <span class="method-icon">{{ getPaymentMethodIcon() }}</span>
+                <span class="method-text">
+                  {{ getPaymentMethodName() }} - {{ getPaymentProviderName() }}
                 </span>
               </div>
             </div>
@@ -456,7 +554,7 @@
           </div>
         </div>
 
-        <!-- ÉTAPE 4: Confirmation -->
+        <!-- ÉTAPE 5: Confirmation -->
         <div class="drawer-body" *ngIf="currentStep === 'confirmation' && selectedDossier">
           <div class="step-content">
             <div class="step-indicator">
@@ -466,7 +564,9 @@
               <div class="step-line completed"></div>
               <div class="step completed">3</div>
               <div class="step-line completed"></div>
-              <div class="step active">4</div>
+              <div class="step completed">4</div>
+              <div class="step-line completed"></div>
+              <div class="step active">5</div>
             </div>
 
             <div class="confirmation-content">
@@ -481,7 +581,19 @@
               
               <div class="currency-info-badge">
                 <span>Devise: <strong>{{ selectedCurrency }}</strong></span>
-                <span>Taux: 1 EUR = {{ getCurrentExchangeRate() }} {{ selectedCurrency }}</span>
+                <span *ngIf="selectedCurrency !== 'XOF'">
+                  Taux: 1 {{ selectedCurrency }} = {{ getInverseExchangeRate() | number:'1.0-0' }} XOF
+                </span>
+                <span *ngIf="selectedCurrency === 'XOF'">
+                  Devise de base
+                </span>
+              </div>
+
+              <div class="payment-method-badge">
+                <span class="method-icon">{{ getPaymentMethodIcon() }}</span>
+                <span class="method-text">
+                  {{ getPaymentMethodName() }} - {{ getPaymentProviderName() }}
+                </span>
               </div>
               
               <div class="confirmation-details">
@@ -502,8 +614,8 @@
                   <span class="value">{{ formatCurrency(convertToSelectedCurrency(totalFees)) }}</span>
                 </div>
                 <div class="detail-item">
-                  <span class="label">Montant en EUR:</span>
-                  <span class="value">{{ convertToEUR(paymentAmount).toFixed(2) }} EUR</span>
+                  <span class="label">Montant en XOF:</span>
+                  <span class="value">{{ convertToXOF(paymentAmount).toLocaleString('fr-FR') }} XOF</span>
                 </div>
                 <div class="detail-item total">
                   <span class="label">Total:</span>
@@ -532,7 +644,7 @@
         <div class="drawer-footer">
           <button 
             class="btn btn-secondary" 
-            *ngIf="currentStep === 'currency' || currentStep === 'details' || currentStep === 'confirmation'"
+            *ngIf="currentStep === 'currency' || currentStep === 'paymentMethod' || currentStep === 'details' || currentStep === 'confirmation'"
             (click)="goBack()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="15,18 9,12 15,6"/>
@@ -546,11 +658,19 @@
             (click)="onCurrencySelect()">
             Suivant
           </button>
+
+          <button 
+            class="btn btn-primary" 
+            *ngIf="currentStep === 'paymentMethod'"
+            (click)="onPaymentMethodSelect()"
+            [disabled]="!selectedPaymentMethod || !selectedPaymentProvider">
+            Suivant
+          </button>
           
           <button 
             class="btn btn-primary" 
             *ngIf="currentStep === 'details'"
-            (click)="goToConfirmation()"
+            (click)="goToPaymentMethod()"
             [disabled]="!paymentAmount || paymentAmount <= 0 || paymentAmount > totalToPayInSelectedCurrency">
             Suivant
           </button>
