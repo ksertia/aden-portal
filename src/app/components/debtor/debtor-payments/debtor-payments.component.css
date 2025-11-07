@@ -1115,3 +1115,193 @@
     max-width: 30px;
   }
 }
+
+/*  css pour le mode de paiement */
+
+/* Payment Method Selection */
+.payment-method-selection {
+  text-align: center;
+}
+
+.payment-methods {
+  display: grid;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.payment-method-card {
+  border: 2px solid #ecf0f1;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.payment-method-card:hover {
+  border-color: #3498db;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.payment-method-card.selected {
+  border-color: #3498db;
+  background: #e8f4fd;
+}
+
+.method-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.method-icon {
+  font-size: 2rem;
+  width: 50px;
+  text-align: center;
+}
+
+.method-info {
+  flex: 1;
+  text-align: left;
+}
+
+.method-info h5 {
+  margin: 0 0 5px 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.method-info p {
+  margin: 0;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+.method-check .checkmark {
+  width: 24px;
+  height: 24px;
+  background: #27ae60;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+/* Providers List */
+.providers-list {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ecf0f1;
+}
+
+.providers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.provider-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  border: 2px solid #ecf0f1;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.provider-card:hover {
+  border-color: #3498db;
+}
+
+.provider-card.selected {
+  border-color: #3498db;
+  background: #e8f4fd;
+}
+
+.provider-icon {
+  font-size: 1.5rem;
+}
+
+.provider-name {
+  flex: 1;
+  font-weight: 500;
+  color: #2c3e50;
+  text-align: left;
+}
+
+.provider-check .checkmark-small {
+  width: 20px;
+  height: 20px;
+  background: #27ae60;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+/* Security Info */
+.security-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #27ae60;
+}
+
+.security-icon {
+  font-size: 1.5rem;
+}
+
+.security-text {
+  text-align: left;
+}
+
+.security-text strong {
+  display: block;
+  color: #2c3e50;
+  margin-bottom: 4px;
+}
+
+.security-text span {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .providers-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .method-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  
+  .method-info {
+    text-align: center;
+  }
+  
+  .step-indicator {
+    margin-bottom: 20px;
+  }
+  
+  .step {
+    width: 22px;
+    height: 22px;
+    font-size: 0.7rem;
+  }
+  
+  .step-line {
+    max-width: 25px;
+  }
+}

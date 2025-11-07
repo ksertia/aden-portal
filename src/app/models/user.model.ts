@@ -41,7 +41,7 @@ allUser: any;
   role: Role;  // Le rôle est un objet qui contient toutes les informations du rôle
   statut: string;
   avatar?: string;
-  phone?: string;
+  Phone?: string;
   companyName?: string;
   licenseNumber?: string;
   address?: Address;
