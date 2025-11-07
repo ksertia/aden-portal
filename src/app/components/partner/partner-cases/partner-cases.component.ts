@@ -103,6 +103,10 @@ export class PartnerCasesComponent implements OnInit {
     file: ''
   };
 
+  // Methode du modal de suppression d\'un document
+  showDeleteConfirmation = false;
+  documentToDelete: any = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -130,9 +134,6 @@ export class PartnerCasesComponent implements OnInit {
     }
 
     const partenaireNodeId = currentUser.nodeId;
-    console.log('Partenaire connecté :', currentUser);
-    console.log('partenaireNodeId envoyé :', partenaireNodeId);
-
     // Verification si l'utilisateur connecté à un NodeId
     if (!partenaireNodeId) {
       this.errorMessage = 'Identifiant du partenaire introuvable.';
@@ -143,12 +144,9 @@ export class PartnerCasesComponent implements OnInit {
     // Appel du web service pour la recuperation des dossiers du partenaire
     this.casesService.getDossiersPartenaire(siteName, partenaireNodeId).subscribe({
       next: (response) => {
-        console.log('Réponse API dossiers :', response);
 
         // Étape 1 : extraction correcte du tableau de dossiers
         const dossiers = response.data?.map((item: any) => item.map) || [];
-
-        console.log(' STRUCTURE COMPLÈTE DU DOSSIER:', JSON.stringify(this.dossiers[0], null, 2));
 
         // Étape 2 : filtrage local
         this.dossiers = dossiers.filter(
@@ -157,7 +155,6 @@ export class PartnerCasesComponent implements OnInit {
 
         // Étape 3 : initialisation du tableau filtré
         this.filteredDossiers = [...this.dossiers];
-        console.log('Dossiers filtrés pour ce partenaire :', this.dossiers);
 
         // Extraire les documents après avoir chargé les dossiers
         this.extractDocuments();
@@ -165,7 +162,6 @@ export class PartnerCasesComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des dossiers :', error);
         this.errorMessage = 'Impossible de récupérer les dossiers.';
         this.isLoading = false;
       }
@@ -236,9 +232,12 @@ export class PartnerCasesComponent implements OnInit {
       !status ||
       dossier.stepGlobal === status ||
       this.getStatusLabel(dossier.stepGlobal).toLowerCase() ===
-        this.getStatusLabel(status).toLowerCase();
+      this.getStatusLabel(status).toLowerCase();
 
-    const matchesPriority = !priority || dossier.priorite === priority;
+    const matchesPriority = 
+      !priority || 
+      dossier.priorite?.toLowerCase() === priority.toLowerCase() ||
+      this.getPriorityLabel(dossier.priorite).toLowerCase() === priority.toLowerCase();
 
     return matchesTerm && matchesStatus && matchesPriority;
   });
@@ -269,6 +268,7 @@ export class PartnerCasesComponent implements OnInit {
   getTotalPaid(): number {
     return this.filteredDossiers.reduce((acc, d) => acc + (d.montantPaye || 0), 0);
   }
+
   getFormattedRemainingAmount(dossier: any): string {
     const reste = (dossier.montantTotal || 0) - (dossier.montantPaye || 0);
     return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'XOF' });
@@ -327,17 +327,29 @@ export class PartnerCasesComponent implements OnInit {
     }
   }
 
+  getPriorityLabel(priority: string): string {
+  const labels: { [key: string]: string } = {
+    'low': 'Faible',
+    'faible': 'Faible',
+    'medium': 'Moyenne', 
+    'moyenne': 'Moyenne',
+    'high': 'Élevée',
+    'elevee': 'Élevée',
+    'urgent': 'Urgente',
+    'urgente': 'Urgente',
+    'normal': 'Normale',
+    'normale': 'Normale'
+  };
+  return labels[priority.toLowerCase()] || priority;
+}
+
   viewCaseDetails(index: number): void {
     this.selectedIndex = index;
     const dossier = this.filteredDossiers[index];
     
     // IMPORTANT: Stocker le dossier sélectionné
     this.selectedDetailCase = dossier;
-    
     this.selectedDebtor = this.getDebiteurForDossier(dossier);
-    console.log("selectedDebtor", this.selectedDebtor);
-    console.log("selectedDetailCase", this.selectedDetailCase);
-    
     this.showDrawer = true;
   }
 
@@ -376,25 +388,18 @@ export class PartnerCasesComponent implements OnInit {
     return typeMap[type] || 'status';
   }
   
-
   // Ajout methode start
   extractDocuments() {
     this.allDocuments = [];
     
-    console.log('Début extraction des documents...');
-    console.log('Nombre de dossiers à traiter:', this.dossiers.length);
-    
     // Parcourir tous les dossiers pour extraire leurs documents
     this.dossiers.forEach(dossier => {
-      console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsPartenaire?.myArrayList);
       
       // Vérifier si le dossier a des documents partenaire
       if (dossier.documentsPartenaire?.myArrayList && Array.isArray(dossier.documentsPartenaire.myArrayList)) {
         dossier.documentsPartenaire.myArrayList.forEach((doc: any) => {
-          console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
           
           const mappedType = this.mapDocumentType(doc.typeDocument);
-          console.log('Type mappé:', mappedType);
           
           this.allDocuments.push({
             id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
@@ -410,14 +415,10 @@ export class PartnerCasesComponent implements OnInit {
     });
     
     this.filteredDocuments = [...this.allDocuments];
-    console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
   }
 
-  
-
   mapDocumentType(apiType: string): DocumentType {
-    console.log('Mapping du type:', apiType);
-    
+
     // Normaliser le type (enlever espaces, mettre en majuscules)
     const normalizedType = (apiType || '').trim().toUpperCase();
     
@@ -437,7 +438,6 @@ export class PartnerCasesComponent implements OnInit {
     };
     
     const result = typeMapping[normalizedType] || DocumentType.CORRESPONDENCE;
-    console.log('Résultat du mapping:', normalizedType, '->', result);
     
     return result;
   }
@@ -445,8 +445,8 @@ export class PartnerCasesComponent implements OnInit {
   filterDocuments() {
     this.filteredDocuments = this.allDocuments.filter(doc => {
       const matchesSearch = !this.searchTerm || 
-        doc.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        this.getCaseNumber(doc.caseId).toLowerCase().includes(this.searchTerm.toLowerCase());
+      doc.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      this.getCaseNumber(doc.caseId).toLowerCase().includes(this.searchTerm.toLowerCase());
       
       const matchesType = !this.selectedDocumentType || doc.type === this.selectedDocumentType;
       const matchesCase = !this.selectedCaseId || doc.caseId === this.selectedCaseId;
@@ -490,12 +490,6 @@ export class PartnerCasesComponent implements OnInit {
   const file = event.target.files[0];
   if (file) {
     this.selectedFile = file;
-    console.log('Fichier sélectionné:', {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      extension: file.name.split('.').pop()
-    });
     
     if (!this.newDocument.name) {
       this.newDocument.name = file.name;
@@ -525,15 +519,12 @@ export class PartnerCasesComponent implements OnInit {
   // Méthode pour s'assurer qu'un dossier est sélectionné
   ensureCaseSelected(): boolean {
     if (!this.selectedDetailCase) {
-      alert('Veuillez d\'abord sélectionner un dossier');
       return false;
     }
     return true;
   }
 
   uploadDocument() {
-
-  console.log('Début de la validation...');
 
   // Réinitialiser les erreurs
   this.resetUploadErrors();
@@ -545,7 +536,6 @@ export class PartnerCasesComponent implements OnInit {
     this.uploadFormErrors.type = true;
     this.uploadErrorMessages.type = 'Veuillez sélectionner un type de document';
     isValid = false;
-    console.log('Erreur type');
   }
 
   if (!this.newDocument.name || this.newDocument.name.trim() === '') {
@@ -568,7 +558,6 @@ export class PartnerCasesComponent implements OnInit {
     console.log('Arrêt: validation échouée ou en cours de chargement');
     return;
   }
-  // if (!this.isUploadValid() || this.isLoading) return;
 
   this.isLoading = true;
   console.log('Début de l\'upload...');
@@ -643,26 +632,15 @@ export class PartnerCasesComponent implements OnInit {
   }
 
   deleteDocument(doc: CaseDocument & { caseId: string }) {
-  // Confirmation avant suppression
-  const confirmed = confirm(`Êtes-vous sûr de vouloir supprimer le document "${doc.name}" ?`);
-  
-  if (!confirmed) {
-    return;
-  }
-
-  console.log('Suppression du document:', doc);
 
   // Vérifier que le document a un ID
   if (!doc.id) {
-    alert('Impossible de supprimer le document : identifiant manquant');
     return;
   }
 
   // Appel du service pour supprimer le document
   this.casesService.deleteDocument(doc.id).subscribe({
     next: (response) => {
-      console.log('Document supprimé avec succès:', response);
-      
       // Supprimer le document des tableaux locaux
       this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
       this.filteredDocuments = this.filteredDocuments.filter(d => d.id !== doc.id);
@@ -679,14 +657,31 @@ export class PartnerCasesComponent implements OnInit {
       }, 3000);
     },
     error: (error) => {
-      console.error('Erreur lors de la suppression:', error);
       alert('Erreur lors de la suppression du document. Veuillez réessayer.');
     }
   });
 }
 
+// Methode du modal de suppression d\'un document
+  confirmDeleteDocument(doc: any): void {
+    this.documentToDelete = doc;
+    this.showDeleteConfirmation = true;
+  }
+
+  executeDelete(): void {
+    if (this.documentToDelete) {
+      this.deleteDocument(this.documentToDelete);
+      this.showDeleteConfirmation = false;
+      this.documentToDelete = null;
+    }
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirmation = false;
+    this.documentToDelete = null;
+  }
+
   closeUploadModal() {
-    console.log('Fermeture de la modal d\'upload');
     this.showUploadModal = false;
     this.selectedFile = null;
     this.newDocument = {
@@ -707,7 +702,7 @@ export class PartnerCasesComponent implements OnInit {
     this.deleteSuccessMessage = '';
   }
 
-  // Ajoutez cette méthode pour valider en temps réel
+  // Méthode pour valider en temps réel
   validateField(fieldName: keyof typeof this.uploadFormErrors): void {
     switch (fieldName) {
       case 'type':
@@ -738,7 +733,6 @@ export class PartnerCasesComponent implements OnInit {
         doc => doc.caseId === this.selectedDetailCase.nodeId
       );
       
-      console.log('Documents du dossier', this.selectedDetailCase.numeroDossier, ':', this.filteredDocuments);
     } else {
       // Afficher tous les documents si aucun dossier n'est sélectionné
       this.filteredDocuments = [...this.allDocuments];
@@ -755,7 +749,6 @@ export class PartnerCasesComponent implements OnInit {
 
   // Méthode pour visualiser un document
   viewDocument(doc: any) {
-    console.log('Visualisation du document:', doc);
 
     const documentIdentifier = doc.nodeId || doc.id; //  fallback si nodeId absent
     
@@ -780,11 +773,9 @@ export class PartnerCasesComponent implements OnInit {
         // Ouvrir la modale de visualisation
         this.showDocumentViewer = true;
         
-        console.log('Document chargé avec succès. Type:', blob.type);
       },
       error: (error) => {
         this.isLoadingDocument = false;
-        console.error('Erreur lors du chargement du document:', error);
         alert('Impossible de charger le document. Veuillez réessayer.');
       }
     });
@@ -803,7 +794,6 @@ export class PartnerCasesComponent implements OnInit {
 
   // Méthode pour télécharger un document
   downloadDocument(doc: any) {
-    console.log('Téléchargement du document:', doc);
     
     if (!doc.id) {
       alert('Identifiant du document manquant');
@@ -841,6 +831,5 @@ export class PartnerCasesComponent implements OnInit {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
-
 
 }
