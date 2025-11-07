@@ -45,10 +45,15 @@
           <label>Priorité</label>
           <select [(ngModel)]="selectedPriority" (change)="updatePriorityFilter()">
             <option value="">Toutes les priorités</option>
-            <option value="FAIBLE">Faible</option>
+            <option value="faible">Faible</option>
+            <option value="moyenne">Moyenne</option>
+            <option value="elevee">Élevée</option>
+            <option value="urgente">Urgente</option>
+            <option value="normale">Normale</option>
+            <!-- <option value="FAIBLE">Faible</option>
             <option value="MOYENNE">Moyenne</option>
             <option value="Élevée">Élevée</option>
-            <option value="urgent">Urgente</option>
+            <option value="urgent">Urgente</option> -->
           </select>
         </div>
       </div>
@@ -80,11 +85,11 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ formatCurrency(getTotalPaid()) }}</div>
-          <div class="stat-label">Montant recouvré</div>
+          <div class="stat-label"> Montant total collecté</div>
         </div>
       </div>
       
-      <div class="stat-card">
+      <!-- <div class="stat-card">
         <div class="stat-icon warning">
           <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960"
             width="25" fill="#FFFFFF"><path 
@@ -96,7 +101,7 @@
           <div class="stat-label">Commission gagnée</div>
         </div>
       </div>
-      
+       -->
       <div class="stat-card">
         <div class="stat-icon info">
              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -106,7 +111,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ getPaymentPercentage(dossiers) }}%</div> 
-          <div class="stat-label">Taux de recouvrement</div>
+          <div class="stat-label">Taux de réussite du recouvrement</div>
         </div>
       </div>
     </div>
@@ -135,7 +140,7 @@
                 {{ getStatusLabel(dossier.stepGlobal) }}
               </span>
               <span class="priority-badge" [ngClass]="getPriorityClass(dossier.priorite)">
-               {{ getPriorityClass(dossier.priorite) }}
+               {{ getPriorityLabel(dossier.priorite) }}
               </span>
             </div>
           </div>
@@ -515,7 +520,7 @@
                             <circle cx="12" cy="12" r="3"/>
                           </svg>
                         </button>
-                        <button class="btn btn-danger small" (click)="deleteDocument(doc)" title="Supprimer">
+                        <button class="btn btn-danger small" (click)="confirmDeleteDocument(doc)" title="Supprimer">
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3,6 5,6 21,6"/>
                             <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
@@ -526,6 +531,32 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <!-- Modale de confirmation de suppression -->
+          <div class="confirmation-overlay" *ngIf="showDeleteConfirmation">
+            <div class="confirmation-modal">
+              <div class="modal-header">
+                <div class="header-with-icon">
+                  <div class="danger-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                  </div>
+                  <h3>Confirmer la suppression</h3>
+                </div>
+              </div>
+              <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer le document "{{ documentToDelete?.name }}" ?</p>
+                <p class="warning-text">Cette action est irréversible.</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Annuler</button>
+                <button type="button" class="btn btn-danger" (click)="executeDelete()">Supprimer</button>
+              </div>
             </div>
           </div>
 
