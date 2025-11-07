@@ -59,6 +59,7 @@ allUser: any;
   typePartenaire: string;
   debiteurNodeId?: string;
   nodeId: string;
+  profil:string;
 }
 
 export interface Debiteurs {
