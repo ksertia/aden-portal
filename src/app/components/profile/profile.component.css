@@ -4,6 +4,12 @@
       margin: 0 auto;
     }
 
+    .ph1 {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    } 
+
     .profile-header {
       margin-bottom: 32px;
     }

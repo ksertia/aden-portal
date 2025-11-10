@@ -1048,12 +1048,12 @@
       text-transform: uppercase;
     }
 
-    .document-type-badge.type-invoice { background: #dbeafe; color: #1e40af; }
-    .document-type-badge.type-contract { background: #e0e7ff; color: #3730a3; }
-    .document-type-badge.type-correspondence { background: #f3e8ff; color: #6b21a8; }
-    .document-type-badge.type-legal_notice { background: #fef3c7; color: #92400e; }
-    .document-type-badge.type-payment_proof { background: #d1fae5; color: #065f46; }
-    .document-type-badge.type-court_document { background: #fdf2f8; color: #be185d; }
+    /* .document-type-badge.type-invoice {  color: #1e40af; }
+    .document-type-badge.type-contract {  color: #3730a3; }
+    .document-type-badge.type-correspondence {  color: #6b21a8; }
+    .document-type-badge.type-legal_notice {  color: #92400e; }
+    .document-type-badge.type-payment_proof { color: #065f46; }
+    .document-type-badge.type-court_document { background: #fdf2f8; color: #be185d; } */
 
     .case-link {
       font-weight: 500;

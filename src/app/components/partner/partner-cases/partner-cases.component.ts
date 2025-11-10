@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PartnerService } from '../../../services/partner.service';
 import { AuthService } from '../../../services/auth.service';
 import { DebtCase, DebtorInfo, CaseDocument, DocumentType, CreditorDetail } from '../../../models/case.model';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
