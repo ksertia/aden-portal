@@ -378,13 +378,8 @@
   align-items: center;
   padding: 24px;
   border-bottom: 1px solid var(--border);
-  position: fixed;
-  top: 0; /* Positionne le header en haut de la fenêtre */
-  left: 0;
-  width: 100%;
-  background-color: var(--surface); /* Fond pour éviter que le texte en dessous soit visible */
-  z-index: 1000; /* Assure que le header reste au-dessus du contenu */
 }
+
 
 .modal-header h3 {
   font-size: 20px;
@@ -400,7 +395,7 @@
 }
 
 .modal-body {
-  padding: 100px 12px 12px 12px;
+  padding: 24px;
   max-height: 70vh;
   overflow-y: auto;
 }
@@ -2227,4 +2222,341 @@
 
 .btn-danger svg {
   stroke: #fff; 
+}
+
+
+
+
+.upload-success-message {
+  background-color: #f0f9f0;
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  animation: slideInRight 0.3s ease;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.success-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+}
+
+.success-content svg {
+  flex-shrink: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.delete-success-message {
+  background-color: #f0f9f0;
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  animation: slideInRight 0.3s ease;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.upload-success-message,
+.delete-success-message {
+  .success-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+  }
+  
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+
+/* Animation pour faire apparaître depuis la droite */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animation de disparition */
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+
+/* Pour gérer plusieurs messages en même temps */
+.upload-success-message:not(:last-child),
+.delete-success-message:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+/* Style responsive pour petits écrans */
+@media (max-width: 768px) {
+  .upload-success-message,
+  .delete-success-message {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}
+
+
+/* Styles pour les erreurs de formulaire */
+.form-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input.error,
+.form-group select.error,
+.file-upload-label.error {
+  border-color: #dc3545 !important;
+  background-color: #fff5f5;
+}
+
+.file-upload-label.error {
+  border: 2px dashed #dc3545 !important;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.error-message::before {
+  content: "⚠";
+  font-size: 0.75rem;
+}
+
+/* Styles existants pour les inputs */
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.file-upload {
+  position: relative;
+}
+
+.file-upload input[type="file"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  justify-content: center;
+}
+
+.file-upload-label:hover {
+  border-color: #007bff;
+  background-color: #e7f3ff;
+}
+
+.upload-success-message {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.success-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.success-content svg {
+  color: #28a745;
+}
+
+/* Styles pour les erreurs */
+.form-group input.error,
+.form-group select.error {
+  border-color: #dc3545 !important;
+  background-color: #fff5f5;
+}
+
+.file-upload-label.error {
+  border-color: #dc3545 !important;
+  background-color: #fff5f5;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Styles de base pour les inputs */
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  text-align: center;
+  justify-content: center;
+}
+
+.upload-success-message {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.success-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+
+/* pour la modale de confirmation d\'un document */
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.confirmation-modal {
+  background: white;
+  border-radius: 8px;
+  padding: 0;
+  min-width: 400px;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.confirmation-modal .modal-header {
+  padding: 20px 20px 0;
+  border-bottom: none;
+}
+
+.confirmation-modal .modal-body {
+  padding: 20px;
+}
+
+.confirmation-modal .modal-footer {
+  padding: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.warning-text {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.header-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.danger-icon {
+  color: #dc3545;
+  display: flex;
+  align-items: center;
+}
+
+.danger-icon svg {
+  stroke: #dc3545;
 }

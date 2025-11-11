@@ -338,3 +338,101 @@
   font-size: 14px;
   color: var(--text-secondary);
 }
+
+
+
+/* Styles pour les notifications */
+.notification-badge {
+  position: absolute;
+  top: -10px;
+  right: -15px;
+  background: #ff4757;
+  color: white;
+  border-radius: 50%;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+/* Style quand il n'y a pas de notifications - icône normale */
+.notification-icon-wrapper:not(:has(.notification-badge)) svg {
+  stroke: #6c757d; /* Couleur plus discrète quand pas de notifications */
+}
+
+/* Styles pour le wrapper de l'icône de notification */
+.notification-icon-wrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.notification-icon-wrapper:hover {
+  transform: translateY(-2px);
+}
+
+.notification-icon-wrapper:hover svg {
+  stroke: #007bff; /* Change la couleur au survol */
+}
+
+/* Alternative avec une forme plus ronde */
+.notification-badge.circle {
+  border-radius: 50%;
+  padding: 4px;
+  min-width: 20px;
+  height: 20px;
+}
+
+/* Pour les grands nombres */
+.notification-badge.large {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+}
+
+/* Animation pour les nouvelles notifications */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.notification-badge.pulse {
+  animation: pulse 1s ease-in-out;
+}
+
+/* Style hover pour l'icône */
+.notification-icon-wrapper:hover .notification-badge {
+  background: #ff3742;
+  transform: scale(1.05);
+  transition: all 0.2s ease;
+}
+
+/* Style pour l'icône de notification sans badge */
+.notification-icon-wrapper svg {
+  transition: stroke 0.3s ease;
+}
+
+/* Nouveau style pour le montant collecté */
+.case-collected {
+  margin: 8px 0;
+}
+
+.amount.collected {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.d-h {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+}
