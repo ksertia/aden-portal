@@ -28,11 +28,33 @@ export class DebtorPaymentsComponent implements OnInit {
   
   // États du drawer de paiement - ORDRE CORRIGÉ
   showPaymentDrawer = false;
-  currentStep: 'selection' | 'currency' | 'details' | 'paymentMethod' | 'confirmation' = 'selection';
+  currentStep: 'selection' | 'currency' | 'details' | 'paymentMethod' | 'paymentInfo' | 'otp' | 'recap' | 'confirmation' = 'selection';
 
   // Mode de paiement sélectionné
   selectedPaymentMethod: string = '';
   selectedPaymentProvider: string = '';
+
+  // Informations de paiement spécifiques
+  // Mobile Money
+  mobileNumber: string = '';
+  mobileAmount: number = 0;
+  mobileOtp: string = '';
+  otpSent: boolean = false;
+  resendCooldown: number = 0;
+  
+  // Carte Bancaire
+  cardNumber: string = '';
+  cardHolderName: string = '';
+  cardExpiryMonth: string = '';
+  cardExpiryYear: string = '';
+  cardCvv: string = '';
+  
+  // PayPal
+  paypalEmail: string = '';
+
+  // Informations de transaction
+  transactionReference: string = '';
+  transactionDate: Date = new Date();
 
   // Modes de paiement disponibles
   paymentMethods = [
@@ -71,7 +93,7 @@ export class DebtorPaymentsComponent implements OnInit {
   paymentAmount = 0;
   selectedDossier: any = null;
   selectedDossierId: string = '';
-  selectedCurrency: string = 'XOF'; // Devise par défaut = XOF
+  selectedCurrency: string = 'XOF';
   exchangeRate: number = 1;
   
   // Frais et calculs
@@ -79,16 +101,16 @@ export class DebtorPaymentsComponent implements OnInit {
   taxes = 0;
   transactionFees = 0;
   totalFees = 0;
-  totalToPay = 0; // En XOF (devise de base)
-  totalToPayInSelectedCurrency = 0; // Dans la devise sélectionnée
+  totalToPay = 0;
+  totalToPayInSelectedCurrency = 0;
   
-  // Devises disponibles (taux de change depuis XOF)
+  // Devises disponibles
   availableCurrencies = [
     { code: 'XOF', name: 'Franc CFA', symbol: 'FCFA', rate: 1 },
-    { code: 'EUR', name: 'Euro', symbol: '€', rate: 0.001524 }, // 1 XOF = 0.001524 EUR
-    { code: 'USD', name: 'Dollar US', symbol: '$', rate: 0.00165 }, // 1 XOF = 0.00165 USD
-    { code: 'GBP', name: 'Livre Sterling', symbol: '£', rate: 0.00130 }, // 1 XOF = 0.00130 GBP
-    { code: 'CAD', name: 'Dollar Canadien', symbol: 'C$', rate: 0.00224 } // 1 XOF = 0.00224 CAD
+    { code: 'EUR', name: 'Euro', symbol: '€', rate: 0.001524 },
+    { code: 'USD', name: 'Dollar US', symbol: '$', rate: 0.00165 },
+    { code: 'GBP', name: 'Livre Sterling', symbol: '£', rate: 0.00130 },
+    { code: 'CAD', name: 'Dollar Canadien', symbol: 'C$', rate: 0.00224 }
   ];
   
   // Loading states
@@ -102,8 +124,6 @@ export class DebtorPaymentsComponent implements OnInit {
     private router: Router
   ) {
     this.loadTranslations();
-    
-    // Écouter les changements de langue
     this.i18nService.currentLocale$.subscribe(() => {
       this.loadTranslations();
     });
@@ -111,6 +131,7 @@ export class DebtorPaymentsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDebtorData();
+    this.generateTransactionReference();
   }
 
   private loadTranslations() {
@@ -145,12 +166,8 @@ export class DebtorPaymentsComponent implements OnInit {
 
     this.caseService.getDossiersDebiteur(siteName, debiteurNodeId).subscribe({
       next: (response) => {
-        console.log('Réponse API paiements :', response);
         this.dossiers = response.data?.map((item: any) => item.map) || [];
-        
-        // Calculer les totaux
         this.calculatePaymentTotals(this.dossiers);
-        
         this.isLoading = false;
       },
       error: (error) => {
@@ -175,12 +192,10 @@ export class DebtorPaymentsComponent implements OnInit {
     const selectedCurrency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
     const symbol = selectedCurrency?.symbol || 'FCFA';
     
-    // Pour le XOF, on formate sans décimales
     if (this.selectedCurrency === 'XOF') {
       return `${Math.round(amount).toLocaleString('fr-FR')} ${symbol}`;
     }
     
-    // Pour les autres devises, on utilise le format standard avec 2 décimales
     return amount.toLocaleString('fr-FR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
@@ -200,7 +215,6 @@ export class DebtorPaymentsComponent implements OnInit {
     const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
     const converted = amountInXOF * (currency?.rate || 1);
     
-    // Arrondir à 2 décimales pour les devises autres que XOF
     return Math.round(converted * 100) / 100;
   }
 
@@ -211,7 +225,7 @@ export class DebtorPaymentsComponent implements OnInit {
     const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
     const converted = amountInCurrency / (currency?.rate || 1);
     
-    return Math.round(converted); // XOF sans décimales
+    return Math.round(converted);
   }
 
   // Obtenir le taux inverse (1 [devise] = ? XOF)
@@ -227,12 +241,14 @@ export class DebtorPaymentsComponent implements OnInit {
     this.currentStep = 'selection';
     this.selectedDossier = null;
     this.selectedDossierId = '';
-    this.selectedCurrency = 'XOF'; // Toujours réinitialiser à XOF
+    this.selectedCurrency = 'XOF';
     this.selectedPaymentMethod = '';
     this.selectedPaymentProvider = '';
     this.exchangeRate = 1;
     this.paymentAmount = 0;
     this.resetFees();
+    this.resetPaymentFields();
+    this.generateTransactionReference();
     this.showPaymentDrawer = true;
   }
 
@@ -242,11 +258,12 @@ export class DebtorPaymentsComponent implements OnInit {
     this.currentStep = 'selection';
     this.selectedDossier = null;
     this.selectedDossierId = '';
-    this.selectedCurrency = 'XOF'; // Réinitialiser à XOF
+    this.selectedCurrency = 'XOF';
     this.selectedPaymentMethod = '';
     this.selectedPaymentProvider = '';
     this.paymentAmount = 0;
     this.resetFees();
+    this.resetPaymentFields();
   }
 
   // Sélectionner un dossier
@@ -265,7 +282,7 @@ export class DebtorPaymentsComponent implements OnInit {
       const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
       this.exchangeRate = currency?.rate || 1;
       this.calculateFees();
-      this.currentStep = 'details'; // On va directement aux détails après la devise
+      this.currentStep = 'details'; // On va aux détails APRÈS la devise
     }
   }
 
@@ -279,45 +296,139 @@ export class DebtorPaymentsComponent implements OnInit {
   // Sélectionner un mode de paiement
   onPaymentMethodSelect() {
     if (this.selectedPaymentMethod && this.selectedPaymentProvider) {
-      this.currentStep = 'confirmation';
+      this.currentStep = 'paymentInfo';
+      this.resetPaymentFields();
     }
   }
 
-  // Calculer les frais (toujours en XOF d'abord)
+  // Valider et procéder à l'étape suivante
+  validateAndProceed() {
+    if (!this.isPaymentInfoValid()) {
+      alert('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+
+    if (this.selectedPaymentMethod === 'mobile') {
+      this.sendOtp();
+    } else {
+      this.currentStep = 'recap';
+    }
+  }
+
+  // Vérifier OTP et procéder
+  verifyOtpAndProceed() {
+    if (!this.mobileOtp || this.mobileOtp.length !== 6) {
+      alert('Veuillez entrer un code OTP valide à 6 chiffres');
+      return;
+    }
+
+    // Simuler la vérification OTP
+    console.log('Vérification OTP:', this.mobileOtp);
+    this.currentStep = 'recap';
+  }
+
+  // Envoyer OTP pour Mobile Money
+  sendOtp() {
+    if (!this.mobileNumber || !this.mobileAmount) {
+      alert('Veuillez renseigner le numéro de téléphone et le montant');
+      return;
+    }
+
+    // Simulation d'envoi d'OTP
+    console.log('Envoi OTP à:', this.mobileNumber);
+    console.log('Montant:', this.mobileAmount);
+    
+    // Simuler un délai d'envoi
+    setTimeout(() => {
+      this.otpSent = true;
+      this.resendCooldown = 60;
+      this.startResendCooldown();
+      this.currentStep = 'otp';
+    }, 1000);
+  }
+
+  // Renvoyer OTP
+  resendOtp() {
+    if (this.resendCooldown > 0) return;
+
+    this.sendOtp();
+  }
+
+  // Démarrer le compte à rebours pour renvoi OTP
+  startResendCooldown() {
+    const interval = setInterval(() => {
+      this.resendCooldown--;
+      if (this.resendCooldown <= 0) {
+        clearInterval(interval);
+      }
+    }, 1000);
+  }
+
+  // Réinitialiser les champs de paiement
+  resetPaymentFields() {
+    // Mobile Money
+    this.mobileNumber = '';
+    this.mobileAmount = this.paymentAmount;
+    this.mobileOtp = '';
+    this.otpSent = false;
+    this.resendCooldown = 0;
+    
+    // Carte Bancaire
+    this.cardNumber = '';
+    this.cardHolderName = '';
+    this.cardExpiryMonth = '';
+    this.cardExpiryYear = '';
+    this.cardCvv = '';
+    
+    // PayPal
+    this.paypalEmail = '';
+  }
+
+  // Vérifier la validité des informations de paiement
+  isPaymentInfoValid(): boolean {
+    if (this.selectedPaymentMethod === 'mobile') {
+      return !!this.mobileNumber && !!this.mobileAmount && this.mobileAmount > 0;
+    }
+    
+    if (this.selectedPaymentMethod === 'card') {
+      return !!this.cardNumber && !!this.cardHolderName && !!this.cardExpiryMonth && 
+             !!this.cardExpiryYear && !!this.cardCvv;
+    }
+    
+    if (this.selectedPaymentMethod === 'paypal') {
+      return !!this.paypalEmail;
+    }
+    
+    return false;
+  }
+
+  // Obtenir le libellé du bouton suivant
+  getNextButtonLabel(): string {
+    if (this.selectedPaymentMethod === 'mobile') {
+      return 'Envoyer OTP';
+    }
+    return 'Suivant';
+  }
+
+  // Calculer les frais
   calculateFees() {
     if (!this.selectedDossier) return;
 
-    // Pénalités si le dossier est en retard (en XOF)
     this.penalties = this.calculatePenalties(this.selectedDossier);
-    
-    // Taxes (exemple: 20% de TVA sur les pénalités) en XOF
     this.taxes = this.penalties * 0.20;
-    
-    // Frais de transaction (exemple: 1.5% du montant à payer) en XOF
     const baseAmount = this.calculateRemainingAmount(this.selectedDossier);
     this.transactionFees = baseAmount * 0.015;
-    
-    // Total des frais en XOF
     this.totalFees = this.penalties + this.taxes + this.transactionFees;
-    
-    // Total à payer en XOF (montant de base + frais)
     this.totalToPay = baseAmount + this.totalFees;
-    
-    // Total à payer dans la devise sélectionnée
     this.totalToPayInSelectedCurrency = this.convertToSelectedCurrency(this.totalToPay);
-    
-    // Par défaut, on propose de payer le total dans la devise sélectionnée
     this.paymentAmount = this.totalToPayInSelectedCurrency;
   }
 
-  // Calculer les pénalités (en XOF)
+  // Calculer les pénalités
   calculatePenalties(dossier: any): number {
-    // Vérifier si le dossier est en retard
     const isOverdue = this.isDossierOverdue(dossier);
-    
     if (!isOverdue) return 0;
     
-    // Calculer les pénalités (exemple: 10% du montant restant) en XOF
     const remainingAmount = this.calculateRemainingAmount(dossier);
     return remainingAmount * 0.10;
   }
@@ -331,14 +442,14 @@ export class DebtorPaymentsComponent implements OnInit {
     return dueDate < today;
   }
 
-  // Calculer le montant restant pour un dossier (en XOF)
+  // Calculer le montant restant pour un dossier
   calculateRemainingAmount(dossier: any): number {
     const totalDue = this.calculateTotalDue(dossier);
     const paid = dossier.montantPaye || 0;
     return totalDue - paid;
   }
 
-  // Calculer le total dû pour un dossier (incluant intérêts et frais) en XOF
+  // Calculer le total dû pour un dossier
   calculateTotalDue(dossier: any): number {
     const principal = dossier.montantTotal || 0;
     const interests = dossier.montantInterets || 0;
@@ -370,20 +481,48 @@ export class DebtorPaymentsComponent implements OnInit {
     return total ? Math.round((paid / total) * 100) : 0;
   }
 
-  // Navigation dans le drawer - CORRIGÉ POUR LE NOUVEL ORDRE
+  // Navigation dans le drawer - ORDRE CORRIGÉ
   goBack() {
-    if (this.currentStep === 'currency') {
-      this.currentStep = 'selection';
-      this.selectedDossier = null;
-      this.selectedDossierId = '';
-      this.resetFees();
-    } else if (this.currentStep === 'details') {
-      this.currentStep = 'currency';
-    } else if (this.currentStep === 'paymentMethod') {
-      this.currentStep = 'details';
-    } else if (this.currentStep === 'confirmation') {
-      this.currentStep = 'paymentMethod';
+    switch (this.currentStep) {
+      case 'currency':
+        this.currentStep = 'selection';
+        this.selectedDossier = null;
+        this.selectedDossierId = '';
+        this.resetFees();
+        break;
+      case 'details':
+        this.currentStep = 'currency';
+        break;
+      case 'paymentMethod':
+        this.currentStep = 'details';
+        break;
+      case 'paymentInfo':
+        this.currentStep = 'paymentMethod';
+        break;
+      case 'otp':
+        this.currentStep = 'paymentInfo';
+        this.otpSent = false;
+        this.resendCooldown = 0;
+        break;
+      case 'recap':
+        if (this.selectedPaymentMethod === 'mobile') {
+          this.currentStep = 'otp';
+        } else {
+          this.currentStep = 'paymentInfo';
+        }
+        break;
+      case 'confirmation':
+        this.currentStep = 'recap';
+        break;
     }
+  }
+
+  // Générer une référence de transaction
+  generateTransactionReference() {
+    const timestamp = new Date().getTime();
+    const random = Math.floor(Math.random() * 10000);
+    this.transactionReference = `TRX-${timestamp}-${random}`;
+    this.transactionDate = new Date();
   }
 
   // Traiter le paiement
@@ -393,22 +532,35 @@ export class DebtorPaymentsComponent implements OnInit {
       return;
     }
 
-    // Convertir le montant payé en XOF pour le traitement
     const amountInXOF = this.convertToXOF(this.paymentAmount);
 
     console.log('Paiement en cours pour le dossier:', this.selectedDossier?.numeroDossier);
     console.log('Montant payé:', this.paymentAmount, this.selectedCurrency);
     console.log('Montant converti en XOF:', amountInXOF);
-    console.log('Taux de change utilisé:', this.exchangeRate);
-    console.log('Mode de paiement:', this.selectedPaymentMethod);
-    console.log('Fournisseur:', this.selectedPaymentProvider);
+    console.log('Référence transaction:', this.transactionReference);
+    
+    // Log des informations spécifiques selon la méthode
+    if (this.selectedPaymentMethod === 'mobile') {
+      console.log('Mobile Number:', this.mobileNumber);
+      console.log('Mobile Amount:', this.mobileAmount);
+      console.log('OTP:', this.mobileOtp);
+    } else if (this.selectedPaymentMethod === 'card') {
+      console.log('Card Number:', this.cardNumber);
+      console.log('Card Holder:', this.cardHolderName);
+    } else if (this.selectedPaymentMethod === 'paypal') {
+      console.log('PayPal Email:', this.paypalEmail);
+    }
     
     // Simulation de paiement
     setTimeout(() => {
-      alert(`Paiement de ${this.formatCurrency(this.paymentAmount)} effectué avec succès pour le dossier ${this.selectedDossier?.numeroDossier}!`);
-      this.closePaymentDrawer();
-      this.loadDebtorData();
+      this.currentStep = 'confirmation';
     }, 2000);
+  }
+
+  // Télécharger le reçu
+  downloadReceipt() {
+    console.log('Téléchargement du reçu pour la transaction:', this.transactionReference);
+    alert('Fonctionnalité de téléchargement du reçu - À implémenter');
   }
 
   // Ouvrir l'historique de paiement
@@ -449,12 +601,6 @@ export class DebtorPaymentsComponent implements OnInit {
     return labels[status] || status;
   }
 
-  // Obtenir le taux de change actuel
-  getCurrentExchangeRate(): number {
-    const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
-    return currency?.rate || 1;
-  }
-
   // Obtenir le nom complet de la devise
   getCurrencyName(): string {
     const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
@@ -477,11 +623,5 @@ export class DebtorPaymentsComponent implements OnInit {
     const method = this.paymentMethods.find(m => m.id === this.selectedPaymentMethod);
     const provider = method?.providers.find(p => p.id === this.selectedPaymentProvider);
     return provider?.icon || '💳';
-  }
-
-  // Réinitialiser le mode de paiement
-  resetPaymentMethod() {
-    this.selectedPaymentMethod = '';
-    this.selectedPaymentProvider = '';
   }
 }
