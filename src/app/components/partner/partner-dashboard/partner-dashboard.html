@@ -1,6 +1,15 @@
 <div class="dashboard-container">
   <div class="dashboard-header fade-in-up">
-    <h1>Tableau de Bord</h1>
+    <div class="d-h"> 
+      <h1>Tableau de Bord</h1>
+      <div class="notification-icon-wrapper" routerLink="/partner/tracking">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/> 
+        </svg>
+        <span class="notification-badge" *ngIf="notifications.length > 0">{{ notifications.length }}</span>
+      </div>
+    </div>
     <p *ngIf="currentUser">
       Bienvenue, {{ getUserRoleLabel() }} {{ currentUser.firstname }} {{ currentUser.lastname }}
     </p>
@@ -17,11 +26,11 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ dossiers.length }}</div>
-        <div class="stat-label">Dossiers totaux</div>
+        <div class="stat-label">Dossiers totaux assignés</div>
       </div>
     </a>
 
-    <div class="stat-card">
+    <!-- <div class="stat-card">
       <div class="stat-icon success">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 12l2 2 4-4"/>
@@ -32,7 +41,7 @@
         <div class="stat-value">{{ activeCount }}</div>
         <div class="stat-label">Dossiers actifs</div>
       </div>
-    </div>
+    </div> -->
 
     <div class="stat-card">
       <div class="stat-icon warning">
@@ -44,7 +53,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{pendingCount }}</div>
-        <div class="stat-label">En attente</div>
+        <div class="stat-label">Nombre total de paiements</div>
       </div>
     </div>
 
@@ -56,8 +65,8 @@
           </svg>
       </div>
       <div class="stat-content">
-          <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div>
-          <div class="stat-label">Montant total</div>
+          <div class="stat-value">{{ formatCurrency(getTotalCollected()) }}</div>
+          <div class="stat-label"> Montant total collecté</div>
       </div>
     </div>
   </div>
@@ -71,7 +80,7 @@
       </div>
       <!--Affichage de trois dossiers -->
       <div class="cases-grid" *ngIf="dossiers.length > 0">
-        <div class="case-card"  *ngFor="let dossier of dossiers.slice(0, 6)">
+        <div class="case-card"  *ngFor="let dossier of dossiers.slice(0, 3)">
           <div class="case-header">
             <h3>{{ dossier.numeroDossier }}</h3>
             <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">

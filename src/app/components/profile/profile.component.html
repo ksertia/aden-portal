@@ -1,7 +1,10 @@
 <div class="profile-container">
-  <div class="profile-header fade-in-up">
-    <h1>{{ t('profile.title') }}</h1>
-    <p>{{ t('profile.subtitle') }}</p>
+  <div class="ph1">
+    <button class="btn btn-secondary" (click)="goBackToDashboard()">Retour</button>
+    <div class="profile-header fade-in-up">
+      <h1>{{ t('profile.title') }}</h1>
+      <p>{{ t('profile.subtitle') }}</p>
+    </div>
   </div>
 
   <div class="profile-content fade-in-up" *ngIf="user">
@@ -37,7 +40,7 @@
 
           <div class="form-group">
             <label for="phone">{{ t('profile.phone') }}</label>
-            <input type="tel" id="phone" [(ngModel)]="user.phone" name="phone">
+            <input type="tel" id="phone" [(ngModel)]="user.Phone" name="phone" required>
           </div>
         </div>
 

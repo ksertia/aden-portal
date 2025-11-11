@@ -39,6 +39,25 @@ export class PartnerDashboard implements OnInit{
   selectedIndex: number | null = null;
   showCaseDetailsModal = false;
 
+
+
+  // Notifications
+  notifications: any[] = [
+    {
+      id: 1,
+      message: 'Nouveau dossier assigné - Dossier #12345',
+      timestamp: new Date(),
+      read: false
+    },
+    {
+      id: 2,
+      message: 'Paiement reçu pour le dossier #12340',
+      timestamp: new Date(Date.now() - 3600000),
+      read: true
+    }
+  ];
+
+
   constructor(
     private authService: AuthService,
     private casesService: CaseService,
@@ -63,9 +82,6 @@ export class PartnerDashboard implements OnInit{
     }
 
     const partenaireNodeId = currentUser.nodeId;
-    console.log('partenair connecté :', currentUser);
-    console.log('partenaireNodeId envoyé :', partenaireNodeId);
-
     if (!partenaireNodeId) {
       this.errorMessage = 'Identifiant du partenaire introuvable.';
       this.isLoading = false;
@@ -79,7 +95,6 @@ export class PartnerDashboard implements OnInit{
       const allDossiers = response.data?.map((item: any) => item.map) || [];
       // Filtre uniquement les dossiers de l'avocat connecté
       this.dossiers = allDossiers.filter((d: any) => d.partenaireNodeId === partenaireNodeId);
-      console.log('Réponse API dossiers :', this.dossiers);
 
       //  mise à jour des statistiques
       this.updateCaseStatistics(); 
@@ -87,7 +102,6 @@ export class PartnerDashboard implements OnInit{
       this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des dossiers :', error);
         this.errorMessage = 'Impossible de récupérer les dossiers.';
         this.isLoading = false;
       }
@@ -154,6 +168,13 @@ export class PartnerDashboard implements OnInit{
 
   getTotalDebt(): number {
     return this.filteredDossiers.reduce((acc, d) => acc + (d.montantTotal || 0), 0);
+  }
+
+  getTotalCollected(): number {
+    if (!this.dossiers) return 0;
+    return this.dossiers.reduce((total, dossier) => {
+      return total + (dossier.montantCollecte || 0);
+    }, 0);
   }
 
    formatCurrency(amount: number): string {

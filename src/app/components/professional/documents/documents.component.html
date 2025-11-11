@@ -1,432 +1,462 @@
 <div class="documents-container">
-      <div class="documents-header fade-in-up">
-        <div class="header-content">
-          <div class="header-content1-1">
-            <button class="btn btn-secondary" (click)="goBackToDashboard()">Retour</button>
-            <div>
-              <h1>Gestion des Documents</h1>
-              <p>Gérez tous les documents liés aux dossiers de recouvrement</p>
-            </div>
-          </div>
-          <button class="btn btn-primary" (click)="showUploadModal = true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17,8 12,3 7,8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            Ajouter un document
-          </button>
+  <div class="documents-header fade-in-up">
+    <div class="header-content">
+      <div class="header-content1-1">
+        <button class="btn btn-secondary" (click)="goBackToDashboard()">Retour</button>
+        <div>
+          <h1>Gestion des Documents</h1>
+          <p>Gérez tous les documents liés aux dossiers de recouvrement</p>
         </div>
       </div>
+      <button class="btn btn-primary" (click)="openUploadModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17,8 12,3 7,8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        Ajouter un document
+      </button>
+    </div>
+  </div>
 
-      <!-- Filtres -->
-      <div class="filters-section fade-in-up">
-        <div class="filters-card">
-          <div class="filters-header">
-          <h3>Filtres et recherche</h3>
-          <button class="btn btn-secondary small" (click)="resetFilters()">Réinitialiser</button>
+  <!-- Filtres -->
+  <div class="filters-section fade-in-up">
+    <div class="filters-card">
+      <div class="filters-header">
+        <h3>Filtres et recherche</h3>
+        <button class="btn btn-secondary small" (click)="resetFilters()">Réinitialiser</button>
+      </div>
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Rechercher</label>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Nom du document, dossier..."
+            (input)="applyFilters()"
+          >
         </div>
-          <div class="filters-grid">
-            <div class="filter-group">
-              <label>Rechercher</label>
-              <input
-                type="text"
-                [(ngModel)]="searchTerm"
-                placeholder="Nom du document, dossier..."
-                (input)="applyFilters()"
-              >
-            </div>
-            
-            <div class="filter-group">
-              <label>Type de document</label>
-              <select [(ngModel)]="selectedDocumentType" (change)="filterDocuments()">
-                <option value="">Tous les types</option>
-                <option value="invoice">Factures</option>
-                <option value="contract">Contrats</option>
-                <option value="correspondence">Correspondances</option>
-                <option value="legal_notice">Mises en demeure</option>
-                <option value="payment_proof">Preuves de paiement</option>
-                <option value="court_document">Documents judiciaires</option>
-              </select>
-            </div>
-            
-            <div class="filter-group">
-              <label>Dossier</label>
-              <select [(ngModel)]="selectedCaseId" (change)="filterDocuments()">
-                <option value="">Tous les dossiers</option>
-                <option  *ngFor="let dossier of uniqueDossiers" [value]="dossier.nodeId">
-                  {{ dossier.numeroDossier }}
-                </option>
-              </select>
-            </div>
-          </div>
+        
+        <div class="filter-group">
+          <label>Type de document</label>
+          <select [(ngModel)]="selectedDocumentType" (change)="filterDocuments()">
+            <option value="">Tous les types</option>
+            <option value="invoice">Factures</option>
+            <option value="contract">Contrats</option>
+            <option value="correspondence">Correspondances</option>
+            <option value="legal_notice">Mises en demeure</option>
+            <option value="payment_proof">Preuves de paiement</option>
+            <option value="court_document">Documents judiciaires</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label>Dossier</label>
+          <select [(ngModel)]="selectedCaseId" (change)="filterDocuments()">
+            <option value="">Tous les dossiers</option>
+            <option *ngFor="let dossier of uniqueDossiers" [value]="dossier.nodeId">
+              {{ dossier.numeroDossier }}
+            </option>
+          </select>
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- Statistiques des documents -->
-      <div class="stats-section fade-in-up">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon primary">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <!-- Statistiques des documents -->
+  <div class="stats-section fade-in-up">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ filteredDocuments.length }}</div>
+          <div class="stat-label">Documents totaux</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon warning">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ dossiers.length }}</div>
+          <div class="stat-label">Dossiers totaux</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des documents -->
+  <div class="documents-list fade-in-up">
+    <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
+      <div class="list-header">
+        <app-view-toggle 
+          [currentView]="currentView" 
+          (viewChange)="currentView = $event">
+        </app-view-toggle>
+      </div>
+
+      <!-- MESSAGE DE SUCCÈS POUR LA SUPPRESSION -->
+      <div *ngIf="showDeleteSuccess" class="delete-success-message">
+        <div class="success-content">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4"/>
+            <circle cx="12" cy="12" r="9"/>
+          </svg>
+          <span>{{ deleteSuccessMessage }}</span>
+        </div>
+      </div>
+      
+      <!-- Vue grille -->
+      <div class="documents-grid" *ngIf="currentView === 'grid'">
+        <div class="document-card" *ngFor="let doc of filteredDocuments">
+          <div class="document-header">
+            <div class="document-icon" [ngClass]="'icon-' + doc.type">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14,2 14,8 20,8"/>
               </svg>
             </div>
-            <div class="stat-content">
-              <div class="stat-value">{{ filteredDocuments.length }}</div>
-              <div class="stat-label">Documents totaux</div>
+            <div class="document-info">
+              <h3>{{ doc.name }}</h3>
+              <p class="document-type">{{ getDocumentTypeLabel(doc.type) }}</p>
+            </div>
+            <div class="document-actions">
+              <button class="btn btn-primary small" (click)="viewDocument(doc)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+              <button class="btn btn-danger small" (click)="confirmDeleteDocument(doc)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3,6 5,6 21,6"/>
+                  <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
+                </svg>
+              </button>
             </div>
           </div>
           
-          <div class="stat-card">
-            <div class="stat-icon warning">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="12"/>
-                <line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
+          <div class="document-details">
+            <div class="detail-row">
+              <span class="label">Dossier :</span>
+              <span class="value">{{ getCaseNumber(doc.caseId) }}</span>
             </div>
-            <div class="stat-content">
-              <div class="stat-value">{{ dossiers.length }}</div>
-              <div class="stat-label">Dossiers totaux</div>
+            <div class="detail-row">
+              <span class="label">Ajouté le :</span>
+              <span class="value">{{ formatDate(doc.uploadedAt) }}</span>
             </div>
+            <!-- <div class="detail-row">
+              <span class="label">Par :</span>
+              <span class="value">{{ doc.uploadedBy }}</span>
+            </div> -->
           </div>
         </div>
       </div>
-
-      <!-- Liste des documents -->
-      <div class="documents-list fade-in-up">
-        <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
-          <div class="list-header">
-            <app-view-toggle 
-              [currentView]="currentView" 
-              (viewChange)="currentView = $event">
-            </app-view-toggle>
-          </div>
-          
-          <!-- Vue grille -->
-          <div class="documents-grid" *ngIf="currentView === 'grid'">
-            <div class="document-card" *ngFor="let doc of filteredDocuments">
-              <div class="document-header">
-                <div class="document-icon" [ngClass]="'icon-' + doc.type">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14,2 14,8 20,8"/>
-                  </svg>
-                </div>
-                <div class="document-info">
-                  <h3>{{ doc.name }}</h3>
-                  <p class="document-type">{{ getDocumentTypeLabel(doc.type) }}</p>
-                </div>
-                <div class="document-actions">
-                  <!-- <button class="btn btn-primary small" (click)="downloadDocument(doc)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="7,10 12,15 17,10"/>
-                      <line x1="12" y1="15" x2="12" y2="3"/>
+      
+      <!-- Vue tableau -->
+      <div class="documents-table-container" *ngIf="currentView === 'table'">
+        <table class="documents-table">
+          <thead>
+            <tr>
+              <th>Document</th>
+              <th>Type</th>
+              <th>Dossier</th>
+              <th>Ajouté le</th>
+              <!-- <th>Ajouté par</th> -->
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let doc of filteredDocuments" class="document-row">
+              <td>
+                <div class="document-cell">
+                  <div class="document-icon-small" [ngClass]="'icon-' + doc.type">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14,2 14,8 20,8"/>
                     </svg>
-                  </button> -->
-                  <button class="btn btn-primary small" (click)="viewDocument(doc)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  </div>
+                  <div class="document-name">{{ doc.name }}</div>
+                </div>
+              </td>
+              <td>
+                <span class="document-type-badge" [ngClass]="'type-' + doc.type">
+                  {{ getDocumentTypeLabel(doc.type) }}
+                </span>
+              </td>
+              <td>
+                <div class="case-link">{{ getCaseNumber(doc.caseId) }}</div>
+              </td>
+              <td>
+                <div class="date-cell">{{ formatDate(doc.uploadedAt) }}</div>
+              </td>
+              <!-- <td>
+                <div class="user-cell">{{ doc.uploadedBy }}</div>
+              </td> -->
+              <td>
+                <div class="table-actions">
+                  <button class="btn btn-primary small" (click)="viewDocument(doc)" title="Voir">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                       <circle cx="12" cy="12" r="3"/>
                     </svg>
                   </button>
-                  <button class="btn btn-danger small" (click)="deleteDocument(doc)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <button class="btn btn-danger small" (click)="confirmDeleteDocument(doc)" title="Supprimer">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <polyline points="3,6 5,6 21,6"/>
                       <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
                     </svg>
                   </button>
                 </div>
-              </div>
-              
-              <div class="document-details">
-                <div class="detail-row">
-                  <span class="label">Dossier :</span>
-                  <span class="value">{{ getCaseNumber(doc.caseId) }}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="label">Ajouté le :</span>
-                  <span class="value">{{ formatDate(doc.uploadedAt) }}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="label">Par :</span>
-                  <span class="value">{{ doc.uploadedBy }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Vue tableau -->
-          <div class="documents-table-container" *ngIf="currentView === 'table'">
-            <table class="documents-table">
-              <thead>
-                <tr>
-                  <th>Document</th>
-                  <th>Type</th>
-                  <th>Dossier</th>
-                  <th>Ajouté le</th>
-                  <th>Ajouté par</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let doc of filteredDocuments" class="document-row">
-                  <td>
-                    <div class="document-cell">
-                      <div class="document-icon-small" [ngClass]="'icon-' + doc.type">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                          <polyline points="14,2 14,8 20,8"/>
-                        </svg>
-                      </div>
-                      <div class="document-name">{{ doc.name }}</div>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="document-type-badge" [ngClass]="'type-' + doc.type">
-                      {{ getDocumentTypeLabel(doc.type) }}
-                    </span>
-                  </td>
-                  <td>
-                    <div class="case-link">{{ getCaseNumber(doc.caseId) }}</div>
-                  </td>
-                  <td>
-                    <div class="date-cell">{{ formatDate(doc.uploadedAt) }}</div>
-                  </td>
-                  <td>
-                    <div class="user-cell">{{ doc.uploadedBy }}</div>
-                  </td>
-                  <td>
-                    <div class="table-actions">
-                      <button class="btn btn-primary small" (click)="viewDocument(doc)" title="Voir">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                          <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                      </button>
-                      <button class="btn btn-danger small" (click)="deleteDocument(doc)" title="Supprimer">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <polyline points="3,6 5,6 21,6"/>
-                          <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <ng-template #noDocuments>
-          <div class="no-documents">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14,2 14,8 20,8"/>
-            </svg>
-            <h3>Aucun document trouvé</h3>
-            <p>Aucun document ne correspond aux critères sélectionnés.</p>
-          </div>
-        </ng-template>
-      </div>
-
-      <!-- Modal d'upload -->
-      <div class="modal-overlay" *ngIf="showUploadModal" (click)="closeUploadModal()">
-        <div class="modal-content" (click)="$event.stopPropagation()">
-          <div class="modal-header">
-            <h3>Ajouter un document</h3>
-            <button class="modal-close" (click)="closeUploadModal()">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="upload-form">
-              <div class="form-group">
-                <label>Dossier associé</label>
-                <select [(ngModel)]="newDocument.caseId" required>
-                  <option value="">Sélectionner un dossier</option>
-                  <option *ngFor="let dossier of uniqueDossiers" [value]="dossier.nodeId">
-                     {{ getDisplayCaseNumber(dossier) }}
-                  </option>
-                </select>
-              </div>
-              
-              <div class="form-group">
-                <label>Type de document</label>
-                <select [(ngModel)]="newDocument.type" required>
-                  <option value="">Sélectionner un type</option>
-                  <option *ngFor="let type of getDocumentTypes()" [value]="type.value">
-                    {{ type.label }}
-                  </option>
-                </select>
-              </div>
-              
-              <div class="form-group">
-                <label>Nom du document</label>
-                <input
-                  type="text"
-                  [(ngModel)]="newDocument.name"
-                  placeholder="Nom du document"
-                  required
-                >
-              </div>
-              
-              <div class="form-group">
-                <label>Fichier</label>
-                <div class="file-upload">
-                  <input type="file" id="fileInput" (change)="onFileSelected($event)" accept=".pdf,.doc,.docx,.jpg,.png">
-                  <label for="fileInput" class="file-upload-label">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="17,8 12,3 7,8"/>
-                      <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                    <span>{{ selectedFile ? selectedFile.name : 'Choisir un fichier' }}</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" (click)="closeUploadModal()">Annuler</button>
-            <button class="btn btn-primary"  (click)="uploadDocument()" [disabled]="isUploading">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="17,8 12,3 7,8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
-              </svg>
-              {{ isUploading ? 'Upload en cours...' : 'Ajouter le document' }}
-              <!-- Ajouter le document -->
-            </button>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- Modal de visualisation (reste identique) -->
-  <div class="modal-overlay" *ngIf="showViewModal" (click)="closeViewModal()">
-    <div class="modal-content large" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>{{ selectedDocument?.name }}</h3>
-        <button class="modal-close" (click)="closeViewModal()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body" *ngIf="selectedDocument">
-        <div class="document-preview">
-          <div class="preview-placeholder">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14,2 14,8 20,8"/>
-            </svg>
-            <p>Aperçu du document</p>
-            <p class="preview-note">{{ getDocumentTypeLabel(selectedDocument.type) }}</p>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closeViewModal()">Fermer</button>
-        <button class="btn btn-primary" (click)="downloadDocument(selectedDocument!)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7,10 12,15 17,10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          Télécharger
-        </button>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- Modale de visualisation de document -->
-<div class="document-viewer-overlay" *ngIf="showDocumentViewer" (click)="closeDocumentViewer()">
-  <div class="document-viewer-modal" (click)="$event.stopPropagation()">
-    <!-- En-tête -->
-    <div class="document-viewer-header">
-      <div class="document-viewer-info">
-        <h3>{{ currentDocument?.name }}</h3>
-        <p class="document-meta">
-          <span class="document-type-badge" [ngClass]="'type-' + currentDocument?.type">
-            {{ getDocumentTypeLabel(currentDocument?.type) }}
-          </span>
-          <span class="document-size" *ngIf="currentDocument?.size">
-            • {{ formatFileSize(currentDocument.size) }}
-          </span>
-        </p>
-      </div>
-      <div class="document-viewer-actions">
-        <button class="btn-icon" (click)="openInNewTab()" title="Ouvrir dans un nouvel onglet">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-            <polyline points="15,3 21,3 21,9"/>
-            <line x1="10" y1="14" x2="21" y2="3"/>
-          </svg>
-        </button>
-        <button class="btn-icon" (click)="downloadDocument(currentDocument)" title="Télécharger">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7,10 12,15 17,10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-        </button>
-        <button class="btn-icon close-btn" (click)="closeDocumentViewer()" title="Fermer">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- Contenu du document -->
-    <div class="document-viewer-content">
-      <!-- Chargement -->
-      <div class="document-loading" *ngIf="isLoadingDocument">
-        <div class="spinner"></div>
-        <p>Chargement du document...</p>
+    <!-- Modale de confirmation de suppression -->
+    <div class="confirmation-overlay" *ngIf="showDeleteConfirmation"> 
+      <div class="confirmation-modal">
+        <div class="modal-header">
+          <div class="header-with-icon">
+            <div class="danger-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+            <h3>Confirmer la suppression</h3>
+          </div>
+        </div>
+        <div class="modal-body">
+          <p>Êtes-vous sûr de vouloir supprimer le document "{{ documentToDelete?.name }}" ?</p>
+          <p class="warning-text">Cette action est irréversible.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Annuler</button>
+          <button type="button" class="btn btn-danger" (click)="executeDelete()">Supprimer</button>
+        </div>
       </div>
+    </div>
 
-      <!-- Affichage PDF -->
-      <iframe 
-        *ngIf="!isLoadingDocument && isDocumentPDF() && currentDocumentUrl"
-        [src]="currentDocumentUrl "
-        class="document-iframe"
-        frameborder="0">
-      </iframe>
-
-      <!-- Affichage Image -->
-      <div class="document-image-container" *ngIf="!isLoadingDocument && isDocumentImage() && currentDocumentUrl">
-        <img [src]="currentDocumentUrl" [alt]="currentDocument?.name" class="document-image">
-      </div>
-
-      <!-- Autres types de documents -->
-      <div class="document-unsupported" *ngIf="!isLoadingDocument && !isDocumentPDF() && !isDocumentImage()">
+    <ng-template #noDocuments>
+      <div class="no-documents">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14,2 14,8 20,8"/>
         </svg>
-        <h3>Aperçu non disponible</h3>
-        <p>Ce type de fichier ne peut pas être visualisé directement dans le navigateur.</p>
-        <button class="btn btn-primary" (click)="downloadDocument(currentDocument)">
+        <h3>Aucun document trouvé</h3>
+        <p>Aucun document ne correspond aux critères sélectionnés.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal d'upload CORRIGÉ -->
+  <div class="modal-overlay" *ngIf="showUploadModal" (click)="closeUploadModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Ajouter un document</h3>
+        <button class="modal-close" (click)="closeUploadModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- MESSAGE DE SUCCÈS -->
+        <div *ngIf="showUploadSuccess" class="upload-success-message">
+          <div class="success-content">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4"/>
+              <circle cx="12" cy="12" r="9"/>
+            </svg>
+            <span>{{ uploadSuccessMessage }}</span>
+          </div>
+        </div>
+        
+        <div class="upload-form" *ngIf="!showUploadSuccess">
+          <div class="form-group">
+            <label>Dossier associé</label>
+            <select 
+              [(ngModel)]="newDocument.caseId" 
+              [class.error]="uploadFormErrors.type"
+              required>
+              <option value="">Sélectionner un dossier</option>
+              <option *ngFor="let dossier of uniqueDossiers" [value]="dossier.nodeId">
+                {{ getDisplayCaseNumber(dossier) }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="uploadFormErrors.type">
+              {{ uploadErrorMessages.type }}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Type de document</label>
+            <select 
+              [(ngModel)]="newDocument.type" 
+              [class.error]="uploadFormErrors.type"
+              required>
+              <option value="">Sélectionner un type</option>
+              <option value="invoice">Facture</option>
+              <option value="contract">Contrat</option>
+              <option value="correspondence">Correspondance</option>
+              <option value="legal_notice">Mise en demeure</option>
+              <option value="payment_proof">Preuve de paiement</option>
+              <option value="court_document">Document judiciaire</option>
+            </select>
+            <div class="error-message" *ngIf="uploadFormErrors.type">
+              {{ uploadErrorMessages.type }}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Nom du document</label>
+            <input
+              type="text"
+              [(ngModel)]="newDocument.name"
+              placeholder="Nom du document"
+              [class.error]="uploadFormErrors.name"
+              required
+            >
+            <div class="error-message" *ngIf="uploadFormErrors.name">
+              {{ uploadErrorMessages.name }}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Fichier</label>
+            <div class="file-upload">
+              <input 
+                type="file" 
+                id="fileInput" 
+                (change)="onFileSelected($event)" 
+                accept=".pdf,.doc,.docx,.jpg,.png"
+                [class.error]="uploadFormErrors.file">
+              <label for="fileInput" class="file-upload-label" [class.error]="uploadFormErrors.file">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17,8 12,3 7,8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <span>{{ selectedFile ? selectedFile.name : 'Choisir un fichier' }}</span>
+              </label>
+            </div>
+            <div class="error-message" *ngIf="uploadFormErrors.file">
+              {{ uploadErrorMessages.file }}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer" *ngIf="!showUploadSuccess">
+        <button class="btn btn-secondary" (click)="closeUploadModal()" [disabled]="isUploading">Annuler</button>
+        <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="isUploading">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7,10 12,15 17,10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
+            <polyline points="17,8 12,3 7,8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
           </svg>
-          Télécharger le document
+          <span *ngIf="isUploading" class="spinner"></span>
+          {{ isUploading ? 'Envoi en cours...' : 'Ajouter le document' }}
         </button>
       </div>
     </div>
   </div>
 
+  <!-- Modale de visualisation de document -->
+  <div class="document-viewer-overlay" *ngIf="showDocumentViewer"> 
+    <div class="document-viewer-modal" (click)="$event.stopPropagation()">
+      <!-- En-tête -->
+      <div class="document-viewer-header">
+        <div class="document-viewer-info">
+          <h3>{{ currentDocument?.name }}</h3>
+          <p class="document-meta">
+            <span class="document-type-badge" [ngClass]="'type-' + currentDocument?.type">
+              {{ getDocumentTypeLabel(currentDocument?.type) }}
+            </span>
+            <span class="document-size" *ngIf="currentDocument?.size">
+              • {{ formatFileSize(currentDocument.size) }}
+            </span>
+          </p>
+        </div>
+        <div class="document-viewer-actions">
+          <button class="btn-icon" (click)="openInNewTab()" title="Ouvrir dans un nouvel onglet">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15,3 21,3 21,9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </button>
+          <button class="btn-icon" (click)="downloadDocument(currentDocument)" title="Télécharger">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </button>
+          <button class="btn-icon close-btn" (click)="closeDocumentViewer()" title="Fermer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenu du document -->
+      <div class="document-viewer-content">
+        <!-- Chargement -->
+        <div class="document-loading" *ngIf="isLoadingDocument">
+          <div class="spinner"></div>
+          <p>Chargement du document...</p>
+        </div>
+
+        <!-- Affichage PDF -->
+        <iframe 
+          *ngIf="!isLoadingDocument && isDocumentPDF() && currentDocumentUrl"
+          [src]="currentDocumentUrl"
+          class="document-iframe"
+          frameborder="0">
+        </iframe>
+
+        <!-- Affichage Image -->
+        <div class="document-image-container" *ngIf="!isLoadingDocument && isDocumentImage() && currentDocumentUrl">
+          <img [src]="currentDocumentUrl" [alt]="currentDocument?.name" class="document-image">
+        </div>
+
+        <!-- Autres types de documents -->
+        <div class="document-unsupported" *ngIf="!isLoadingDocument && !isDocumentPDF() && !isDocumentImage()">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+          </svg>
+          <h3>Aperçu non disponible</h3>
+          <p>Ce type de fichier ne peut pas être visualisé directement dans le navigateur.</p>
+          <button class="btn btn-primary" (click)="downloadDocument(currentDocument)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Télécharger le document
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

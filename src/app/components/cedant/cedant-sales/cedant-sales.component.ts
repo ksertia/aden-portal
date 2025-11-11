@@ -29,15 +29,15 @@ export class CedantSalesComponent implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.cedantService.getPortfolios(currentUser.id).subscribe(portfolios => {
-      this.portfolios = portfolios;
-      this.activeSales = portfolios.filter(p => 
-        p.status === PortfolioStatus.SUBMITTED || 
-        p.status === PortfolioStatus.UNDER_EVALUATION || 
-        p.status === PortfolioStatus.APPROVED
-      );
-      this.soldPortfolios = portfolios.filter(p => p.status === PortfolioStatus.SOLD);
-    });
+    // this.cedantService.getPortfolios(currentUser.id).subscribe(portfolios => {
+    //   this.portfolios = portfolios;
+    //   this.activeSales = portfolios.filter(p => 
+    //     p.status === PortfolioStatus.SUBMITTED || 
+    //     p.status === PortfolioStatus.UNDER_EVALUATION || 
+    //     p.status === PortfolioStatus.APPROVED
+    //   );
+    //   this.soldPortfolios = portfolios.filter(p => p.status === PortfolioStatus.SOLD);
+    // });
   }
 
   refreshData() {
@@ -50,34 +50,34 @@ export class CedantSalesComponent implements OnInit {
   }
 
   acceptOffer(portfolio: CedantPortfolio) {
-    if (confirm('Êtes-vous sûr de vouloir accepter cette offre ?')) {
-      this.cedantService.updatePortfolio(portfolio.id, {
-        status: PortfolioStatus.SOLD,
-        soldAt: new Date()
-      }).subscribe({
-        next: () => {
-          this.loadData();
-        },
-        error: (error) => {
-          console.error('Erreur lors de l\'acceptation:', error);
-        }
-      });
-    }
+    // if (confirm('Êtes-vous sûr de vouloir accepter cette offre ?')) {
+    //   this.cedantService.updatePortfolio(portfolio.id, {
+    //     status: PortfolioStatus.SOLD,
+    //     soldAt: new Date()
+    //   }).subscribe({
+    //     next: () => {
+    //       this.loadData();
+    //     },
+    //     error: (error) => {
+    //       console.error('Erreur lors de l\'acceptation:', error);
+    //     }
+    //   });
+    // }
   }
 
   rejectOffer(portfolio: CedantPortfolio) {
-    if (confirm('Êtes-vous sûr de vouloir refuser cette offre ?')) {
-      this.cedantService.updatePortfolio(portfolio.id, {
-        status: PortfolioStatus.REJECTED
-      }).subscribe({
-        next: () => {
-          this.loadData();
-        },
-        error: (error) => {
-          console.error('Erreur lors du refus:', error);
-        }
-      });
-    }
+    // if (confirm('Êtes-vous sûr de vouloir refuser cette offre ?')) {
+    //   this.cedantService.updatePortfolio(portfolio.id, {
+    //     status: PortfolioStatus.REJECTED
+    //   }).subscribe({
+    //     next: () => {
+    //       this.loadData();
+    //     },
+    //     error: (error) => {
+    //       console.error('Erreur lors du refus:', error);
+    //     }
+    //   });
+    // }
   }
 
   getBuybackRate(portfolio: CedantPortfolio): number {

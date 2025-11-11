@@ -2,89 +2,115 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { LanguageSwitcherComponent } from '../../shared/language-switcher/language-switcher.component';
 import { I18nService } from '../../../services/i18n.service';
-import { AdminService } from '../../../services/admin.service';
-import { CaseService } from '../../../services/case.service';
-import { AuthService } from '../../../services/auth.service';
-import { CreditorDetail } from '../../../models/case.model';
 import { DebtCase } from '../../../models/case.model';
-import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
-import { CaseDocument, DocumentType } from '../../../models/case.model';
+import { AuthService } from '../../../services/auth.service';
+import { CaseService } from '../../../services/case.service';
 
 @Component({
   selector: 'app-debtor-payments',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, ViewToggleComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './debtor-payments.component.html',
   styleUrls: ['./debtor-payments.component.css']
 })
 export class DebtorPaymentsComponent implements OnInit {
-
-
-  // pour le drawer
-    // Propriétés pour le paiement
-isPaymentDrawerOpen = false;
-currentPaymentStep = 1;
-selectedDossier: any = null;
-selectedCurrency = 'fcfa';
-selectedPaymentMethod = 'mobile';
-exchangeRates = {
-  fcfa: 1,
-  eur: 0.0015,
-  usd: 0.0017,
-  gbp: 0.0013
-};
-  //fin pour le drawer
-
   translations: any = {};
-   dossiers: any[] = [];
-    isLoading = true;
-    errorMessage = '';
+  userCases: DebtCase[] = [];
   
-    userCases: DebtCase[] = [];
+  // Données de la dette
+  totalDue = 0;
+  alreadyPaid = 0;
+  remainingBalance = 0;
+  dossiers: any[] = [];
   
-    currentView: 'grid' | 'table' = 'table';
+  // États du drawer de paiement - ORDRE CORRIGÉ
+  showPaymentDrawer = false;
+  currentStep: 'selection' | 'currency' | 'details' | 'paymentMethod' | 'confirmation' = 'selection';
 
-    // Liste brute et filtrée pour pouvoir extraire le lastname, le firstname, l'email, le telephone et le type du débiteur (importer depuis AdminService)
-    creditors: CreditorDetail[] = [];
-    filteredCreditors: CreditorDetail[] = [];
+  // Mode de paiement sélectionné
+  selectedPaymentMethod: string = '';
+  selectedPaymentProvider: string = '';
+
+  // Modes de paiement disponibles
+  paymentMethods = [
+    {
+      id: 'mobile',
+      name: 'Paiement Mobile',
+      description: 'Payer via votre mobile money',
+      providers: [
+        { id: 'corisMoney', name: 'Coris Money', icon: '📱' },
+        { id: 'orangeMoney', name: 'Orange Money', icon: '🟠' },
+        { id: 'moovMoney', name: 'Moov Money', icon: '🔵' },
+        { id: 'telecelMoney', name: 'Telecel Money', icon: '🟡' }
+      ]
+    },
+    {
+      id: 'card',
+      name: 'Carte Bancaire',
+      description: 'Payer par carte de crédit/débit',
+      providers: [
+        { id: 'visa', name: 'Carte Visa', icon: '💳' },
+        { id: 'mastercard', name: 'Carte Mastercard', icon: '💳' },
+        { id: 'localCard', name: 'Carte Bancaire Locale', icon: '🏦' }
+      ]
+    },
+    {
+      id: 'paypal',
+      name: 'PayPal',
+      description: 'Payer via votre compte PayPal',
+      providers: [
+        { id: 'paypal', name: 'PayPal', icon: '🔵' }
+      ]
+    }
+  ];
   
-    selectedcreditor: CreditorDetail | undefined;
-// pour le filtrage des dossiers
-     selectedStatus = '';
-  selectedPriority = '';
-  filteredDossiers: any[] = [];
+  // Données pour le paiement
+  paymentAmount = 0;
+  selectedDossier: any = null;
+  selectedDossierId: string = '';
+  selectedCurrency: string = 'XOF'; // Devise par défaut = XOF
+  exchangeRate: number = 1;
+  
+  // Frais et calculs
+  penalties = 0;
+  taxes = 0;
+  transactionFees = 0;
+  totalFees = 0;
+  totalToPay = 0; // En XOF (devise de base)
+  totalToPayInSelectedCurrency = 0; // Dans la devise sélectionnée
+  
+  // Devises disponibles (taux de change depuis XOF)
+  availableCurrencies = [
+    { code: 'XOF', name: 'Franc CFA', symbol: 'FCFA', rate: 1 },
+    { code: 'EUR', name: 'Euro', symbol: '€', rate: 0.001524 }, // 1 XOF = 0.001524 EUR
+    { code: 'USD', name: 'Dollar US', symbol: '$', rate: 0.00165 }, // 1 XOF = 0.00165 USD
+    { code: 'GBP', name: 'Livre Sterling', symbol: '£', rate: 0.00130 }, // 1 XOF = 0.00130 GBP
+    { code: 'CAD', name: 'Dollar Canadien', symbol: 'C$', rate: 0.00224 } // 1 XOF = 0.00224 CAD
+  ];
+  
+  // Loading states
+  isLoading = true;
+  errorMessage = '';
 
-    // Ajout start
-    cases: DebtCase[] = [];
-    allDocuments: (CaseDocument & { caseId: string })[] = [];
-    filteredDocuments: (CaseDocument & { caseId: string })[] = [];
-    currentViews: 'grid' | 'table' = 'table';
-    showDocumentsModal: boolean = false;
-    
-    searchTerm = '';
-    selectedDocumentType = '';
-    selectedCaseId = '';
-    
-    showUploadModal = false;
-    selectedFile: File | null = null;
-    
-    newDocument = {
-      caseId: '',
-      type: '',
-      name: ''
-    };
-    // Ajout end
-
-
-  constructor(private i18nService: I18nService, private adminService: AdminService, private casesService: CaseService, private authService: AuthService) {
+  constructor(
+    private i18nService: I18nService,
+    private authService: AuthService,
+    private caseService: CaseService,
+    private router: Router
+  ) {
     this.loadTranslations();
-
+    
     // Écouter les changements de langue
     this.i18nService.currentLocale$.subscribe(() => {
       this.loadTranslations();
     });
+  }
+
+  ngOnInit(): void {
+    this.loadDebtorData();
   }
 
   private loadTranslations() {
@@ -98,29 +124,318 @@ exchangeRates = {
     return this.i18nService.translate(key, this.translations);
   }
 
-  ngOnInit(): void {
+  // Charger les données du débiteur
+  loadDebtorData() {
+    const siteName = 'portail-recouvrement';
+    const currentUser = this.authService.getCurrentUser();
 
-    this.loadTranslations();
-    this.i18nService.currentLocale$.subscribe(() => {
-    this.loadTranslations();
+    if (!currentUser) {
+      this.errorMessage = 'Utilisateur non connecté.';
+      this.isLoading = false;
+      return;
+    }
+
+    const debiteurNodeId = currentUser.nodeId;
+
+    if (!debiteurNodeId) {
+      this.errorMessage = 'Identifiant du débiteur introuvable.';
+      this.isLoading = false;
+      return;
+    }
+
+    this.caseService.getDossiersDebiteur(siteName, debiteurNodeId).subscribe({
+      next: (response) => {
+        console.log('Réponse API paiements :', response);
+        this.dossiers = response.data?.map((item: any) => item.map) || [];
+        
+        // Calculer les totaux
+        this.calculatePaymentTotals(this.dossiers);
+        
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des données :', error);
+        this.errorMessage = 'Impossible de récupérer les données de paiement.';
+        this.isLoading = false;
+      }
     });
-
-
-    this.loadDossiers();
   }
 
-  // pour le status, le format currency(la dévise) et la priorité des dossiers
+  // Calculer les totaux de paiement
+  calculatePaymentTotals(dossiers: any[]) {
+    this.totalDue = dossiers.reduce((acc, dossier) => acc + (dossier.montantTotal || 0), 0);
+    this.alreadyPaid = dossiers.reduce((acc, dossier) => acc + (dossier.montantPaye || 0), 0);
+    this.remainingBalance = this.totalDue - this.alreadyPaid;
+  }
 
+  // Formater les montants en devise
   formatCurrency(amount: number): string {
-    if (!amount) return '0 FCFA';
+    if (!amount) return `0 ${this.getCurrencySymbol()}`;
+    
+    const selectedCurrency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
+    const symbol = selectedCurrency?.symbol || 'FCFA';
+    
+    // Pour le XOF, on formate sans décimales
+    if (this.selectedCurrency === 'XOF') {
+      return `${Math.round(amount).toLocaleString('fr-FR')} ${symbol}`;
+    }
+    
+    // Pour les autres devises, on utilise le format standard avec 2 décimales
     return amount.toLocaleString('fr-FR', {
-      style: 'currency',
-      currency: 'XOF',
-      minimumFractionDigits: 0
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + ` ${symbol}`;
+  }
+
+  // Obtenir le symbole de la devise sélectionnée
+  getCurrencySymbol(): string {
+    const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
+    return currency?.symbol || 'FCFA';
+  }
+
+  // Convertir un montant XOF vers la devise sélectionnée
+  convertToSelectedCurrency(amountInXOF: number): number {
+    if (this.selectedCurrency === 'XOF') return amountInXOF;
+    
+    const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
+    const converted = amountInXOF * (currency?.rate || 1);
+    
+    // Arrondir à 2 décimales pour les devises autres que XOF
+    return Math.round(converted * 100) / 100;
+  }
+
+  // Convertir un montant de la devise sélectionnée vers XOF
+  convertToXOF(amountInCurrency: number): number {
+    if (this.selectedCurrency === 'XOF') return amountInCurrency;
+    
+    const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
+    const converted = amountInCurrency / (currency?.rate || 1);
+    
+    return Math.round(converted); // XOF sans décimales
+  }
+
+  // Obtenir le taux inverse (1 [devise] = ? XOF)
+  getInverseExchangeRate(): number {
+    if (this.selectedCurrency === 'XOF') return 1;
+    
+    const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
+    return 1 / (currency?.rate || 1);
+  }
+
+  // Ouvrir le drawer de paiement
+  openPaymentDrawer() {
+    this.currentStep = 'selection';
+    this.selectedDossier = null;
+    this.selectedDossierId = '';
+    this.selectedCurrency = 'XOF'; // Toujours réinitialiser à XOF
+    this.selectedPaymentMethod = '';
+    this.selectedPaymentProvider = '';
+    this.exchangeRate = 1;
+    this.paymentAmount = 0;
+    this.resetFees();
+    this.showPaymentDrawer = true;
+  }
+
+  // Fermer le drawer de paiement
+  closePaymentDrawer() {
+    this.showPaymentDrawer = false;
+    this.currentStep = 'selection';
+    this.selectedDossier = null;
+    this.selectedDossierId = '';
+    this.selectedCurrency = 'XOF'; // Réinitialiser à XOF
+    this.selectedPaymentMethod = '';
+    this.selectedPaymentProvider = '';
+    this.paymentAmount = 0;
+    this.resetFees();
+  }
+
+  // Sélectionner un dossier
+  onDossierSelect() {
+    if (this.selectedDossierId) {
+      this.selectedDossier = this.dossiers.find(d => d.nodeId === this.selectedDossierId);
+      if (this.selectedDossier) {
+        this.currentStep = 'currency';
+      }
+    }
+  }
+
+  // Sélectionner une devise
+  onCurrencySelect() {
+    if (this.selectedCurrency) {
+      const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
+      this.exchangeRate = currency?.rate || 1;
+      this.calculateFees();
+      this.currentStep = 'details'; // On va directement aux détails après la devise
+    }
+  }
+
+  // Aller au mode de paiement depuis les détails
+  goToPaymentMethod() {
+    if (this.paymentAmount > 0 && this.paymentAmount <= this.totalToPayInSelectedCurrency) {
+      this.currentStep = 'paymentMethod';
+    }
+  }
+
+  // Sélectionner un mode de paiement
+  onPaymentMethodSelect() {
+    if (this.selectedPaymentMethod && this.selectedPaymentProvider) {
+      this.currentStep = 'confirmation';
+    }
+  }
+
+  // Calculer les frais (toujours en XOF d'abord)
+  calculateFees() {
+    if (!this.selectedDossier) return;
+
+    // Pénalités si le dossier est en retard (en XOF)
+    this.penalties = this.calculatePenalties(this.selectedDossier);
+    
+    // Taxes (exemple: 20% de TVA sur les pénalités) en XOF
+    this.taxes = this.penalties * 0.20;
+    
+    // Frais de transaction (exemple: 1.5% du montant à payer) en XOF
+    const baseAmount = this.calculateRemainingAmount(this.selectedDossier);
+    this.transactionFees = baseAmount * 0.015;
+    
+    // Total des frais en XOF
+    this.totalFees = this.penalties + this.taxes + this.transactionFees;
+    
+    // Total à payer en XOF (montant de base + frais)
+    this.totalToPay = baseAmount + this.totalFees;
+    
+    // Total à payer dans la devise sélectionnée
+    this.totalToPayInSelectedCurrency = this.convertToSelectedCurrency(this.totalToPay);
+    
+    // Par défaut, on propose de payer le total dans la devise sélectionnée
+    this.paymentAmount = this.totalToPayInSelectedCurrency;
+  }
+
+  // Calculer les pénalités (en XOF)
+  calculatePenalties(dossier: any): number {
+    // Vérifier si le dossier est en retard
+    const isOverdue = this.isDossierOverdue(dossier);
+    
+    if (!isOverdue) return 0;
+    
+    // Calculer les pénalités (exemple: 10% du montant restant) en XOF
+    const remainingAmount = this.calculateRemainingAmount(dossier);
+    return remainingAmount * 0.10;
+  }
+
+  // Vérifier si le dossier est en retard
+  isDossierOverdue(dossier: any): boolean {
+    if (!dossier.dateEcheance) return false;
+    
+    const dueDate = new Date(dossier.dateEcheance);
+    const today = new Date();
+    return dueDate < today;
+  }
+
+  // Calculer le montant restant pour un dossier (en XOF)
+  calculateRemainingAmount(dossier: any): number {
+    const totalDue = this.calculateTotalDue(dossier);
+    const paid = dossier.montantPaye || 0;
+    return totalDue - paid;
+  }
+
+  // Calculer le total dû pour un dossier (incluant intérêts et frais) en XOF
+  calculateTotalDue(dossier: any): number {
+    const principal = dossier.montantTotal || 0;
+    const interests = dossier.montantInterets || 0;
+    const penalties = dossier.montantPenalites || 0;
+    const fees = dossier.montantFrais || 0;
+    
+    return principal + interests + penalties + fees;
+  }
+
+  // Réinitialiser les frais
+  resetFees() {
+    this.penalties = 0;
+    this.taxes = 0;
+    this.transactionFees = 0;
+    this.totalFees = 0;
+    this.totalToPay = 0;
+    this.totalToPayInSelectedCurrency = 0;
+  }
+
+  // Obtenir le pourcentage de paiement
+  getPaymentPercentage(): number {
+    return this.totalDue ? Math.round((this.alreadyPaid / this.totalDue) * 100) : 0;
+  }
+
+  // Obtenir le pourcentage de paiement pour un dossier spécifique
+  getDossierPaymentPercentage(dossier: any): number {
+    const total = this.calculateTotalDue(dossier);
+    const paid = dossier.montantPaye || 0;
+    return total ? Math.round((paid / total) * 100) : 0;
+  }
+
+  // Navigation dans le drawer - CORRIGÉ POUR LE NOUVEL ORDRE
+  goBack() {
+    if (this.currentStep === 'currency') {
+      this.currentStep = 'selection';
+      this.selectedDossier = null;
+      this.selectedDossierId = '';
+      this.resetFees();
+    } else if (this.currentStep === 'details') {
+      this.currentStep = 'currency';
+    } else if (this.currentStep === 'paymentMethod') {
+      this.currentStep = 'details';
+    } else if (this.currentStep === 'confirmation') {
+      this.currentStep = 'paymentMethod';
+    }
+  }
+
+  // Traiter le paiement
+  processPayment() {
+    if (this.paymentAmount <= 0 || this.paymentAmount > this.totalToPayInSelectedCurrency) {
+      alert('Montant de paiement invalide');
+      return;
+    }
+
+    // Convertir le montant payé en XOF pour le traitement
+    const amountInXOF = this.convertToXOF(this.paymentAmount);
+
+    console.log('Paiement en cours pour le dossier:', this.selectedDossier?.numeroDossier);
+    console.log('Montant payé:', this.paymentAmount, this.selectedCurrency);
+    console.log('Montant converti en XOF:', amountInXOF);
+    console.log('Taux de change utilisé:', this.exchangeRate);
+    console.log('Mode de paiement:', this.selectedPaymentMethod);
+    console.log('Fournisseur:', this.selectedPaymentProvider);
+    
+    // Simulation de paiement
+    setTimeout(() => {
+      alert(`Paiement de ${this.formatCurrency(this.paymentAmount)} effectué avec succès pour le dossier ${this.selectedDossier?.numeroDossier}!`);
+      this.closePaymentDrawer();
+      this.loadDebtorData();
+    }, 2000);
+  }
+
+  // Ouvrir l'historique de paiement
+  openPaymentHistory() {
+    console.log('Ouvrir historique de paiement');
+    alert('Fonctionnalité Historique de paiement - À implémenter');
+  }
+
+  // Ouvrir les détails de la dette
+  openDebtDetails() {
+    console.log('Ouvrir détails de la dette');
+    alert('Fonctionnalité Détails dettes - À implémenter');
+  }
+
+  // Formater la date
+  formatDate(dateStr: string): string {
+    if (!dateStr) return 'N/A';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
     });
   }
 
-   getStatusLabel(status: string): string {
+  // Obtenir le statut du dossier
+  getStatusLabel(status: string): string {
     const labels: { [key: string]: string } = {
       'pending': 'En attente',
       'active': 'Actif',
@@ -134,286 +449,39 @@ exchangeRates = {
     return labels[status] || status;
   }
 
-  getPriorityClass(priority: string): string {
-    switch(priority.toLowerCase()) {
-      case 'low':
-      case 'faible':
-        return 'priorite-faible';
-      case 'medium':
-      case 'moyenne':
-        return 'moyenne';
-      case 'high':
-      case 'elevee':
-        return 'elevee';
-      case 'urgent':
-      case 'urgente':
-        return 'urgente';
-      case 'normal':
-      case 'normale':
-        return 'normale';
-      default:
-        return '';
-    }
+  // Obtenir le taux de change actuel
+  getCurrentExchangeRate(): number {
+    const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
+    return currency?.rate || 1;
   }
 
-  // pour la récupération des dossiers et créanciers
-  loadDossiers() {
-    const siteName = 'portail-recouvrement';
-    const currentUser = this.authService.getCurrentUser();
-
-    // Verification si l'utilisateur est connecté
-    if (!currentUser) {
-      this.errorMessage = 'Utilisateur non connecté.';
-      this.isLoading = false;
-      return;
-    }
-
-    const debiteurNodeId = currentUser.nodeId;
-    console.log('Débiteur connecté :', currentUser);
-    console.log('debiteurNodeId envoyé :', debiteurNodeId);
-
-    // Verification si l'utilisateur connecté à un NodeId
-    if (!debiteurNodeId) {
-      this.errorMessage = 'Identifiant du débiteur introuvable.';
-      this.isLoading = false;
-      return;
-    }
-
-    // Appel du web service pour la recuperation des dossiers du debiteur
-    this.casesService.getDossiersDebiteur(siteName, debiteurNodeId).subscribe({
-      next: (response) => {
-        console.log('Réponse API dossiers :', response);
-        this.dossiers = response.data?.map((item: any) => item.map) || [];
-        this.filteredDossiers = [...this.dossiers];
-
-      // IMPORTANT: Extraire les documents après avoir chargé les dossiers
-      this.extractDocuments();
-
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des dossiers :', error);
-        this.errorMessage = 'Impossible de récupérer les dossiers.';
-        this.isLoading = false;
-      }
-    });
-
-    // Appel du web service pour la recuperation des données(extraction du lastname,firstname,email,telephone et type) du creancier 
-    this.adminService.getCreanciers(siteName).subscribe({
-      next: (data: CreditorDetail[]) => {
-        this.creditors = data;
-        this.filteredCreditors = [...this.creditors];
-      },
-      error: (err) => console.error(err)
-    });
-  }
-    
-
-  getPaymentPercentage(dossier: any): number {
-    const total = dossier.montantTotal || 0;
-    const paid = dossier.montantPaye || 0;
-    return total ? Math.round((paid / total) * 100) : 0;
+  // Obtenir le nom complet de la devise
+  getCurrencyName(): string {
+    const currency = this.availableCurrencies.find(c => c.code === this.selectedCurrency);
+    return currency?.name || 'Franc CFA';
   }
 
-  getTotalDebt(): number {
-    return this.filteredDossiers.reduce((acc, d) => acc + (d.montantTotal || 0), 0);
+  // Méthodes utilitaires pour les modes de paiement
+  getPaymentMethodName(): string {
+    const method = this.paymentMethods.find(m => m.id === this.selectedPaymentMethod);
+    return method?.name || '';
   }
 
-   // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
-  getCreancierForDossier(dossier: any): CreditorDetail | undefined {
-    return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
+  getPaymentProviderName(): string {
+    const method = this.paymentMethods.find(m => m.id === this.selectedPaymentMethod);
+    const provider = method?.providers.find(p => p.id === this.selectedPaymentProvider);
+    return provider?.name || '';
   }
 
-  getTotalPaid(): number {
-    return this.filteredDossiers.reduce((acc, d) => acc + (d.montantPaye || 0), 0);
-  }
-  getFormattedRemainingAmount(dossier: any): string {
-    const reste = (dossier.montantTotal || 0) - (dossier.montantPaye || 0);
-    return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'XOF' });
+  getPaymentMethodIcon(): string {
+    const method = this.paymentMethods.find(m => m.id === this.selectedPaymentMethod);
+    const provider = method?.providers.find(p => p.id === this.selectedPaymentProvider);
+    return provider?.icon || '💳';
   }
 
-  getInterestTypeLabel(type: string): string {
-    const labels: { [key: string]: string } = {
-      'legal': 'Intérêts légaux',
-      'contractual': 'Intérêts contractuels',
-      'delay': 'Intérêts de retard'
-    };
-    return labels[type] || type;
+  // Réinitialiser le mode de paiement
+  resetPaymentMethod() {
+    this.selectedPaymentMethod = '';
+    this.selectedPaymentProvider = '';
   }
-
-   formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-
-
-
-  //pour extracdocument
-   extractDocuments() {
-  this.allDocuments = [];
-  
-  console.log('Début extraction des documents...');
-  console.log('Nombre de dossiers à traiter:', this.dossiers.length);
-  
-  // Parcourir tous les dossiers pour extraire leurs documents
-  this.dossiers.forEach(dossier => {
-    console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsDebiteur?.myArrayList);
-    
-    // Vérifier si le dossier a des documents débiteur
-    if (dossier.documentsDebiteur?.myArrayList && Array.isArray(dossier.documentsDebiteur.myArrayList)) {
-      dossier.documentsDebiteur.myArrayList.forEach((doc: any) => {
-        // VÉRIFICATION CRITIQUE : s'assurer que doc n'est pas null
-        if (!doc) {
-          console.log('Document null ignoré');
-          return; // Passer au document suivant
-        }
-        
-        console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
-        
-        const mappedType = this.mapDocumentType(doc.typeDocument);
-        console.log('Type mappé:', mappedType);
-        
-        this.allDocuments.push({
-          id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
-          name: doc.fileName || doc.name || 'Document sans nom',
-          type: mappedType,
-          url: doc.url || doc.downloadUrl || '#',
-          uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
-          uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
-          caseId: dossier.nodeId
-        });
-      });
-    } else {
-      console.log('Aucun document trouvé pour le dossier:', dossier.numeroDossier);
-    }
-  });
-  
-  this.filteredDocuments = [...this.allDocuments];
-  console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
 }
-
-mapDocumentType(apiType: string): DocumentType {
-    console.log('Mapping du type:', apiType);
-    
-    // Normaliser le type (enlever espaces, mettre en majuscules)
-    const normalizedType = (apiType || '').trim().toUpperCase();
-    
-    const typeMapping: { [key: string]: DocumentType } = {
-      'FACTURE': DocumentType.INVOICE,
-      'INVOICE': DocumentType.INVOICE,
-      'CONTRAT': DocumentType.CONTRACT,
-      'CONTRACT': DocumentType.CONTRACT,
-      'CORRESPONDANCE': DocumentType.CORRESPONDENCE,
-      'CORRESPONDENCE': DocumentType.CORRESPONDENCE,
-      'MISE_EN_DEMEURE': DocumentType.LEGAL_NOTICE,
-      'LEGAL_NOTICE': DocumentType.LEGAL_NOTICE,
-      'PREUVE_PAIEMENT': DocumentType.PAYMENT_PROOF,
-      'PAYMENT_PROOF': DocumentType.PAYMENT_PROOF,
-      'DOCUMENT_JUDICIAIRE': DocumentType.COURT_DOCUMENT,
-      'COURT_DOCUMENT': DocumentType.COURT_DOCUMENT
-    };
-    
-    const result = typeMapping[normalizedType] || DocumentType.CORRESPONDENCE;
-    console.log('Résultat du mapping:', normalizedType, '->', result);
-    
-    return result;
-  }
-
-
-// ts pour le drawer 
-
-// Méthodes pour le drawer de paiement
-openPaymentDrawer(dossier: any): void {
-  this.selectedDossier = dossier;
-  this.currentPaymentStep = 1;
-  this.selectedCurrency = 'fcfa';
-  this.selectedPaymentMethod = 'mobile';
-  this.isPaymentDrawerOpen = true;
-}
-
-closePaymentDrawer(): void {
-  this.isPaymentDrawerOpen = false;
-  this.selectedDossier = null;
-}
-
-goToPaymentStep(step: number): void {
-  this.currentPaymentStep = step;
-}
-
-selectCurrency(currency: string): void {
-  this.selectedCurrency = currency;
-}
-
-selectPaymentMethod(method: string): void {
-  this.selectedPaymentMethod = method;
-}
-
-// Méthodes de calcul pour le résumé
-calculateTotalDu(): number {
-  if (!this.selectedDossier) return 0;
-  
-  return this.selectedDossier.montantTotal + 
-         this.calculateInteretsLegaux() + 
-         this.calculateInteretsRetard() + 
-         this.calculatePenalitesRetard() + 
-         this.calculateFraisDivers();
-}
-
-calculateInteretsLegaux(): number {
-  if (!this.selectedDossier) return 0;
-  // Implémentez votre logique de calcul des intérêts légaux
-  return this.selectedDossier.montantTotal * 0.035;
-}
-
-calculateInteretsRetard(): number {
-  if (!this.selectedDossier) return 0;
-  // Implémentez votre logique de calcul des intérêts de retard
-  return this.selectedDossier.montantTotal * 0.10;
-}
-
-calculatePenalitesRetard(): number {
-  if (!this.selectedDossier) return 0;
-  // Implémentez votre logique de calcul des pénalités
-  return this.selectedDossier.montantTotal * 0.05;
-}
-
-calculateFraisDivers(): number {
-  if (!this.selectedDossier) return 0;
-  // Frais divers fixes ou calculés
-  return 3000;
-}
-
-calculateResteAPayer(): number {
-  if (!this.selectedDossier) return 0;
-  return this.calculateTotalDu() - (this.selectedDossier.montantPaye || 0);
-}
-
-getCurrencySymbol(currency: string): string {
-  const symbols: any = {
-    fcfa: 'FCFA',
-    eur: '€',
-    usd: '$',
-    gbp: '£'
-  };
-  return symbols[currency] || 'FCFA';
-}
-
-processPayment(): void {
-  // Implémentez votre logique de traitement de paiement
-  const amount = this.calculateResteAPayer();
-  alert(`Paiement de ${this.formatCurrency(amount)} effectué avec succès pour le dossier: ${this.selectedDossier.numeroDossier}`);
-  
-  // Fermer le drawer après paiement
-  this.closePaymentDrawer();
-  
-  // Ici, vous devriez appeler votre service de paiement
-  // et mettre à jour les données
-}
-
-
-
-}
-

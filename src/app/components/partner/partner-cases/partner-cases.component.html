@@ -45,10 +45,15 @@
           <label>Priorité</label>
           <select [(ngModel)]="selectedPriority" (change)="updatePriorityFilter()">
             <option value="">Toutes les priorités</option>
-            <option value="FAIBLE">Faible</option>
+            <option value="faible">Faible</option>
+            <option value="moyenne">Moyenne</option>
+            <option value="elevee">Élevée</option>
+            <option value="urgente">Urgente</option>
+            <option value="normale">Normale</option>
+            <!-- <option value="FAIBLE">Faible</option>
             <option value="MOYENNE">Moyenne</option>
             <option value="Élevée">Élevée</option>
-            <option value="urgent">Urgente</option>
+            <option value="urgent">Urgente</option> -->
           </select>
         </div>
       </div>
@@ -80,11 +85,11 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ formatCurrency(getTotalPaid()) }}</div>
-          <div class="stat-label">Montant recouvré</div>
+          <div class="stat-label"> Montant total collecté</div>
         </div>
       </div>
       
-      <div class="stat-card">
+      <!-- <div class="stat-card">
         <div class="stat-icon warning">
           <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960"
             width="25" fill="#FFFFFF"><path 
@@ -96,7 +101,7 @@
           <div class="stat-label">Commission gagnée</div>
         </div>
       </div>
-      
+       -->
       <div class="stat-card">
         <div class="stat-icon info">
              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -106,7 +111,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ getPaymentPercentage(dossiers) }}%</div> 
-          <div class="stat-label">Taux de recouvrement</div>
+          <div class="stat-label">Taux de réussite du recouvrement</div>
         </div>
       </div>
     </div>
@@ -135,7 +140,7 @@
                 {{ getStatusLabel(dossier.stepGlobal) }}
               </span>
               <span class="priority-badge" [ngClass]="getPriorityClass(dossier.priorite)">
-               {{ getPriorityClass(dossier.priorite) }}
+               {{ getPriorityLabel(dossier.priorite) }}
               </span>
             </div>
           </div>
@@ -432,23 +437,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Historique des activités -->
-            <!-- <div class="details-section">
-              <h4>Historique des activités</h4>
-              <div class="activity-timeline">
-                <div class="timeline-item" *ngFor="let activity of getRecentActivities(selectedIndex)">
-                  <div class="timeline-dot" [ngClass]="getActivityClass(activity.type)"></div>
-                  <div class="timeline-content">
-                    <div class="timeline-description">{{ activity.description }}</div>
-                    <div class="timeline-meta">
-                      <span class="timeline-date">{{ formatDate(activity.date) }}</span>
-                      <span class="timeline-user">par {{ activity.userName }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> -->
           </div>
           </div>
         </div>
@@ -466,7 +454,7 @@
   </div>
 
 <!-- Tiroir document -->
-  <div class="drawer-overlay-document" *ngIf="showDocumentsModal" (click)="closeDocumentsModal()">
+  <div class="drawer-overlay-document" *ngIf="showDocumentsModal" >
     <div class="drawer-document" [class.open]="showDocumentsModal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Documents ({{ filteredDocuments.length }})</h3>
@@ -478,6 +466,17 @@
         </button>
       </div>
       <div class="modal-body">
+        <!-- MESSAGE DE SUCCÈS POUR LA SUPPRESSION -->
+        <div *ngIf="showDeleteSuccess" class="delete-success-message">
+          <div class="success-content">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4"/>
+              <circle cx="12" cy="12" r="9"/>
+            </svg>
+            <span>{{ deleteSuccessMessage }}</span>
+          </div>
+        </div>
+
         <div class="documents-list">
           <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
 
@@ -521,7 +520,7 @@
                             <circle cx="12" cy="12" r="3"/>
                           </svg>
                         </button>
-                        <button class="btn btn-danger small" (click)="deleteDocument(doc)" title="Supprimer">
+                        <button class="btn btn-danger small" (click)="confirmDeleteDocument(doc)" title="Supprimer">
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3,6 5,6 21,6"/>
                             <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
@@ -532,6 +531,32 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <!-- Modale de confirmation de suppression -->
+          <div class="confirmation-overlay" *ngIf="showDeleteConfirmation">
+            <div class="confirmation-modal">
+              <div class="modal-header">
+                <div class="header-with-icon">
+                  <div class="danger-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                  </div>
+                  <h3>Confirmer la suppression</h3>
+                </div>
+              </div>
+              <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer le document "{{ documentToDelete?.name }}" ?</p>
+                <p class="warning-text">Cette action est irréversible.</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Annuler</button>
+                <button type="button" class="btn btn-danger" (click)="executeDelete()">Supprimer</button>
+              </div>
             </div>
           </div>
 
@@ -562,80 +587,102 @@
     </div>
   </div>
 
-
-  <!-- tiroir d'upload -->
-  <div class="drawer-overlay-upload" *ngIf="showUploadModal">
-      <div class="drawer-upload" [class.open]="showUploadModal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>Ajouter un document</h3>
-          <button class="modal-close" (click)="closeUploadModal()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="upload-form">
-            <div class="form-group">
-              <label>Type de document</label>
-              <select [(ngModel)]="newDocument.type" required>
-                <option value="">Sélectionner un type</option>
-                <option value="invoice">Facture</option>
-                <option value="contract">Contrat</option>
-                <option value="correspondence">Correspondance</option>
-                <option value="legal_notice">Mise en demeure</option>
-                <option value="payment_proof">Preuve de paiement</option>
-                <option value="court_document">Document judiciaire</option>
-              </select>
-            </div>
-              
-            <div class="form-group">
-              <label>Nom du document</label>
-              <input
-                type="text"
-                [(ngModel)]="newDocument.name"
-                placeholder="Nom du fichier"
-                required  
-              >
-            </div>
-              
-            <div class="form-group">
-              <label>Fichier</label>
-              <div class="file-upload">
-                <input type="file" id="fileInput" (change)="onFileSelected($event)" accept=".pdf,.doc,.docx,.jpg,.png">
-                <label for="fileInput" class="file-upload-label">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17,8 12,3 7,8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
-                  </svg>
-                  <span>{{ selectedFile ? selectedFile.name : 'Choisir un fichier' }}</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="closeUploadModal()" [disabled]="isLoading">Annuler</button>
-          <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="!isUploadValid() || isLoading">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17,8 12,3 7,8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            <span *ngIf="isLoading" class="spinner"></span>
-            {{ isLoading ? 'Envoi en cours...' : 'Ajouter le document' }}
-          </button>
+<!-- tiroir d'upload -->
+<div class="drawer-overlay-upload" *ngIf="showUploadModal">
+  <div class="drawer-upload" [class.open]="showUploadModal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Ajouter un document</h3>
+      <button class="modal-close" (click)="closeUploadModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- MESSAGE DE SUCCÈS -->
+      <div *ngIf="showUploadSuccess" class="upload-success-message">
+        <div class="success-content">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4"/>
+            <circle cx="12" cy="12" r="9"/>
+          </svg>
+          <span>{{ uploadSuccessMessage }}</span>
         </div>
       </div>
+      
+      <div class="upload-form" *ngIf="!showUploadSuccess">
+        <div class="form-group">
+          <label>Type de document</label>
+          <select [(ngModel)]="newDocument.type" [class.error]="uploadFormErrors.type" required>
+            <option value="">Sélectionner un type</option>
+            <option value="invoice">Facture</option>
+            <option value="contract">Contrat</option>
+            <option value="correspondence">Correspondance</option>
+            <option value="legal_notice">Mise en demeure</option>
+            <option value="payment_proof">Preuve de paiement</option>
+            <option value="court_document">Document judiciaire</option>
+          </select>
+
+          <div class="error-message" *ngIf="uploadFormErrors.type">
+             {{ uploadErrorMessages.type }}
+          </div>
+        </div>
+          
+        <div class="form-group">
+          <label>Nom du document</label>
+          <input
+            type="text"
+            [(ngModel)]="newDocument.name"
+            placeholder="Nom du fichier"
+            [class.error]="uploadFormErrors.name"
+            required  
+          >
+
+          <div class="error-message" *ngIf="uploadFormErrors.name">
+            {{ uploadErrorMessages.name }}
+        </div>
+        </div>
+          
+        <div class="form-group">
+          <label>Fichier</label>
+          <div class="file-upload">
+            <input type="file" id="fileInput" (change)="onFileSelected($event); validateField('file')" accept=".pdf,.doc,.docx,.jpg,.png" [class.error]="uploadFormErrors.file">
+            <label for="fileInput" class="file-upload-label" [class.error]="uploadFormErrors.file">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17,8 12,3 7,8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <span>{{ selectedFile ? selectedFile.name : 'Choisir un fichier' }}</span>
+            </label>
+          </div>
+
+          <div class="error-message" *ngIf="uploadFormErrors.file">
+            {{ uploadErrorMessages.file }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer" *ngIf="!showUploadSuccess">
+      <button class="btn btn-secondary" (click)="closeUploadModal()" [disabled]="isLoading">Annuler</button>
+      <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="isLoading">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17,8 12,3 7,8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <span *ngIf="isLoading" class="spinner"></span>
+        {{ isLoading ? 'Envoi en cours...' : 'Ajouter le document' }}
+      </button>
+    </div>
   </div>
+</div>
 
-
-
-  <!-- Modale de visualisation de document -->
-<div class="document-viewer-overlay" *ngIf="showDocumentViewer" (click)="closeDocumentViewer()">
+<!-- Modale de visualisation de document -->
+<div class="document-viewer-overlay" *ngIf="showDocumentViewer" >
   <div class="document-viewer-modal" (click)="$event.stopPropagation()">
     <!-- En-tête -->
     <div class="document-viewer-header">
@@ -716,6 +763,5 @@
       </div>
     </div>
   </div>
-
 
 </div>

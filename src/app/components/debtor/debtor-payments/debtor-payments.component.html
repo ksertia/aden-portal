@@ -1,445 +1,692 @@
 <div class="payments-container">
-  <div class="payments-header fade-in-up">
-    <!-- <app-language-switcher></app-language-switcher> -->
-   <button>
-      <h1>{{ t('payments.title') }}</h1>
-   </button>
-    <!-- <p>{{ t('payments.subtitle') }}</p> -->
-  </div>
-
-  <div class="payments-content fade-in-up">
-    <div class="coming-soon">
-      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-        <line x1="1" y1="10" x2="23" y2="10"/>
-      </svg>
-      <!-- <h3>{{ t('payments.comingSoonTitle') }}</h3>
-      <p>{{ t('payments.comingSoonDescription') }}</p> -->
-    </div>
-  </div>
-
-  <!-- Liste des créances -->
-  <div class="cases-content fade-in-up">
+  <!-- Affichage principal des informations de paiement -->
+  <div class="payments-content fade-in-up" *ngIf="!isLoading && !errorMessage">
     
-    <!-- États de chargement et d'erreur -->
-    <div *ngIf="isLoading" class="loading">
-      <p>Chargement des dossiers...</p>
-    </div>
-
-    <div *ngIf="errorMessage && !isLoading" class="error">
-      <p>{{ errorMessage }}</p>
-    </div>
-
-    <div class="cases-list" *ngIf="filteredDossiers.length > 0 && !isLoading">
-      <div class="list-header">
-        <app-view-toggle 
-          [currentView]="currentView" 
-          (viewChange)="currentView = $event">
-        </app-view-toggle>
-      </div>
-
-      <!-- Vue grille -->
-      <div class="cases-grid" *ngIf="currentView === 'grid'">
-        <div class="case-card" *ngFor="let dossier of filteredDossiers; let i = index">
-          <div class="case-header">
-            <div class="case-info">
-              <h3>{{ dossier.numeroDossier }}</h3>
-              <p class="debtor-name">{{ dossier.objet }}</p>
-            </div>
-            <div class="case-badges">
-              <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">
-                {{ getStatusLabel(dossier.stepGlobal) }}
-              </span>
-              <span class="priority-badge" [ngClass]="getPriorityClass(dossier.priorite)">
-                {{ dossier.priorite }}
-              </span>
-            </div>
+    <!-- Carte de résumé de la dette EN LIGNE -->
+    <div class="payment-summary-card">
+      <div class="summary-header">
+        <h2>Résumé de votre dette</h2>
+        <div class="payment-progress">
+          <div class="progress-info">
+            <span class="progress-label">Progression du paiement</span>
+            <span class="progress-percentage">{{ getPaymentPercentage() }}%</span>
           </div>
-          
-          <div class="case-body">
-            <div class="case-amounts">
-              <div class="amount-item">
-                <span class="amount-label">Montant total</span>
-                <span class="amount-value">{{ formatCurrency(dossier.montantTotal) }}</span>
-              </div>
-              <div class="amount-item">
-                <span class="amount-label">Déjà payé</span>
-                <span class="amount-value recovered">{{ formatCurrency(dossier.montantPaye) }}</span>
-              </div>
-              <div class="amount-item">
-                <span class="amount-label">Reste à payer</span>
-                <span class="amount-value remaining">{{ getFormattedRemainingAmount(dossier) }}</span>
-              </div>
-            </div>
-            
-            <div class="case-progress">
-              <div class="progress-info">
-                <span class="progress-label">Progression</span>
-                <span class="progress-percentage">{{ getPaymentPercentage(dossier) }}%</span>
-              </div>
-              <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
-              </div>
-            </div>
-            
-            <div class="case-meta">
-              <div class="meta-item">
-                <span class="meta-label">Créancier:</span>
-                <span class="meta-value">{{ getCreancierForDossier(dossier)?.contactPrincipal }}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label">Phase :</span>
-                <span class="meta-value">{{ dossier.phaseCode }}</span>
-              </div>
-              <div class="meta-item">
-                <span class="meta-label">Créé le :</span>
-                <span class="meta-value">{{ formatDate(dossier.dateCreation) }}</span>
-              </div>
-            </div>
-            
-            <div class="case-actions">
-              <button class="btn btn-primary small">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-                Détails
-              </button>
-              <button class="btn btn-success small" (click)="openPaymentDrawer(dossier)">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 1a11 11 0 1 0 0 22 11 11 0 0 0 0-22zm5.7 8.3l-7 7a1 1 0 0 1-1.4 0l-3-3a1 1 0 0 1 1.4-1.4l2.3 2.3 6.3-6.3a1 1 0 0 1 1.4 1.4z"/>
-                  </svg>
-                  Payer ce dossier
-                </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Vue table -->
-      <div class="cases-table-container" *ngIf="currentView === 'table'">
-        <table class="cases-table">
-          <thead>
-            <tr>
-              <th>Dossier</th>
-              <th>Créancier</th>
-              <th>Montant total</th>
-              <th>Déjà payé</th>
-              <th>Reste à payer</th>
-              <th>Statut</th>
-              <th>Progression</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let dossier of filteredDossiers; let i = index" class="case-row">
-              <td>
-                <div class="case-cell">
-                  <div class="case-number">{{ dossier.numeroDossier }}</div>
-                  <div class="case-date">{{ formatDate(dossier.dateCreation) }}</div>
-                </div>
-              </td>
-              <td>
-                <div class="debtor-cell">
-                  <div class="debtor-name">{{ getCreancierForDossier(dossier)?.contactPrincipal }}</div>
-                  <div class="debtor-type">{{ getCreancierForDossier(dossier)?.raisonSociale }}</div>
-                </div>
-              </td>
-              <td>
-                <div class="amount-cell">
-                  <div class="amount-value">{{ formatCurrency(dossier.montantTotal) }}</div>
-                </div>
-              </td>
-              <td>
-                <div class="amount-cell recovered">
-                  <div class="amount-value">{{ formatCurrency(dossier.montantPaye) }}</div>
-                </div>
-              </td>
-              <td>
-                <div class="amount-cell remaining">
-                  <div class="amount-value">{{ getFormattedRemainingAmount(dossier) }}</div>
-                </div>
-              </td>
-              <td>
-                <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">
-                  {{ getStatusLabel(dossier.stepGlobal) }}
-                </span>
-              </td>
-              <td>
-                <div class="progress-cell">
-                  <div class="progress-bar-small">
-                    <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
-                  </div>
-                  <span class="progress-text">{{ getPaymentPercentage(dossier) }}%</span>
-                </div>
-              </td>
-              <td>
-                <div class="table-actions">
-                  <button class="btn btn-primary small" title="Voir détails">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                      <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                  </button>
-                  <button class="btn btn-success small" title="Payer ce dossier" (click)="openPaymentDrawer(dossier)">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 1a11 11 0 1 0 0 22 11 11 0 0 0 0-22zm5.7 8.3l-7 7a1 1 0 0 1-1.4 0l-3-3a1 1 0 0 1 1.4-1.4l2.3 2.3 6.3-6.3a1 1 0 0 1 1.4 1.4z"/>
-                      </svg>
-                    </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div *ngIf="filteredDossiers.length === 0 && !isLoading" class="no-cases">
-      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <polyline points="14,2 14,8 20,8"/>
-      </svg>
-      <h3>Aucun dossier trouvé</h3>
-      <p>Aucun dossier ne correspond aux critères sélectionnés.</p>
-    </div>
-  </div>  
-
-
-
-
-  <!-- drawer -->
-
- <!-- Drawer de paiement -->
-<div class="payment-drawer" [class.open]="isPaymentDrawerOpen">
-  <div class="drawer-overlay" (click)="closePaymentDrawer()"></div>
-  <div class="drawer-content">
-    <div class="drawer-header">
-      <h2>Paiement du Dossier</h2>
-      <button class="drawer-close" (click)="closePaymentDrawer()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-
-    <div class="drawer-body">
-      <!-- Indicateur d'étapes -->
-      <div class="step-indicator">
-        <div class="step" [class.active]="currentPaymentStep === 1" [class.completed]="currentPaymentStep > 1">
-          <div class="step-circle">1</div>
-          <div class="step-label">Résumé</div>
-        </div>
-        <div class="step" [class.active]="currentPaymentStep === 2" [class.completed]="currentPaymentStep > 2">
-          <div class="step-circle">2</div>
-          <div class="step-label">Devise</div>
-        </div>
-        <div class="step" [class.active]="currentPaymentStep === 3">
-          <div class="step-circle">3</div>
-          <div class="step-label">Paiement</div>
-        </div>
-      </div>
-
-      <!-- Étape 1: Résumé du paiement -->
-      <div *ngIf="currentPaymentStep === 1" class="payment-step">
-        <div class="payment-summary">
-          <h3>Résumé du Paiement - {{ selectedDossier?.numeroDossier }}</h3>
-          
-          <div class="interest-details">
-            <div class="interest-item">
-              <span>Montant principal:</span>
-              <span>{{ formatCurrency(selectedDossier?.montantTotal || 0) }}</span>
-            </div>
-            <div class="interest-item">
-              <span>Intérêts légaux (3.5%):</span>
-              <span>{{ formatCurrency(calculateInteretsLegaux()) }}</span>
-            </div>
-            <div class="interest-item">
-              <span>Intérêts de retard (10%):</span>
-              <span>{{ formatCurrency(calculateInteretsRetard()) }}</span>
-            </div>
-            <div class="interest-item">
-              <span>Pénalités de retard:</span>
-              <span>{{ formatCurrency(calculatePenalitesRetard()) }}</span>
-            </div>
-            <div class="interest-item">
-              <span>Frais divers:</span>
-              <span>{{ formatCurrency(calculateFraisDivers()) }}</span>
-            </div>
-          </div>
-          
-          <div class="total-section">
-            <div class="total-item">
-              <span>Déjà payé:</span>
-              <span>{{ formatCurrency(selectedDossier?.montantPaye || 0) }}</span>
-            </div>
-            <div class="total-item">
-              <span>Reste à payer:</span>
-              <span>{{ formatCurrency(calculateResteAPayer()) }}</span>
-            </div>
-            <div class="total-amount">
-              <span>TOTAL DÛ:</span>
-              <span>{{ formatCurrency(calculateTotalDu()) }}</span>
-            </div>
-          </div>
-          
           <div class="progress-bar">
-            <div class="progress" [style.width.%]="getPaymentPercentage(selectedDossier)"></div>
+            <div class="progress-fill" [style.width.%]="getPaymentPercentage()"></div>
           </div>
-          <div class="amounts">
-            <div>
-              <strong>Montant payé:</strong>
-              <span>{{ formatCurrency(selectedDossier?.montantPaye || 0) }}</span>
-            </div>
-            <div>
-              <strong>Reste à payer:</strong>
-              <span>{{ formatCurrency(calculateResteAPayer()) }}</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="navigation-buttons">
-          <button class="nav-btn secondary" (click)="closePaymentDrawer()">Retour aux dossiers</button>
-          <button class="nav-btn" (click)="goToPaymentStep(2)">Suivant</button>
         </div>
       </div>
 
-      <!-- Étape 2: Sélection de devise -->
-      <div *ngIf="currentPaymentStep === 2" class="payment-step">
-        <div class="currency-section">
-          <div class="section-title">Sélectionnez votre devise</div>
-          <div class="currency-options">
-            <div class="currency-option" 
-                 [class.active]="selectedCurrency === 'fcfa'"
-                 (click)="selectCurrency('fcfa')">
-              <div class="currency-symbol">FCFA</div>
-              <div>Franc CFA</div>
-            </div>
-            <div class="currency-option" 
-                 [class.active]="selectedCurrency === 'eur'"
-                 (click)="selectCurrency('eur')">
-              <div class="currency-symbol">€</div>
-              <div>Euro</div>
-            </div>
-            <div class="currency-option" 
-                 [class.active]="selectedCurrency === 'usd'"
-                 (click)="selectCurrency('usd')">
-              <div class="currency-symbol">$</div>
-              <div>Dollar US</div>
-            </div>
-            <div class="currency-option" 
-                 [class.active]="selectedCurrency === 'gbp'"
-                 (click)="selectCurrency('gbp')">
-              <div class="currency-symbol">£</div>
-              <div>Livre Sterling</div>
-            </div>
+      <!-- Grille en ligne -->
+      <div class="summary-grid-horizontal">
+        <!-- Montant Total Dû -->
+        <div class="summary-item-horizontal total-due">
+          <div class="item-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
           </div>
-          <!-- <div class="exchange-rate" *ngIf="selectedCurrency !== 'fcfa'">
-            Taux de change: 1 {{ getCurrencySymbol(selectedCurrency) }} = {{ (1 / exchangeRates[selectedCurrency]).toFixed(2) }} FCFA
-          </div> -->
+          <div class="item-content">
+            <div class="item-label">Montant Total Dû</div>
+            <div class="item-value">{{ formatCurrency(totalDue) }}</div>
+          </div>
         </div>
-        
-        <div class="navigation-buttons">
-          <button class="nav-btn secondary" (click)="goToPaymentStep(1)">Retour</button>
-          <button class="nav-btn" (click)="goToPaymentStep(3)">Suivant</button>
+
+        <!-- Déjà Payé -->
+        <div class="summary-item-horizontal already-paid">
+          <div class="item-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22,4 12,14.01 9,11.01"/>
+            </svg>
+          </div>
+          <div class="item-content">
+            <div class="item-label">Déjà Payé</div>
+            <div class="item-value">{{ formatCurrency(alreadyPaid) }}</div>
+          </div>
+        </div>
+
+        <!-- Solde Restant -->
+        <div class="summary-item-horizontal remaining-balance">
+          <div class="item-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+              <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+          </div>
+          <div class="item-content">
+            <div class="item-label">Solde Restant</div>
+            <div class="item-value">{{ formatCurrency(remainingBalance) }}</div>
+          </div>
         </div>
       </div>
 
-      <!-- Étape 3: Sélection du mode de paiement -->
-      <div *ngIf="currentPaymentStep === 3" class="payment-step">
-        <div class="payment-methods-section">
-          <div class="section-title">Sélectionnez votre mode de paiement</div>
-          <div class="payment-methods">
-            <div class="method" 
-                 [class.active]="selectedPaymentMethod === 'mobile'"
-                 (click)="selectPaymentMethod('mobile')">
-              <div class="method-icon">📱</div>
-              <div>Mobile Money</div>
-            </div>
-            <div class="method" 
-                 [class.active]="selectedPaymentMethod === 'card'"
-                 (click)="selectPaymentMethod('card')">
-              <div class="method-icon">💳</div>
-              <div>Carte Bancaire</div>
-            </div>
-            <div class="method" 
-                 [class.active]="selectedPaymentMethod === 'paypal'"
-                 (click)="selectPaymentMethod('paypal')">
-              <div class="method-icon">🔵</div>
-              <div>PayPal</div>
-            </div>
-          </div>
+      <!-- Bouton d'action principal -->
+      <div class="payment-action">
+        <button 
+          class="btn btn-primary large" 
+          (click)="openPaymentDrawer()"
+          [disabled]="remainingBalance <= 0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+            <line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
+          Effectuer un paiement
+        </button>
+        
+        <!-- Actions rapides -->
+        <div class="quick-actions">
+          <button class="btn btn-secondary quick-action-btn" (click)="openPaymentHistory()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10,9 9,9 8,9"/>
+            </svg>
+            Historique de paiement
+          </button>
+          
+          <button class="btn btn-outline quick-action-btn" (click)="openDebtDetails()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            Détails dettes
+          </button>
         </div>
         
-        <!-- Formulaire Mobile Money -->
-        <div class="payment-form" *ngIf="selectedPaymentMethod === 'mobile'">
-          <h3>Paiement par Mobile Money</h3>
-          <div class="form-group">
-            <label for="mobile-provider">Opérateur</label>
-            <select id="mobile-provider" class="form-control">
-              <option value="">Sélectionnez un opérateur</option>
-              <option value="orange">Orange Money</option>
-              <option value="moov">Moov Money</option>
-              <option value="telecel">Telecel Money</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="mobile-number">Numéro de téléphone</label>
-            <input type="tel" id="mobile-number" placeholder="Ex: 07 12 34 56 78">
-          </div>
-          <div class="form-group">
-            <label for="mobile-amount">Montant à payer ({{ getCurrencySymbol(selectedCurrency) }})</label>
-            <input type="number" id="mobile-amount" [value]="calculateResteAPayer()">
-          </div>
-          <button class="btn" (click)="processPayment()">Payer</button>
+        <div class="payment-note" *ngIf="remainingBalance <= 0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22,4 12,14.01 9,11.01"/>
+          </svg>
+          Félicitations ! Votre dette est entièrement réglée.
         </div>
-        
-        <!-- Formulaire Carte Bancaire -->
-        <div class="payment-form" *ngIf="selectedPaymentMethod === 'card'">
-          <h3>Paiement par Carte Bancaire</h3>
-          <div class="form-group">
-            <label for="card-number">Numéro de carte</label>
-            <input type="text" id="card-number" placeholder="1234 5678 9012 3456">
-          </div>
-          <div class="form-group">
-            <div style="display: flex; gap: 15px;">
-              <div style="flex: 1;">
-                <label for="card-expiry">Date d'expiration</label>
-                <input type="text" id="card-expiry" placeholder="MM/AA">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- États de chargement et d'erreur -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Chargement de vos informations de paiement...</p>
+  </div>
+
+  <div class="error-state" *ngIf="errorMessage && !isLoading">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="15" y1="9" x2="9" y2="15"/>
+      <line x1="9" y1="9" x2="15" y2="15"/>
+    </svg>
+    <h3>Erreur</h3>
+    <p>{{ errorMessage }}</p>
+    <button class="btn btn-primary" (click)="loadDebtorData()">Réessayer</button>
+  </div>
+
+  <!-- Drawer de paiement -->
+  <div class="drawer-overlay" *ngIf="showPaymentDrawer">
+    <div class="drawer" [class.open]="showPaymentDrawer" (click)="$event.stopPropagation()">
+      <div class="drawer-content">
+        <!-- En-tête du drawer -->
+        <div class="drawer-header">
+          <h3>
+            <span *ngIf="currentStep === 'selection'">Sélection du dossier</span>
+            <span *ngIf="currentStep === 'currency'">Choix de la devise</span>
+            <span *ngIf="currentStep === 'paymentMethod'">Mode de paiement</span>
+            <span *ngIf="currentStep === 'details'">Détails du paiement</span>
+            <span *ngIf="currentStep === 'confirmation'">Confirmation</span>
+          </h3>
+          <button class="close-button" (click)="closePaymentDrawer()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- ÉTAPE 1: Sélection du dossier -->
+        <div class="drawer-body" *ngIf="currentStep === 'selection'">
+          <div class="step-content">
+            <div class="step-indicator">
+              <div class="step active">1</div>
+              <div class="step-line"></div>
+              <div class="step">2</div>
+              <div class="step-line"></div>
+              <div class="step">3</div>
+              <div class="step-line"></div>
+              <div class="step">4</div>
+              <div class="step-line"></div>
+              <div class="step">5</div>
+            </div>
+
+            <div class="form-section">
+              <h4>Sélectionnez le dossier à payer</h4>
+              <div class="form-group">
+                <label for="dossierSelect">Choisir un dossier</label>
+                <select 
+                  id="dossierSelect"
+                  [(ngModel)]="selectedDossierId" 
+                  (change)="onDossierSelect()"
+                  class="dossier-select">
+                  <option value="">Sélectionnez un dossier</option>
+                  <option 
+                    *ngFor="let dossier of dossiers" 
+                    [value]="dossier.nodeId"
+                    [disabled]="calculateRemainingAmount(dossier) <= 0">
+                    {{ dossier.numeroDossier }} - {{ dossier.objet }} 
+                    ({{ formatCurrency(calculateRemainingAmount(dossier)) }})
+                  </option>
+                </select>
               </div>
-              <div style="flex: 1;">
-                <label for="card-cvv">CVV</label>
-                <input type="text" id="card-cvv" placeholder="123">
+            </div>
+
+            <div class="dossiers-list">
+              <h5>Vos dossiers en cours</h5>
+              <div class="dossier-cards">
+                <div 
+                  *ngFor="let dossier of dossiers" 
+                  class="dossier-card"
+                  [class.selected]="selectedDossierId === dossier.nodeId"
+                  (click)="selectedDossierId = dossier.nodeId; onDossierSelect()">
+                  <div class="dossier-header">
+                    <h6>{{ dossier.numeroDossier }}</h6>
+                    <span class="status-badge" [ngClass]="'status-' + dossier.stepGlobal">
+                      {{ getStatusLabel(dossier.stepGlobal) }}
+                    </span>
+                  </div>
+                  <p class="dossier-object">{{ dossier.objet }}</p>
+                  <div class="dossier-amounts">
+                    <div class="amount-item">
+                      <span>Total:</span>
+                      <strong>{{ formatCurrency(calculateTotalDue(dossier)) }}</strong>
+                    </div>
+                    <div class="amount-item">
+                      <span>Payé:</span>
+                      <span class="paid">{{ formatCurrency(dossier.montantPaye || 0) }}</span>
+                    </div>
+                    <div class="amount-item">
+                      <span>Reste:</span>
+                      <span class="remaining">{{ formatCurrency(calculateRemainingAmount(dossier)) }}</span>
+                    </div>
+                  </div>
+                  <div class="dossier-progress">
+                    <div class="progress-bar-small">
+                      <div class="progress-fill" [style.width.%]="getDossierPaymentPercentage(dossier)"></div>
+                    </div>
+                    <span>{{ getDossierPaymentPercentage(dossier) }}%</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="form-group">
-            <label for="card-amount">Montant à payer ({{ getCurrencySymbol(selectedCurrency) }})</label>
-            <input type="number" id="card-amount" [value]="calculateResteAPayer()">
-          </div>
-          <button class="btn" (click)="processPayment()">Payer</button>
         </div>
-        
-        <!-- Formulaire PayPal -->
-        <div class="payment-form" *ngIf="selectedPaymentMethod === 'paypal'">
-          <h3>Paiement par PayPal</h3>
-          <div class="form-group">
-            <label for="paypal-email">Adresse email PayPal</label>
-            <input type="email" id="paypal-email" placeholder="votre@email.com">
+
+        <!-- ÉTAPE 2: Choix de la devise -->
+        <div class="drawer-body" *ngIf="currentStep === 'currency' && selectedDossier">
+          <div class="step-content">
+            <div class="step-indicator">
+              <div class="step completed">1</div>
+              <div class="step-line completed"></div>
+              <div class="step active">2</div>
+              <div class="step-line"></div>
+              <div class="step">3</div>
+              <div class="step-line"></div>
+              <div class="step">4</div>
+              <div class="step-line"></div>
+              <div class="step">5</div>
+            </div>
+
+            <div class="currency-selection">
+              <h4>Choisissez votre devise de paiement</h4>
+              <p class="selection-description">
+                Sélectionnez la devise dans laquelle vous souhaitez effectuer le paiement pour le dossier 
+                <strong>{{ selectedDossier.numeroDossier }}</strong>
+              </p>
+
+              <div class="currency-cards">
+                <div 
+                  *ngFor="let currency of availableCurrencies" 
+                  class="currency-card"
+                  [class.selected]="selectedCurrency === currency.code"
+                  (click)="selectedCurrency = currency.code">
+                  <div class="currency-info">
+                    <div class="currency-symbol">{{ currency.symbol }}</div>
+                    <div class="currency-details">
+                      <div class="currency-name">{{ currency.name }}</div>
+                      <div class="exchange-rate" *ngIf="currency.code !== 'XOF'">
+                        1 {{ currency.code }} = {{ getInverseExchangeRate() | number:'1.0-0' }} XOF
+                      </div>
+                      <div class="exchange-rate" *ngIf="currency.code === 'XOF'">
+                        Devise de base
+                      </div>
+                    </div>
+                  </div>
+                  <div class="currency-check">
+                    <div class="checkmark" *ngIf="selectedCurrency === currency.code">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20,6 9,17 4,12"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="amount-preview" *ngIf="selectedCurrency">
+                <div class="preview-card">
+                  <h5>Montant estimé</h5>
+                  <div class="preview-amount">
+                    {{ formatCurrency(convertToSelectedCurrency(calculateRemainingAmount(selectedDossier))) }}
+                  </div>
+                  <div class="preview-note">
+                    Montant de base en {{ selectedCurrency }} (hors frais)
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="paypal-amount">Montant à payer ({{ getCurrencySymbol(selectedCurrency) }})</label>
-            <input type="number" id="paypal-amount" [value]="calculateResteAPayer()">
-          </div>
-          <button class="btn" (click)="processPayment()">Payer avec PayPal</button>
         </div>
-        
-        <div class="navigation-buttons">
-          <button class="nav-btn secondary" (click)="goToPaymentStep(2)">Retour</button>
+
+        <!-- ÉTAPE 3: Mode de paiement -->
+        <div class="drawer-body" *ngIf="currentStep === 'paymentMethod' && selectedDossier">
+          <div class="step-content">
+            <div class="step-indicator">
+              <div class="step completed">1</div>
+              <div class="step-line completed"></div>
+              <div class="step completed">2</div>
+              <div class="step-line completed"></div>
+              <div class="step active">3</div>
+              <div class="step-line"></div>
+              <div class="step">4</div>
+              <div class="step-line"></div>
+              <div class="step">5</div>
+            </div>
+
+            <div class="payment-method-selection">
+              <h4>Choisissez votre mode de paiement</h4>
+              <p class="selection-description">
+                Sélectionnez comment vous souhaitez payer le dossier 
+                <strong>{{ selectedDossier.numeroDossier }}</strong> en 
+                <strong>{{ getCurrencySymbol() }}</strong>
+              </p>
+
+              <!-- Méthodes de paiement principales -->
+              <div class="payment-methods">
+                <div 
+                  *ngFor="let method of paymentMethods" 
+                  class="payment-method-card"
+                  [class.selected]="selectedPaymentMethod === method.id"
+                  (click)="selectedPaymentMethod = method.id; selectedPaymentProvider = ''">
+                  
+                  <div class="method-header">
+                    <div class="method-icon">{{ method.id === 'mobile' ? '📱' : method.id === 'card' ? '💳' : '🔵' }}</div>
+                    <div class="method-info">
+                      <h5>{{ method.name }}</h5>
+                      <p>{{ method.description }}</p>
+                    </div>
+                    <div class="method-check">
+                      <div class="checkmark" *ngIf="selectedPaymentMethod === method.id">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                          <polyline points="20,6 9,17 4,12"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Fournisseurs pour cette méthode -->
+                  <div class="providers-list" *ngIf="selectedPaymentMethod === method.id">
+                    <div class="providers-grid">
+                      <div 
+                        *ngFor="let provider of method.providers" 
+                        class="provider-card"
+                        [class.selected]="selectedPaymentProvider === provider.id"
+                        (click)="$event.stopPropagation(); selectedPaymentProvider = provider.id">
+                        
+                        <div class="provider-icon">{{ provider.icon }}</div>
+                        <div class="provider-name">{{ provider.name }}</div>
+                        <div class="provider-check">
+                          <div class="checkmark-small" *ngIf="selectedPaymentProvider === provider.id">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                              <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Informations de sécurité -->
+              <div class="security-info">
+                <div class="security-icon">🔒</div>
+                <div class="security-text">
+                  <strong>Paiement 100% sécurisé</strong>
+                  <span>Toutes vos transactions sont cryptées et protégées</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 4: Détails du paiement -->
+        <div class="drawer-body" *ngIf="currentStep === 'details' && selectedDossier">
+          <div class="step-content">
+            <div class="step-indicator">
+              <div class="step completed">1</div>
+              <div class="step-line completed"></div>
+              <div class="step completed">2</div>
+              <div class="step-line completed"></div>
+              <div class="step completed">3</div>
+              <div class="step-line completed"></div>
+              <div class="step active">4</div>
+              <div class="step-line"></div>
+              <div class="step">5</div>
+            </div>
+
+            <!-- Bannière de devise sélectionnée -->
+            <div class="currency-banner">
+              <div class="banner-content">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                <span>
+                  Paiement en <strong>{{ getCurrencySymbol() }}</strong> 
+                  <span *ngIf="selectedCurrency !== 'XOF'">
+                    (1 {{ selectedCurrency }} = {{ getInverseExchangeRate() | number:'1.0-0' }} XOF)
+                  </span>
+                  <span *ngIf="selectedCurrency === 'XOF'">
+                    (devise de base)
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Informations du mode de paiement -->
+            <div class="payment-method-info" *ngIf="selectedPaymentMethod && selectedPaymentProvider">
+              <h4>Mode de paiement sélectionné</h4>
+              <div class="method-badge">
+                <span class="method-icon">{{ getPaymentMethodIcon() }}</span>
+                <span class="method-text">
+                  {{ getPaymentMethodName() }} - {{ getPaymentProviderName() }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Informations du dossier sélectionné -->
+            <div class="selected-dossier-info">
+              <h4>Dossier sélectionné</h4>
+              <div class="dossier-summary">
+                <div class="dossier-header">
+                  <h5>{{ selectedDossier.numeroDossier }}</h5>
+                  <span class="status-badge" [ngClass]="'status-' + selectedDossier.stepGlobal">
+                    {{ getStatusLabel(selectedDossier.stepGlobal) }}
+                  </span>
+                </div>
+                <p class="dossier-object">{{ selectedDossier.objet }}</p>
+                
+                <!-- Détails de la dette -->
+                <div class="debt-breakdown">
+                  <h6>Détail de la dette</h6>
+                  <div class="breakdown-grid">
+                    <div class="breakdown-item">
+                      <span class="label">Principal</span>
+                      <span class="value">{{ formatCurrency(convertToSelectedCurrency(selectedDossier.montantTotal || 0)) }}</span>
+                    </div>
+                    <div class="breakdown-item">
+                      <span class="label">Intérêts</span>
+                      <span class="value">{{ formatCurrency(convertToSelectedCurrency(selectedDossier.montantInterets || 0)) }}</span>
+                    </div>
+                    <div class="breakdown-item">
+                      <span class="label">Frais de dossier</span>
+                      <span class="value">{{ formatCurrency(convertToSelectedCurrency(selectedDossier.montantFrais || 0)) }}</span>
+                    </div>
+                    <div class="breakdown-item total">
+                      <span class="label">Total dû</span>
+                      <span class="value">{{ formatCurrency(convertToSelectedCurrency(calculateTotalDue(selectedDossier))) }}</span>
+                    </div>
+                    <div class="breakdown-item paid">
+                      <span class="label">Déjà payé</span>
+                      <span class="value">{{ formatCurrency(convertToSelectedCurrency(selectedDossier.montantPaye || 0)) }}</span>
+                    </div>
+                    <div class="breakdown-item remaining">
+                      <span class="label">Reste à payer</span>
+                      <span class="value">{{ formatCurrency(convertToSelectedCurrency(calculateRemainingAmount(selectedDossier))) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Frais supplémentaires -->
+            <div class="fees-section">
+              <h4>Frais supplémentaires</h4>
+              <div class="fees-grid">
+                <div class="fee-item" *ngIf="penalties > 0">
+                  <div class="fee-info">
+                    <span class="fee-label">Pénalités de retard</span>
+                    <span class="fee-description" *ngIf="isDossierOverdue(selectedDossier)">
+                      Dossier en retard depuis le {{ formatDate(selectedDossier.dateEcheance) }}
+                    </span>
+                  </div>
+                  <span class="fee-amount">{{ formatCurrency(convertToSelectedCurrency(penalties)) }}</span>
+                </div>
+                
+                <div class="fee-item" *ngIf="taxes > 0">
+                  <div class="fee-info">
+                    <span class="fee-label">Taxes</span>
+                    <span class="fee-description">TVA applicable</span>
+                  </div>
+                  <span class="fee-amount">{{ formatCurrency(convertToSelectedCurrency(taxes)) }}</span>
+                </div>
+                
+                <div class="fee-item">
+                  <div class="fee-info">
+                    <span class="fee-label">Frais de transaction</span>
+                    <span class="fee-description">Frais de traitement du paiement</span>
+                  </div>
+                  <span class="fee-amount">{{ formatCurrency(convertToSelectedCurrency(transactionFees)) }}</span>
+                </div>
+                
+                <div class="fee-item total-fees">
+                  <div class="fee-info">
+                    <span class="fee-label">Total des frais</span>
+                  </div>
+                  <span class="fee-amount">{{ formatCurrency(convertToSelectedCurrency(totalFees)) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total à payer -->
+            <div class="total-section">
+              <div class="total-breakdown">
+                <div class="total-item">
+                  <span class="label">Montant de base</span>
+                  <span class="value">{{ formatCurrency(convertToSelectedCurrency(calculateRemainingAmount(selectedDossier))) }}</span>
+                </div>
+                <div class="total-item">
+                  <span class="label">Frais supplémentaires</span>
+                  <span class="value">{{ formatCurrency(convertToSelectedCurrency(totalFees)) }}</span>
+                </div>
+                <div class="total-item grand-total">
+                  <span class="label">Total à payer</span>
+                  <span class="value">{{ formatCurrency(totalToPayInSelectedCurrency) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Montant du paiement -->
+            <div class="payment-amount-section">
+              <div class="form-group">
+                <label for="paymentAmount">Montant à payer ({{ selectedCurrency }})</label>
+                <input
+                  type="number"
+                  id="paymentAmount"
+                  [(ngModel)]="paymentAmount"
+                  [max]="totalToPayInSelectedCurrency"
+                  min="1"
+                  step="1"
+                  placeholder="Entrez le montant à payer"
+                >
+                <small class="form-help">Montant maximum: {{ formatCurrency(totalToPayInSelectedCurrency) }}</small>
+              </div>
+              
+              <div class="quick-amounts">
+                <h5>Montants rapides</h5>
+                <div class="quick-buttons">
+                  <button
+                    type="button"
+                    class="quick-amount-btn"
+                    (click)="paymentAmount = totalToPayInSelectedCurrency">
+                    Tout payer ({{ formatCurrency(totalToPayInSelectedCurrency) }})
+                  </button>
+                  <button
+                    type="button"
+                    class="quick-amount-btn"
+                    (click)="paymentAmount = totalToPayInSelectedCurrency / 2">
+                    Moitié ({{ formatCurrency(totalToPayInSelectedCurrency / 2) }})
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉTAPE 5: Confirmation -->
+        <div class="drawer-body" *ngIf="currentStep === 'confirmation' && selectedDossier">
+          <div class="step-content">
+            <div class="step-indicator">
+              <div class="step completed">1</div>
+              <div class="step-line completed"></div>
+              <div class="step completed">2</div>
+              <div class="step-line completed"></div>
+              <div class="step completed">3</div>
+              <div class="step-line completed"></div>
+              <div class="step completed">4</div>
+              <div class="step-line completed"></div>
+              <div class="step active">5</div>
+            </div>
+
+            <div class="confirmation-content">
+              <div class="confirmation-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22,4 12,14.01 9,11.01"/>
+                </svg>
+              </div>
+              
+              <h4>Confirmer votre paiement</h4>
+              
+              <div class="currency-info-badge">
+                <span>Devise: <strong>{{ selectedCurrency }}</strong></span>
+                <span *ngIf="selectedCurrency !== 'XOF'">
+                  Taux: 1 {{ selectedCurrency }} = {{ getInverseExchangeRate() | number:'1.0-0' }} XOF
+                </span>
+                <span *ngIf="selectedCurrency === 'XOF'">
+                  Devise de base
+                </span>
+              </div>
+
+              <div class="payment-method-badge">
+                <span class="method-icon">{{ getPaymentMethodIcon() }}</span>
+                <span class="method-text">
+                  {{ getPaymentMethodName() }} - {{ getPaymentProviderName() }}
+                </span>
+              </div>
+              
+              <div class="confirmation-details">
+                <div class="detail-item">
+                  <span class="label">Dossier:</span>
+                  <span class="value">{{ selectedDossier.numeroDossier }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Objet:</span>
+                  <span class="value">{{ selectedDossier.objet }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Montant à payer:</span>
+                  <span class="value">{{ formatCurrency(paymentAmount) }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Frais inclus:</span>
+                  <span class="value">{{ formatCurrency(convertToSelectedCurrency(totalFees)) }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Montant en XOF:</span>
+                  <span class="value">{{ convertToXOF(paymentAmount).toLocaleString('fr-FR') }} XOF</span>
+                </div>
+                <div class="detail-item total">
+                  <span class="label">Total:</span>
+                  <span class="value">{{ formatCurrency(paymentAmount) }}</span>
+                </div>
+              </div>
+
+              <div class="security-notice">
+                <div class="security-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <circle cx="12" cy="5" r="2"/>
+                    <path d="M12 7v4"/>
+                  </svg>
+                </div>
+                <div class="security-content">
+                  <h6>Paiement sécurisé</h6>
+                  <p>Vos informations de paiement sont cryptées et sécurisées.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pied du drawer -->
+        <div class="drawer-footer">
+          <button 
+            class="btn btn-secondary" 
+            *ngIf="currentStep === 'currency' || currentStep === 'paymentMethod' || currentStep === 'details' || currentStep === 'confirmation'"
+            (click)="goBack()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15,18 9,12 15,6"/>
+            </svg>
+            Retour
+          </button>
+          
+          <button 
+            class="btn btn-primary" 
+            *ngIf="currentStep === 'currency'"
+            (click)="onCurrencySelect()">
+            Suivant
+          </button>
+
+          <button 
+            class="btn btn-primary" 
+            *ngIf="currentStep === 'paymentMethod'"
+            (click)="onPaymentMethodSelect()"
+            [disabled]="!selectedPaymentMethod || !selectedPaymentProvider">
+            Suivant
+          </button>
+          
+          <button 
+            class="btn btn-primary" 
+            *ngIf="currentStep === 'details'"
+            (click)="goToPaymentMethod()"
+            [disabled]="!paymentAmount || paymentAmount <= 0 || paymentAmount > totalToPayInSelectedCurrency">
+            Suivant
+          </button>
+          
+          <button 
+            class="btn btn-primary" 
+            *ngIf="currentStep === 'confirmation'"
+            (click)="processPayment()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+              <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+            Confirmer le paiement
+          </button>
         </div>
       </div>
     </div>
   </div>
-
 </div>
-

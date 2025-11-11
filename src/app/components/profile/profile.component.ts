@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-
+import { Router } from '@angular/router';
 import { User, StrapiRole } from '../../models/user.model';
 
 import { I18nService } from '../../services/i18n.service';
@@ -21,10 +21,14 @@ export class ProfileComponent implements OnInit {
   updateSuccess = false;
   translations: any = {};
 
-  constructor(private authService: AuthService, private i18nService: I18nService) {}
+  constructor(
+    private authService: AuthService,
+    private i18nService: I18nService,
+    private router: Router,
+    ) {}
 
   ngOnInit() {
-    // ⚠️ si user vient du parent (UserList), on l’utilise directement
+    // si user vient du parent (UserList), on l’utilise directement
     if (!this.user) {
       // sinon on fallback sur l’utilisateur connecté
       this.user = this.authService.getCurrentUser();
@@ -85,5 +89,73 @@ export class ProfileComponent implements OnInit {
   private showSuccessMessage() {
     this.updateSuccess = true;
     setTimeout(() => (this.updateSuccess = false), 3000);
+  }
+
+  // Fonction pour rediriger l\'utilisateur connecté vers son dashboard
+  goBackToDashboard(): void {
+    const currentUser = this.authService.getCurrentUser();
+    
+    if (!currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const userRole = currentUser.role;
+    let roleType = '';
+
+    // Gestion sécurisée du type avec vérifications
+    if (typeof userRole === 'string') {
+      roleType = userRole;
+    } else if (userRole && typeof userRole === 'object') {
+      // Vérification plus sécurisée pour les propriétés
+      const roleObj = userRole as any; 
+      roleType = (roleObj.type || roleObj.name || '').toUpperCase();
+    } else {
+      roleType = '';
+    }
+
+    // Rediriger vers le dashboard approprié
+    switch (roleType) {
+      case 'AVOCAT':
+      case 'LAWYER':
+        this.router.navigate(['/lawyer/dashboard']);
+      break;
+
+      case 'DEBITEUR':
+      case 'DEBTOR':
+        this.router.navigate(['/debtor/dashboard']);
+      break;
+
+      case 'CREANCIER':
+      case 'CREDITOR':
+        this.router.navigate(['/creditor/dashboard']);
+      break;
+
+      case 'CEDANT':
+      case 'CéDANT':
+        this.router.navigate(['/cedant/dashboard']);
+      break;
+
+      case 'HUISSIER':
+      case 'BAILIFF':
+        this.router.navigate(['/bailiff/dashboard']);
+      break;
+
+      case 'PARTENAIRE':
+      case 'PARTNER':
+        this.router.navigate(['/partner/dashboard']);
+      break;
+
+      case 'ADMINISTRATEUR':
+      case 'ADMINISTRATEUR':
+        this.router.navigate(['/Administrateur/dashboard']);
+      break;
+
+      default:
+        // Redirection par défaut vers la page d'accueil
+        console.warn('Rôle non reconnu, redirection vers la page d\'accueil');
+        this.router.navigate(['/']);
+      break;
+    }
   }
 }

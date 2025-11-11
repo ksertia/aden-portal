@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { PartnerService } from '../../../services/partner.service';
 import { AuthService } from '../../../services/auth.service';
 import { PartnerUpdate, DebtCase } from '../../../models/case.model';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-partner-tracking',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './partner-tracking.component.html',
   styleUrls: ['./partner-tracking.component.css']
 })
@@ -23,7 +24,8 @@ export class PartnerTrackingComponent implements OnInit {
 
   constructor(
     private partnerService: PartnerService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router,
   ) {}
 
   ngOnInit() {
@@ -34,14 +36,14 @@ export class PartnerTrackingComponent implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) return;
 
-    this.partnerService.getAssignedCases(currentUser.id).subscribe(cases => {
-      this.allCededCases = cases;
-    });
+    // this.partnerService.getAssignedCases(currentUser.id).subscribe(cases => {
+    //   this.allCededCases = cases;
+    // });
 
-    this.partnerService.getPartnerUpdates().subscribe(updates => {
-      this.allUpdates = updates;
-      this.filteredUpdates = [...updates];
-    });
+    // this.partnerService.getPartnerUpdates().subscribe(updates => {
+    //   this.allUpdates = updates;
+    //   this.filteredUpdates = [...updates];
+    // });
   }
 
   filterUpdates() {
