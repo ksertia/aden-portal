@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CaseService } from '../../../services/case.service';
 import { I18nService } from '../../../services/i18n.service';
-import { DebtCase, ActivityType, PaymentProposal  } from '../../../models/case.model';
+import { DebtCase, ActivityType } from '../../../models/case.model';
 import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.component';
 import { AuthService } from '../../../services/auth.service';
 import { RouterModule } from '@angular/router';
@@ -124,6 +124,29 @@ export class DebtorCasesComponent implements OnInit {
   reminderHistory: ReminderHistory[] = [];
 
 
+  // Propriétés pour les messages temporaires ( ajout ou suppression reussi ou achouer d'un document)
+  showUploadSuccess = false;
+  uploadSuccessMessage = '';
+  showDeleteSuccess = false;
+  deleteSuccessMessage = '';
+
+  // Propriétés pour la validation des champs avec mise en évidence rouge et messages d'erreur
+  uploadFormErrors = {
+    type: false,
+    name: false,
+    file: false
+  };
+
+  uploadErrorMessages = {
+    type: '',
+    name: '',
+    file: ''
+  };
+
+  // Methode du modal de suppression d\'un document
+  showDeleteConfirmation = false;
+  documentToDelete: any = null;
+
   constructor(private casesService: CaseService,
     private i18nService: I18nService,
     private authService: AuthService,
@@ -193,6 +216,7 @@ export class DebtorCasesComponent implements OnInit {
       error: (err) => console.error(err)
     });
   }
+
   // Lorsque le bouton "Détails" est cliqué
   viewDossierDetails(dossier: any): void {
     this.selectedDetailCase = dossier;
@@ -361,6 +385,7 @@ export class DebtorCasesComponent implements OnInit {
       activity.type === ActivityType.CORRESPONDENCE_SENT
     );
   }
+
   getReminderIconClass(type: string): string {
     const classes: { [key: string]: string } = {
       [ActivityType.REMINDER_SENT]: 'email',
@@ -419,6 +444,7 @@ export class DebtorCasesComponent implements OnInit {
     };
     this.showDisputeModal = true;
   }
+
   disputeForm = {
     reason: '',
     description: '',
@@ -435,8 +461,8 @@ export class DebtorCasesComponent implements OnInit {
   setPaymentAmount(amount: number) {
     this.paymentAmount = Math.round(amount * 100) / 100;
   }
-  processPayment() {
 
+  processPayment() {
   }
 
   closePaymentPlanModal() {
@@ -471,21 +497,23 @@ export class DebtorCasesComponent implements OnInit {
     };
   }
 
-  onFileSelected(event: any) {
-  const file = event.target.files[0];
-  if (file) {
-    this.selectedFile = file;
-    console.log('Fichier sélectionné:', {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      extension: file.name.split('.').pop()
-    });
-    
-    if (!this.newDocument.name) {
-      this.newDocument.name = file.name;
+   onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      
+      if (!this.newDocument.name) {
+        this.newDocument.name = file.name;
+      }
+
+      // Réinitialiser l'erreur du fichier si un fichier est sélectionné
+      this.uploadFormErrors.file = false;
+      this.uploadErrorMessages.file = '';
+    }else {
+      // Marquer comme erreur si aucun fichier n'est sélectionné
+      this.uploadFormErrors.file = true;
+      this.uploadErrorMessages.file = 'Veuillez sélectionner un fichier';
     }
-  }
   }
 
   formatFileSize(bytes: number): string {
@@ -501,7 +529,6 @@ export class DebtorCasesComponent implements OnInit {
   }
 
   submitDispute() {
-  
   }
 
   isDisputeValid(): boolean {
@@ -783,8 +810,8 @@ export class DebtorCasesComponent implements OnInit {
   filterDocuments() {
     this.filteredDocuments = this.allDocuments.filter(doc => {
       const matchesSearch = !this.searchTerm || 
-        doc.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        this.getCaseNumber(doc.caseId).toLowerCase().includes(this.searchTerm.toLowerCase());
+      doc.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      this.getCaseNumber(doc.caseId).toLowerCase().includes(this.searchTerm.toLowerCase());
       
       const matchesType = !this.selectedDocumentType || doc.type === this.selectedDocumentType;
       const matchesCase = !this.selectedCaseId || doc.caseId === this.selectedCaseId;
@@ -805,7 +832,6 @@ export class DebtorCasesComponent implements OnInit {
       doc.type === DocumentType.PAYMENT_PROOF
     ).length;
   }
-
 
   // Modifiez la méthode getCaseNumber pour utiliser nodeId
   getCaseNumber(caseId: string): string {
@@ -907,9 +933,42 @@ export class DebtorCasesComponent implements OnInit {
   }
 
   uploadDocument() {
-  if (!this.isUploadValid() || this.isLoading) return;
+
+  // Réinitialiser les erreurs
+  this.resetUploadErrors();
+
+  // Valider les champs
+  let isValid = true;
+
+  if (!this.newDocument.type) {
+    this.uploadFormErrors.type = true;
+    this.uploadErrorMessages.type = 'Veuillez sélectionner un type de document';
+    isValid = false;
+  }
+
+  if (!this.newDocument.name || this.newDocument.name.trim() === '') {
+    this.uploadFormErrors.name = true;
+    this.uploadErrorMessages.name = 'Veuillez saisir un nom pour le document';
+    isValid = false;
+    console.log('Erreur name');
+  }
+
+  if (!this.selectedFile) {
+    this.uploadFormErrors.file = true;
+    this.uploadErrorMessages.file = 'Veuillez sélectionner un fichier';
+    isValid = false;
+    console.log('Erreur file');
+  }
+
+  console.log('Validation résultat:', isValid, 'isLoading:', this.isLoading); 
+
+  if (!isValid || this.isLoading) {
+    console.log('Arrêt: validation échouée ou en cours de chargement');
+    return;
+  }
 
   this.isLoading = true;
+  console.log('Début de l\'upload...');
 
   const formData = new FormData();
   formData.append('filedata', this.selectedFile!);
@@ -939,15 +998,22 @@ export class DebtorCasesComponent implements OnInit {
         uploadedAt: new Date(),
         uploadedBy: 'Utilisateur actuel',
         caseId: this.selectedDetailCase.nodeId,
-        // originalData: uploadedFile
       };
 
       this.allDocuments.push(newDoc);
       this.filteredDocuments.push(newDoc);
+
+      // AFFICHER LE MESSAGE DE SUCCÈS DANS LA MODALE
+      this.showUploadSuccess = true;
+      this.uploadSuccessMessage = 'Document ajouté avec succès!';
       
-      this.closeUploadModal();
-      this.filterDocuments();
-      alert('Document ajouté avec succès!');
+      // Fermer la modale d'upload après 3 secondes
+      setTimeout(() => {
+        this.showUploadSuccess = false;
+        this.uploadSuccessMessage = '';
+        this.closeUploadModal();
+        // this.filterDocuments();
+      }, 3000);
     },
     error: (error) => {
       this.isLoading = false;
@@ -957,43 +1023,74 @@ export class DebtorCasesComponent implements OnInit {
   });
   }
 
+    // Ajoutez cette méthode pour réinitialiser les erreurs
+  resetUploadErrors(): void {
+    this.uploadFormErrors = {
+      type: false,
+      name: false,
+      file: false
+    };
+    this.uploadErrorMessages = {
+      type: '',
+      name: '',
+      file: ''
+    };
+  }
+
+
   deleteDocument(doc: CaseDocument & { caseId: string }) {
-  // Confirmation avant suppression
-  const confirmed = confirm(`Êtes-vous sûr de vouloir supprimer le document "${doc.name}" ?`);
-  
-  if (!confirmed) {
-    return;
-  }
 
-  console.log('Suppression du document:', doc);
-
-  // Vérifier que le document a un ID
-  if (!doc.id) {
-    alert('Impossible de supprimer le document : identifiant manquant');
-    return;
-  }
-
-  // Appel du service pour supprimer le document
-  this.casesService.deleteDocument(doc.id).subscribe({
-    next: (response) => {
-      console.log('Document supprimé avec succès:', response);
-      
-      // Supprimer le document des tableaux locaux
-      this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
-      this.filteredDocuments = this.filteredDocuments.filter(d => d.id !== doc.id);
-      
-      // Mettre à jour l'affichage
-      this.filterDocuments();
-      
-      // Afficher un message de succès
-      alert('Document supprimé avec succès!');
-    },
-    error: (error) => {
-      console.error('Erreur lors de la suppression:', error);
-      alert('Erreur lors de la suppression du document. Veuillez réessayer.');
+    // Vérifier que le document a un ID
+    if (!doc.id) {
+      alert('Impossible de supprimer le document : identifiant manquant');
+      return;
     }
-  });
-}
+
+    // Appel du service pour supprimer le document
+    this.casesService.deleteDocument(doc.id).subscribe({
+      next: (response) => {
+        console.log('Document supprimé avec succès:', response);
+        
+        // Supprimer le document des tableaux locaux
+        this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
+        this.filteredDocuments = this.filteredDocuments.filter(d => d.id !== doc.id);
+        
+        // AFFICHER LE MESSAGE DE SUCCÈS POUR LA SUPPRESSION
+        this.showDeleteSuccess = true;
+        this.deleteSuccessMessage = 'Document supprimé avec succès!';
+
+        // Cacher le message après 3 secondes
+        setTimeout(() => {
+          this.showDeleteSuccess = false;
+          this.deleteSuccessMessage = '';
+          // this.filterDocuments();
+        }, 3000);
+      },
+      error: (error) => {
+        console.error('Erreur lors de la suppression:', error);
+        alert('Erreur lors de la suppression du document. Veuillez réessayer.');
+      }
+    });
+  }
+
+  // Methode du modal de suppression d\'un document
+  confirmDeleteDocument(doc: any): void {
+    this.documentToDelete = doc;
+    this.showDeleteConfirmation = true;
+  }
+
+  executeDelete(): void {
+    if (this.documentToDelete) {
+      this.deleteDocument(this.documentToDelete);
+      this.showDeleteConfirmation = false;
+      this.documentToDelete = null;
+    }
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirmation = false;
+    this.documentToDelete = null;
+  }
 
   closeUploadModal() {
     this.showUploadModal = false;
@@ -1003,28 +1100,72 @@ export class DebtorCasesComponent implements OnInit {
       type: '',
       name: ''
     };
+    // RÉINITIALISER LE MESSAGE DE SUCCÈS
+    this.showUploadSuccess = false;
+    this.uploadSuccessMessage = '';
+    this.resetUploadErrors(); // Réinitialiser les erreurs
   }
 
   // Fonction pour fermer la modal des documents
   closeDocumentsModal() {
     this.showDocumentsModal = false;
+    // RÉINITIALISER LE MESSAGE DE SUPPRESSION
+    this.showDeleteSuccess = false;
+    this.deleteSuccessMessage = '';
+  }
+
+  // Méthode pour valider en temps réel
+  validateField(fieldName: keyof typeof this.uploadFormErrors): void {
+    switch (fieldName) {
+      case 'type':
+        this.uploadFormErrors.type = !this.newDocument.type;
+        this.uploadErrorMessages.type = this.uploadFormErrors.type ? 'Veuillez sélectionner un type de document' : '';
+        break;
+      case 'name':
+        this.uploadFormErrors.name = !this.newDocument.name || this.newDocument.name.trim() === '';
+        this.uploadErrorMessages.name = this.uploadFormErrors.name ? 'Veuillez saisir un nom pour le document' : '';
+        break;
+      case 'file':
+        this.uploadFormErrors.file = !this.selectedFile;
+        this.uploadErrorMessages.file = this.uploadFormErrors.file ? 'Veuillez sélectionner un fichier' : '';
+        break;
+    }
   }
 
 
   // Ajout methode end
   // Méthode pour filtrer les documents du dossier sélectionné
+  // openDocumentsModal() {
+  //   if (this.selectedDetailCase) {
+  //     // Filtrer uniquement les documents du dossier sélectionné
+  //     this.filteredDocuments = this.allDocuments.filter(
+  //       doc => doc.caseId === this.selectedDetailCase.nodeId
+  //     );
+  //   } else {
+  //     // Afficher tous les documents
+  //     this.filteredDocuments = [...this.allDocuments];
+  //   }
+  //   this.showDocumentsModal = true;
+  // }
   openDocumentsModal() {
+    if (this.selectedIndex !== null) {
+      this.selectedDetailCase = this.filteredDossiers[this.selectedIndex];
+    }
+    
     if (this.selectedDetailCase) {
       // Filtrer uniquement les documents du dossier sélectionné
       this.filteredDocuments = this.allDocuments.filter(
         doc => doc.caseId === this.selectedDetailCase.nodeId
       );
+      
     } else {
-      // Afficher tous les documents
+      // Afficher tous les documents si aucun dossier n'est sélectionné
       this.filteredDocuments = [...this.allDocuments];
     }
+    
     this.showDocumentsModal = true;
   }
+
 
   // Compter les documents d'un dossier
   getDocumentsCount(dossier: any): number {

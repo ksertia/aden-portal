@@ -454,7 +454,7 @@
   </div>
 
 <!-- Tiroir document -->
-  <div class="drawer-overlay-document" *ngIf="showDocumentsModal" (click)="closeDocumentsModal()">
+  <div class="drawer-overlay-document" *ngIf="showDocumentsModal" >
     <div class="drawer-document" [class.open]="showDocumentsModal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Documents ({{ filteredDocuments.length }})</h3>
@@ -535,7 +535,7 @@
           </div>
 
           <!-- Modale de confirmation de suppression -->
-          <div class="confirmation-overlay" *ngIf="showDeleteConfirmation">
+          <div class="confirmation-overlay"  *ngIf="showDeleteConfirmation">
             <div class="confirmation-modal">
               <div class="modal-header">
                 <div class="header-with-icon">
@@ -682,7 +682,7 @@
 </div>
 
 <!-- Modale de visualisation de document -->
-<div class="document-viewer-overlay" *ngIf="showDocumentViewer" (click)="closeDocumentViewer()">
+<div class="document-viewer-overlay" *ngIf="showDocumentViewer" >
   <div class="document-viewer-modal" (click)="$event.stopPropagation()">
     <!-- En-tête -->
     <div class="document-viewer-header">
