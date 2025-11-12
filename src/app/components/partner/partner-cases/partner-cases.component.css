@@ -400,10 +400,6 @@
   color: var(--text);
 }
 
-.table-actions {
-  display: flex;
-  gap: 4px;
-}
 
 .no-cases {
   text-align: center;

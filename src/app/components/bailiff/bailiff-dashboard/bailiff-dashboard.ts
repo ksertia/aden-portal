@@ -57,9 +57,6 @@ export class BailiffDashboard implements OnInit {
     }
 
     const huissierNodeId = currentUser.nodeId;
-    console.log('Huissier connecté :', currentUser);
-    console.log('huissierNodeId envoyé :', huissierNodeId);
-
     // Verification si l'utilisateur connecté à un NodeId
     if (!huissierNodeId) {
       this.errorMessage = 'Identifiant du créancier introuvable.';
@@ -70,7 +67,6 @@ export class BailiffDashboard implements OnInit {
     // Appel du web service pour la recuperation des dossiers du creanciers
     this.casesService.getDossiersHuissier(siteName, huissierNodeId).subscribe({
       next: (response) => {
-        console.log('Réponse API dossiers :', response);
 
         // Étape 1 : extraction correcte du tableau de dossiers
         const dossiers = response.data?.map((item: any) => item.map) || [];
@@ -79,7 +75,6 @@ export class BailiffDashboard implements OnInit {
         this.dossiers = dossiers.filter(
           (d: any) => d.huissierNodeId === huissierNodeId
         );
-        console.log('Dossiers filtrés pour ce créancier :', this.dossiers);
 
         //  mise à jour des statistiques
         this.updateCaseStatistics(); 
@@ -87,7 +82,6 @@ export class BailiffDashboard implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des dossiers :', error);
         this.errorMessage = 'Impossible de récupérer les dossiers.';
         this.isLoading = false;
       }
@@ -172,6 +166,5 @@ export class BailiffDashboard implements OnInit {
       return statut === 'en_attente' || statut === 'pending' || statut === 'attente';
     }).length;
   }
-
 
 }

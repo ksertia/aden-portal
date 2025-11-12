@@ -50,10 +50,6 @@
             <option value="elevee">Élevée</option>
             <option value="urgente">Urgente</option>
             <option value="normale">Normale</option>
-            <!-- <option value="FAIBLE">Faible</option>
-            <option value="MOYENNE">Moyenne</option>
-            <option value="Élevée">Élevée</option>
-            <option value="urgent">Urgente</option> -->
           </select>
         </div>
       </div>
@@ -454,7 +450,7 @@
   </div>
 
 <!-- Tiroir document -->
-  <div class="drawer-overlay-document" *ngIf="showDocumentsModal" >
+  <div class="drawer-overlay-document" *ngIf="showDocumentsModal" > 
     <div class="drawer-document" [class.open]="showDocumentsModal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Documents ({{ filteredDocuments.length }})</h3>

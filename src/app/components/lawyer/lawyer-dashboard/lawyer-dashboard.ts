@@ -59,9 +59,6 @@ export class LawyerDashboard implements OnInit{
     }
 
     const avocatNodeId = currentUser.nodeId;
-    console.log('Avocat connecté :', currentUser);
-    console.log('avocatNodeId envoyé :', avocatNodeId);
-
     if (!avocatNodeId) {
       this.errorMessage = 'Identifiant de lavocat introuvable.';
       this.isLoading = false;
@@ -73,17 +70,16 @@ export class LawyerDashboard implements OnInit{
 
       // Récupère tous les dossiers
       const allDossiers = response.data?.map((item: any) => item.map) || [];
+
       // Filtre uniquement les dossiers de l'avocat connecté
       this.dossiers = allDossiers.filter((d: any) => d.avocatNodeId === avocatNodeId);
-      console.log('Réponse API dossiers :', this.dossiers);
-
+      
       //  mise à jour des statistiques
       this.updateCaseStatistics(); 
 
       this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des dossiers :', error);
         this.errorMessage = 'Impossible de récupérer les dossiers.';
         this.isLoading = false;
       }

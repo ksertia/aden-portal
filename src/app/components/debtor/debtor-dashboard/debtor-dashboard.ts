@@ -60,9 +60,6 @@ export class DebtorDashboard implements OnInit {
     }
 
     const debiteurNodeId = currentUser.nodeId;
-    console.log('Débiteur connecté :', currentUser);
-    console.log('debiteurNodeId envoyé :', debiteurNodeId);
-
     if (!debiteurNodeId) {
       this.errorMessage = 'Identifiant du débiteur introuvable.';
       this.isLoading = false;
@@ -71,7 +68,6 @@ export class DebtorDashboard implements OnInit {
 
     this.casesService.getDossiersDebiteur(siteName, debiteurNodeId).subscribe({
       next: (response) => {
-        console.log('Réponse API dossiers :', response);
         this.dossiers = response.data?.map((item: any) => item.map) || [];
 
         //  mise à jour des statistiques
@@ -80,7 +76,6 @@ export class DebtorDashboard implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des dossiers :', error);
         this.errorMessage = 'Impossible de récupérer les dossiers.';
         this.isLoading = false;
       }
@@ -98,7 +93,7 @@ export class DebtorDashboard implements OnInit {
 
    // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
     getCreancierForDossier(dossier: any): CreditorDetail | undefined {
-        return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
+      return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
     }
 
   getUserRoleLabel(): string {
