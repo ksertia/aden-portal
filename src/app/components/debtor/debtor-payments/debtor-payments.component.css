@@ -159,7 +159,7 @@
   padding: 15px 30px;
   font-size: 1.1rem;
   min-width: 200px;
-  margin-bottom: 15px;
+  /* margin-bottom: 15px; */
 }
 
 /* Actions rapides */
@@ -178,7 +178,8 @@
   font-size: 0.9rem;
   border: 2px solid #ecf0f1;
   background: white;
-  color: #2c3e50;
+  /* color: #2c3e50; */
+  color: #107dea;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -240,7 +241,7 @@
 }
 
 .drawer {
-  width: 100%;
+  width: 50%;
   max-width: 1500px;
   height: 100%;
   background: white;
@@ -1305,3 +1306,57 @@
     max-width: 25px;
   }
 }
+
+/* Historique des paiements Start */
+.history-section .filters {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.history-section select,
+.history-section input {
+  padding: 8px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+
+.history-table {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.history-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th {
+  background: #F8FAFC;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.history-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.history-table tr.payment-success {
+  background: #F0FDF4;
+}
+
+.history-table tr.payment-pending {
+  background: #FFFBEB;
+}
+
+.history-table tr.payment-failed {
+  background: #FEF2F2;
+}
+/* /* Historique des paiements */ 
