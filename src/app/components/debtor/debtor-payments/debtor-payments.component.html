@@ -1138,7 +1138,7 @@
   </div>
 
   <!-- Drawer Historique des Paiements -->
-  <div class="drawer-overlay" *ngIf="showHistoryDrawer">
+  <div class="drawer-overlay history-section" *ngIf="showHistoryDrawer">
     <div class="drawer" [class.open]="showHistoryDrawer" (click)="$event.stopPropagation()">
       <div class="drawer-content">
         <!-- En-tête du drawer -->
@@ -1153,7 +1153,7 @@
         </div>
 
         <!-- Filtrage de l'historique -->
-        <div class="filters">
+        <!-- <div class="filters">
           <select>
             <option>Tous les statuts</option>
             <option>Réussi</option>
@@ -1161,6 +1161,16 @@
             <option>Échoué</option>
           </select>
           <input type="text" placeholder="Rechercher une référence...">
+        </div> -->
+        <div class="filters">
+          <select [(ngModel)]="selectedStatus" (ngModelChange)="filterHistory()">
+            <option value="">Tous les statuts</option>
+            <option value="success">Réussi</option>
+            <option value="pending">En attente</option>
+            <option value="failed">Échoué</option>
+          </select>
+          
+          <input type="text" [(ngModel)]="searchQuery" (input)="filterHistory()" placeholder="Rechercher une référence...">
         </div>
 
         <!-- Tableau de l'historique des paiements -->
