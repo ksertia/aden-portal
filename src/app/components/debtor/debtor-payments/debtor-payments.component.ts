@@ -29,6 +29,38 @@ export class DebtorPaymentsComponent implements OnInit {
   // États du drawer de paiement - ORDRE CORRIGÉ
   showPaymentDrawer = false;
   currentStep: 'selection' | 'currency' | 'details' | 'paymentMethod' | 'confirmation' = 'selection';
+  
+  // historique des paiement start
+  showHistoryDrawer: boolean = false;
+  payments = [
+    { date: '01/12/2024', montant: '1 000 €', moyenPaiement: '💳 Carte Bancaire', statut: 'Réussi', reference: 'TXN-001', facture: '#FAC-001' },
+    { date: '28/11/2024', montant: '500 €', moyenPaiement: '📱 Mobile Money', statut: 'En attente', reference: 'TXN-002', facture: '#FAC-001' },
+    { date: '25/11/2024', montant: '1 000 €', moyenPaiement: '💳 Carte Bancaire', statut: 'Échoué', reference: 'TXN-003', facture: '#FAC-001' }
+  ];
+  // Données de filtrage
+  selectedStatus: string = 'Tous les statuts';
+  searchQuery: string = '';
+  // Méthode pour fermer le drawer
+  closeHistoryDrawer(): void {
+    this.showHistoryDrawer = false;
+  }
+  // Méthode pour filtrer les paiements en fonction du statut et de la recherche
+  getFilteredPayments() {
+    return this.payments.filter(payment => {
+      const matchesStatus = this.selectedStatus === 'Tous les statuts' || payment.statut === this.selectedStatus;
+      const matchesSearch = payment.reference.toLowerCase().includes(this.searchQuery.toLowerCase());
+      return matchesStatus && matchesSearch;
+    });
+  }
+  // // Méthode pour fermer le drawer
+  // closeHistoryDrawer(): void {
+  //   this.showHistoryDrawer = false;
+  // }
+  // Méthode pour changer la recherche
+  onSearchChange(event: any) {
+    this.searchQuery = event.target.value;
+  }
+  // historique des paiement end
 
   // Mode de paiement sélectionné
   selectedPaymentMethod: string = '';

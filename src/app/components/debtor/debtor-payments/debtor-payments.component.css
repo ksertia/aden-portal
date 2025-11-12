@@ -159,7 +159,7 @@
   padding: 15px 30px;
   font-size: 1.1rem;
   min-width: 200px;
-  margin-bottom: 15px;
+  /* margin-bottom: 15px; */
 }
 
 /* Actions rapides */
@@ -178,7 +178,8 @@
   font-size: 0.9rem;
   border: 2px solid #ecf0f1;
   background: white;
-  color: #2c3e50;
+  /* color: #2c3e50; */
+  color: #107dea;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
