@@ -1,17 +1,17 @@
 <div class="profile-container">
   <div class="ph1">
     <button class="btn btn-secondary" (click)="goBackToDashboard()">Retour</button>
-    <div class="profile-header fade-in-up">
-      <h1>{{ t('profile.title') }}</h1>
-      <p>{{ t('profile.subtitle') }}</p>
-    </div>
   </div>
 
   <div class="profile-content fade-in-up" *ngIf="user">
     <div class="profile-card">
+      <!-- Avatar et infos simples -->
       <div class="profile-avatar">
-        <div class="avatar-circle">
+        <div class="avatar-circle" *ngIf="!avatarPreviewUrl">
           {{ user.firstname.charAt(0) }}{{ user.lastname.charAt(0) }}
+        </div>
+        <div class="avatar-circle" *ngIf="avatarPreviewUrl">
+          <img [src]="avatarPreviewUrl" alt="avatar" class="avatar-img" />
         </div>
         <div class="avatar-info">
           <h2>{{ user.firstname }} {{ user.lastname }}</h2>
@@ -19,74 +19,41 @@
         </div>
       </div>
 
-      <form (ngSubmit)="updateProfile()" class="profile-form">
+      <!-- Formulaire de profil -->
+      <form (ngSubmit)="onSubmitProfile()" class="profile-form" #profileForm="ngForm" novalidate>
         <div class="form-section">
-          <h3>{{ t('profile.personal_info') }}</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="firstName">{{ t('profile.first_name') }}</label>
-              <input type="text" id="firstName" [(ngModel)]="user.firstname" name="firstName" required>
-            </div>
-            <div class="form-group">
-              <label for="lastName">{{ t('profile.last_name') }}</label>
-              <input type="text" id="lastName" [(ngModel)]="user.lastname" name="lastName" required>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="email">{{ t('profile.email') }}</label>
-            <input type="email" id="email" [(ngModel)]="user.email" name="email" required disabled>
-          </div>
-
-          <div class="form-group">
-            <label for="phone">{{ t('profile.phone') }}</label>
-            <input type="tel" id="phone" [(ngModel)]="user.Phone" name="phone" required>
-          </div>
-        </div>
-
-        <div class="form-section" *ngIf="user.companyName || user.licenseNumber">
-          <h3>{{ t('profile.professional_info') }}</h3>
-
-          <div class="form-group" *ngIf="user.companyName">
-            <label for="companyName">{{ t('profile.company_name') }}</label>
-            <input type="text" id="companyName" [(ngModel)]="user.companyName" name="companyName">
-          </div>
-
-          <div class="form-group" *ngIf="user.licenseNumber">
-            <label for="licenseNumber">{{ t('profile.license_number') }}</label>
-            <input type="text" id="licenseNumber" [(ngModel)]="user.licenseNumber" name="licenseNumber">
-          </div>
-        </div>
-
-        <div class="form-section" *ngIf="user.address">
-          <h3>{{ t('profile.address') }}</h3>
-
-          <div class="form-group">
-            <label for="street">{{ t('profile.street') }}</label>
-            <input type="text" id="street" [(ngModel)]="user.address.street" name="street">
-          </div>
+          <h3>{{ t("profile.personal_info") }}</h3>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="city">{{ t('profile.city') }}</label>
-              <input type="text" id="city" [(ngModel)]="user.address.city" name="city">
+              <label for="firstName">{{ t("profile.first_name") }}</label>
+              <input type="text" id="firstName" [(ngModel)]="user.firstname" name="firstName" required />
             </div>
             <div class="form-group">
-              <label for="postalCode">{{ t('profile.postal_code') }}</label>
-              <input type="text" id="postalCode" [(ngModel)]="user.address.postalCode" name="postalCode">
+              <label for="lastName">{{ t("profile.last_name") }}</label>
+              <input type="text" id="lastName" [(ngModel)]="user.lastname" name="lastName" required />
             </div>
           </div>
 
           <div class="form-group">
-            <label for="country">{{ t('profile.country') }}</label>
-            <input type="text" id="country" [(ngModel)]="user.address.country" name="country">
+            <label for="email">{{ t("profile.email") }}</label>
+            <input type="email" id="email" [(ngModel)]="user.email" name="email" required />
+          </div>
+
+          <div class="form-group">
+            <label for="phone">{{ t("profile.phone") }}</label>
+            <input type="tel" id="phone" [(ngModel)]="user.Phone" name="phone" required />
           </div>
         </div>
 
-        <div class="form-actions">
+        <div class="form-actions" style="gap: 12px; align-items: center">
           <button type="submit" class="btn btn-primary" [disabled]="isUpdating">
-            <span *ngIf="!isUpdating">{{ t('profile.update') }}</span>
-            <span *ngIf="isUpdating">{{ t('profile.updating') }}</span>
+            <span *ngIf="!isUpdating">{{ t("profile.update") }}</span>
+            <span *ngIf="isUpdating">{{ t("profile.updating") }}</span>
+          </button>
+
+          <button type="button" class="btn btn-outline" (click)="goToChangePassword()">
+            Changer le mot de passe
           </button>
         </div>
       </form>
@@ -95,9 +62,11 @@
 
   <div class="success-message" *ngIf="updateSuccess">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M9 12l2 2 4-4"/>
-      <circle cx="12" cy="12" r="9"/>
+      <path d="M9 12l2 2 4-4" />
+      <circle cx="12" cy="12" r="9" />
     </svg>
-    {{ t('profile.success') }}
+    {{ t("profile.success") }}
   </div>
 </div>
+
+

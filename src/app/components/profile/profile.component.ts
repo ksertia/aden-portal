@@ -1,12 +1,11 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { User, StrapiRole } from '../../models/user.model';
-
 import { I18nService } from '../../services/i18n.service';
-import { LanguageSwitcherComponent } from '../shared/language-switcher/language-switcher.component';
+
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -15,30 +14,25 @@ import { LanguageSwitcherComponent } from '../shared/language-switcher/language-
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  @Input() user: User | null = null;  // <- un seul champ
-
+  @Input() user: User | null = null;
   isUpdating = false;
   updateSuccess = false;
   translations: any = {};
 
+  avatarFile: File | null = null;
+  avatarPreviewUrl: string | null = null; // ✅ ajout pour corriger l'erreur
+
   constructor(
     private authService: AuthService,
     private i18nService: I18nService,
-    private router: Router,
-    ) {}
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    // si user vient du parent (UserList), on l’utilise directement
-    if (!this.user) {
-      // sinon on fallback sur l’utilisateur connecté
-      this.user = this.authService.getCurrentUser();
-    }
-
+    if (!this.user) this.user = this.authService.getCurrentUser();
     if (this.user) {
       this.user = { ...this.user };
-      if (this.user.address) {
-        this.user.address = { ...this.user.address };
-      }
+      if ((this.user as any).avatar) this.avatarPreviewUrl = (this.user as any).avatar;
     }
 
     this.loadTranslations();
@@ -58,7 +52,7 @@ export class ProfileComponent implements OnInit {
 
   getUserRoleLabel(): string {
     if (!this.user) return '';
-    switch (this.user.role.name) {
+    switch (this.user.role?.name) {
       case StrapiRole.DEBTOR: return 'Débiteur';
       case StrapiRole.BAILIFF: return 'Huissier de Justice';
       case StrapiRole.LAWYER: return 'Avocat';
@@ -70,92 +64,88 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  updateProfile() {
+  onSubmitProfile() {
     if (!this.user) return;
+
     this.isUpdating = true;
-    this.authService.updateProfile(this.user).subscribe({
-      next: (updatedUser) => {
-        this.user = updatedUser;
+
+    const userId = Number(this.user.id);
+    if (isNaN(userId)) {
+      console.error('User id invalide');
+      this.isUpdating = false;
+      return;
+    }
+
+    const token = this.authService.getToken();
+    if (!token) {
+      console.error("Token manquant, veuillez vous reconnecter !");
+      this.isUpdating = false;
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    // Création de l'objet userData
+    const userData: {
+      firstname?: string;
+      lastname?: string;
+      email?: string;
+      Phone?: string;
+      photo?: File;
+    } = {
+      firstname: this.user.firstname,
+      lastname: this.user.lastname,
+      email: this.user.email,
+      Phone: this.user.Phone
+    };
+
+    if (this.avatarFile) userData.photo = this.avatarFile;
+
+    console.log("Envoi userData:", userData);
+    console.log("User id:", userId);
+
+    // Ici on force le type any pour éviter l'erreur FormData vs objet TS
+    this.authService.updateProfileMultipart(userId, userData as any).subscribe({
+      next: (resp) => {
         this.isUpdating = false;
+        if (resp.user) {
+          this.user = resp.user;
+        }
         this.showSuccessMessage();
       },
-      error: (error) => {
-        console.error('Erreur lors de la mise à jour:', error);
+      error: (err) => {
+        console.error("Erreur lors de la mise à jour", err);
         this.isUpdating = false;
+        if (err?.error?.message?.includes("Token invalide")) {
+          alert("Votre session a expiré. Veuillez vous reconnecter.");
+          this.router.navigate(['/login']);
+        }
       }
     });
   }
 
   private showSuccessMessage() {
     this.updateSuccess = true;
-    setTimeout(() => (this.updateSuccess = false), 3000);
+    setTimeout(() => this.updateSuccess = false, 3000);
   }
 
-  // Fonction pour rediriger l\'utilisateur connecté vers son dashboard
   goBackToDashboard(): void {
     const currentUser = this.authService.getCurrentUser();
-    
-    if (!currentUser) {
-      this.router.navigate(['/login']);
-      return;
+    if (!currentUser) { this.router.navigate(['/login']); return; }
+
+    const roleName = currentUser.role?.name?.toUpperCase() || '';
+    switch (roleName) {
+      case 'AVOCAT': case 'LAWYER': this.router.navigate(['/lawyer/dashboard']); break;
+      case 'DEBITEUR': case 'DEBTOR': this.router.navigate(['/debtor/dashboard']); break;
+      case 'CREANCIER': case 'CREDITOR': this.router.navigate(['/creditor/dashboard']); break;
+      case 'CEDANT': this.router.navigate(['/cedant/dashboard']); break;
+      case 'HUISSIER': case 'BAILIFF': this.router.navigate(['/bailiff/dashboard']); break;
+      case 'PARTENAIRE': case 'PARTNER': this.router.navigate(['/partner/dashboard']); break;
+      case 'ADMINISTRATEUR': this.router.navigate(['/Administrateur/dashboard']); break;
+      default: this.router.navigate(['/']); break;
     }
+  }
 
-    const userRole = currentUser.role;
-    let roleType = '';
-
-    // Gestion sécurisée du type avec vérifications
-    if (typeof userRole === 'string') {
-      roleType = userRole;
-    } else if (userRole && typeof userRole === 'object') {
-      // Vérification plus sécurisée pour les propriétés
-      const roleObj = userRole as any; 
-      roleType = (roleObj.type || roleObj.name || '').toUpperCase();
-    } else {
-      roleType = '';
-    }
-
-    // Rediriger vers le dashboard approprié
-    switch (roleType) {
-      case 'AVOCAT':
-      case 'LAWYER':
-        this.router.navigate(['/lawyer/dashboard']);
-      break;
-
-      case 'DEBITEUR':
-      case 'DEBTOR':
-        this.router.navigate(['/debtor/dashboard']);
-      break;
-
-      case 'CREANCIER':
-      case 'CREDITOR':
-        this.router.navigate(['/creditor/dashboard']);
-      break;
-
-      case 'CEDANT':
-      case 'CéDANT':
-        this.router.navigate(['/cedant/dashboard']);
-      break;
-
-      case 'HUISSIER':
-      case 'BAILIFF':
-        this.router.navigate(['/bailiff/dashboard']);
-      break;
-
-      case 'PARTENAIRE':
-      case 'PARTNER':
-        this.router.navigate(['/partner/dashboard']);
-      break;
-
-      case 'ADMINISTRATEUR':
-      case 'ADMINISTRATEUR':
-        this.router.navigate(['/Administrateur/dashboard']);
-      break;
-
-      default:
-        // Redirection par défaut vers la page d'accueil
-        console.warn('Rôle non reconnu, redirection vers la page d\'accueil');
-        this.router.navigate(['/']);
-      break;
-    }
+  goToChangePassword() {
+    this.router.navigate(['/change-password']);
   }
 }

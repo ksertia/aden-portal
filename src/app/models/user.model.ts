@@ -81,7 +81,7 @@ export interface LoginRequest {
 // Interface pour la réponse de connexion, contenant l'utilisateur et le token JWT
 export interface LoginResponse {
   user: User;
-  token: string;
+  jwt: string;
 }
 
 // Fonction pour mapper un rôle de Strapi en une valeur de l'énumération StrapiRole
