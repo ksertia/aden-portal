@@ -242,7 +242,7 @@
 
 .drawer {
   width: 100%;
-  max-width: 1000px;
+  max-width: 1500px;
   height: 100%;
   background: white;
   transform: translateX(100%);
@@ -1306,3 +1306,57 @@
     max-width: 25px;
   }
 }
+
+/* Historique des paiements Start */
+.history-section .filters {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.history-section select,
+.history-section input {
+  padding: 8px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+
+.history-table {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.history-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th {
+  background: #F8FAFC;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.history-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.history-table tr.payment-success {
+  background: #F0FDF4;
+}
+
+.history-table tr.payment-pending {
+  background: #FFFBEB;
+}
+
+.history-table tr.payment-failed {
+  background: #FEF2F2;
+}
+/* /* Historique des paiements */ 
