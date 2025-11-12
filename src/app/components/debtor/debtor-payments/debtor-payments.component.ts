@@ -564,10 +564,10 @@ export class DebtorPaymentsComponent implements OnInit {
   }
 
   // Ouvrir l'historique de paiement
-  openPaymentHistory() {
-    console.log('Ouvrir historique de paiement');
-    alert('Fonctionnalité Historique de paiement - À implémenter');
-  }
+  // openPaymentHistory() {
+  //   console.log('Ouvrir historique de paiement');
+  //   alert('Fonctionnalité Historique de paiement - À implémenter');
+  // }
 
   // Ouvrir les détails de la dette
   openDebtDetails() {
@@ -624,4 +624,46 @@ export class DebtorPaymentsComponent implements OnInit {
     const provider = method?.providers.find(p => p.id === this.selectedPaymentProvider);
     return provider?.icon || '💳';
   }
+
+
+
+  //_-----------------Historique de paiement Start-----------------------------------
+
+  showHistoryDrawer = false;
+  selectedStatus: string = '';  // Valeur de statut sélectionné (initialement vide)
+  searchQuery: string = '';  // Valeur de recherche (initialement vide)
+
+  payments = [
+    { date: '01/12/2024', amount: '1 000 €', paymentMethod: '💳 Carte Bancaire', status: 'success', reference: 'TXN-001', invoice: '#FAC-001' },
+    { date: '28/11/2024', amount: '500 €', paymentMethod: '📱 Mobile Money', status: 'pending', reference: 'TXN-002', invoice: '#FAC-001' },
+    { date: '25/11/2024', amount: '1 000 €', paymentMethod: '💳 Carte Bancaire', status: 'failed', reference: 'TXN-003', invoice: '#FAC-001' },
+  ];
+
+  // Copier les paiements dans filteredPayments pour éviter les modifications directes de `payments`
+  filteredPayments = [...this.payments]; // Utilisation de la déstructuration pour créer une copie indépendante
+
+  // Méthode pour ouvrir le drawer
+  openPaymentHistory() {
+    this.showHistoryDrawer = true;
+  }
+
+  // Méthode pour fermer le drawer
+  closeHistoryDrawer() {
+    this.showHistoryDrawer = false;
+  }
+
+  // Méthode de filtrage
+  filterHistory() {
+    // Appliquer les filtres
+    this.filteredPayments = this.payments.filter(payment => {
+      // Filtrage par statut
+      const matchesStatus = this.selectedStatus ? payment.status === this.selectedStatus : true;
+      // Filtrage par référence, insensible à la casse
+      const matchesQuery = payment.reference.toLowerCase().includes(this.searchQuery.toLowerCase());
+      // Retourne true si les deux filtres sont valides
+      return matchesStatus && matchesQuery;
+    });
+  }
+  
+  //_----------------------Historique de paiement End-------------------------------
 }
