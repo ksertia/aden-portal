@@ -48,10 +48,10 @@ export class DebtorCasesComponent implements OnInit {
   userCases: DebtCase[] = [];
 
   currentView: 'grid' | 'table' = 'table';
+
   // tiroir variale start
   selectedDetailCase: any;
   showCaseDetailsModal = false; 
-
   // tiroir variale end
 
   // --- Filtres ---
@@ -70,7 +70,7 @@ export class DebtorCasesComponent implements OnInit {
   showPaymentPlanModal = false;
   showDisputeModal = false;
   selectedCase: DebtCase | null = null;
-   paymentAmount = 0;
+  paymentAmount = 0;
   isProcessingPayment = false;
   
   paymentPlanProposal = {
@@ -118,7 +118,6 @@ export class DebtorCasesComponent implements OnInit {
   selectedcreditor: CreditorDetail | undefined;
 
   selectedIndex: number | null = null;
-  // showCaseDetailsModal = false;
 
   showReminderHistoryModal = false;
   reminderHistory: ReminderHistory[] = [];
@@ -162,7 +161,6 @@ export class DebtorCasesComponent implements OnInit {
     this.loadTranslations();
     });
 
-
     this.loadDossiers();
   }
 
@@ -178,9 +176,6 @@ export class DebtorCasesComponent implements OnInit {
     }
 
     const debiteurNodeId = currentUser.nodeId;
-    console.log('Débiteur connecté :', currentUser);
-    console.log('debiteurNodeId envoyé :', debiteurNodeId);
-
     // Verification si l'utilisateur connecté à un NodeId
     if (!debiteurNodeId) {
       this.errorMessage = 'Identifiant du débiteur introuvable.';
@@ -191,7 +186,6 @@ export class DebtorCasesComponent implements OnInit {
     // Appel du web service pour la récupération des dossiers du débiteur
     this.casesService.getDossiersDebiteur(siteName, debiteurNodeId).subscribe({
       next: (response) => {
-        console.log('Réponse API dossiers :', response);
         this.dossiers = response.data?.map((item: any) => item.map) || [];
         this.filteredDossiers = [...this.dossiers];
 
@@ -201,7 +195,6 @@ export class DebtorCasesComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des dossiers :', error);
         this.errorMessage = 'Impossible de récupérer les dossiers.';
         this.isLoading = false;
       }
@@ -220,7 +213,6 @@ export class DebtorCasesComponent implements OnInit {
   // Lorsque le bouton "Détails" est cliqué
   viewDossierDetails(dossier: any): void {
     this.selectedDetailCase = dossier;
-    console.log("this.selectedDetailCase", this.selectedDetailCase);
     this.showCaseDetailsModal = true; // Afficher le tiroir
   }
 
@@ -238,9 +230,10 @@ export class DebtorCasesComponent implements OnInit {
   private loadTranslations() {
     const locale = this.i18nService.getCurrentLocale();
     this.i18nService.loadTranslations(locale).subscribe(translations => {
-      this.translations = translations;
+    this.translations = translations;
     });
   }
+
   t(key: string): string {
     return this.i18nService.translate(key, this.translations);
   }
@@ -298,7 +291,6 @@ export class DebtorCasesComponent implements OnInit {
   }
 
   downloadCaseReport(case_: DebtCase) {
-    console.log('Télécharger rapport pour:', case_.caseNumber);
   }
 
   // Appliquer les filtres (recherche, statut, priorité)
@@ -578,7 +570,7 @@ export class DebtorCasesComponent implements OnInit {
     return totalDue - paid;
   }
 
-  // Version formatée du reste à payer (utilise celle-ci dans ton template)
+  // Version formatée du reste à payer
   getFormattedRemainingAmountWithDetails(dossier: any): string {
     const remaining = this.calculateRemainingAmount(dossier);
     return this.formatCurrency(remaining);
@@ -740,26 +732,18 @@ export class DebtorCasesComponent implements OnInit {
   extractDocuments() {
     this.allDocuments = [];
     
-    console.log('Début extraction des documents...');
-    console.log('Nombre de dossiers à traiter:', this.dossiers.length);
-    
     // Parcourir tous les dossiers pour extraire leurs documents
     this.dossiers.forEach(dossier => {
-      console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsDebiteur?.myArrayList);
       
       // Vérifier si le dossier a des documents débiteur
       if (dossier.documentsDebiteur?.myArrayList && Array.isArray(dossier.documentsDebiteur.myArrayList)) {
         dossier.documentsDebiteur.myArrayList.forEach((doc: any) => {
           // VÉRIFICATION CRITIQUE : s'assurer que doc n'est pas null
           if (!doc) {
-            console.log('Document null ignoré');
             return; // Passer au document suivant
           }
           
-          console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
-          
           const mappedType = this.mapDocumentType(doc.typeDocument);
-          console.log('Type mappé:', mappedType);
           
           this.allDocuments.push({
             id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
@@ -772,16 +756,13 @@ export class DebtorCasesComponent implements OnInit {
           });
         });
       } else {
-        console.log('Aucun document trouvé pour le dossier:', dossier.numeroDossier);
       }
     });
     
     this.filteredDocuments = [...this.allDocuments];
-    console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
   }
 
   mapDocumentType(apiType: string): DocumentType {
-    console.log('Mapping du type:', apiType);
     
     // Normaliser le type (enlever espaces, mettre en majuscules)
     const normalizedType = (apiType || '').trim().toUpperCase();
@@ -802,7 +783,6 @@ export class DebtorCasesComponent implements OnInit {
     };
     
     const result = typeMapping[normalizedType] || DocumentType.CORRESPONDENCE;
-    console.log('Résultat du mapping:', normalizedType, '->', result);
     
     return result;
   }
@@ -853,7 +833,6 @@ export class DebtorCasesComponent implements OnInit {
 
 // Méthode pour visualiser un document
   viewDocument(doc: any) {
-    console.log('Visualisation du document:', doc);
 
     const documentIdentifier = doc.nodeId || doc.id; //  fallback si nodeId absent
     
@@ -878,11 +857,9 @@ export class DebtorCasesComponent implements OnInit {
         // Ouvrir la modale de visualisation
         this.showDocumentViewer = true;
         
-        console.log('Document chargé avec succès. Type:', blob.type);
       },
       error: (error) => {
         this.isLoadingDocument = false;
-        console.error('Erreur lors du chargement du document:', error);
         alert('Impossible de charger le document. Veuillez réessayer.');
       }
     });
@@ -901,7 +878,6 @@ export class DebtorCasesComponent implements OnInit {
 
   // Méthode pour télécharger un document
   downloadDocument(doc: any) {
-    console.log('Téléchargement du document:', doc);
     
     if (!doc.id) {
       alert('Identifiant du document manquant');
@@ -958,17 +934,13 @@ export class DebtorCasesComponent implements OnInit {
     this.uploadErrorMessages.file = 'Veuillez sélectionner un fichier';
     isValid = false;
     console.log('Erreur file');
-  }
-
-  console.log('Validation résultat:', isValid, 'isLoading:', this.isLoading); 
+  } 
 
   if (!isValid || this.isLoading) {
-    console.log('Arrêt: validation échouée ou en cours de chargement');
     return;
   }
 
   this.isLoading = true;
-  console.log('Début de l\'upload...');
 
   const formData = new FormData();
   formData.append('filedata', this.selectedFile!);
@@ -985,10 +957,8 @@ export class DebtorCasesComponent implements OnInit {
   this.casesService.uploadDocument(formData, params).subscribe({
     next: (response) => {
       this.isLoading = false;
-      console.log(' Document uploadé:', response);
 
       const uploadedFile = response.files[0];
-      
       // FORCER le nom original peu importe ce que retourne Alfresco
       const newDoc: CaseDocument & { caseId: string } = {
         id: uploadedFile.documentNodeId,
@@ -1017,13 +987,12 @@ export class DebtorCasesComponent implements OnInit {
     },
     error: (error) => {
       this.isLoading = false;
-      console.error('Erreur lors de l\'upload:', error);
       alert('Erreur lors de l\'upload du document. Veuillez réessayer.');
     }
   });
   }
 
-    // Ajoutez cette méthode pour réinitialiser les erreurs
+  // Ajoutez cette méthode pour réinitialiser les erreurs
   resetUploadErrors(): void {
     this.uploadFormErrors = {
       type: false,
@@ -1049,8 +1018,6 @@ export class DebtorCasesComponent implements OnInit {
     // Appel du service pour supprimer le document
     this.casesService.deleteDocument(doc.id).subscribe({
       next: (response) => {
-        console.log('Document supprimé avec succès:', response);
-        
         // Supprimer le document des tableaux locaux
         this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
         this.filteredDocuments = this.filteredDocuments.filter(d => d.id !== doc.id);
@@ -1132,21 +1099,6 @@ export class DebtorCasesComponent implements OnInit {
     }
   }
 
-
-  // Ajout methode end
-  // Méthode pour filtrer les documents du dossier sélectionné
-  // openDocumentsModal() {
-  //   if (this.selectedDetailCase) {
-  //     // Filtrer uniquement les documents du dossier sélectionné
-  //     this.filteredDocuments = this.allDocuments.filter(
-  //       doc => doc.caseId === this.selectedDetailCase.nodeId
-  //     );
-  //   } else {
-  //     // Afficher tous les documents
-  //     this.filteredDocuments = [...this.allDocuments];
-  //   }
-  //   this.showDocumentsModal = true;
-  // }
   openDocumentsModal() {
     if (this.selectedIndex !== null) {
       this.selectedDetailCase = this.filteredDossiers[this.selectedIndex];

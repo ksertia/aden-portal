@@ -80,6 +80,30 @@ export class CreditorCasesComponent implements OnInit {
   isLoadingDocument = false;
   safePdfUrl: SafeResourceUrl | null = null;
 
+
+  // Propriétés pour les messages temporaires ( ajout ou suppression reussi ou achouer d'un document)
+  showUploadSuccess = false;
+  uploadSuccessMessage = '';
+  showDeleteSuccess = false;
+  deleteSuccessMessage = '';
+
+  // Propriétés pour la validation des champs avec mise en évidence rouge et messages d'erreur
+  uploadFormErrors = {
+    type: false,
+    name: false,
+    file: false
+  };
+
+  uploadErrorMessages = {
+    type: '',
+    name: '',
+    file: ''
+  };
+
+  // Methode du modal de suppression d\'un document
+  showDeleteConfirmation = false;
+  documentToDelete: any = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -107,9 +131,6 @@ export class CreditorCasesComponent implements OnInit {
     }
 
     const creancierNodeId = currentUser.nodeId;
-    console.log('Créancier connecté :', currentUser);
-    console.log('creancierNodeId envoyé :', creancierNodeId);
-
     // Verification si l'utilisateur connecté à un NodeId
     if (!creancierNodeId) {
       this.errorMessage = 'Identifiant du créancier introuvable.';
@@ -120,7 +141,6 @@ export class CreditorCasesComponent implements OnInit {
     // Appel du web service pour la recuperation des dossiers du creanciers
     this.casesService.getDossiersCreancier(siteName, creancierNodeId).subscribe({
       next: (response) => {
-        console.log('Réponse API dossiers :', response);
 
         // Étape 1 : extraction correcte du tableau de dossiers
         const dossiers = response.data?.map((item: any) => item.map) || [];
@@ -132,7 +152,6 @@ export class CreditorCasesComponent implements OnInit {
 
         // Étape 3 : initialisation du tableau filtré
         this.filteredDossiers = [...this.dossiers];
-        console.log('Dossiers filtrés pour ce créancier :', this.dossiers);
 
         // IMPORTANT: Extraire les documents après avoir chargé les dossiers
         this.extractDocuments();
@@ -140,7 +159,6 @@ export class CreditorCasesComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des dossiers :', error);
         this.errorMessage = 'Impossible de récupérer les dossiers.';
         this.isLoading = false;
       }
@@ -229,6 +247,7 @@ export class CreditorCasesComponent implements OnInit {
   getTotalPaid(): number {
     return this.filteredDossiers.reduce((acc, d) => acc + (d.montantPaye || 0), 0);
   }
+
   getFormattedRemainingAmount(dossier: any): string {
     const reste = (dossier.montantTotal || 0) - (dossier.montantPaye || 0);
     return reste.toLocaleString('fr-FR', { style: 'currency', currency: 'XOF' });
@@ -291,12 +310,10 @@ export class CreditorCasesComponent implements OnInit {
     this.selectedIndex = index;
     const dossier = this.filteredDossiers[index];
     
-    // IMPORTANT: Stocker le dossier sélectionné
+    // Stocke le dossier sélectionné
     this.selectedDetailCase = dossier;
     
     this.selectedDebtor = this.getDebiteurForDossier(dossier);
-    console.log("selectedDebtor", this.selectedDebtor);
-    console.log("selectedDetailCase", this.selectedDetailCase);
     
     this.showDrawer = true;
   }
@@ -314,7 +331,6 @@ export class CreditorCasesComponent implements OnInit {
   }
 
   downloadCaseReport(case_: DebtCase) {
-    console.log('Télécharger rapport pour:', case_.caseNumber);
   }
 
   generateCustomReport() {
@@ -341,21 +357,14 @@ export class CreditorCasesComponent implements OnInit {
   extractDocuments() {
     this.allDocuments = [];
     
-    console.log('Début extraction des documents...');
-    console.log('Nombre de dossiers à traiter:', this.dossiers.length);
-    
     // Parcourir tous les dossiers pour extraire leurs documents
     this.dossiers.forEach(dossier => {
-      console.log('Dossier:', dossier.numeroDossier, 'Documents:', dossier.documentsCreancier?.myArrayList);
       
       // Vérifier si le dossier a des documents creéancier
       if (dossier.documentsCreancier?.myArrayList && Array.isArray(dossier.documentsCreancier.myArrayList)) {
         dossier.documentsCreancier.myArrayList.forEach((doc: any) => {
-          console.log('Document trouvé:', doc.fileName, 'Type:', doc.typeDocument);
           
           const mappedType = this.mapDocumentType(doc.typeDocument);
-          console.log('Type mappé:', mappedType);
-          
           this.allDocuments.push({
             id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
             name: doc.fileName || doc.name || 'Document sans nom',
@@ -370,11 +379,9 @@ export class CreditorCasesComponent implements OnInit {
     });
     
     this.filteredDocuments = [...this.allDocuments];
-    console.log('Documents extraits (total):', this.allDocuments.length, this.allDocuments);
   }
 
   mapDocumentType(apiType: string): DocumentType {
-    console.log('Mapping du type:', apiType);
     
     // Normaliser le type (enlever espaces, mettre en majuscules)
     const normalizedType = (apiType || '').trim().toUpperCase();
@@ -395,8 +402,7 @@ export class CreditorCasesComponent implements OnInit {
     };
     
     const result = typeMapping[normalizedType] || DocumentType.CORRESPONDENCE;
-    console.log('Résultat du mapping:', normalizedType, '->', result);
-    
+ 
     return result;
   }
 
@@ -443,41 +449,28 @@ export class CreditorCasesComponent implements OnInit {
     };
     return labels[type] || type;
   }
-  // onFileSelected(event: any) {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     this.selectedFile = file;
-  //     if (!this.newDocument.name) {
-  //       this.newDocument.name = file.name;
-  //     }
-  //   }
-  // }
 
-  // isUploadValid(): boolean {
-  //   return !!(this.newDocument.caseId && this.newDocument.type && this.newDocument.name && this.selectedFile);
-  // }
-
-  // uploadDocument() {
-  // }
   onFileSelected(event: any) {
-  const file = event.target.files[0];
-  if (file) {
-    this.selectedFile = file;
-    console.log('Fichier sélectionné:', {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      extension: file.name.split('.').pop()
-    });
-    
-    if (!this.newDocument.name) {
-      this.newDocument.name = file.name;
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      
+      if (!this.newDocument.name) {
+        this.newDocument.name = file.name;
+      }
+
+      // Réinitialiser l'erreur du fichier si un fichier est sélectionné
+      this.uploadFormErrors.file = false;
+      this.uploadErrorMessages.file = '';
+    }else {
+      // Marquer comme erreur si aucun fichier n'est sélectionné
+      this.uploadFormErrors.file = true;
+      this.uploadErrorMessages.file = 'Veuillez sélectionner un fichier';
     }
-  }
   }
 
   // Méthode améliorée pour la validation
-  isUploadValid(): boolean {
+   isUploadValid(): boolean {
     return !!(
       this.selectedDetailCase?.nodeId && 
       this.newDocument.type && 
@@ -487,7 +480,7 @@ export class CreditorCasesComponent implements OnInit {
   }
 
   // Méthode pour s'assurer qu'un dossier est sélectionné
-  ensureCaseSelected(): boolean {
+   ensureCaseSelected(): boolean {
     if (!this.selectedDetailCase) {
       alert('Veuillez d\'abord sélectionner un dossier');
       return false;
@@ -496,96 +489,153 @@ export class CreditorCasesComponent implements OnInit {
   }
 
   uploadDocument() {
-  if (!this.isUploadValid() || this.isLoading) return;
 
-  this.isLoading = true;
+    // Réinitialiser les erreurs
+    this.resetUploadErrors();
 
-  const formData = new FormData();
-  formData.append('filedata', this.selectedFile!);
+    // Valider les champs
+    let isValid = true;
 
-  const params = {
-    objetNodeId: this.selectedDetailCase.nodeId,
-    fieldName: 'documentsCreancier', 
-    typeDocument: this.newDocument.type
-  };
-
-  // SAUVEGARDER le nom original AVANT l'upload
-  const originalFileName = this.selectedFile!.name;
-
-  this.casesService.uploadDocument(formData, params).subscribe({
-    next: (response) => {
-      this.isLoading = false;
-      console.log('Document uploadé:', response);
-
-      const uploadedFile = response.files[0];
-      
-      // FORCER le nom original peu importe ce que retourne Alfresco
-      const newDoc: CaseDocument & { caseId: string } = {
-        id: uploadedFile.documentNodeId,
-        name: originalFileName, // TOUJOURS le nom original du fichier
-        type: this.mapDocumentType(uploadedFile.typeDocument),
-        url: '#',
-        uploadedAt: new Date(),
-        uploadedBy: 'Utilisateur actuel',
-        caseId: this.selectedDetailCase.nodeId,
-        // originalData: uploadedFile
-      };
-
-      this.allDocuments.push(newDoc);
-      this.filteredDocuments.push(newDoc);
-      
-      this.closeUploadModal();
-      this.filterDocuments();
-      alert('Document ajouté avec succès!');
-    },
-    error: (error) => {
-      this.isLoading = false;
-      console.error('Erreur lors de l\'upload:', error);
-      alert('Erreur lors de l\'upload du document. Veuillez réessayer.');
+    if (!this.newDocument.type) {
+      this.uploadFormErrors.type = true;
+      this.uploadErrorMessages.type = 'Veuillez sélectionner un type de document';
+      isValid = false;
     }
-  });
-}
+
+    if (!this.newDocument.name || this.newDocument.name.trim() === '') {
+      this.uploadFormErrors.name = true;
+      this.uploadErrorMessages.name = 'Veuillez saisir un nom pour le document';
+      isValid = false;
+    }
+
+    if (!this.selectedFile) {
+      this.uploadFormErrors.file = true;
+      this.uploadErrorMessages.file = 'Veuillez sélectionner un fichier';
+      isValid = false;
+    } 
+
+    if (!isValid || this.isLoading) {
+      return;
+    }
+
+    this.isLoading = true;
+
+    const formData = new FormData();
+    formData.append('filedata', this.selectedFile!);
+
+    const params = {
+      objetNodeId: this.selectedDetailCase.nodeId,
+      fieldName: 'documentsCreancier', 
+      typeDocument: this.newDocument.type
+    };
+
+    // SAUVEGARDER le nom original AVANT l'upload
+    const originalFileName = this.selectedFile!.name;
+
+    this.casesService.uploadDocument(formData, params).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+
+        const uploadedFile = response.files[0];
+        // FORCER le nom original peu importe ce que retourne Alfresco
+        const newDoc: CaseDocument & { caseId: string } = {
+          id: uploadedFile.documentNodeId,
+          name: originalFileName, // TOUJOURS le nom original du fichier
+          type: this.mapDocumentType(uploadedFile.typeDocument),
+          url: '#',
+          uploadedAt: new Date(),
+          uploadedBy: 'Utilisateur actuel',
+          caseId: this.selectedDetailCase.nodeId,
+        };
+
+        this.allDocuments.push(newDoc);
+        this.filteredDocuments.push(newDoc);
+        
+        // AFFICHER LE MESSAGE DE SUCCÈS DANS LA MODALE
+        this.showUploadSuccess = true;
+        this.uploadSuccessMessage = 'Document ajouté avec succès!';
+        
+        // Fermer la modale d'upload après 3 secondes
+        setTimeout(() => {
+          this.showUploadSuccess = false;
+          this.uploadSuccessMessage = '';
+          this.closeUploadModal();
+          // this.filterDocuments();
+        }, 3000);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        alert('Erreur lors de l\'upload du document. Veuillez réessayer.');
+      }
+    });
+  }
+
+  // Ajoutez cette méthode pour réinitialiser les erreurs
+  resetUploadErrors(): void {
+    this.uploadFormErrors = {
+      type: false,
+      name: false,
+      file: false
+    };
+    this.uploadErrorMessages = {
+      type: '',
+      name: '',
+      file: ''
+    };
+  }
 
   deleteDocument(doc: CaseDocument & { caseId: string }) {
-  // Confirmation avant suppression
-  const confirmed = confirm(`Êtes-vous sûr de vouloir supprimer le document "${doc.name}" ?`);
-  
-  if (!confirmed) {
-    return;
-  }
 
-  console.log('Suppression du document:', doc);
-
-  // Vérifier que le document a un ID
-  if (!doc.id) {
-    alert('Impossible de supprimer le document : identifiant manquant');
-    return;
-  }
-
-  // Appel du service pour supprimer le document
-  this.casesService.deleteDocument(doc.id).subscribe({
-    next: (response) => {
-      console.log('Document supprimé avec succès:', response);
-      
-      // Supprimer le document des tableaux locaux
-      this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
-      this.filteredDocuments = this.filteredDocuments.filter(d => d.id !== doc.id);
-      
-      // Mettre à jour l'affichage
-      this.filterDocuments();
-      
-      // Afficher un message de succès
-      alert('Document supprimé avec succès!');
-    },
-    error: (error) => {
-      console.error('Erreur lors de la suppression:', error);
-      alert('Erreur lors de la suppression du document. Veuillez réessayer.');
+    // Vérifier que le document a un ID
+    if (!doc.id) {
+      alert('Impossible de supprimer le document : identifiant manquant');
+      return;
     }
-  });
-}
+
+    // Appel du service pour supprimer le document
+    this.casesService.deleteDocument(doc.id).subscribe({
+      next: (response) => {
+        
+        // Supprimer le document des tableaux locaux
+        this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
+        this.filteredDocuments = this.filteredDocuments.filter(d => d.id !== doc.id);
+        
+        // AFFICHER LE MESSAGE DE SUCCÈS POUR LA SUPPRESSION
+        this.showDeleteSuccess = true;
+        this.deleteSuccessMessage = 'Document supprimé avec succès!';
+
+        // Cacher le message après 3 secondes
+        setTimeout(() => {
+          this.showDeleteSuccess = false;
+          this.deleteSuccessMessage = '';
+        }, 3000);
+      },
+      error: (error) => {
+        alert('Erreur lors de la suppression du document. Veuillez réessayer.');
+      }
+    });
+  }
+
+ // Methode du modal de suppression d\'un document
+  confirmDeleteDocument(doc: any): void {
+    this.documentToDelete = doc;
+    this.showDeleteConfirmation = true;
+  }
+
+  executeDelete(): void {
+    if (this.documentToDelete) {
+      this.deleteDocument(this.documentToDelete);
+      this.showDeleteConfirmation = false;
+      this.documentToDelete = null;
+    }
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirmation = false;
+    this.documentToDelete = null;
+  }
 
   closeUploadModal() {
-    console.log('Fermeture de la modal d\'upload');
     this.showUploadModal = false;
     this.selectedFile = null;
     this.newDocument = {
@@ -593,14 +643,37 @@ export class CreditorCasesComponent implements OnInit {
       type: '',
       name: ''
     };
+    // RÉINITIALISER LE MESSAGE DE SUCCÈS
+    this.showUploadSuccess = false;
+    this.uploadSuccessMessage = '';
+    this.resetUploadErrors(); // Réinitialiser les erreurs
   }
-  
 
   // Fonction pour fermer la modal des documents
   closeDocumentsModal() {
     this.showDocumentsModal = false;
+    // RÉINITIALISER LE MESSAGE DE SUPPRESSION
+    this.showDeleteSuccess = false;
+    this.deleteSuccessMessage = '';
   }
 
+  // Méthode pour valider en temps réel
+  validateField(fieldName: keyof typeof this.uploadFormErrors): void {
+    switch (fieldName) {
+      case 'type':
+        this.uploadFormErrors.type = !this.newDocument.type;
+        this.uploadErrorMessages.type = this.uploadFormErrors.type ? 'Veuillez sélectionner un type de document' : '';
+        break;
+      case 'name':
+        this.uploadFormErrors.name = !this.newDocument.name || this.newDocument.name.trim() === '';
+        this.uploadErrorMessages.name = this.uploadFormErrors.name ? 'Veuillez saisir un nom pour le document' : '';
+        break;
+      case 'file':
+        this.uploadFormErrors.file = !this.selectedFile;
+        this.uploadErrorMessages.file = this.uploadFormErrors.file ? 'Veuillez sélectionner un fichier' : '';
+        break;
+    }
+  }
 
   // Ajout methode end
   openDocumentsModal() {
@@ -613,8 +686,7 @@ export class CreditorCasesComponent implements OnInit {
       this.filteredDocuments = this.allDocuments.filter(
         doc => doc.caseId === this.selectedDetailCase.nodeId
       );
-      
-      console.log('Documents du dossier', this.selectedDetailCase.numeroDossier, ':', this.filteredDocuments);
+    
     } else {
       // Afficher tous les documents si aucun dossier n'est sélectionné
       this.filteredDocuments = [...this.allDocuments];
@@ -631,7 +703,6 @@ export class CreditorCasesComponent implements OnInit {
 
   // Méthode pour visualiser un document
   viewDocument(doc: any) {
-    console.log('Visualisation du document:', doc);
 
     const documentIdentifier = doc.nodeId || doc.id; //  fallback si nodeId absent
     
@@ -655,12 +726,9 @@ export class CreditorCasesComponent implements OnInit {
         
         // Ouvrir la modale de visualisation
         this.showDocumentViewer = true;
-        
-        console.log('Document chargé avec succès. Type:', blob.type);
       },
       error: (error) => {
         this.isLoadingDocument = false;
-        console.error('Erreur lors du chargement du document:', error);
         alert('Impossible de charger le document. Veuillez réessayer.');
       }
     });
@@ -679,13 +747,11 @@ export class CreditorCasesComponent implements OnInit {
 
   // Méthode pour télécharger un document
   downloadDocument(doc: any) {
-    console.log('Téléchargement du document:', doc);
     
     if (!doc.id) {
       alert('Identifiant du document manquant');
       return;
     }
-
     this.casesService.downloadDocument(doc.id, doc.name);
   }
 

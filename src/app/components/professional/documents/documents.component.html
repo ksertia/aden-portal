@@ -263,8 +263,8 @@
     </ng-template>
   </div>
 
-  <!-- Modal d'upload CORRIGÉ -->
-  <div class="modal-overlay" *ngIf="showUploadModal" (click)="closeUploadModal()">
+  <!-- Modal d'upload -->
+  <div class="modal-overlay" *ngIf="showUploadModal">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Ajouter un document</h3>
