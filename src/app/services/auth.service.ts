@@ -205,6 +205,7 @@ export class AuthService {
     email?: string;
     Phone?: string;
     photo?: File;
+    password?: string; // facultatif, seulement si l'utilisateur veut changer son mot de passe
   }
 ): Observable<{ message?: string; user?: User }> {
   const token = this.getToken();
@@ -221,6 +222,9 @@ export class AuthService {
   if (userData.email != null) formData.append("email", userData.email);
   if (userData.Phone != null) formData.append("Phone", userData.Phone);
   if (userData.photo) formData.append("photo", userData.photo, userData.photo.name);
+  
+  // ✅ Ajout du mot de passe seulement si fourni
+  if (userData.password) formData.append("password", userData.password);
 
   // Headers (ne PAS mettre 'Content-Type' pour FormData)
   const headers = new HttpHeaders({
