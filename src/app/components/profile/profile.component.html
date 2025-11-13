@@ -2,7 +2,7 @@
   <div class="ph1">
     <button class="btn btn-secondary" (click)="goBackToDashboard()">Retour</button>
   </div>
-
+  
   <div class="profile-content fade-in-up" *ngIf="user">
     <div class="profile-card">
       <!-- Avatar et infos simples -->
@@ -23,7 +23,7 @@
       <form (ngSubmit)="onSubmitProfile()" class="profile-form" #profileForm="ngForm" novalidate>
         <div class="form-section">
           <h3>{{ t("profile.personal_info") }}</h3>
-
+          
           <div class="form-row">
             <div class="form-group">
               <label for="firstName">{{ t("profile.first_name") }}</label>
@@ -51,15 +51,82 @@
             <span *ngIf="!isUpdating">{{ t("profile.update") }}</span>
             <span *ngIf="isUpdating">{{ t("profile.updating") }}</span>
           </button>
-
-          <button type="button" class="btn btn-outline" (click)="goToChangePassword()">
-            Changer le mot de passe
+          
+          <button type="button" class="btn btn-outline" (click)="togglePasswordForm()">
+            {{ showPasswordForm ? 'Masquer le formulaire' : 'Changer le mot de passe' }}
           </button>
         </div>
       </form>
+
+      <!-- 🔐 FORMULAIRE CHANGEMENT MOT DE PASSE (s'affiche en dessous) -->
+      <div class="password-change-section" *ngIf="showPasswordForm">
+        <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;">
+        
+        <form (ngSubmit)="onSubmitPasswordChange()" #passwordForm="ngForm" novalidate>
+          <h3 style="margin-bottom: 16px; color: #1f2937;">Changer le mot de passe</h3>
+          
+          <div class="form-group">
+            <label for="currentPassword">Mot de passe actuel *</label>
+            <input 
+              type="password" 
+              id="currentPassword" 
+              [(ngModel)]="passwordData.currentPassword" 
+              name="currentPassword" 
+              required 
+              autocomplete="current-password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">Nouveau mot de passe * (min. 8 caractères)</label>
+            <input 
+              type="password" 
+              id="newPassword" 
+              [(ngModel)]="passwordData.newPassword" 
+              name="newPassword" 
+              required 
+              minlength="8"
+              autocomplete="new-password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="passwordConfirmation">Confirmer le nouveau mot de passe *</label>
+            <input 
+              type="password" 
+              id="passwordConfirmation" 
+              [(ngModel)]="passwordData.passwordConfirmation" 
+              name="passwordConfirmation" 
+              required 
+              autocomplete="new-password"
+            />
+          </div>
+
+          <div class="form-actions" style="gap: 12px; margin-top: 16px;">
+            <button 
+              type="submit" 
+              class="btn btn-primary" 
+              [disabled]="isChangingPassword"
+            >
+              <span *ngIf="!isChangingPassword">Valider</span>
+              <span *ngIf="isChangingPassword">Changement en cours...</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              (click)="cancelPasswordChange()"
+              [disabled]="isChangingPassword"
+            >
+              Annuler
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
+  <!-- Message de succès (profil) -->
   <div class="success-message" *ngIf="updateSuccess">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M9 12l2 2 4-4" />
@@ -67,6 +134,13 @@
     </svg>
     {{ t("profile.success") }}
   </div>
+
+  <!-- Message de succès (mot de passe changé) -->
+  <div class="success-message" *ngIf="passwordChangeSuccess">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 12l2 2 4-4" />
+      <circle cx="12" cy="12" r="9" />
+    </svg>
+    Mot de passe changé avec succès ! Redirection...
+  </div>
 </div>
-
-

@@ -114,35 +114,6 @@ export class AuthService {
    * @param userId - ID de l'utilisateur
    * @param userData - Données à mettre à jour (firstname, lastname, Phone, etc.)
    */
-  updateProfile(
-    userId: number,
-    userData: Partial<User>
-  ): Observable<{ message: string; user: User }> {
-    const token = this.getToken();
-    if (!token) {
-      return throwError(() => new Error("Utilisateur non connecté"));
-    }
-
-    return this.http
-      .put<{ message: string; user: User }>(
-        `${this.apiUrl}/users/${userId}`,
-        userData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      )
-      .pipe(
-        tap((response) => {
-          // Mise à jour du profil local
-          localStorage.setItem("currentUser", JSON.stringify(response.user));
-          this.currentUserSubject.next(response.user);
-        }),
-        catchError((error) => {
-          console.error("❌ Erreur mise à jour profil:", error);
-          return throwError(() => error);
-        })
-      );
-  }
 
   // ==================== GESTION DES MOTS DE PASSE ====================
 
@@ -197,59 +168,42 @@ export class AuthService {
       passwordConfirmation,
     });
   }
-  updateProfileMultipart(
+  updateProfile(
   userId: number,
-  userData: {
-    firstname?: string;
-    lastname?: string;
-    email?: string;
-    Phone?: string;
-    photo?: File;
-    password?: string; // facultatif, seulement si l'utilisateur veut changer son mot de passe
-  }
-): Observable<{ message?: string; user?: User }> {
+  userData: Partial<User>
+): Observable<{ message: string; user: User }> {
   const token = this.getToken();
   
   if (!token) {
     console.error("Token manquant ou expiré !");
-    return throwError(() => new Error("Utilisateur non connecté ou token manquant"));
+    return throwError(() => new Error("Utilisateur non connecté"));
   }
 
-  // Création du FormData
-  const formData = new FormData();
-  if (userData.firstname != null) formData.append("firstname", userData.firstname);
-  if (userData.lastname != null) formData.append("lastname", userData.lastname);
-  if (userData.email != null) formData.append("email", userData.email);
-  if (userData.Phone != null) formData.append("Phone", userData.Phone);
-  if (userData.photo) formData.append("photo", userData.photo, userData.photo.name);
-  
-  // ✅ Ajout du mot de passe seulement si fourni
-  if (userData.password) formData.append("password", userData.password);
+  console.log("🔄 Envoi updateProfile:", { userId, userData });
 
-  // Headers (ne PAS mettre 'Content-Type' pour FormData)
-  const headers = new HttpHeaders({
-    Authorization: `Bearer ${token}`,
-  });
-
-  console.log("Token envoyé:", token); // debug
-  console.log("FormData envoyé:", formData);
-
-  return this.http.put<{ message?: string; user?: User }>(
-    `${this.apiUrl}/users/${userId}`,
-    formData,
-    { headers }
-  ).pipe(
-    tap((res) => {
-      if (res.user) {
-        localStorage.setItem("currentUser", JSON.stringify(res.user));
-        this.currentUserSubject.next(res.user);
+  return this.http
+    .put<{ message: string; user: User }>(
+      `${this.apiUrl}/users/${userId}`,
+      userData,
+      {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       }
-    }),
-    catchError((err) => {
-      console.error("Erreur updateProfileMultipart:", err);
-      return throwError(() => err);
-    })
-  );
+    )
+    .pipe(
+      tap((response) => {
+        console.log("✅ Profil mis à jour:", response);
+        // Mise à jour du profil local
+        localStorage.setItem("currentUser", JSON.stringify(response.user));
+        this.currentUserSubject.next(response.user);
+      }),
+      catchError((error) => {
+        console.error("❌ Erreur mise à jour profil:", error);
+        return throwError(() => error);
+      })
+    );
 }
 
 }

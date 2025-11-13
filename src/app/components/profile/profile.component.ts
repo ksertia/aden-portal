@@ -20,7 +20,17 @@ export class ProfileComponent implements OnInit {
   translations: any = {};
 
   avatarFile: File | null = null;
-  avatarPreviewUrl: string | null = null; // ✅ ajout pour corriger l'erreur
+  avatarPreviewUrl: string | null = null;
+
+  // 🔐 Gestion changement mot de passe
+  showPasswordForm = false;
+  isChangingPassword = false;
+  passwordChangeSuccess = false;
+  passwordData = {
+    currentPassword: '',
+    newPassword: '',
+    passwordConfirmation: ''
+  };
 
   constructor(
     private authService: AuthService,
@@ -84,40 +94,36 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    // Création de l'objet userData
-    const userData: {
-      firstname?: string;
-      lastname?: string;
-      email?: string;
-      Phone?: string;
-      photo?: File;
-    } = {
+    const userData = {
       firstname: this.user.firstname,
       lastname: this.user.lastname,
       email: this.user.email,
       Phone: this.user.Phone
     };
 
-    if (this.avatarFile) userData.photo = this.avatarFile;
+    console.log("📤 Envoi userData:", userData);
 
-    console.log("Envoi userData:", userData);
-    console.log("User id:", userId);
-
-    // Ici on force le type any pour éviter l'erreur FormData vs objet TS
-    this.authService.updateProfileMultipart(userId, userData as any).subscribe({
-      next: (resp) => {
+    this.authService.updateProfile(userId, userData).subscribe({
+      next: (response) => {
+        console.log("✅ Réponse serveur:", response);
         this.isUpdating = false;
-        if (resp.user) {
-          this.user = resp.user;
+        
+        if (response.user) {
+          this.user = response.user;
         }
+        
         this.showSuccessMessage();
       },
       error: (err) => {
-        console.error("Erreur lors de la mise à jour", err);
+        console.error("❌ Erreur lors de la mise à jour:", err);
         this.isUpdating = false;
-        if (err?.error?.message?.includes("Token invalide")) {
-          alert("Votre session a expiré. Veuillez vous reconnecter.");
+        
+        if (err?.error?.message?.includes("Token invalide") || 
+            err?.error?.message?.includes("Accès refusé")) {
+          alert("Votre session a expiré ou vous n'avez pas les droits. Veuillez vous reconnecter.");
           this.router.navigate(['/login']);
+        } else {
+          alert(err?.error?.message || "Erreur lors de la mise à jour du profil");
         }
       }
     });
@@ -126,6 +132,97 @@ export class ProfileComponent implements OnInit {
   private showSuccessMessage() {
     this.updateSuccess = true;
     setTimeout(() => this.updateSuccess = false, 3000);
+  }
+
+  // 🔐 GESTION CHANGEMENT MOT DE PASSE
+
+  /**
+   * Affiche/masque le formulaire de changement de mot de passe
+   */
+  togglePasswordForm() {
+    this.showPasswordForm = !this.showPasswordForm;
+    
+    // Réinitialiser les champs si on ferme le formulaire
+    if (!this.showPasswordForm) {
+      this.resetPasswordForm();
+    }
+  }
+
+  /**
+   * Annule le changement de mot de passe
+   */
+  cancelPasswordChange() {
+    this.showPasswordForm = false;
+    this.resetPasswordForm();
+  }
+
+  /**
+   * Réinitialise le formulaire de mot de passe
+   */
+  private resetPasswordForm() {
+    this.passwordData = {
+      currentPassword: '',
+      newPassword: '',
+      passwordConfirmation: ''
+    };
+  }
+
+  /**
+   * Soumet le changement de mot de passe
+   */
+  onSubmitPasswordChange() {
+    // Validation des champs
+    if (!this.passwordData.currentPassword || !this.passwordData.newPassword || !this.passwordData.passwordConfirmation) {
+      alert('Tous les champs sont requis');
+      return;
+    }
+
+    // Vérification que les mots de passe correspondent
+    if (this.passwordData.newPassword !== this.passwordData.passwordConfirmation) {
+      alert('Le nouveau mot de passe et la confirmation ne correspondent pas');
+      return;
+    }
+
+    // Vérification longueur minimale
+    if (this.passwordData.newPassword.length < 8) {
+      alert('Le mot de passe doit contenir au moins 8 caractères');
+      return;
+    }
+
+    this.isChangingPassword = true;
+
+    this.authService.changePassword(
+      this.passwordData.currentPassword,
+      this.passwordData.newPassword,
+      this.passwordData.passwordConfirmation
+    ).subscribe({
+      next: (response) => {
+        console.log("✅ Mot de passe changé avec succès:", response);
+        this.isChangingPassword = false;
+        this.passwordChangeSuccess = true;
+
+        // Afficher le message de succès pendant 2 secondes
+        setTimeout(() => {
+          this.passwordChangeSuccess = false;
+          
+          // Déconnexion et redirection vers login
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        }, 2000);
+      },
+      error: (err) => {
+        console.error("❌ Erreur changement mot de passe:", err);
+        this.isChangingPassword = false;
+        
+        const errorMessage = err?.error?.message || err?.error?.error?.message || 'Erreur lors du changement de mot de passe';
+        
+        if (errorMessage.includes('incorrect') || errorMessage.includes('Mot de passe actuel incorrect')) {
+          alert('Le mot de passe actuel est incorrect');
+        } else {
+          alert(errorMessage);
+        }
+      }
+    });
   }
 
   goBackToDashboard(): void {
@@ -145,7 +242,8 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  // ⚠️ Cette méthode n'est plus nécessaire, on utilise togglePasswordForm() maintenant
   goToChangePassword() {
-    this.router.navigate(['/change-password']);
+    this.togglePasswordForm();
   }
 }
