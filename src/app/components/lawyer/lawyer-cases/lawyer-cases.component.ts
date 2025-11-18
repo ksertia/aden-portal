@@ -320,8 +320,22 @@ export class LawyerCasesComponent implements OnInit {
     });
   }
 
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('fr-FR', {
+  // formatDate(date: Date): string {
+  //   return new Date(date).toLocaleDateString('fr-FR', {
+  //     year: 'numeric',
+  //     month: 'long',
+  //     day: 'numeric'
+  //   });
+  // }
+  formatDate(date: Date | string): string {
+    // S'assurer que c'est un objet Date valide
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    
+    if (isNaN(dateObj.getTime())) {
+      return 'Date invalide';
+    }
+    
+    return dateObj.toLocaleDateString('fr-FR', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -451,6 +465,26 @@ generateReport() {
   }
 
 
+  // Méthode utilitaire pour parser les dates de manière sécurisée
+  parseSafeDate(dateString: any): Date {
+    if (!dateString) {
+      return new Date(); // Retourne la date actuelle si aucune date n'est fournie
+    }
+    
+    try {
+      const date = new Date(dateString);
+      // Vérifier si la date est valide
+      if (isNaN(date.getTime())) {
+        console.warn('Date invalide détectée, utilisation de la date actuelle:', dateString);
+        return new Date();
+      }
+      return date;
+    } catch (error) {
+      console.warn('Erreur lors du parsing de la date, utilisation de la date actuelle:', error);
+      return new Date();
+    }
+  }
+
     extractDocuments() {
       this.allDocuments = [];
       
@@ -462,13 +496,32 @@ generateReport() {
           dossier.documentsAvocat.myArrayList.forEach((doc: any) => {
             
             const mappedType = this.mapDocumentType(doc.typeDocument);
+
+            // Gestion robuste de la date
+            let documentDate: Date;
+            try {
+              // Essayer de parser la date depuis l'API
+              if (doc.date || doc.uploadedAt || doc.dateCreation) {
+                documentDate = new Date(doc.date || doc.uploadedAt || doc.dateCreation);
+                // Vérifier si la date est valide
+                if (isNaN(documentDate.getTime())) {
+                  documentDate = new Date(); // Fallback à la date actuelle
+                }
+              } else {
+                documentDate = new Date(); // Fallback si aucune date n'est fournie
+              }
+            } catch (error) {
+              documentDate = new Date(); // Fallback en cas d'erreur
+            }
             
             this.allDocuments.push({
               id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
               name: doc.fileName || doc.name || 'Document sans nom',
               type: mappedType,
               url: doc.url || doc.downloadUrl || '#',
-              uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
+              // Utiliser cette méthode dans extractDocuments()
+              uploadedAt: this.parseSafeDate(doc.date || doc.uploadedAt || doc.dateCreation),
+              // uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now() || documentDate),
               uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
               caseId: dossier.nodeId
             });
@@ -662,6 +715,11 @@ generateReport() {
         console.log('Document uploadé:', response);
 
         const uploadedFile = response.files[0];
+
+        // Récupérer la date du serveur depuis la réponse
+        const serverDate = uploadedFile.dateCreation 
+          ? new Date(uploadedFile.dateCreation) 
+          : new Date(uploadedFile.date || uploadedFile.uploadedAt);
         
         // FORCER le nom original peu importe ce que retourne Alfresco
         const newDoc: CaseDocument & { caseId: string } = {
@@ -669,7 +727,7 @@ generateReport() {
           name: originalFileName, 
           type: this.mapDocumentType(uploadedFile.typeDocument),
           url: '#',
-          uploadedAt: new Date(),
+          uploadedAt: serverDate,
           uploadedBy: 'Utilisateur actuel',
           caseId: this.selectedDetailCase.nodeId,
 
@@ -712,8 +770,7 @@ generateReport() {
     };
   }
 
-
-    deleteDocument(doc: CaseDocument & { caseId: string }) {
+  deleteDocument(doc: CaseDocument & { caseId: string }) {
 
   // Vérifier que le document a un ID
   if (!doc.id) {
@@ -742,7 +799,7 @@ generateReport() {
       alert('Erreur lors de la suppression du document. Veuillez réessayer.');
     }
   });
-    }
+  }
 
 // Methode du modal de suppression d\'un document
   confirmDeleteDocument(doc: any): void {
@@ -750,8 +807,7 @@ generateReport() {
     this.showDeleteConfirmation = true;
   }
 
-
-    executeDelete(): void {
+  executeDelete(): void {
     if (this.documentToDelete) {
       this.deleteDocument(this.documentToDelete);
       this.showDeleteConfirmation = false;
@@ -764,7 +820,7 @@ generateReport() {
     this.documentToDelete = null;
   }
 
-    closeUploadModal() {
+  closeUploadModal() {
     this.showUploadModal = false;
     this.selectedFile = null;
     this.newDocument = {
@@ -778,7 +834,7 @@ generateReport() {
     this.resetUploadErrors(); // Réinitialiser les erreurs
   }
 
-    filterDocuments() {
+  filterDocuments() {
     // this.filteredDocuments = this.allDocuments.filter(doc => {
     //   const matchesSearch = !this.searchTerm || 
     //   doc.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
@@ -817,7 +873,7 @@ generateReport() {
   isDocumentPDF(): boolean {
     return this.documentContentType === 'application/pdf' || 
       this.currentDocument?.name?.toLowerCase().endsWith('.pdf');
-    }
+  }
 
   // Méthode pour vérifier si le document est une image
   isDocumentImage(): boolean {

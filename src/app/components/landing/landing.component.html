@@ -9,10 +9,12 @@
             <path d="M12 8v8"/>
             <path d="m8 14 4 4 4-4"/>
           </svg>
-          <span>RecouvrePro</span>
+          <span>{{ header?.logo }}</span>
+          <!-- <span>RecouvrePro</span> -->
+          <span>{{ header?.logoText }}</span>
         </div>
         <div class="nav-links" *ngIf="nav">
-  <a (click)="scrollToSection('services')">{{ nav?.services }}</a>
+  <a (click)="scrollToSection('services')">{{ nav?.services }}</a> 
   <a (click)="scrollToSection('advantages')">{{ nav?.advantages }}</a>
   <a (click)="scrollToSection('contact')">{{ nav?.contact }}</a>
   <app-language-switcher></app-language-switcher>

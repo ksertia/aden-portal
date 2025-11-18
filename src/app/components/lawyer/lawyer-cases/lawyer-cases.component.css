@@ -168,11 +168,11 @@
   flex-direction: column;
 }
 
-.case-number {
+/* .case-number {
   font-weight: 600;
   color: var(--text);
   font-size: 14px;
-}
+} */
 
 .case-date {
   font-size: 12px;
@@ -183,12 +183,6 @@
   display: flex;
   flex-direction: column;
 }
-
-/* .creditor-name, .debtor-name {
-  font-weight: bold;
-  color: var(--text);
-  font-size: 16px;
-} */
 
 .creditor-contact, .debtor-type {
   font-size: 12px;
@@ -201,7 +195,7 @@
 }
 
 .total-amount {
-  font-weight: bold;
+  /* font-weight: bold; */
   color: var(--text);
   font-size: 14px;
 }
@@ -209,7 +203,7 @@
 .recovered-amount {
   font-size: 12px;
   color: var(--success);
-  font-weight: bold;
+  /* font-weight: bold; */
 }
 
 .priority-badge {
@@ -435,13 +429,12 @@
   font-weight: 600;
   color: var(--text);
 }
+
 .amount-cell.remaining {
   color: var(--warning);
-  font-weight: bold;
+  /* font-weight: bold; */
   font-size: 12px;
 }
-
-
 
 .cases-grid {
   display: grid;
@@ -474,11 +467,6 @@
   color: var(--text);
   margin-bottom: 4px;
 }
-
-/* .debtor-name {
-  font-size: 14px;
-  color: var(--text-secondary);
-} */
 
 .case-badges {
   display: flex;
@@ -790,12 +778,12 @@
   flex: 1;
 }
 
-.debtor-name {
+/* .debtor-name {
   font-size: 18px;
   font-weight: 600;
   color: var(--text);
   margin-bottom: 12px;
-}
+} */
 
 .detail-row {
   display: flex;
