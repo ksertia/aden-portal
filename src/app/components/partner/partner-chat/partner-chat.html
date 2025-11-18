@@ -1,0 +1,136 @@
+<!-- chat-dashboard.component.html -->
+<div class="pc-container">
+    <div class="pc-content">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="chat-wrapper">
+                    <!-- Offcanvas user list -->
+                    <div class="offcanvas-xxl offcanvas-start chat-offcanvas" id="offcanvas_User_list" tabindex="-1">
+                        <div class="offcanvas-header">
+                            <button aria-label="Close" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#offcanvas_User_list"></button>
+                        </div>
+                        <div class="offcanvas-body p-0">
+                            <div class="show collapse collapse-horizontal" id="chat-user_list">
+                                <div class="chat-user_list">
+                                    <div class="card overflow-hidden">
+                                        <div class="card-body">
+                                            <h5 class="mb-4">Messages <span class="avtar avtar-xs bg-light-primary rounded-circle">9</span></h5>
+                                            <div class="form-search"><i class="ti ti-search"></i> <input class="form-control" placeholder="Search Followers" type="search" /></div>
+                                        </div>
+                                        <div class="scroll-block">
+                                            <div class="card-body p-0">
+                                                <div class="list-group list-group-flush">
+                                                    <!-- Liste des utilisateurs -->
+                                                    <a class="list-group-item list-group-item-action p-3" href="#">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="chat-avtar">
+                                                                <img alt="User image" class="rounded-circle img-fluid wid-40" src="assets/images/user/avatar-1.jpg" />
+                                                                <div class="bg-success chat-badge"></div>
+                                                            </div>
+                                                            <div class="flex-grow-1 mx-2">
+                                                                <h6 class="mb-0">John Doe <span class="float-end text-sm text-muted f-w-400">2h ago</span></h6>
+                                                                <span class="text-sm text-muted">Technical Department <span class="float-end"><span class="chat-badge-status bg-danger text-white">9</span></span></span>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                    <!-- Ajoutez ici d'autres utilisateurs -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat content -->
+                    <div class="chat-content">
+                        <div class="card mb-0">
+                            <div class="card-header p-3">
+                                <div class="d-flex align-items-center">
+                                    <ul class="list-inline me-auto mb-0">
+                                        <li class="list-inline-item align-bottom">
+                                            <a class="d-xxl-none avtar avtar-s btn-link-secondary" data-bs-target="#offcanvas_User_list" data-bs-toggle="offcanvas" href="#"><i class="ti ti-menu-2 f-18"></i> </a>
+                                            <a class="d-none d-xxl-inline-flex avtar avtar-s btn-link-secondary" data-bs-target="#chat-user_list" data-bs-toggle="collapse" href="#"><i class="ti ti-menu-2 f-18"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Messages list -->
+                            <div class="scroll-block chat-message">
+                                <div class="card-body">
+                                    <!-- Exemple d'un message sorti -->
+                                    <div class="message-out">
+                                        <div class="d-flex align-items-end flex-column">
+                                            <p class="mb-1 text-muted"><small>9h ago</small></p>
+                                            <div class="message d-flex align-items-end flex-column">
+                                                <div class="d-flex align-items-center mb-1 chat-msg">
+                                                    <div class="flex-shrink-0">
+                                                        <ul class="list-inline ms-auto mb-0 chat-msg-option">
+                                                            <li class="list-inline-item">
+                                                                <div class="dropdown">
+                                                                    <a aria-expanded="false" aria-haspopup="true" class="avtar avtar-xs btn-link-secondary dropdown-toggle arrow-none" data-bs-toggle="dropdown" href="#"><i class="ti ti-dots-vertical f-18"></i></a>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <div class="msg-content bg-primary">
+                                                            <p class="mb-0">Hi...Henny!!</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Exemple d'un message entrant -->
+                                    <div class="message-in">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0">
+                                                <div class="chat-avtar"><img alt="User image" class="rounded-circle img-fluid wid-40" src="assets/images/user/avatar-3.jpg" /> <i class="chat-badge bg-success"></i></div>
+                                            </div>
+                                            <div class="flex-grow-1 mx-3">
+                                                <div class="d-flex align-items-start flex-column">
+                                                    <p class="mb-1 text-muted">Agilulf Fuxg <small>11:23 AM</small></p>
+                                                    <div class="message d-flex align-items-start flex-column">
+                                                        <div class="d-flex align-items-center mb-1 chat-msg">
+                                                            <div class="flex-grow-1 me-3">
+                                                                <div class="msg-content card mb-0">
+                                                                    <p class="mb-0">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer for typing message -->
+                    <div class="card-footer py-2 px-3">
+                        <textarea class="form-control border-0 shadow-none" placeholder="Type a Message" rows="2"></textarea>
+                        <hr class="my-2" />
+                        <div class="d-sm-flex align-items-center">
+                            <ul class="list-inline me-auto mb-0">
+                                <li class="list-inline-item"><a class="avtar avtar-xs btn-link-secondary" href="#"><i class="ti ti-paperclip f-18"></i></a></li>
+                                <li class="list-inline-item"><a class="avtar avtar-xs btn-link-secondary" href="#"><i class="ti ti-photo f-18"></i></a></li>
+                                <li class="list-inline-item"><a class="avtar avtar-xs btn-link-secondary" href="#"><i class="ti ti-mood-smile f-18"></i></a></li>
+                                <li class="list-inline-item"><a class="avtar avtar-xs btn-link-secondary" href="#"><i class="ti ti-volume f-18"></i></a></li>
+                            </ul>
+                            <ul class="list-inline ms-auto mb-0">
+                                <li class="list-inline-item"><a class="avtar avtar-s btn-link-primary" href="#"><i class="ti ti-send f-18"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

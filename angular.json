@@ -70,8 +70,19 @@
             "browser": "src/main.ts",
             "outputPath": "dist/demo",
             "polyfills": ["zone.js"],
-            "scripts": [],
-            "styles": ["src/global_styles.css"],
+            "scripts": [
+              "src/assets/js/plugins/popper.min.js",  
+              "src/assets/js/plugins/bootstrap.min.js", 
+              "src/assets/js/plugins/simplebar.min.js",
+              "src/assets/js/script.js",  
+              "src/assets/js/theme.js"
+            ],
+            "styles": [
+              "src/global_styles.css",
+              "src/assets/fonts/fontawesome.css",
+              "src/assets/fonts/feather.css",
+              "src/assets/fonts/material.css"
+            ],
             "tsConfig": "tsconfig.app.json"
           }
         },
