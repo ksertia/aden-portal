@@ -52,18 +52,36 @@ export class LandingService {
             })
         );
     }
+    
+    // getHeader(locale: string): Observable<Header | null> {
+    //     return this.http.get<StrapiResponse<Header>>(
+    //         `${this.apiUrl}/headers?locale=${locale}&populate=*`
+    //     ).pipe(
+    //         map(res => {
+    //             if (res.data.length > 0) {
+    //                 return res.data[0].attributes || res.data[0] as any;
+    //             }
+    //             return null;
+    //         })
+    //     );
+    // }
     getHeader(locale: string): Observable<Header | null> {
-        return this.http.get<StrapiResponse<Header>>(
+        return this.http.get<any>(
             `${this.apiUrl}/headers?locale=${locale}&populate=*`
         ).pipe(
             map(res => {
-                if (res.data.length > 0) {
-                    return res.data[0].attributes || res.data[0] as any;
-                }
-                return null;
+            if (!res || res.data.length === 0) return null;
+
+            const item = res.data[0]; // Strapi v4 renvoie déjà les données SANS attributes
+
+            return {
+                ...item,          // id, documentId, logoText, etc.
+                logo: item.logo,  // important pour pouvoir accéder à url
+            };
             })
         );
     }
+
 
     getServices(locale: string): Observable<Services | null> {
         return forkJoin({
