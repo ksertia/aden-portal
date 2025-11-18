@@ -22,7 +22,7 @@ export interface Header {
   navAdvantages: string;
   navContact: string;
   navLogin: string;
-  Logo: string;
+  logo: string;
 }
 
 // Service Item individuel
