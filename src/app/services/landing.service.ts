@@ -5,7 +5,8 @@ import { map } from "rxjs/operators";
 import { environment } from "../../environment/environment";
 import { 
   Hero, Nav, Services, ServiceItem, Benefits, BenefitItem, 
-  Statistiques, CTA, Contact, Footer, Common, Sidebar 
+  Statistiques, CTA, Contact, Footer, Common, Sidebar, 
+  Header
 } from "../models/landing.model";
 
 interface StrapiResponse<T> {
@@ -42,6 +43,18 @@ export class LandingService {
     getHero(locale: string): Observable<Hero | null> {
         return this.http.get<StrapiResponse<Hero>>(
             `${this.apiUrl}/heroes?locale=${locale}&populate=*`
+        ).pipe(
+            map(res => {
+                if (res.data.length > 0) {
+                    return res.data[0].attributes || res.data[0] as any;
+                }
+                return null;
+            })
+        );
+    }
+    getHeader(locale: string): Observable<Header | null> {
+        return this.http.get<StrapiResponse<Header>>(
+            `${this.apiUrl}/headers?locale=${locale}&populate=*`
         ).pipe(
             map(res => {
                 if (res.data.length > 0) {

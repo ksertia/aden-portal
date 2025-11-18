@@ -16,6 +16,15 @@ export interface Hero {
   };
 }
 
+export interface Header {
+  logoText: string;
+  navServices: string;
+  navAdvantages: string;
+  navContact: string;
+  navLogin: string;
+  Logo: string;
+}
+
 // Service Item individuel
 export interface ServiceItem {
   id: number;
