@@ -206,6 +206,45 @@ export class AuthService {
     );
 }
 
+uploadAvatar(userId: number, file: File): Observable<{ message: string; user: User }> {
+    const token = this.getToken();
+    
+    if (!token) {
+      console.error("Token manquant ou expiré !");
+      return throwError(() => new Error("Utilisateur non connecté"));
+    }
+
+    // Création du FormData
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    console.log("📸 Upload avatar pour userId:", userId);
+    console.log("📁 Fichier:", file.name, file.type, file.size);
+
+    return this.http
+      .post<{ message: string; user: User }>(
+        `${this.apiUrl}/users/${userId}/avatar`,
+        formData,
+        {
+          headers: { 
+            'Authorization': `Bearer ${token}`
+            // ⚠️ Ne pas ajouter Content-Type, Angular le gère automatiquement avec FormData
+          }
+        }
+      )
+      .pipe(
+        tap((response) => {
+          console.log("✅ Avatar uploadé avec succès:", response);
+          // Mise à jour du profil local
+          localStorage.setItem("currentUser", JSON.stringify(response.user));
+          this.currentUserSubject.next(response.user);
+        }),
+        catchError((error) => {
+          console.error("❌ Erreur upload avatar:", error);
+          return throwError(() => error);
+        })
+      );
+  }
 
 
 }

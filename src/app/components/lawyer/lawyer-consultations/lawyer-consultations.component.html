@@ -1,16 +1,149 @@
 <div class="consultations-container">
   <div class="consultations-header fade-in-up">
-    <h1>Consultations</h1>
-    <p>Gérez vos consultations juridiques</p>
+    <h1>Notes d'honoraires</h1>
+    <p>Gérez vos notes d'honoraires et frais juridiques</p>
   </div>
 
   <div class="consultations-content fade-in-up">
-    <div class="coming-soon">
-      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-      </svg>
-      <h3>Module de consultations en développement</h3>
-      <p>Les outils de gestion des consultations seront bientôt disponibles.</p>
+    <div class="page-title">
+      <h2>Nouvelle note d'honoraires</h2>
+      <button class="btn btn-primary" (click)="toggleView()">
+        {{ showExistingInvoices ? 'Créer une nouvelle note' : 'Voir les notes existantes' }}
+      </button>
+    </div>
+
+    <!-- Formulaire de création -->
+    <div *ngIf="!showExistingInvoices" class="invoice-form-container">
+      <form (ngSubmit)="validateInvoice()" #invoiceForm="ngForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="dossierRef">Référence du dossier</label>
+            <input type="text" id="dossierRef" class="form-control" 
+                   [(ngModel)]="newInvoice.dossierRef" name="dossierRef" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="crediteur">Créditeur concerné</label>
+            <input type="text" id="crediteur" class="form-control"
+                   [(ngModel)]="newInvoice.crediteur" name="crediteur" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="avocat">Avocat (émetteur)</label>
+            <input type="text" id="avocat" class="form-control"
+                   [(ngModel)]="newInvoice.avocat" name="avocat" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="dateEmission">Date d'émission</label>
+            <input type="date" id="dateEmission" class="form-control"
+                   [(ngModel)]="newInvoice.dateEmission" name="dateEmission" required>
+          </div>
+        </div>
+
+        <div class="invoice-details">
+          <h3>Détails de la prestation</h3>
+          
+          <div class="form-group">
+            <label for="typePrestation">Type de prestation</label>
+            <select id="typePrestation" class="form-control"
+                    [(ngModel)]="newInvoice.typePrestation" name="typePrestation" required>
+              <option value="Audience de conciliation">Audience de conciliation</option>
+              <option value="Consultation juridique">Consultation juridique</option>
+              <option value="Rédaction d'acte">Rédaction d'acte</option>
+              <option value="Procédure judiciaire">Procédure judiciaire</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="description">Description de la prestation</label>
+            <textarea id="description" class="form-control" rows="3"
+                      [(ngModel)]="newInvoice.description" name="description" required></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="montantHT">Montant des honoraires (HT)</label>
+            <input type="number" id="montantHT" class="form-control"
+                   [(ngModel)]="newInvoice.montantHT" name="montantHT" 
+                   (input)="calculateTotals()" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="tauxTVA">Taux TVA</label>
+            <input type="number" id="tauxTVA" class="form-control"
+                   [(ngModel)]="newInvoice.tauxTVA" name="tauxTVA"
+                   (input)="calculateTotals()" required>
+          </div>
+        </div>
+
+        <!-- Totaux -->
+        <div class="invoice-totals">
+          <h3>Totaux automatiques</h3>
+          <div class="total-row">
+            <span>Total HT</span>
+            <span>{{ formatAmount(newInvoice.montantHT) }} FCFA</span>
+          </div>
+          <div class="total-row">
+            <span>TVA</span>
+            <span>{{ formatAmount(newInvoice.montantTVA) }} FCFA</span>
+          </div>
+          <div class="total-row">
+            <span>Autres taxes</span>
+            <span>{{ formatAmount(newInvoice.autresTaxes) }} FCFA</span>
+          </div>
+          <div class="total-row total-ttc">
+            <span>Total TTC</span>
+            <span>{{ formatAmount(newInvoice.totalTTC) }} FCFA</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="validationDate">Date de validation</label>
+          <input type="date" id="validationDate" class="form-control"
+                 [(ngModel)]="newInvoice.validationDate" name="validationDate">
+        </div>
+        
+        <div class="form-group">
+          <label>Pièces jointes</label>
+          <input type="file" class="form-control" (change)="onFileSelected($event)">
+        </div>
+        
+        <div class="form-group">
+          <label for="commentaires">Commentaires/Observations</label>
+          <textarea id="commentaires" class="form-control" rows="3"
+                    [(ngModel)]="newInvoice.commentaires" name="commentaires"></textarea>
+        </div>
+        
+        <div class="invoice-actions">
+          <button type="submit" class="btn btn-success" [disabled]="!invoiceForm.valid">
+            Valider
+          </button>
+          <button type="button" class="btn btn-warning" (click)="modifyInvoice()">
+            Modifier
+          </button>
+          <button type="button" class="btn btn-danger" (click)="deleteInvoice()">
+            Supprimer
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Liste des notes existantes -->
+    <div *ngIf="showExistingInvoices" class="existing-invoices">
+      <h2>Liste des notes créées</h2>
+      
+      <div class="invoice-card" *ngFor="let invoice of invoices">
+        <div class="invoice-info">
+          <h3>Note #{{ invoice.dossierRef }}</h3>
+          <p>{{ invoice.crediteur }} - {{ invoice.typePrestation }}</p>
+          <p>Date: {{ invoice.dateEmission }} - Montant: {{ formatAmount(invoice.totalTTC) }} FCFA</p>
+        </div>
+        <div class="invoice-actions-small">
+          <button class="btn btn-primary" (click)="viewInvoice(invoice)">Voir</button>
+          <button class="btn btn-warning" (click)="editInvoice(invoice)">Modifier</button>
+          <button class="btn btn-danger" (click)="deleteInvoice(invoice)">Supprimer</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

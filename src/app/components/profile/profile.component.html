@@ -5,14 +5,56 @@
   
   <div class="profile-content fade-in-up" *ngIf="user">
     <div class="profile-card">
-      <!-- Avatar et infos simples -->
+      <!-- Avatar avec bouton d'édition -->
       <div class="profile-avatar">
-        <div class="avatar-circle" *ngIf="!avatarPreviewUrl">
-          {{ user.firstname.charAt(0) }}{{ user.lastname.charAt(0) }}
+        <div class="avatar-wrapper">
+          <!-- Avatar sans photo -->
+          <div class="avatar-circle" *ngIf="!avatarPreviewUrl">
+            {{ user.firstname?.charAt(0) }}{{ user.lastname?.charAt(0) }}
+          </div>
+          
+          <!-- Avatar avec photo -->
+          <div class="avatar-circle" *ngIf="avatarPreviewUrl">
+            <img [src]="avatarPreviewUrl" alt="avatar" class="avatar-img" />
+          </div>
+
+          <!-- Bouton d'édition (crayon) -->
+          <button 
+            class="avatar-edit-btn" 
+            (click)="triggerFileInput()"
+            [disabled]="isUploadingAvatar"
+            type="button"
+            title="Changer la photo de profil"
+          >
+            <svg 
+              *ngIf="!isUploadingAvatar" 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="14" 
+              height="14" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              stroke-width="2" 
+              stroke-linecap="round" 
+              stroke-linejoin="round"
+            >
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            <!-- Spinner pendant l'upload -->
+            <span *ngIf="isUploadingAvatar" class="spinner-small"></span>
+          </button>
+
+          <!-- Input file caché -->
+          <input 
+            #fileInput
+            type="file" 
+            accept="image/*" 
+            (change)="onFileSelected($event)"
+            style="display: none"
+          />
         </div>
-        <div class="avatar-circle" *ngIf="avatarPreviewUrl">
-          <img [src]="avatarPreviewUrl" alt="avatar" class="avatar-img" />
-        </div>
+
         <div class="avatar-info">
           <h2>{{ user.firstname }} {{ user.lastname }}</h2>
           <p class="role">{{ getUserRoleLabel() }}</p>
@@ -58,7 +100,7 @@
         </div>
       </form>
 
-      <!-- 🔐 FORMULAIRE CHANGEMENT MOT DE PASSE (s'affiche en dessous) -->
+      <!-- 🔐 FORMULAIRE CHANGEMENT MOT DE PASSE -->
       <div class="password-change-section" *ngIf="showPasswordForm">
         <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;">
         
