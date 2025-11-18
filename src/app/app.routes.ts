@@ -31,10 +31,6 @@ export const routes: Routes = [
     loadComponent: () => import('./components/auth/reset-password/reset-password').then(c => c.ResetPassword)
   },
   {
-    path: 'change-password',
-    loadComponent: () => import('./components/auth/change-password/change-password').then(c => c.ChangePassword)
-  },
-  {
     path: 'register',
     loadComponent: () => import('./components/auth/register/register').then(c => c.Register)
   },

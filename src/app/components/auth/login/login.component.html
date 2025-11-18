@@ -33,18 +33,32 @@
         />
       </div>
 
-      <div class="form-group">
-        <label for="password">Mot de passe</label>
-        <input
-          type="password"
-          id="password"
-          [(ngModel)]="credentials.password"
-          name="password"
-          placeholder="Votre mot de passe"
-          required
-          [disabled]="isLoading"
-        />
-      </div>
+      <div class="form-group password-wrapper">
+  <label for="password">Mot de passe</label>
+
+  <input
+    [type]="showPassword ? 'text' : 'password'"
+    id="password"
+    [(ngModel)]="credentials.password"
+    name="password"
+    placeholder="Votre mot de passe"
+    required
+    [disabled]="isLoading"
+  />
+
+  <!-- Icône œil -->
+  <span class="toggle-eye" (click)="showPassword = !showPassword">
+    <svg *ngIf="!showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+
+    <svg *ngIf="showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.87 21.87 0 0 1 5.17-6.88"/>
+      <path d="M1 1l22 22"/>
+    </svg>
+  </span>
+</div>
 
       <!--Lien ajouté ici -->
       <div class="forgot-password">
