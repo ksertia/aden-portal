@@ -1360,3 +1360,246 @@
   background: #FEF2F2;
 }
 /* /* Historique des paiements */ 
+
+/* Styles pour la section reçu */
+.receipt-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.receipt-section h5 {
+  margin-bottom: 1rem;
+  color: #2c5aa0;
+  font-size: 1.2rem;
+}
+
+.receipt-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.receipt-actions .btn {
+  flex: 1;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.receipt-preview {
+  margin-top: 1.5rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  background: white;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.preview-header h6 {
+  margin: 0;
+  color: #2c5aa0;
+}
+
+.close-preview {
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+.close-preview:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.receipt-content {
+  padding: 2rem;
+}
+
+/* Styles du reçu */
+.receipt {
+  font-family: Arial, sans-serif;
+  color: #333;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.receipt-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  border-bottom: 3px solid #2c5aa0;
+  padding-bottom: 1.5rem;
+}
+
+.company-logo h2 {
+  color: #2c5aa0;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.company-logo p {
+  color: #6c757d;
+  margin: 0.25rem 0 0 0;
+}
+
+.receipt-title h1 {
+  color: #333;
+  margin: 1rem 0 0.5rem 0;
+  font-size: 2rem;
+}
+
+.receipt-number {
+  color: #6c757d;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.receipt-info {
+  margin-bottom: 2rem;
+}
+
+.info-section {
+  margin-bottom: 2rem;
+}
+
+.info-section h3 {
+  color: #2c5aa0;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.info-grid, .payment-details, .breakdown {
+  margin-top: 1rem;
+}
+
+.info-item, .detail-row, .breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.info-item .label, .detail-row .label, .breakdown-row .label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.info-item .value, .detail-row .value, .breakdown-row .value {
+  font-weight: 600;
+  color: #333;
+}
+
+.breakdown-row.total {
+  border-top: 2px solid #2c5aa0;
+  padding-top: 1rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-top: 1rem;
+}
+
+.receipt-footer {
+  margin-top: 3rem;
+  border-top: 3px solid #2c5aa0;
+  padding-top: 1.5rem;
+  text-align: center;
+}
+
+.signature p {
+  margin: 0.5rem 0;
+  color: #6c757d;
+}
+
+.security-note {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.security-note p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.verification-link {
+  color: #2c5aa0;
+  font-weight: 500;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  justify-content: center;
+}
+
+/* Spinner pour le téléchargement */
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* États des boutons */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status-completed {
+  color: #28a745;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .receipt-actions {
+    flex-direction: column;
+  }
+  
+  .receipt-actions .btn {
+    min-width: auto;
+  }
+  
+  .preview-actions {
+    flex-direction: column;
+  }
+  
+  .receipt-content {
+    padding: 1rem;
+  }
+  
+  .info-item, .detail-row, .breakdown-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
