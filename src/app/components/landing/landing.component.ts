@@ -99,6 +99,12 @@ export class LandingComponent implements OnInit {
     });
   }
 
+    onImageError(event: any) {
+    console.error('❌ Erreur de chargement de l\'image:', event);
+    // Optionnel: Vous pouvez définir une image de fallback ici
+    // event.target.src = 'assets/images/fallback-logo.png';
+  }
+
   /**
    * Retourne la classe CSS pour l'icône du service en fonction de l'index
    */

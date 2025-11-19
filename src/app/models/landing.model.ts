@@ -17,12 +17,19 @@ export interface Hero {
 }
 
 export interface Header {
-  logoText: string;
-  navServices: string;
-  navAdvantages: string;
-  navContact: string;
-  navLogin: string;
-  logo: string;
+  id?: number;
+  documentId?: string;
+  logoTextPhoto?: string | null;
+  logoText?: string;
+  navServices?: string;
+  navAdvantages?: string;
+  navContact?: string;
+  navLogin?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string;
+  locale?: string;
+  localizations?: any[];
 }
 
 // Service Item individuel
