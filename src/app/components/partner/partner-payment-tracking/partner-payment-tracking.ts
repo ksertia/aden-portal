@@ -5,6 +5,21 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { CaseService } from '../../../services/case.service';
 
+
+// Interface pour les échéances (ajoutez en haut du fichier si nécessaire)
+interface Echeance {
+  id: string;
+  dossierId: string;
+  dossierNumero: string;
+  debiteurName: string;
+  montant: number;
+  dateEcheance: Date;
+  datePaiement?: Date;
+  statut: 'paid' | 'current' | 'future';
+  modePaiement?: string;
+  progress?: number;
+  createdBy: string;
+}
 @Component({
   selector: 'app-partner-payment-tracking',
   standalone: true,
@@ -23,6 +38,82 @@ export class PartnerPaymentTracking implements OnInit {
   totalPayments = 0;
   totalCommissions = 0;
   commissionsReceived = 0;
+
+  // Historique des transactions
+showHistoryDrawer = false;
+searchTerm = '';
+dateFilter = '';
+typeFilter = '';
+statusFilter = '';
+
+// Données d'exemple pour l'historique
+transactionsHistory = [
+  {
+    id: 1,
+    date: new Date('2024-12-01'),
+    reference: 'TXN-001',
+    dossierNumber: 'DOS-001',
+    amount: 1000,
+    paymentType: 'card',
+    status: 'success',
+    currency: 'XOF',
+    debtorCreditor: 'Créancier',
+    invoice: '#FAC-001'
+  },
+  {
+    id: 2,
+    date: new Date('2024-11-28'),
+    reference: 'TXN-002',
+    dossierNumber: 'DOS-001',
+    amount: 500,
+    paymentType: 'mobile',
+    status: 'pending',
+    currency: 'XOF',
+    debtorCreditor: 'Créancier',
+    invoice: '#FAC-001'
+  },
+  {
+    id: 3,
+    date: new Date('2024-11-25'),
+    reference: 'TXN-003',
+    dossierNumber: 'DOS-002',
+    amount: 1000,
+    paymentType: 'card',
+    status: 'failed',
+    currency: 'XOF',
+    debtorCreditor: 'Débiteur',
+    invoice: '#FAC-002'
+  },
+  {
+    id: 4,
+    date: new Date('2024-11-20'),
+    reference: 'TXN-004',
+    dossierNumber: 'DOS-003',
+    amount: 750,
+    paymentType: 'paypal',
+    status: 'success',
+    currency: 'EUR',
+    debtorCreditor: 'Créancier',
+    invoice: '#FAC-003'
+  }
+];
+
+// Suivi des transactions
+showTrackingDrawer = false;
+activePaymentTab: 'paid' | 'current' | 'future' = 'current';
+
+// Données pour le suivi des transactions
+echeances: any[] = [];
+filteredEcheances: any[] = [];
+trackingFilters = {
+  searchTerm: '',
+  status: '',
+  priority: ''
+};
+selectedStatus = '';
+selectedPriority = '';
+
+
 
   // Données de paiement
   showPaymentDrawer = false;
@@ -469,6 +560,25 @@ export class PartnerPaymentTracking implements OnInit {
     }) + ` ${symbol}`;
   }
 
+  formatDate(date: Date | string | null | undefined): string {
+  if (!date) return 'Non définie';
+  
+  try {
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      return 'Date invalide';
+    }
+    
+    return dateObj.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  } catch (error) {
+    return 'Date invalide';
+  }
+}
+
   convertToSelectedCurrency(amountInXOF: number): number {
     if (this.selectedCurrency === 'XOF') return amountInXOF;
     
@@ -534,4 +644,296 @@ export class PartnerPaymentTracking implements OnInit {
     };
     return labels[status] || status;
   }
+
+  // pour le drawer historique
+
+  // Getter pour les transactions filtrées
+get filteredTransactions() {
+  let filtered = this.transactionsHistory;
+
+  // Filtre par recherche
+  if (this.searchTerm) {
+    filtered = filtered.filter(t => 
+      t.reference.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      t.dossierNumber.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  }
+
+  // Filtre par date
+  if (this.dateFilter) {
+    const today = new Date();
+    filtered = filtered.filter(t => {
+      switch (this.dateFilter) {
+        case 'today':
+          return t.date.toDateString() === today.toDateString();
+        case 'week':
+          const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+          return t.date >= weekAgo;
+        case 'month':
+          const monthAgo = new Date(today.getFullYear(), today.getMonth(), 1);
+          return t.date >= monthAgo;
+        case 'last-month':
+          const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+          const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+          return t.date >= lastMonth && t.date < thisMonth;
+        default:
+          return true;
+      }
+    });
+  }
+
+  // Filtre par type
+  if (this.typeFilter) {
+    filtered = filtered.filter(t => t.paymentType === this.typeFilter);
+  }
+
+  // Filtre par statut
+  if (this.statusFilter) {
+    filtered = filtered.filter(t => t.status === this.statusFilter);
+  }
+
+  // Tri chronologique (plus récent en premier)
+  return filtered.sort((a, b) => b.date.getTime() - a.date.getTime());
+}
+
+// Méthodes pour l'historique
+openHistoryDrawer() {
+  this.showHistoryDrawer = true;
+  this.resetHistoryFilters();
+}
+
+closeHistoryDrawer() {
+  this.showHistoryDrawer = false;
+  this.resetHistoryFilters();
+}
+
+resetHistoryFilters() {
+  this.searchTerm = '';
+  this.dateFilter = '';
+  this.typeFilter = '';
+  this.statusFilter = '';
+}
+
+viewTransactionDetails(transaction: any) {
+  console.log('Détails de la transaction:', transaction);
+  // Implémentez la logique pour afficher les détails
+  alert(`Détails de la transaction ${transaction.reference}\nDossier: ${transaction.dossierNumber}\nMontant: ${transaction.amount} ${transaction.currency}\nStatut: ${this.getStatusLabel(transaction.status)}`);
+}
+
+exportToPDF() {
+  console.log('Export PDF des transactions');
+  // Implémentez la logique d'export PDF
+  alert('Fonctionnalité d\'export PDF - À implémenter');
+}
+
+getPaymentMethodLabel(type: string): string {
+  const labels: { [key: string]: string } = {
+    'mobile': 'Mobile Money',
+    'card': 'Carte Bancaire',
+    'paypal': 'PayPal'
+  };
+  return labels[type] || type;
+}
+
+// pour le drawer suivi des paiements
+
+// Méthodes pour le suivi des transactions
+openTrackingDrawer() {
+  this.showTrackingDrawer = true;
+  this.loadEcheances();
+  this.resetTrackingFilters();
+}
+
+closeTrackingDrawer() {
+  this.showTrackingDrawer = false;
+  this.resetTrackingFilters();
+}
+
+resetTrackingFilters() {
+  this.trackingFilters = {
+    searchTerm: '',
+    status: '',
+    priority: ''
+  };
+  this.selectedStatus = '';
+  this.selectedPriority = '';
+  this.filteredEcheances = [...this.echeances];
+}
+
+loadEcheances() {
+  // Données mockées pour test
+  this.echeances = [
+    {
+      id: '1',
+      dossierId: 'doss1',
+      dossierNumero: 'DOS-2024-001',
+      debiteurName: 'Jean Dupont',
+      montant: 150000,
+      dateEcheance: new Date('2024-01-15'),
+      datePaiement: new Date('2024-01-15'),
+      statut: 'paid',
+      modePaiement: 'Virement bancaire',
+      progress: 100,
+      createdBy: 'system'
+    },
+    {
+      id: '2',
+      dossierId: 'doss2',
+      dossierNumero: 'DOS-2024-002',
+      debiteurName: 'Marie Martin',
+      montant: 75000,
+      dateEcheance: new Date(),
+      statut: 'current',
+      progress: 50,
+      createdBy: 'system'
+    },
+    {
+      id: '3',
+      dossierId: 'doss3',
+      dossierNumero: 'DOS-2024-003',
+      debiteurName: 'Pierre Durand',
+      montant: 200000,
+      dateEcheance: new Date(new Date().setDate(new Date().getDate() + 10)),
+      statut: 'future',
+      createdBy: 'system'
+    }
+  ];
+  this.filteredEcheances = [...this.echeances];
+}
+
+setActivePaymentTab(tab: 'paid' | 'current' | 'future') {
+  this.activePaymentTab = tab;
+}
+
+getDaysRemaining(dateEcheance: Date): number {
+  const today = new Date();
+  const echeance = new Date(dateEcheance);
+  const diffTime = echeance.getTime() - today.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+getDaysUntil(dateEcheance: Date): number {
+  return this.getDaysRemaining(dateEcheance);
+}
+
+// Méthodes pour les actions
+viewPaymentDetails(echeance: any) {
+  console.log('Voir détails paiement:', echeance);
+  alert(`Détails du paiement:\nDossier: ${echeance.dossierNumero}\nDébiteur: ${echeance.debiteurName}\nMontant: ${this.formatCurrency(echeance.montant)}\nStatut: ${echeance.statut}`);
+}
+
+recordPayment(echeance: any) {
+  console.log('Enregistrer paiement:', echeance);
+  this.openPaymentDrawer();
+}
+
+sendReminder(echeance: any) {
+  console.log('Envoyer rappel:', echeance);
+  alert(`Rappel envoyé pour le dossier ${echeance.dossierNumero}`);
+}
+
+scheduleReminder(echeance: any) {
+  console.log('Planifier rappel:', echeance);
+  alert(`Rappel planifié pour le dossier ${echeance.dossierNumero}`);
+}
+
+viewEcheanceDetails(echeance: any) {
+  console.log('Voir détails échéance:', echeance);
+  alert(`Détails de l'échéance:\nDossier: ${echeance.dossierNumero}\nDébiteur: ${echeance.debiteurName}\nÉchéance:
+     ${this.formatDate(echeance.dateEcheance)}\nMontant: ${this.formatCurrency(echeance.montant)}`);
+}
+
+// Filtres pour le suivi
+updateStatusFilter(): void {
+  this.trackingFilters.status = this.selectedStatus;
+  this.applyTrackingFilters();
+}
+
+updatePriorityFilter(): void {
+  this.trackingFilters.priority = this.selectedPriority;
+  this.applyTrackingFilters();
+}
+
+applyTrackingFilters(): void {
+  if (!this.echeances || this.echeances.length === 0) {
+    this.filteredEcheances = [];
+    return;
+  }
+
+  let filtered = [...this.echeances];
+
+  // Filtre par terme de recherche
+  if (this.trackingFilters.searchTerm) {
+    const searchTerm = this.trackingFilters.searchTerm.toLowerCase().trim();
+    filtered = filtered.filter(echeance => 
+      echeance.dossierNumero?.toLowerCase().includes(searchTerm) ||
+      echeance.debiteurName?.toLowerCase().includes(searchTerm) ||
+      echeance.modePaiement?.toLowerCase().includes(searchTerm) ||
+      this.formatCurrency(echeance.montant)?.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  // Filtre par statut
+  if (this.trackingFilters.status) {
+    filtered = filtered.filter(echeance => {
+      switch (this.trackingFilters.status) {
+        case 'pending':
+          return echeance.statut === 'current' && this.getDaysRemaining(echeance.dateEcheance) > 0;
+        case 'active':
+          return echeance.statut === 'current';
+        case 'negotiation':
+          return echeance.statut === 'current' && echeance.progress && echeance.progress > 0;
+        case 'legal_action':
+          return echeance.statut === 'current' && this.getDaysRemaining(echeance.dateEcheance) < 0;
+        case 'completed':
+          return echeance.statut === 'paid';
+        case 'new':
+          return echeance.statut === 'future' && this.getDaysUntil(echeance.dateEcheance) > 30;
+        default:
+          return true;
+      }
+    });
+  }
+
+  // Filtre par priorité
+  if (this.trackingFilters.priority) {
+    filtered = filtered.filter(echeance => {
+      const daysRemaining = this.getDaysRemaining(echeance.dateEcheance);
+      const isOverdue = daysRemaining < 0;
+      const isUrgent = daysRemaining <= 3 && daysRemaining >= 0;
+      const isHighPriority = echeance.montant > 100000;
+      
+      switch (this.trackingFilters.priority.toLowerCase()) {
+        case 'faible':
+          return !isOverdue && !isUrgent && !isHighPriority;
+        case 'moyenne':
+          return isHighPriority && !isUrgent && !isOverdue;
+        case 'elevee':
+          return isUrgent || (isHighPriority && daysRemaining <= 7);
+        case 'urgent':
+          return isOverdue || (isUrgent && isHighPriority);
+        default:
+          return true;
+      }
+    });
+  }
+
+  this.filteredEcheances = filtered;
+}
+
+// Obtenir les échéances filtrées
+getPaidEcheances(): any[] {
+  const source = this.filteredEcheances.length > 0 ? this.filteredEcheances : this.echeances;
+  return source.filter(e => e.statut === 'paid');
+}
+
+getCurrentEcheances(): any[] {
+  const source = this.filteredEcheances.length > 0 ? this.filteredEcheances : this.echeances;
+  return source.filter(e => e.statut === 'current');
+}
+
+getFutureEcheances(): any[] {
+  const source = this.filteredEcheances.length > 0 ? this.filteredEcheances : this.echeances;
+  return source.filter(e => e.statut === 'future');
+}
 }
