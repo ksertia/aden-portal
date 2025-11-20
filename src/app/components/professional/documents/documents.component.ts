@@ -9,6 +9,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
 import { AdminService } from '../../../services/admin.service';
+import { I18nService } from '../../../services/i18n.service';
 
 @Component({
   selector: 'app-documents',
@@ -18,6 +19,9 @@ import { AdminService } from '../../../services/admin.service';
   styleUrls: ['./documents.component.css']
 })
 export class DocumentsComponent implements OnInit {
+
+  translations: any = {};
+
   showUploadModal = false;
 
   // RECUPERATION DES DOCUMENTS
@@ -87,11 +91,27 @@ export class DocumentsComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private router: Router,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef, 
+    private cdr: ChangeDetectorRef,
+    private i18nService: I18nService,
   ) {}
 
   ngOnInit() {
+
+    this.loadTranslations();
+    this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+
     this.loadData();
+  }
+
+  private loadTranslations() {
+    const currentLocale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
   }
 
   getLegalDocumentsCount(): number {

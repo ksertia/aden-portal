@@ -22,12 +22,12 @@ export class ProfileComponent implements OnInit {
   updateSuccess = false;
   translations: any = {};
 
-  // 📸 Gestion avatar
+  // Gestion avatar
   avatarFile: File | null = null;
   avatarPreviewUrl: string | null = null;
   isUploadingAvatar = false;
 
-  // 🔐 Gestion changement mot de passe
+  // Gestion changement mot de passe
   showPasswordForm = false;
   isChangingPassword = false;
   passwordChangeSuccess = false;

@@ -249,7 +249,7 @@
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14,2 14,8 20,8"/>
           </svg>
-          <span>Mes Dossiers </span>
+          <span>{{ t('sidebar.myCases') }} </span>
         </a>
       </li>
 
@@ -269,7 +269,7 @@
             <path d="M9 12l2 2 4-4"/>
             <circle cx="12" cy="12" r="9"/>
           </svg>
-          <span>Transactions</span>
+          <span>{{ t('sidebar.Transactions') }}</span>
         </a>
       </li>
 
@@ -289,7 +289,7 @@
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14,2 14,8 20,8"/>
           </svg>
-          <span>Messagerie</span>
+          <span>{{ t('sidebar.Messaging') }}</span>
         </a>
       </li>
 
@@ -333,18 +333,18 @@
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14,2 14,8 20,8"/>
           </svg>
-          Liste des utilisateurs
-          <span [ngClass]="{ 'rotate-90': isUserListOpen }" style="margin-left:auto;">▶</span>
+          {{ t('profile.User List') }}
+          <span [ngClass]="{ 'rotate-90': isUserListOpen }" style="margin-left:auto;">{{ t('profile.icone') }}</span>
         </a>
         <!-- Sous-menu dépliable -->
         <ul *ngIf="isUserListOpen" class="submenu">
-          <li><a routerLink="/Administrateur/creancier" routerLinkActive="active" class="nav-item">Créanciers</a></li>
-          <li><a routerLink="/Administrateur/debiteur" routerLinkActive="active" class="nav-item">Débiteurs</a></li>
-          <li><a routerLink="/Administrateur/huissier" routerLinkActive="active" class="nav-item">Huissiers</a></li>
-          <li><a routerLink="/Administrateur/avocat" routerLinkActive="active" class="nav-item">Avocats</a></li>
-          <li><a routerLink="/Administrateur/cedant" routerLinkActive="active" class="nav-item">Cédants</a></li>
-          <li><a routerLink="/Administrateur/partenaire" routerLinkActive="active" class="nav-item">Partenaires</a></li>
-          <li><a routerLink="/Administrateur/user-list" routerLinkActive="active" class="nav-item">Tous les utilisateurs</a></li>
+          <li><a routerLink="/Administrateur/creancier" routerLinkActive="active" class="nav-item">{{ t('profile.Creditors') }}</a></li>
+          <li><a routerLink="/Administrateur/debiteur" routerLinkActive="active" class="nav-item">{{ t('profile.Debtors') }}</a></li>
+          <li><a routerLink="/Administrateur/huissier" routerLinkActive="active" class="nav-item">{{ t('profile.Bailiffs') }}</a></li>
+          <li><a routerLink="/Administrateur/avocat" routerLinkActive="active" class="nav-item">{{ t('profile.Lawyers') }}</a></li>
+          <li><a routerLink="/Administrateur/cedant" routerLinkActive="active" class="nav-item">{{ t('profile.Assignors') }}</a></li>
+          <li><a routerLink="/Administrateur/partenaire" routerLinkActive="active" class="nav-item">{{ t('profile.Partners') }}</a></li>
+          <li><a routerLink="/Administrateur/user-list" routerLinkActive="active" class="nav-item"> {{ t('profile.All users') }}</a></li>
         </ul>
       </li>
 
@@ -358,7 +358,6 @@
           <span>{{ t('sidebar.profile') }}</span>
         </a>
       </li>
-
     </ul>
   </nav>
 

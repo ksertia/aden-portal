@@ -5,6 +5,7 @@ export interface Nav {
   advantages: string;
   contact: string;
   login: string;
+  register: string
 }
 
 export interface Hero {
@@ -108,6 +109,9 @@ export interface Contact {
   phone: string;
   email: string;
   form: ContactFormData;
+  nameAdresse: string;
+  nameTelephone: string;
+  nameEmail: string
 }
 
 export interface Footer {
@@ -121,6 +125,8 @@ export interface Footer {
   privacy: string;
   cgu: string;
   copyright: string;
+  name: string;
+  nameDescription: string
 }
 
 export interface Common {

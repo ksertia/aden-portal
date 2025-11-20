@@ -1,5 +1,4 @@
 import { Component, OnInit} from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
@@ -7,6 +6,7 @@ import { CaseService } from '../../../services/case.service';
 import { User, StrapiRole } from '../../../models/user.model';
 import { AdminService } from '../../../services/admin.service';
 import { CreditorDetail } from '../../../models/case.model';
+import { I18nService } from '../../../services/i18n.service';
 
 @Component({
   selector: 'app-cedant-dashboard',
@@ -16,8 +16,9 @@ import { CreditorDetail } from '../../../models/case.model';
 })
 export class CedantDashboard implements OnInit {
 
+  translations: any = {};
 
-   currentUser: User | null = null;
+  currentUser: User | null = null;
  
   dossiers: any[] = [];
   isLoading = true;
@@ -40,15 +41,30 @@ export class CedantDashboard implements OnInit {
   constructor(
     private authService: AuthService,
     private casesService: CaseService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private i18nService: I18nService,
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
 
+    this.loadTranslations();
+    this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+
     this.loadDossiers();
   }
   
+  private loadTranslations() {
+    const currentLocale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
+  }
+
   // Chargement des dossiers
   loadDossiers() {
     const siteName = 'portail-recouvrement';
@@ -61,9 +77,6 @@ export class CedantDashboard implements OnInit {
     }
 
     const cedantNodeId = currentUser.nodeId;
-    console.log('Cédant connecté :', currentUser);
-    console.log('cedantNodeId envoyé :', cedantNodeId);
-
     if (!cedantNodeId) {
       this.errorMessage = 'Identifiant du cédant introuvable.';
       this.isLoading = false;
@@ -77,15 +90,13 @@ export class CedantDashboard implements OnInit {
       const allDossiers = response.data?.map((item: any) => item.map) || [];
       // Filtre uniquement les dossiers du cédant connecté
       this.dossiers = allDossiers.filter((d: any) => d.cedantNodeId === cedantNodeId);
-      console.log('Réponse API dossiers :', this.dossiers);
 
       //  mise à jour des statistiques
       this.updateCaseStatistics(); 
 
       this.isLoading = false;
       },
-      error: (error) => {
-        console.error('Erreur lors du chargement des dossiers :', error);
+      error: (error) => { 
         this.errorMessage = 'Impossible de récupérer les dossiers.';
         this.isLoading = false;
       }
@@ -102,9 +113,9 @@ export class CedantDashboard implements OnInit {
   }
 
    // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
-    getCreancierForDossier(dossier: any): CreditorDetail | undefined {
-      return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
-    }
+  getCreancierForDossier(dossier: any): CreditorDetail | undefined {
+    return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
+  }
 
   getUserRoleLabel(): string {
     if (!this.currentUser) return '';
@@ -170,6 +181,5 @@ export class CedantDashboard implements OnInit {
       return statut === 'en_attente' || statut === 'pending' || statut === 'attente';
     }).length;
   }
-
 
 }

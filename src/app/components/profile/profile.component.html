@@ -1,6 +1,6 @@
 <div class="profile-container">
   <div class="ph1">
-    <button class="btn btn-secondary" (click)="goBackToDashboard()">Retour</button>
+    <button class="btn btn-secondary" (click)="goBackToDashboard()">{{ t("profile.return") }}</button>
   </div>
   
   <div class="profile-content fade-in-up" *ngIf="user">
@@ -10,7 +10,7 @@
         <div class="avatar-wrapper">
           <!-- Avatar sans photo -->
           <div class="avatar-circle" *ngIf="!avatarPreviewUrl">
-            {{ user.firstname?.charAt(0) }}{{ user.lastname?.charAt(0) }}
+            {{ user.firstname?.charAt(0) }}{{ user.lastname?.charAt(0) }} 
           </div>
           
           <!-- Avatar avec photo -->
@@ -95,20 +95,21 @@
           </button>
           
           <button type="button" class="btn btn-outline" (click)="togglePasswordForm()">
-            {{ showPasswordForm ? 'Masquer le formulaire' : 'Changer le mot de passe' }}
+            <!-- {{ showPasswordForm ? 'Masquer le formulaire' : 'Changer le mot de passe' }} -->
+            {{ t("profile.Change password") }}
           </button>
         </div>
       </form>
 
-      <!-- 🔐 FORMULAIRE CHANGEMENT MOT DE PASSE -->
+      <!-- FORMULAIRE CHANGEMENT MOT DE PASSE -->
       <div class="password-change-section" *ngIf="showPasswordForm">
         <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;">
         
         <form (ngSubmit)="onSubmitPasswordChange()" #passwordForm="ngForm" novalidate>
-          <h3 style="margin-bottom: 16px; color: #1f2937;">Changer le mot de passe</h3>
+          <h3 style="margin-bottom: 16px; color: #1f2937;">{{ t("profile.Change password") }}</h3>
           
           <div class="form-group">
-            <label for="currentPassword">Mot de passe actuel *</label>
+            <label for="currentPassword">{{ t("profile.Current password") }}</label> 
             <input 
               type="password" 
               id="currentPassword" 
@@ -120,7 +121,7 @@
           </div>
 
           <div class="form-group">
-            <label for="newPassword">Nouveau mot de passe * (min. 8 caractères)</label>
+            <label for="newPassword">{{ t("profile.New password") }}</label>
             <input 
               type="password" 
               id="newPassword" 
@@ -133,7 +134,7 @@
           </div>
 
           <div class="form-group">
-            <label for="passwordConfirmation">Confirmer le nouveau mot de passe *</label>
+            <label for="passwordConfirmation">{{ t("profile.Confirm the new password") }}</label>
             <input 
               type="password" 
               id="passwordConfirmation" 
@@ -150,8 +151,8 @@
               class="btn btn-primary" 
               [disabled]="isChangingPassword"
             >
-              <span *ngIf="!isChangingPassword">Valider</span>
-              <span *ngIf="isChangingPassword">Changement en cours...</span>
+              <span *ngIf="!isChangingPassword">{{ t("profile.To validate") }}</span>
+              <span *ngIf="isChangingPassword">{{ t("profile.Change in progress") }}</span>
             </button>
 
             <button 
@@ -160,7 +161,7 @@
               (click)="cancelPasswordChange()"
               [disabled]="isChangingPassword"
             >
-              Annuler
+             {{ t("profile.Cancel") }}
             </button>
           </div>
         </form>
@@ -183,6 +184,6 @@
       <path d="M9 12l2 2 4-4" />
       <circle cx="12" cy="12" r="9" />
     </svg>
-    Mot de passe changé avec succès ! Redirection...
+    {{ t("profile.Password changed successfully! Redirecting") }}
   </div>
 </div>

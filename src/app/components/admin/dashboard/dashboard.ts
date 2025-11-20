@@ -51,7 +51,7 @@ export class Dashboard implements OnInit {
 
     this.loadTranslations();
     this.i18nService.currentLocale$.subscribe(() => {
-      this.loadTranslations();
+    this.loadTranslations();
     });
   }
 
