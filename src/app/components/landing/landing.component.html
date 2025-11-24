@@ -3,28 +3,28 @@
   <header class="landing-header">
     <nav class="navbar">
       <div class="nav-container">
+
         <div class="logo">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <!-- <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2v6l3-3 3 3"/>
             <path d="M12 8v8"/>
             <path d="m8 14 4 4 4-4"/>
-          </svg>
-          <span>{{ header?.logo }}</span>
+          </svg> -->
+          <!-- <span>{{ header?.logoTextPhoto }}</span> -->
           <!-- <span>RecouvrePro</span> -->
           <span>{{ header?.logoText }}</span>
         </div>
-        <div class="nav-links" *ngIf="nav">
-  <a (click)="scrollToSection('services')">{{ nav?.services }}</a> 
-  <a (click)="scrollToSection('advantages')">{{ nav?.advantages }}</a>
-  <a (click)="scrollToSection('contact')">{{ nav?.contact }}</a>
-  <app-language-switcher></app-language-switcher>
-  <div class="auth">
-    <a routerLink="/login" class="btn btn-primary">{{ nav?.login }}</a>
-    <a routerLink="/register" class="btn btn-secondary">Inscription</a>
-  </div>
-  
-</div>
 
+        <div class="nav-links" *ngIf="nav">
+          <a (click)="scrollToSection('services')">{{ nav?.services }}</a> 
+          <a (click)="scrollToSection('advantages')">{{ nav?.advantages }}</a>
+          <a (click)="scrollToSection('contact')">{{ nav?.contact }}</a>
+          <app-language-switcher></app-language-switcher>
+          <div class="auth">
+            <a routerLink="/login" class="btn btn-primary">{{ nav?.login }}</a>
+            <a routerLink="/register" class="btn btn-secondary">{{ nav?.register }}</a>
+          </div>
+        </div>
       </div>
     </nav>
   </header>
@@ -240,7 +240,7 @@
               </svg>
             </div>
             <div>
-              <h3>Adresse</h3>
+              <h3>{{ contact.nameAdresse }}</h3>
               <p>{{ contact.address }}</p>
             </div>
           </div>
@@ -252,7 +252,7 @@
               </svg>
             </div>
             <div>
-              <h3>Téléphone</h3>
+              <h3>{{ contact.nameTelephone }}</h3>
               <p>{{ contact.phone }}</p>
             </div>
           </div>
@@ -265,7 +265,7 @@
               </svg>
             </div>
             <div>
-              <h3>Email</h3>
+              <h3>{{ contact.nameEmail }}</h3>
               <p>{{ contact.email }}</p>
             </div>
           </div>
@@ -353,14 +353,15 @@
       <!-- Section Logo et description -->
       <div class="footer-section">
         <div class="footer-logo">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <!-- <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2v6l3-3 3 3"/>
             <path d="M12 8v8"/>
             <path d="m8 14 4 4 4-4"/>
-          </svg>
-          <span>RecouvrePro</span>
+          </svg> -->
+          <!-- <span>RecouvrePro</span> -->
+          <span>{{ footer.name }}</span>
         </div>
-        <p>La plateforme digitale qui révolutionne le recouvrement de créances.</p>
+        <p>{{ footer.nameDescription }}</p>
       </div>
       
       <!-- Section Services -->

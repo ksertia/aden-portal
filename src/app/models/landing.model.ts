@@ -5,6 +5,7 @@ export interface Nav {
   advantages: string;
   contact: string;
   login: string;
+  register: string
 }
 
 export interface Hero {
@@ -17,12 +18,19 @@ export interface Hero {
 }
 
 export interface Header {
-  logoText: string;
-  navServices: string;
-  navAdvantages: string;
-  navContact: string;
-  navLogin: string;
-  logo: string;
+  id?: number;
+  documentId?: string;
+  logoTextPhoto?: string | null;
+  logoText?: string;
+  navServices?: string;
+  navAdvantages?: string;
+  navContact?: string;
+  navLogin?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string;
+  locale?: string;
+  localizations?: any[];
 }
 
 // Service Item individuel
@@ -101,6 +109,9 @@ export interface Contact {
   phone: string;
   email: string;
   form: ContactFormData;
+  nameAdresse: string;
+  nameTelephone: string;
+  nameEmail: string
 }
 
 export interface Footer {
@@ -114,6 +125,8 @@ export interface Footer {
   privacy: string;
   cgu: string;
   copyright: string;
+  name: string;
+  nameDescription: string
 }
 
 export interface Common {

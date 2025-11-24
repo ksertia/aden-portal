@@ -6,6 +6,7 @@ import { CaseService } from '../../../services/case.service';
 import { User, StrapiRole } from '../../../models/user.model';
 import { AdminService } from '../../../services/admin.service';
 import { CreditorDetail } from '../../../models/case.model';
+import { I18nService } from '../../../services/i18n.service';
 
 @Component({
   selector: 'app-lawyer-dashboard',
@@ -14,6 +15,8 @@ import { CreditorDetail } from '../../../models/case.model';
   styleUrl: './lawyer-dashboard.css'
 })
 export class LawyerDashboard implements OnInit{
+
+  translations: any = {};
 
   currentUser: User | null = null;
  
@@ -38,13 +41,28 @@ export class LawyerDashboard implements OnInit{
   constructor(
     private authService: AuthService,
     private casesService: CaseService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private i18nService: I18nService,
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
 
+    this.loadTranslations();
+    this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+
     this.loadDossiers();
+  }
+
+  private loadTranslations() {
+    const currentLocale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
   }
   
   // Chargement des dossiers

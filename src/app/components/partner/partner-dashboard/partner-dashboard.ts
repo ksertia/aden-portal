@@ -6,6 +6,7 @@ import { CaseService } from '../../../services/case.service';
 import { User, StrapiRole } from '../../../models/user.model';
 import { AdminService } from '../../../services/admin.service';
 import { CreditorDetail, DebtorInfo } from '../../../models/case.model';
+import { I18nService } from '../../../services/i18n.service';
 
 @Component({
   selector: 'app-partner-dashboard',
@@ -14,6 +15,8 @@ import { CreditorDetail, DebtorInfo } from '../../../models/case.model';
   styleUrl: './partner-dashboard.css'
 })
 export class PartnerDashboard implements OnInit{
+
+  translations: any = {};
 
   currentUser: User | null = null;
  
@@ -39,8 +42,6 @@ export class PartnerDashboard implements OnInit{
   selectedIndex: number | null = null;
   showCaseDetailsModal = false;
 
-
-
   // Notifications
   notifications: any[] = [
     {
@@ -61,13 +62,28 @@ export class PartnerDashboard implements OnInit{
   constructor(
     private authService: AuthService,
     private casesService: CaseService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private i18nService: I18nService,
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
 
     this.loadDossiers();
+
+    this.loadTranslations();
+    this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+  }
+
+  private loadTranslations() {
+    const currentLocale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
   }
   
   // Chargement des dossiers
@@ -137,7 +153,6 @@ export class PartnerDashboard implements OnInit{
     return this.debiteurs.find(d => String(d.nodeId).trim() === String(debiteurNodeId));
   }
 
-
   getUserRoleLabel(): string {
     if (!this.currentUser) return '';
     switch (this.currentUser.role.name) {
@@ -177,7 +192,7 @@ export class PartnerDashboard implements OnInit{
     }, 0);
   }
 
-   formatCurrency(amount: number): string {
+  formatCurrency(amount: number): string {
     if (!amount) return '0 FCFA';
     return amount.toLocaleString('fr-FR', {
       style: 'currency',

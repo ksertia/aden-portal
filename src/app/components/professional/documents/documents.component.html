@@ -4,8 +4,8 @@
       <div class="header-content1-1">
         <button class="btn btn-secondary" (click)="goBackToDashboard()">Retour</button>
         <div>
-          <h1>Gestion des Documents</h1>
-          <p>Gérez tous les documents liés aux dossiers de recouvrement</p>
+          <h1>{{ t("dashDocument.title") }}</h1>
+          <p>{{ t("dashDocument.description") }}</p>
         </div>
       </div>
       <button class="btn btn-primary" (click)="openUploadModal()">
@@ -14,7 +14,7 @@
           <polyline points="17,8 12,3 7,8"/>
           <line x1="12" y1="3" x2="12" y2="15"/>
         </svg>
-        Ajouter un document
+       {{ t("dashDocument.modals.upload.title") }}
       </button>
     </div>
   </div>
@@ -23,24 +23,24 @@
   <div class="filters-section fade-in-up">
     <div class="filters-card">
       <div class="filters-header">
-        <h3>Filtres et recherche</h3>
-        <button class="btn btn-secondary small" (click)="resetFilters()">Réinitialiser</button>
+        <h3>{{ t("dashDocument.filters.name") }}</h3>
+        <button class="btn btn-secondary small" (click)="resetFilters()">{{ t("dashDocument.filters.reset") }}</button>
       </div>
       <div class="filters-grid">
         <div class="filter-group">
-          <label>Rechercher</label>
+          <label>{{ t("dashDocument.filters.search_name") }}</label>
           <input
             type="text"
             [(ngModel)]="searchTerm"
-            placeholder="Nom du document, dossier..."
+            placeholder="Nom du document, dossier... " 
             (input)="applyFilters()"
           >
         </div>
         
         <div class="filter-group">
-          <label>Type de document</label>
+          <label>{{ t("dashDocument.filters.nameType") }}</label>
           <select [(ngModel)]="selectedDocumentType" (change)="filterDocuments()">
-            <option value="">Tous les types</option>
+            <option value="">{{ t("dashDocument.filters.All_types") }}</option>
             <option value="invoice">Factures</option>
             <option value="contract">Contrats</option>
             <option value="correspondence">Correspondances</option>
@@ -51,9 +51,9 @@
         </div>
         
         <div class="filter-group">
-          <label>Dossier</label>
+          <label>{{ t("dashDocument.filters.case") }}</label>
           <select [(ngModel)]="selectedCaseId" (change)="filterDocuments()">
-            <option value="">Tous les dossiers</option>
+            <option value="">{{ t("dashDocument.filters.All_case") }}</option>
             <option *ngFor="let dossier of uniqueDossiers" [value]="dossier.nodeId">
               {{ dossier.numeroDossier }}
             </option>
@@ -257,8 +257,8 @@
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14,2 14,8 20,8"/>
         </svg>
-        <h3>Aucun document trouvé</h3>
-        <p>Aucun document ne correspond aux critères sélectionnés.</p>
+        <h3>{{ t("dashboard.No_files_found") }}</h3>
+        <p> {{ t("dashboard.No_files_found_Description1") }}</p>
       </div>
     </ng-template>
   </div>

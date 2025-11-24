@@ -1,10 +1,11 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { User, StrapiRole } from '../../models/user.model';
 import { I18nService } from '../../services/i18n.service';
+import { environment } from '../../../environment/environment';
 
 @Component({
   selector: 'app-profile',
@@ -15,14 +16,18 @@ import { I18nService } from '../../services/i18n.service';
 })
 export class ProfileComponent implements OnInit {
   @Input() user: User | null = null;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
   isUpdating = false;
   updateSuccess = false;
   translations: any = {};
 
+  // Gestion avatar
   avatarFile: File | null = null;
   avatarPreviewUrl: string | null = null;
+  isUploadingAvatar = false;
 
-  // 🔐 Gestion changement mot de passe
+  // Gestion changement mot de passe
   showPasswordForm = false;
   isChangingPassword = false;
   passwordChangeSuccess = false;
@@ -42,11 +47,30 @@ export class ProfileComponent implements OnInit {
     if (!this.user) this.user = this.authService.getCurrentUser();
     if (this.user) {
       this.user = { ...this.user };
-      if ((this.user as any).avatar) this.avatarPreviewUrl = (this.user as any).avatar;
+      // Construire l'URL de l'avatar s'il existe
+      this.loadAvatarUrl();
     }
 
     this.loadTranslations();
     this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+  }
+
+  /**
+   * Charge l'URL de l'avatar depuis Strapi
+   */
+  private loadAvatarUrl() {
+    if (this.user && (this.user as any).profil) {
+      const profil = (this.user as any).profil;
+      
+      // Si profil est un objet avec url
+      if (typeof profil === 'object' && profil.url) {
+        this.avatarPreviewUrl = `${environment.apiUrl}${profil.url}`;
+      } 
+      // Si profil est déjà une URL complète
+      else if (typeof profil === 'string') {
+        this.avatarPreviewUrl = profil;
+      }
+    }
   }
 
   private loadTranslations() {
@@ -73,6 +97,83 @@ export class ProfileComponent implements OnInit {
       default: return 'Rôle inconnu';
     }
   }
+
+  // ==================== GESTION AVATAR ====================
+
+  /**
+   * Ouvre le sélecteur de fichiers
+   */
+  triggerFileInput() {
+    this.fileInput.nativeElement.click();
+  }
+
+  /**
+   * Gère la sélection d'un fichier
+   */
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+
+    // Validation du type de fichier
+    if (!file.type.startsWith('image/')) {
+      alert('Veuillez sélectionner une image');
+      return;
+    }
+
+    // Validation de la taille (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La taille de l\'image ne doit pas dépasser 5 MB');
+      return;
+    }
+
+    this.avatarFile = file;
+
+    // Prévisualisation immédiate
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.avatarPreviewUrl = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    // Upload automatique
+    this.uploadAvatar();
+  }
+
+  /**
+   * Upload l'avatar vers le serveur
+   */
+  uploadAvatar() {
+    if (!this.avatarFile || !this.user) return;
+
+    this.isUploadingAvatar = true;
+    const userId = Number(this.user.id);
+
+    this.authService.uploadAvatar(userId, this.avatarFile).subscribe({
+      next: (response) => {
+        console.log("✅ Avatar uploadé:", response);
+        this.isUploadingAvatar = false;
+        
+        // Mise à jour de l'utilisateur local
+        if (response.user) {
+          this.user = response.user;
+          this.loadAvatarUrl();
+        }
+
+        // Message de succès
+        this.updateSuccess = true;
+        setTimeout(() => this.updateSuccess = false, 3000);
+      },
+      error: (err) => {
+        console.error("❌ Erreur upload avatar:", err);
+        this.isUploadingAvatar = false;
+        alert(err?.error?.message || "Erreur lors de l'upload de la photo");
+      }
+    });
+  }
+
+  // ==================== MISE À JOUR PROFIL ====================
 
   onSubmitProfile() {
     if (!this.user) return;
@@ -110,6 +211,7 @@ export class ProfileComponent implements OnInit {
         
         if (response.user) {
           this.user = response.user;
+          this.loadAvatarUrl();
         }
         
         this.showSuccessMessage();
@@ -134,31 +236,20 @@ export class ProfileComponent implements OnInit {
     setTimeout(() => this.updateSuccess = false, 3000);
   }
 
-  // 🔐 GESTION CHANGEMENT MOT DE PASSE
+  // ==================== CHANGEMENT MOT DE PASSE ====================
 
-  /**
-   * Affiche/masque le formulaire de changement de mot de passe
-   */
   togglePasswordForm() {
     this.showPasswordForm = !this.showPasswordForm;
-    
-    // Réinitialiser les champs si on ferme le formulaire
     if (!this.showPasswordForm) {
       this.resetPasswordForm();
     }
   }
 
-  /**
-   * Annule le changement de mot de passe
-   */
   cancelPasswordChange() {
     this.showPasswordForm = false;
     this.resetPasswordForm();
   }
 
-  /**
-   * Réinitialise le formulaire de mot de passe
-   */
   private resetPasswordForm() {
     this.passwordData = {
       currentPassword: '',
@@ -167,23 +258,17 @@ export class ProfileComponent implements OnInit {
     };
   }
 
-  /**
-   * Soumet le changement de mot de passe
-   */
   onSubmitPasswordChange() {
-    // Validation des champs
     if (!this.passwordData.currentPassword || !this.passwordData.newPassword || !this.passwordData.passwordConfirmation) {
       alert('Tous les champs sont requis');
       return;
     }
 
-    // Vérification que les mots de passe correspondent
     if (this.passwordData.newPassword !== this.passwordData.passwordConfirmation) {
       alert('Le nouveau mot de passe et la confirmation ne correspondent pas');
       return;
     }
 
-    // Vérification longueur minimale
     if (this.passwordData.newPassword.length < 8) {
       alert('Le mot de passe doit contenir au moins 8 caractères');
       return;
@@ -201,11 +286,8 @@ export class ProfileComponent implements OnInit {
         this.isChangingPassword = false;
         this.passwordChangeSuccess = true;
 
-        // Afficher le message de succès pendant 2 secondes
         setTimeout(() => {
           this.passwordChangeSuccess = false;
-          
-          // Déconnexion et redirection vers login
           this.authService.logout();
           this.router.navigate(['/login']);
         }, 2000);
@@ -225,6 +307,8 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  // ==================== NAVIGATION ====================
+
   goBackToDashboard(): void {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) { this.router.navigate(['/login']); return; }
@@ -240,10 +324,5 @@ export class ProfileComponent implements OnInit {
       case 'ADMINISTRATEUR': this.router.navigate(['/Administrateur/dashboard']); break;
       default: this.router.navigate(['/']); break;
     }
-  }
-
-  // ⚠️ Cette méthode n'est plus nécessaire, on utilise togglePasswordForm() maintenant
-  goToChangePassword() {
-    this.togglePasswordForm();
   }
 }

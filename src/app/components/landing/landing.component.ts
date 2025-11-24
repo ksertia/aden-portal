@@ -65,6 +65,7 @@ export class LandingComponent implements OnInit {
 
     this.landingService.getHeader(locale).subscribe(data => {
       this.header = data || undefined;
+       console.log('Header loaded:', this.header);
     });
 
     this.landingService.getServices(locale).subscribe(data => {
@@ -98,7 +99,6 @@ export class LandingComponent implements OnInit {
       this.common = data || undefined;
     });
   }
-
   /**
    * Retourne la classe CSS pour l'icône du service en fonction de l'index
    */
