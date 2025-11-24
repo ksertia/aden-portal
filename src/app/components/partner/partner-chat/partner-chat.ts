@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+
 
 @Component({
   selector: 'app-partner-chat',
@@ -7,5 +8,11 @@ import { Component } from '@angular/core';
   styleUrl: './partner-chat.css'
 })
 export class PartnerChat {
+
+  constructor() { }
+
+  ngOnInit(): void {
+    // You can initialize anything or load data here
+  }
 
 }
