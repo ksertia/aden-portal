@@ -20,6 +20,29 @@ interface Echeance {
   progress?: number;
   createdBy: string;
 }
+
+// Interfaces pour les commissions
+interface Commission {
+  id: string;
+  reference: string;
+  dateDemande: Date;
+  montant: number;
+  statut: 'paid' | 'pending' | 'rejected';
+  datePaiement?: Date;
+  dossierReference: string;
+  creancier: string;
+  partenaire: string;
+  montantRecouvre: number;
+  tauxCommission: number;
+  referencePaiement: string;
+}
+
+interface CommissionStats {
+  tauxCommission: number;
+  commissionsDues: number;
+  commissionsPayees: number;
+  dernierReversement: Date | null;
+}
 @Component({
   selector: 'app-partner-payment-tracking',
   standalone: true,
@@ -28,6 +51,19 @@ interface Echeance {
   styleUrls: ['./partner-payment-tracking.css']
 })
 export class PartnerPaymentTracking implements OnInit {
+
+   // Propriétés à ajouter dans votre classe
+commissionStats: CommissionStats = {
+  tauxCommission: 10,
+  commissionsDues: 0,
+  commissionsPayees: 0,
+  dernierReversement: null
+};
+
+commissions: Commission[] = [];
+activeTrackingTab: 'debiteur' | 'commission' = 'debiteur';
+commissionActiveTab: 'history' | 'status' = 'history';
+
   // Données des dossiers
   availableDossiers: any[] = [];
   isLoading = true;
@@ -38,6 +74,10 @@ export class PartnerPaymentTracking implements OnInit {
   totalPayments = 0;
   totalCommissions = 0;
   commissionsReceived = 0;
+
+  // Drawer de détails de transaction
+showTransactionDetailsDrawer = false;
+selectedTransaction: any = null;
 
   // Historique des transactions
 showHistoryDrawer = false;
@@ -98,6 +138,8 @@ transactionsHistory = [
   }
 ];
 
+
+
 // Suivi des transactions
 showTrackingDrawer = false;
 activePaymentTab: 'paid' | 'current' | 'future' = 'current';
@@ -112,6 +154,82 @@ trackingFilters = {
 };
 selectedStatus = '';
 selectedPriority = '';
+
+// Méthodes pour les commissions
+loadCommissions() {
+  // Données mockées - dans la réalité, ça viendrait d'une API
+  this.commissions = [
+    {
+      id: '1',
+      reference: 'DRC-2025-001',
+      dateDemande: new Date('2025-05-10'),
+      montant: 1000000,
+      statut: 'paid',
+      datePaiement: new Date('2025-05-15'),
+      dossierReference: 'CRC-2025-008',
+      creancier: 'Société ABC',
+      partenaire: 'Cabinet XYZ',
+      montantRecouvre: 10000000,
+      tauxCommission: 10,
+      referencePaiement: 'V000125AB'
+    },
+    {
+      id: '2',
+      reference: 'DRC-2025-002',
+      dateDemande: new Date('2025-04-05'),
+      montant: 750000,
+      statut: 'paid',
+      datePaiement: new Date('2025-04-12'),
+      dossierReference: 'CRC-2025-007',
+      creancier: 'Entreprise DEF',
+      partenaire: 'Cabinet XYZ',
+      montantRecouvre: 7500000,
+      tauxCommission: 10,
+      referencePaiement: 'V000124CD'
+    },
+    {
+      id: '3',
+      reference: 'DRC-2025-003',
+      dateDemande: new Date('2025-03-20'),
+      montant: 1500000,
+      statut: 'paid',
+      datePaiement: new Date('2025-03-25'),
+      dossierReference: 'CRC-2025-006',
+      creancier: 'Société GHI',
+      partenaire: 'Cabinet XYZ',
+      montantRecouvre: 15000000,
+      tauxCommission: 10,
+      referencePaiement: 'V000123EF'
+    },
+    {
+      id: '4',
+      reference: 'DRC-2025-004',
+      dateDemande: new Date(),
+      montant: 1200000,
+      statut: 'pending',
+      dossierReference: 'CRC-2025-009',
+      creancier: 'Entreprise JKL',
+      partenaire: 'Cabinet XYZ',
+      montantRecouvre: 12000000,
+      tauxCommission: 10,
+      referencePaiement: 'V000126GH'
+    },
+    {
+      id: '5',
+      reference: 'DRC-2025-005',
+      dateDemande: new Date(new Date().setDate(new Date().getDate() - 2)),
+      montant: 800000,
+      statut: 'rejected',
+      dossierReference: 'CRC-2025-010',
+      creancier: 'Société MNO',
+      partenaire: 'Cabinet XYZ',
+      montantRecouvre: 8000000,
+      tauxCommission: 10,
+      referencePaiement: 'V000127IJ'
+    }
+  ];
+    this.calculateCommissionStats();
+}
 
 
 
@@ -714,11 +832,11 @@ resetHistoryFilters() {
   this.statusFilter = '';
 }
 
-viewTransactionDetails(transaction: any) {
-  console.log('Détails de la transaction:', transaction);
-  // Implémentez la logique pour afficher les détails
-  alert(`Détails de la transaction ${transaction.reference}\nDossier: ${transaction.dossierNumber}\nMontant: ${transaction.amount} ${transaction.currency}\nStatut: ${this.getStatusLabel(transaction.status)}`);
-}
+// viewTransactionDetails(transaction: any) {
+//   console.log('Détails de la transaction:', transaction);
+//   // Implémentez la logique pour afficher les détails
+//   alert(`Détails de la transaction ${transaction.reference}\nDossier: ${transaction.dossierNumber}\nMontant: ${transaction.amount} ${transaction.currency}\nStatut: ${this.getStatusLabel(transaction.status)}`);
+// }
 
 exportToPDF() {
   console.log('Export PDF des transactions');
@@ -741,6 +859,7 @@ getPaymentMethodLabel(type: string): string {
 openTrackingDrawer() {
   this.showTrackingDrawer = true;
   this.loadEcheances();
+  this.loadCommissions();
   this.resetTrackingFilters();
 }
 
@@ -935,5 +1054,152 @@ getCurrentEcheances(): any[] {
 getFutureEcheances(): any[] {
   const source = this.filteredEcheances.length > 0 ? this.filteredEcheances : this.echeances;
   return source.filter(e => e.statut === 'future');
+}
+
+// Méthodes pour les détails de transaction
+viewTransactionDetails(transaction: any) {
+  this.selectedTransaction = {
+    ...transaction,
+    // Informations supplémentaires pour les détails
+    montantNet: transaction.amount * 0.985, // Exemple: 1.5% de frais
+    horodatage: transaction.date,
+    frais: transaction.amount * 0.015,
+    reference: transaction.reference,
+    statutDetail: this.getDetailedStatus(transaction.status),
+    numeroDossier: transaction.dossierNumber,
+    moyenPaiement: this.getPaymentMethodLabel(transaction.paymentType),
+    creancierDebiteur: transaction.debtorCreditor
+  };
+  this.showTransactionDetailsDrawer = true;
+}
+
+closeTransactionDetails() {
+  this.showTransactionDetailsDrawer = false;
+  this.selectedTransaction = null;
+}
+
+getDetailedStatus(status: string): string {
+  const statusDetails: { [key: string]: string } = {
+    'success': 'Paiement réussi et confirmé',
+    'pending': 'Paiement en attente de confirmation',
+    'failed': 'Paiement échoué'
+  };
+  return statusDetails[status] || status;
+}
+// Méthodes utilitaires pour les détails
+formatTime(date: Date | string): string {
+  if (!date) return '--:--';
+  
+  try {
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      return '--:--';
+    }
+    
+    return dateObj.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (error) {
+    return '--:--';
+  }
+}
+
+getCurrentTimestamp(): string {
+  const now = new Date();
+  return `${this.formatDate(now)} à ${this.formatTime(now)}`;
+}
+
+
+// commission
+calculateCommissionStats() {
+  const commissionsPayees = this.commissions.filter(c => c.statut === 'paid');
+  const commissionsEnAttente = this.commissions.filter(c => c.statut === 'pending' || c.statut === 'rejected');
+  
+  this.commissionStats.commissionsPayees = commissionsPayees.reduce((sum, c) => sum + c.montant, 0);
+  this.commissionStats.commissionsDues = commissionsEnAttente.reduce((sum, c) => sum + c.montant, 0);
+  
+  // Trouver la date du dernier reversement
+  const datesPaiement = commissionsPayees
+    .filter(c => c.datePaiement)
+    .map(c => new Date(c.datePaiement!))
+    .sort((a, b) => b.getTime() - a.getTime());
+  
+  this.commissionStats.dernierReversement = datesPaiement.length > 0 ? datesPaiement[0] : null;
+}
+
+// Méthodes pour filtrer les commissions
+getCommissionsPayees(): Commission[] {
+  return this.commissions.filter(c => c.statut === 'paid');
+}
+
+getCommissionsEnAttente(): Commission[] {
+  return this.commissions.filter(c => c.statut === 'pending' || c.statut === 'rejected');
+}
+
+// Méthode pour formater les montants en FCFA
+formatFCFA(amount: number): string {
+  return `${amount.toLocaleString('fr-FR')} FCFA`;
+}
+
+// Méthode pour obtenir le libellé du statut
+getCommissionStatusLabel(statut: string): string {
+  const labels: { [key: string]: string } = {
+    'paid': 'Payé',
+    'pending': 'En attente',
+    'rejected': 'Rejeté'
+  };
+  return labels[statut] || statut;
+}
+
+// Méthodes pour les onglets de suivi
+setActiveTrackingTab(tab: 'debiteur' | 'commission') {
+  this.activeTrackingTab = tab;
+}
+
+setCommissionTab(tab: 'history' | 'status') {
+  this.commissionActiveTab = tab;
+}
+
+requestCommissionPayout() {
+  console.log('Demande de reversement de commission');
+  // Implémentez la logique pour demander un reversement
+  alert('Fonctionnalité de demande de reversement - À implémenter');
+}
+
+// Méthode pour obtenir la classe CSS du statut
+getCommissionStatusClass(statut: string): string {
+  const classes: { [key: string]: string } = {
+    'paid': 'status-paid',
+    'pending': 'status-pending',
+    'rejected': 'status-rejected'
+  };
+  return classes[statut] || '';
+}
+viewCommissionDetails(commission: Commission) {
+  console.log('Détails de la commission:', commission);
+  
+  const details = `
+Détails de la commission ${commission.reference}
+
+Informations générales:
+- Référence: ${commission.reference}
+- Date de demande: ${this.formatDate(commission.dateDemande)}
+- Statut: ${this.getCommissionStatusLabel(commission.statut)}
+${commission.datePaiement ? `- Date de paiement: ${this.formatDate(commission.datePaiement)}` : ''}
+
+Informations financières:
+- Montant recouvré: ${this.formatFCFA(commission.montantRecouvre)}
+- Taux de commission: ${commission.tauxCommission}%
+- Commission: ${this.formatFCFA(commission.montant)}
+- Référence paiement: ${commission.referencePaiement}
+
+Parties concernées:
+- Créancier: ${commission.creancier}
+- Partenaire: ${commission.partenaire}
+- Dossier: ${commission.dossierReference}
+  `;
+  
+  alert(details);
 }
 }
