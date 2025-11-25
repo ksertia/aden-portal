@@ -488,6 +488,7 @@
 
 /* Section Suivi des Paiements */
 .payment-tracking-section {
+  max-width: 100%;
   margin: 2rem 0;
   padding: 1.5rem;
   background: var(--surface);
@@ -1516,7 +1517,7 @@
 
 /* Drawer pour l'historique des paiements */
 .history-drawer {
-  max-width: 1200px;
+  max-width: 1000px;
 }
 
 /* Section de recherche et filtres */
@@ -1877,5 +1878,538 @@
   
   .transactions-header h4 {
     font-size: 1rem;
+  }
+}
+
+/* Onglets de suivi des transactions */
+.tracking-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-alt);
+  padding: 0 20px;
+}
+
+.tracking-tab {
+  flex: 1;
+  padding: 16px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-light);
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  font-size: 0.95rem;
+  position: relative;
+}
+
+.tracking-tab:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.tracking-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background: var(--surface);
+}
+
+/* Contenu Commission */
+.commission-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.commission-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+/* Statistiques Commission */
+.commission-container .stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.commission-container .stat-card {
+  background: var(--surface);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border);
+  text-align: center;
+  transition: all 0.3s ease;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.commission-container .stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.commission-container .stat-label {
+  color: var(--text-light);
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.commission-container .stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+/* Onglets Commission */
+.commission-container .tabs {
+  display: flex;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.commission-container .tab {
+  flex: 1;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-light);
+  transition: all 0.3s ease;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.commission-container .tab:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.commission-container .tab.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+/* Tableaux Commission */
+.commission-container table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 20px;
+}
+
+.commission-container thead {
+  background: var(--surface-alt);
+}
+
+.commission-container th {
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+
+.commission-container td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.commission-container tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.commission-container tbody tr:hover {
+  background: var(--surface-alt);
+}
+
+.commission-container tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Statuts Commission */
+.commission-container .status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid;
+}
+
+.commission-container .status-paid {
+  background: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
+}
+
+.commission-container .status-pending {
+  background: #fff3cd;
+  color: #856404;
+  border-color: #ffeaa7;
+}
+
+.commission-container .status-rejected {
+  background: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+
+/* Boutons Commission */
+.commission-container .btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.commission-container .btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.commission-container .btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.commission-container .btn-sm {
+  padding: 8px 12px;
+  font-size: 0.8rem;
+}
+
+/* Message vide */
+.commission-container .no-data {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+  background: var(--surface);
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.commission-container .no-data h4 {
+  margin: 0 0 8px 0;
+  color: var(--text-light);
+  font-size: 1.1rem;
+}
+
+.commission-container .no-data p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Contenu des onglets Commission */
+.commission-container .tab-content {
+  display: none;
+  flex: 1;
+  overflow: auto;
+}
+
+.commission-container .tab-content.active {
+  display: block;
+}
+
+/* Bouton de demande */
+.commission-request-btn {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.commission-request-btn .btn {
+  padding: 12px 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tracking-tabs {
+    padding: 0 15px;
+    flex-direction: column;
+  }
+  
+  .tracking-tab {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .commission-container {
+    padding: 15px;
+  }
+  
+  .commission-container .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .commission-container .tabs {
+    flex-direction: column;
+  }
+  
+  .commission-container .tab {
+    width: 100%;
+  }
+  
+  .commission-container table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .commission-container th,
+  .commission-container td {
+    padding: 12px 8px;
+    font-size: 0.8rem;
+  }
+  
+  .commission-container .status {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .commission-container .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .commission-container {
+    padding: 10px;
+  }
+  
+  .commission-container th,
+  .commission-container td {
+    padding: 10px 6px;
+    font-size: 0.75rem;
+  }
+}
+
+/* Drawer pour les détails de transaction */
+.details-drawer {
+  max-width: 60%;
+  z-index: 1002; /* Au-dessus du drawer d'historique */
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--text-light);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.transaction-details-content {
+  padding: 0 20px;
+}
+
+/* Bannière de statut */
+.status-banner {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+}
+
+.status-banner.status-success {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.status-banner.status-pending {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+}
+
+.status-banner.status-failed {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.status-icon {
+  flex-shrink: 0;
+}
+
+.status-content h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.status-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Sections de détails */
+.details-section {
+  margin-bottom: 30px;
+}
+
+.details-section h5 {
+  color: var(--text);
+  margin-bottom: 15px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.details-grid, .financial-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.detail-item, .financial-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.detail-item:last-child, .financial-item:last-child {
+  border-bottom: none;
+}
+
+.detail-item .label, .financial-item .label {
+  color: var(--text-light);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.detail-item .value, .financial-item .value {
+  color: var(--text);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.financial-item.total {
+  border-top: 2px solid var(--primary);
+  padding-top: 15px;
+  margin-top: 5px;
+}
+
+.financial-item.total .value {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+/* Actions */
+.details-actions {
+  text-align: center;
+  margin: 30px 0;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Informations supplémentaires */
+.additional-info {
+  background: var(--surface-alt);
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.additional-info h6 {
+  margin: 0 0 10px 0;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.additional-info p {
+  margin: 0 0 10px 0;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.additional-info .timestamp {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .details-drawer {
+    max-width: 100%;
+  }
+  
+  .transaction-details-content {
+    padding: 0 15px;
+  }
+  
+  .status-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  
+  .details-grid, .financial-grid {
+    gap: 8px;
+  }
+  
+  .detail-item, .financial-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
 }

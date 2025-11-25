@@ -1,1 +1,239 @@
 <p>payment-processor works!</p>
+
+
+ 
+
+
+      <!-- Section des filtres -->
+      <!-- <div class="search-filters-section">
+        <div class="search-bar">
+          <div class="search-input-wrapper">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input 
+              type="text" 
+              [(ngModel)]="trackingFilters.searchTerm"
+              (input)="applyTrackingFilters()"
+              placeholder="Rechercher un dossier, débiteur..." 
+              class="search-input">
+          </div>
+        </div>
+
+        <div class="filters-row">
+          <select [(ngModel)]="selectedStatus" (change)="updateStatusFilter()" class="filter-select">
+            <option value="">Tous les statuts</option>
+            <option value="pending">En attente</option>
+            <option value="active">Actif</option>
+            <option value="negotiation">Négociation</option>
+            <option value="legal_action">Action légale</option>
+            <option value="completed">Terminé</option>
+            <option value="new">Nouveau</option>
+          </select>
+
+          <select [(ngModel)]="selectedPriority" (change)="updatePriorityFilter()" class="filter-select">
+            <option value="">Toutes les priorités</option>
+            <option value="faible">Faible</option>
+            <option value="moyenne">Moyenne</option>
+            <option value="elevee">Élevée</option>
+            <option value="urgent">Urgent</option>
+          </select>
+
+          <button class="export-btn" (click)="resetTrackingFilters()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M7 12h10M5 18h14"/>
+            </svg>
+            Réinitialiser
+          </button>
+        </div>
+      </div> -->
+
+      <!-- Contenu du suivi -->
+      <!-- <div class="payment-tracking-section" style="margin: 0; border: none; box-shadow: none; flex: 1; display: flex; flex-direction: column;"> -->
+        <!-- Onglets -->
+        <!-- <div class="payment-tabs">
+          <button 
+            class="tab-button" 
+            [class.active]="activePaymentTab === 'paid'"
+            (click)="setActivePaymentTab('paid')">
+            Échéances payées
+            <span class="tab-badge">{{ getPaidEcheances().length }}</span>
+          </button>
+
+          <button 
+            class="tab-button" 
+            [class.active]="activePaymentTab === 'current'"
+            (click)="setActivePaymentTab('current')">
+            Échéances en cours
+            <span class="tab-badge">{{ getCurrentEcheances().length }}</span>
+          </button>
+
+          <button 
+            class="tab-button" 
+            [class.active]="activePaymentTab === 'future'"
+            (click)="setActivePaymentTab('future')">
+            Échéances futures
+            <span class="tab-badge">{{ getFutureEcheances().length }}</span>
+          </button>
+        </div> -->
+
+        <!-- Contenu des onglets -->
+        <!-- <div class="tab-content" style="flex: 1; overflow: auto;"> -->
+          
+          <!-- Échéances payées -->
+        <!--  <div class="tab-pane" *ngIf="activePaymentTab === 'paid'">
+             <div class="echeances-grid" *ngIf="getPaidEcheances().length > 0; else noPaidEcheances">
+              <div class="echeance-card paid" *ngFor="let echeance of getPaidEcheances()">
+                <div class="echeance-header">
+                  <div class="echeance-info">
+                    <h4>{{ echeance.dossierNumero }}</h4>
+                    <span class="echeance-status status-paid">Payée</span>
+                  </div>
+                  <div class="echeance-amount">
+                    {{ formatCurrency(echeance.montant) }}
+                  </div>
+                </div>
+                
+                <div class="echeance-details">
+                  <div class="detail-row">
+                    <span class="label">Débiteur:</span>
+                    <span class="value">{{ echeance.debiteurName }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Date d'échéance:</span>
+                    <span class="value">{{ formatDate(echeance.dateEcheance) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Date de paiement:</span>
+                    <span class="value success">{{ formatDate(echeance.datePaiement) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Mode de paiement:</span>
+                    <span class="value">{{ echeance.modePaiement || 'Non spécifié' }}</span>
+                  </div>
+                </div>
+
+                <div class="echeance-actions">
+                  <button class="btn btn-sm btn-outline" (click)="viewPaymentDetails(echeance)">
+                    Détails
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <ng-template #noPaidEcheances>
+              <div class="no-data">
+                <h4>Aucune échéance payée</h4>
+                <p>Aucun paiement n'a été enregistré pour le moment.</p>
+              </div>
+            </ng-template>
+          </div> -->
+
+          <!-- Échéances en cours -->
+          <!-- <div class="tab-pane" *ngIf="activePaymentTab === 'current'">
+            <div class="echeances-grid" *ngIf="getCurrentEcheances().length > 0; else noCurrentEcheances">
+              <div class="echeance-card current" *ngFor="let echeance of getCurrentEcheances()">
+                <div class="echeance-header">
+                  <div class="echeance-info">
+                    <h4>{{ echeance.dossierNumero }}</h4>
+                    <span class="echeance-status status-current">En cours</span>
+                  </div>
+                  <div class="echeance-amount">
+                    {{ formatCurrency(echeance.montant) }}
+                  </div>
+                </div>
+                
+                <div class="echeance-details">
+                  <div class="detail-row">
+                    <span class="label">Débiteur:</span>
+                    <span class="value">{{ echeance.debiteurName }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Date d'échéance:</span>
+                    <span class="value">{{ formatDate(echeance.dateEcheance) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Jours restants:</span>
+                    <span class="value warning">{{ getDaysRemaining(echeance.dateEcheance) }} jours</span>
+                  </div>
+                </div>
+
+                <div class="payment-progress">
+                  <div class="progress-info">
+                    <span>Progression du paiement</span>
+                    <span>{{ echeance.progress || 0 }}%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="echeance.progress || 0"></div>
+                  </div>
+                </div>
+
+                <div class="echeance-actions">
+                  <button class="btn btn-sm btn-primary" (click)="recordPayment(echeance)">
+                    Enregistrer paiement
+                  </button>
+                  <button class="btn btn-sm btn-outline" (click)="sendReminder(echeance)">
+                    Relancer
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <ng-template #noCurrentEcheances>
+              <div class="no-data">
+                <h4>Aucune échéance en cours</h4>
+                <p>Aucune échéance n'est actuellement en cours de paiement.</p>
+              </div>
+            </ng-template>
+          </div> -->
+
+          <!-- Échéances futures -->
+          <!-- <div class="tab-pane" *ngIf="activePaymentTab === 'future'">
+            <div class="echeances-grid" *ngIf="getFutureEcheances().length > 0; else noFutureEcheances">
+              <div class="echeance-card future" *ngFor="let echeance of getFutureEcheances()">
+                <div class="echeance-header">
+                  <div class="echeance-info">
+                    <h4>{{ echeance.dossierNumero }}</h4>
+                    <span class="echeance-status status-future">Future</span>
+                  </div>
+                  <div class="echeance-amount">
+                    {{ formatCurrency(echeance.montant) }}
+                  </div>
+                </div>
+                
+                <div class="echeance-details">
+                  <div class="detail-row">
+                    <span class="label">Débiteur:</span>
+                    <span class="value">{{ echeance.debiteurName }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Date d'échéance:</span>
+                    <span class="value">{{ formatDate(echeance.dateEcheance) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Jours avant échéance:</span>
+                    <span class="value info">{{ getDaysUntil(echeance.dateEcheance) }} jours</span>
+                  </div>
+                </div>
+
+                <div class="echeance-actions">
+                  <button class="btn btn-sm btn-outline" (click)="scheduleReminder(echeance)">
+                    Planifier rappel
+                  </button>
+                  <button class="btn btn-sm btn-outline" (click)="viewEcheanceDetails(echeance)">
+                    Détails
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <ng-template #noFutureEcheances>
+              <div class="no-data">
+                <h4>Aucune échéance future</h4>
+                <p>Aucune échéance n'est prévue pour le moment.</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>  -->
