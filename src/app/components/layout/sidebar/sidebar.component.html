@@ -242,6 +242,7 @@
           </svg>
           <span>{{ t('sidebar.dashboard') }}</span>
         </a>
+
       </li>
       <li *ngIf="isRecovery_PartnerUser">
         <a routerLink="/partner/cases" routerLinkActive="active" class="nav-item">
@@ -282,9 +283,9 @@
           <span>{{ t('sidebar.documents') }}</span>
         </a>
       </li>
-
+      <!--  Kagambega-->
       <li *ngIf="isRecovery_PartnerUser">
-        <a routerLink="......." routerLinkActive="active" class="nav-item">
+        <a routerLink="/partner/partner-chat" routerLinkActive="active" class="nav-item">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14,2 14,8 20,8"/>
