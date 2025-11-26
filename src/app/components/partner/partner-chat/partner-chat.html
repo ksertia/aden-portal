@@ -69,10 +69,19 @@
                                 </div>
                             </div>
                             <div class="col-lg-6 hidden-sm text-right">
-                                <a href="javascript:void(0);" class="btn btn-outline-secondary"><i class="fa fa-camera"></i></a>
+                                <!-- <a href="javascript:void(0);" class="btn btn-outline-secondary"><i class="fa fa-camera"></i></a>
                                 <a href="javascript:void(0);" class="btn btn-outline-primary"><i class="fa fa-image"></i></a>
                                 <a href="javascript:void(0);" class="btn btn-outline-info"><i class="fa fa-cogs"></i></a>
-                                <a href="javascript:void(0);" class="btn btn-outline-warning"><i class="fa fa-question"></i></a>
+                                <a href="javascript:void(0);" class="btn btn-outline-warning"><i class="fa fa-question"></i></a> -->
+                                <!-- Start recherche -->
+
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Rechercher un message...">
+                                    <span class="input-group-text">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -183,14 +192,50 @@
                             </li>  
                         </ul>
                     </div>
+                    <!-- <div class="chat-message clearfix">
+                        <div class="input-group mb-0">
+                            <input type="text" class="form-control" placeholder="Enter text here...">
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fa fa-send p-button-label"></i></span>
+                            </div>                                    
+                        </div>
+
+                        <div class="col-lg-6 hidden-sm text-right">
+                            <a href="javascript:void(0);" class="btn btn-outline-secondary"><i class="fa fa-camera"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-primary"><i class="fa fa-image"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-info"><i class="fa fa-cogs"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-warning"><i class="fa fa-question"></i></a>
+                        </div>
+                    </div> -->
+
+
                     <div class="chat-message clearfix">
                         <div class="input-group mb-0">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa fa-send"></i></span>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Enter text here...">                                    
+                            <!-- Champ de texte avec largeur et hauteur augmentées, bords arrondis -->
+                            <textarea class="form-control" placeholder="Ecire un nouveau message..." rows="3" style="border-radius: 20px; padding-left: 20px; resize: none;"></textarea>
+                            <div class="input-group-append">
+                                <!-- Bouton envoyer avec icône -->
+                                <button class="btn btn-primary" style="border-radius: 20px;">
+                                    <i class="fa fa-paper-plane"></i>
+                                </button>
+                            </div>                                    
                         </div>
-                    </div>
+
+                        <!-- <div class="col-lg-6 hidden-sm text-right">
+                            
+                            <a href="javascript:void(0);" class="btn btn-outline-secondary" style="border-radius: 50%;"><i class="fa fa-camera"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-primary" style="border-radius: 50%;"><i class="fa fa-image"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-info" style="border-radius: 50%;"><i class="fa fa-cogs"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-warning" style="border-radius: 50%;"><i class="fa fa-question"></i></a>
+                        </div> -->
+
+                        <div class="col-lg-6 hidden-sm text-right">
+                                <!-- Icônes similaires à celles dans l'image -->
+                                <a href="javascript:void(0);" class="btn btn-outline-secondary" style="border-radius: 50%;"><i class="fa fa-smile"></i></a> <!-- Emoticône -->
+                                <a href="javascript:void(0);" class="btn btn-outline-secondary" style="border-radius: 50%;"><i class="fa fa-paperclip"></i></a> <!-- Attachement -->
+                                <a href="javascript:void(0);" class="btn btn-outline-secondary" style="border-radius: 50%;"><i class="fa fa-image"></i></a> <!-- Agrandir -->
+                                <a href="javascript:void(0);" class="btn btn-outline-secondary" style="border-radius: 50%;"><i class="fa fa-microphone"></i></a> <!-- Microphone -->    
+                        </div>
                 </div>
             </div>
         </div>
