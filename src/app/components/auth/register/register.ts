@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { I18nService } from '../../../services/i18n.service';
 
 // Type pour l'inscription
 interface RegisterUser {
@@ -32,7 +33,9 @@ const ROLE_IDS: Record<string, number> = {
   templateUrl: './register.html',
   styleUrls: ['./register.css']
 })
-export class Register {
+export class Register implements OnInit {
+
+  translations: any = {};
 
   user: RegisterUser = {
     nom: '',
@@ -56,7 +59,28 @@ export class Register {
     { value: 'cedant', label: 'Cédant' }
   ];
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private i18nService: I18nService,
+    ) {}
+
+  ngOnInit() {
+
+    this.loadTranslations();
+    this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+  }
+
+  private loadTranslations() {
+    const currentLocale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
+  }
 
   onSubmit() {
     if (!this.user.nom || !this.user.prenom || !this.user.email || !this.user.telephone || !this.user.password || !this.confirmPassword || !this.user.role) {

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router,RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { LoginRequest, LoginResponse } from '../../../models/user.model';
+import { LoginRequest } from '../../../models/user.model';
+import { I18nService } from '../../../services/i18n.service';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,9 @@ import { LoginRequest, LoginResponse } from '../../../models/user.model';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+
+  translations: any = {};
    
   credentials: LoginRequest = {
     email: '',
@@ -22,7 +25,28 @@ export class LoginComponent {
   isLoading = false;
   errorMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService,
+     private router: Router,
+     private i18nService: I18nService,
+    ) {}
+
+
+  ngOnInit() {
+
+    this.loadTranslations();
+    this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+  }
+
+  private loadTranslations() {
+    const currentLocale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
+  }
 
   onSubmit() {
     if (!this.credentials.email || !this.credentials.password) {
@@ -95,5 +119,7 @@ export class LoginComponent {
   }
 
   showPassword: boolean = false;
+
+
 
 }

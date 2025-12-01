@@ -8,6 +8,7 @@ import { ViewToggleComponent } from '../../shared/view-toggle/view-toggle.compon
 import { CaseService } from '../../../services/case.service';
 import { AdminService } from '../../../services/admin.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { I18nService } from '../../../services/i18n.service';
 
 @Component({
   selector: 'app-partner-cases',
@@ -17,6 +18,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   styleUrls: ['./partner-cases.component.css']
 })
 export class PartnerCasesComponent implements OnInit {
+
+  translations: any = {};
 
   selectedCase: DebtCase | null = null;
 
@@ -112,12 +115,27 @@ export class PartnerCasesComponent implements OnInit {
     private casesService: CaseService,
     private authService: AuthService,
     private adminService: AdminService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private i18nService: I18nService,
   ) {}
 
   ngOnInit() {
 
+    this.loadTranslations();
+    this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+
     this.loadDossiers();
+  }
+
+  private loadTranslations() {
+    const currentLocale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
   }
 
   // Fonction pour charger les dossiers
@@ -397,16 +415,19 @@ export class PartnerCasesComponent implements OnInit {
       // Vérifier si le dossier a des documents partenaire
       if (dossier.documentsPartenaire?.myArrayList && Array.isArray(dossier.documentsPartenaire.myArrayList)) {
         dossier.documentsPartenaire.myArrayList.forEach((doc: any) => {
+
+          // Accéder à l'objet map à l'intérieur
+          const docMap = doc.map || doc;
           
-          const mappedType = this.mapDocumentType(doc.typeDocument);
+          const mappedType = this.mapDocumentType(docMap.typeDocument);
           
           this.allDocuments.push({
-            id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
-            name: doc.fileName || doc.name || 'Document sans nom',
+            id: docMap.documentNodeId || docMap.id || Date.now().toString() + Math.random(),
+            name: docMap.fileName || docMap.name || 'Document sans nom',
             type: mappedType,
-            url: doc.url || doc.downloadUrl || '#',
-            uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
-            uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+            url: docMap.url || docMap.downloadUrl || '#',
+            uploadedAt: new Date(docMap.date || docMap.uploadedAt || docMap.dateCreation || Date.now()),
+            uploadedBy: docMap.uploadedBy || docMap.createurUsername || dossier.createurUsername || 'Système',
             caseId: dossier.nodeId
           });
         });
@@ -749,7 +770,8 @@ export class PartnerCasesComponent implements OnInit {
   // Méthode pour visualiser un document
   viewDocument(doc: any) {
 
-    const documentIdentifier = doc.nodeId || doc.id; //  fallback si nodeId absent
+    // S'assurer qu'on a bien l'ID du document
+    const documentIdentifier = doc.nodeId || doc.id; 
     
     if (!documentIdentifier) {
       alert('Identifiant du document manquant');

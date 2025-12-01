@@ -740,18 +740,20 @@ export class DebtorCasesComponent implements OnInit {
         dossier.documentsDebiteur.myArrayList.forEach((doc: any) => {
           // VÉRIFICATION CRITIQUE : s'assurer que doc n'est pas null
           if (!doc) {
-            return; // Passer au document suivant
+            return; 
           }
-          
-          const mappedType = this.mapDocumentType(doc.typeDocument);
+
+           // Accéder à l'objet map à l'intérieur
+          const docMap = doc.map || doc;
+          const mappedType = this.mapDocumentType(docMap.typeDocument);
           
           this.allDocuments.push({
-            id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
-            name: doc.fileName || doc.name || 'Document sans nom',
+            id: docMap.documentNodeId || docMap.id || Date.now().toString() + Math.random(),
+            name: docMap.fileName || docMap.name || 'Document sans nom',
             type: mappedType,
-            url: doc.url || doc.downloadUrl || '#',
-            uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
-            uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+            url: docMap.url || docMap.downloadUrl || '#',
+            uploadedAt: new Date(docMap.date || docMap.uploadedAt || docMap.dateCreation || Date.now()),
+            uploadedBy: docMap.uploadedBy || docMap.createurUsername || dossier.createurUsername || 'Système',
             caseId: dossier.nodeId
           });
         });
@@ -1117,7 +1119,6 @@ export class DebtorCasesComponent implements OnInit {
     
     this.showDocumentsModal = true;
   }
-
 
   // Compter les documents d'un dossier
   getDocumentsCount(dossier: any): number {

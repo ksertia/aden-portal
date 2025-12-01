@@ -411,7 +411,59 @@
         "Delete": "Delete"
       }
     }
+  },
+
+   "login": {
+    "title": "CrediSolve",
+    "subtitle": "Login to your personal space",
+
+    "email_label": "Email address",
+    "email_placeholder": "Your email address",
+
+    "password_label": "Password",
+    "password_placeholder": "Your password",
+
+    "forgot_password": "Forgot password?",
+
+    "button_cancel": "Cancel",
+    "button_login": "Login",
+    "button_loading": "Connecting...",
+
+    "error": "An error has occurred"
+  },
+
+  "register": {
+    "title": "CrediSolve",
+    "subtitle": "Create a new account",
+
+    "last_name_label": "Last name",
+    "last_name_placeholder": "Your last name",
+
+    "first_name_label": "First name",
+    "first_name_placeholder": "Your first name",
+
+    "phone_label": "Phone",
+    "phone_placeholder": "Your phone number",
+
+    "email_label": "Email address",
+    "email_placeholder": "Your email address",
+
+    "role_label": "Profile",
+    "role_placeholder": "-- Select your profile --",
+
+    "password_label": "Password",
+    "password_placeholder": "Your password",
+
+    "confirm_password_label": "Confirm password",
+    "confirm_password_placeholder": "Confirm your password",
+
+    "error": "An error has occurred",
+
+    "button_login": "Already registered? Login",
+    "button_register": "Register",
+    "button_loading": "Registering..."
   }
+
 
 
 }

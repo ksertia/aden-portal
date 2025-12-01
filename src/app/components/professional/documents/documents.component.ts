@@ -325,82 +325,159 @@ export class DocumentsComponent implements OnInit {
   }
 
   // Extraire TOUS les documents de TOUTES les sources SANS DOUBLONS
+  // extractAllDocuments() {
+  //   this.allDocuments = [];
+    
+  //   const processedDocumentIds = new Set<string>();
+  //   const currentUser = this.authService.getCurrentUser();
+    
+  //   if (!currentUser) {
+  //     this.filteredDocuments = [];
+  //     return;
+  //   }
+
+  //   // DEBUG: Afficher la structure complète des dossiers
+  //   console.log('📂 Structure des dossiers:', this.dossiers);
+    
+  //   // Liste de toutes les sources de documents possibles
+  //   // const documentSources = [
+  //   //   { key: 'documentsDebiteur', label: 'Débiteur' },
+  //   //   { key: 'documentsCreancier', label: 'Créancier' },
+  //   //   { key: 'documentsAvocat', label: 'Avocat' },
+  //   //   { key: 'documentsHuissier', label: 'Huissier' },
+  //   //   { key: 'documentsPartage', label: 'Partagé' },
+  //   //   { key: 'documentsPartenaire', label: 'Partenaire' },
+  //   //   { key: 'documentsCedant', label: 'Cédant' }
+  //   // ];
+  //   const documentSources = [
+  //     { key: 'documentsPartage', label: 'Partage' },
+  //   ];
+    
+  //   // Parcourir tous les dossiers (déjà filtrés pour l'utilisateur)
+  //   this.dossiers.forEach((dossier, index) => {
+      
+  //     let documentsTrouves = 0;
+      
+  //     // Pour chaque source de documents
+  //     documentSources.forEach(source => {
+  //       const documentsContainer = dossier[source.key];
+        
+  //       // Vérifier si le conteneur de documents existe et contient un tableau
+  //       if (documentsContainer?.myArrayList && Array.isArray(documentsContainer.myArrayList)) {
+          
+  //         // Extraire chaque document
+  //         documentsContainer.myArrayList.forEach((doc: any, docIndex: number) => {
+            
+  //           // Créer un identifiant unique pour le document
+  //           const docId = doc.documentNodeId || doc.id || 
+  //             `${doc.fileName}_${doc.date}_${source.key}`;
+            
+  //           // Vérifier si le document a déjà été traité
+  //           if (!processedDocumentIds.has(docId)) {
+  //             processedDocumentIds.add(docId);
+              
+  //             const mappedType = this.mapDocumentType(doc.typeDocument);
+              
+  //             this.allDocuments.push({
+  //               id: docId,
+  //               name: doc.fileName || doc.name || 'Document sans nom',
+  //               type: mappedType,
+  //               url: doc.url || doc.downloadUrl || '#',
+  //               uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
+  //               uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+  //               caseId: dossier.nodeId,
+  //               source: source.label
+  //             });
+              
+  //             documentsTrouves++;
+  //           } else {
+  //           }
+  //         });
+  //       } else {
+  //       }
+  //     });
+  //   });
+    
+  //   this.filteredDocuments = [...this.allDocuments];
+    
+  //   // Log de débogage
+  //   if (this.allDocuments.length === 0) {
+  //   }
+  // }
   extractAllDocuments() {
-    this.allDocuments = [];
+  console.log('🔄 Début de l\'extraction des documents');
+  this.allDocuments = [];
+  
+  const processedDocumentIds = new Set<string>();
+  
+  this.dossiers.forEach((dossier, dossierIndex) => {
+    console.log(`📂 Traitement du dossier ${dossierIndex}: ${dossier.numeroDossier || dossier.nodeId}`);
     
-    const processedDocumentIds = new Set<string>();
-    const currentUser = this.authService.getCurrentUser();
-    
-    if (!currentUser) {
-      this.filteredDocuments = [];
-      return;
-    }
-    
-    // Liste de toutes les sources de documents possibles
-    // const documentSources = [
-    //   { key: 'documentsDebiteur', label: 'Débiteur' },
-    //   { key: 'documentsCreancier', label: 'Créancier' },
-    //   { key: 'documentsAvocat', label: 'Avocat' },
-    //   { key: 'documentsHuissier', label: 'Huissier' },
-    //   { key: 'documentsPartage', label: 'Partagé' },
-    //   { key: 'documentsPartenaire', label: 'Partenaire' },
-    //   { key: 'documentsCedant', label: 'Cédant' }
+    // Liste des propriétés contenant des documents
+    // const documentProperties = [
+    //   'documentsPartage', 'documentsDebiteur', 'documentsCreancier',
+    //   'documentsAvocat', 'documentsHuissier', 'documentsPartenaire', 'documentsCedant'
     // ];
-    const documentSources = [
-      { key: 'documentsPartage', label: 'Partage' },
+    const documentProperties = [
+      'documentsPartage'
     ];
     
-    // Parcourir tous les dossiers (déjà filtrés pour l'utilisateur)
-    this.dossiers.forEach((dossier, index) => {
+    documentProperties.forEach(propertyName => {
+      const documentsContainer = dossier[propertyName];
       
-      let documentsTrouves = 0;
-      
-      // Pour chaque source de documents
-      documentSources.forEach(source => {
-        const documentsContainer = dossier[source.key];
+      if (documentsContainer && documentsContainer.myArrayList) {
+        console.log(`📄 ${documentsContainer.myArrayList.length} documents trouvés dans ${propertyName}`);
         
-        // Vérifier si le conteneur de documents existe et contient un tableau
-        if (documentsContainer?.myArrayList && Array.isArray(documentsContainer.myArrayList)) {
+        documentsContainer.myArrayList.forEach((docWrapper: any, docIndex: number) => {
+          // Accéder à la propriété map qui contient les vraies données du document
+          const doc = docWrapper.map || docWrapper;
           
-          // Extraire chaque document
-          documentsContainer.myArrayList.forEach((doc: any, docIndex: number) => {
+          // Récupérer l'ID du document
+          const docId = doc.documentNodeId || `doc-${propertyName}-${dossierIndex}-${docIndex}`;
+          
+          // Récupérer le NOM du document (c'était le problème !)
+          const docName = doc.fileName || 'Document sans nom';
+          
+          // Récupérer le type
+          const docType = doc.typeDocument || 'correspondence';
+          
+          // Récupérer la date
+          let docDate = new Date();
+          if (doc.date) docDate = new Date(doc.date);
+          
+          // Récupérer l'extension
+          const fileExtension = doc.fileExtension || '';
+          
+          if (!processedDocumentIds.has(docId)) {
+            processedDocumentIds.add(docId);
             
-            // Créer un identifiant unique pour le document
-            const docId = doc.documentNodeId || doc.id || 
-              `${doc.fileName}_${doc.date}_${source.key}`;
+            const mappedType = this.mapDocumentType(docType);
             
-            // Vérifier si le document a déjà été traité
-            if (!processedDocumentIds.has(docId)) {
-              processedDocumentIds.add(docId);
-              
-              const mappedType = this.mapDocumentType(doc.typeDocument);
-              
-              this.allDocuments.push({
-                id: docId,
-                name: doc.fileName || doc.name || 'Document sans nom',
-                type: mappedType,
-                url: doc.url || doc.downloadUrl || '#',
-                uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
-                uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
-                caseId: dossier.nodeId,
-                source: source.label
-              });
-              
-              documentsTrouves++;
-            } else {
-            }
-          });
-        } else {
-        }
-      });
+            const newDocument = {
+              id: docId,
+              name: docName, // ✅ Maintenant le nom sera correct !
+              type: mappedType,
+              url: '#', // L'URL sera générée dynamiquement
+              uploadedAt: docDate,
+              uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+              caseId: dossier.nodeId,
+              source: propertyName,
+              fileExtension: fileExtension,
+              // Garder les données originales pour le debug
+              originalData: doc
+            };
+            
+            this.allDocuments.push(newDocument);
+            console.log(`✅ Document ajouté: "${docName}" (${mappedType}) - ID: ${docId}`);
+          }
+        });
+      }
     });
-    
-    this.filteredDocuments = [...this.allDocuments];
-    
-    // Log de débogage
-    if (this.allDocuments.length === 0) {
-    }
-  }
+  });
+  
+  console.log(`📊 Extraction terminée: ${this.allDocuments.length} documents au total`);
+  this.filteredDocuments = [...this.allDocuments];
+}
 
   getDocumentsBySource(): { [key: string]: number } {
     const distribution: { [key: string]: number } = {};

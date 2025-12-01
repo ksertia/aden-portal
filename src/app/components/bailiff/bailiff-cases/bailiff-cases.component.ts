@@ -354,15 +354,18 @@ export class BailiffCasesComponent implements OnInit {
       // Vérifier si le dossier a des documents creéancier
       if (dossier.documentsHuissier?.myArrayList && Array.isArray(dossier.documentsHuissier.myArrayList)) {
         dossier.documentsHuissier.myArrayList.forEach((doc: any) => {
-          
-          const mappedType = this.mapDocumentType(doc.typeDocument);
+
+          // Accéder à l'objet map à l'intérieur
+          const docMap = doc.map || doc;
+          const mappedType = this.mapDocumentType(docMap.typeDocument);
+
           this.allDocuments.push({
-            id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
-            name: doc.fileName || doc.name || 'Document sans nom',
+            id: docMap.documentNodeId || docMap.id || Date.now().toString() + Math.random(),
+            name: docMap.fileName || docMap.name || 'Document sans nom',
             type: mappedType,
-            url: doc.url || doc.downloadUrl || '#',
-            uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
-            uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+            url: docMap.url || docMap.downloadUrl || '#',
+            uploadedAt: new Date(docMap.date || docMap.uploadedAt || docMap.dateCreation || Date.now()),
+            uploadedBy: docMap.uploadedBy|| docMap.createurUsername || dossier.createurUsername || 'Système',
             caseId: dossier.nodeId
           });
         });

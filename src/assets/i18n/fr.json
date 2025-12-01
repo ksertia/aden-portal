@@ -349,7 +349,6 @@
     }
   },
 
-
   "dashDocument": {
     "title": "Gestion des Documents",
     "description": "Gérez tous les documents liés aux dossiers de recouvrement",
@@ -410,8 +409,58 @@
         "Delete": "Supprimer"
       }
     }
-  }
+  },
 
+  "login": {
+    "title": "CrediSolve",
+    "subtitle": "Connexion à votre espace personnel",
+
+    "email_label": "Adresse e-mail",
+    "email_placeholder": "Votre adresse e-mail",
+
+    "password_label": "Mot de passe",
+    "password_placeholder": "Votre mot de passe",
+
+    "forgot_password": "Mot de passe oublié ?",
+
+    "button_cancel": "Annuler",
+    "button_login": "Se connecter",
+    "button_loading": "Connexion...",
+
+    "error": "Une erreur est survenue"
+  },
+
+  "register": {
+    "title": "CrediSolve",
+    "subtitle": "Créer un nouveau compte",
+
+    "last_name_label": "Nom",
+    "last_name_placeholder": "Votre nom",
+
+    "first_name_label": "Prénom",
+    "first_name_placeholder": "Votre prénom",
+
+    "phone_label": "Téléphone",
+    "phone_placeholder": "Votre numéro de téléphone",
+
+    "email_label": "Adresse e-mail",
+    "email_placeholder": "Votre adresse e-mail",
+
+    "role_label": "Profil",
+    "role_placeholder": "-- Sélectionnez votre profil --",
+
+    "password_label": "Mot de passe",
+    "password_placeholder": "Votre mot de passe",
+
+    "confirm_password_label": "Confirmer le mot de passe",
+    "confirm_password_placeholder": "Confirmez votre mot de passe",
+
+    "error": "Une erreur est survenue",
+
+    "button_login": "Déjà inscrit ? Se connecter",
+    "button_register": "S’inscrire",
+    "button_loading": "Enregistrement..."
+  }
 
 
 

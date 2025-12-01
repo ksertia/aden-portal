@@ -438,8 +438,7 @@ generateReport() {
     });
   }
 
-
-    openDocumentsModal() {
+  openDocumentsModal() {
     if (this.selectedIndex !== null) {
       this.selectedDetailCase = this.filteredDossiers[this.selectedIndex];
     }
@@ -458,7 +457,7 @@ generateReport() {
     this.showDocumentsModal = true;
   }
 
-    // Compter les documents d'un dossier
+  // Compter les documents d'un dossier
   getDocumentsCount(dossier: any): number {
     if (!dossier) return 0;
     return dossier.documentsAvocat?.myArrayList?.length || 0;
@@ -494,15 +493,18 @@ generateReport() {
         // Vérifier si le dossier a des documents partenaire
         if (dossier.documentsAvocat?.myArrayList && Array.isArray(dossier.documentsAvocat.myArrayList)) {
           dossier.documentsAvocat.myArrayList.forEach((doc: any) => {
-            
-            const mappedType = this.mapDocumentType(doc.typeDocument);
+
+
+            // Accéder à l'objet map à l'intérieur
+            const docMap = doc.map || doc;
+            const mappedType = this.mapDocumentType(docMap.typeDocument);
 
             // Gestion robuste de la date
             let documentDate: Date;
             try {
               // Essayer de parser la date depuis l'API
-              if (doc.date || doc.uploadedAt || doc.dateCreation) {
-                documentDate = new Date(doc.date || doc.uploadedAt || doc.dateCreation);
+              if (docMap.date || docMap.uploadedAt || docMap.dateCreation) {
+                documentDate = new Date(docMap.date || docMap.uploadedAt || docMap.dateCreation);
                 // Vérifier si la date est valide
                 if (isNaN(documentDate.getTime())) {
                   documentDate = new Date(); // Fallback à la date actuelle
@@ -515,14 +517,14 @@ generateReport() {
             }
             
             this.allDocuments.push({
-              id: doc.documentNodeId || doc.id || Date.now().toString() + Math.random(),
-              name: doc.fileName || doc.name || 'Document sans nom',
+              id: docMap.documentNodeId || docMap.id || Date.now().toString() + Math.random(),
+              name: docMap.fileName || docMap.name || 'Document sans nom',
               type: mappedType,
-              url: doc.url || doc.downloadUrl || '#',
+              url: docMap.url || docMap.downloadUrl || '#',
               // Utiliser cette méthode dans extractDocuments()
-              uploadedAt: this.parseSafeDate(doc.date || doc.uploadedAt || doc.dateCreation),
+              uploadedAt: this.parseSafeDate(docMap.date || docMap.uploadedAt || docMap.dateCreation),
               // uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now() || documentDate),
-              uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+              uploadedBy: docMap.uploadedBy|| docMap.createurUsername || dossier.createurUsername || 'Système',
               caseId: dossier.nodeId
             });
           });

@@ -16,26 +16,26 @@
         </svg>
       </div>
       <!-- <h1>RecouvrePro</h1> -->
-      <h1>CrediSolve</h1>
-      <p>Connexion à votre espace personnel</p>
+      <h1>{{ t("login.title") }}</h1>
+      <p>{{ t("login.subtitle") }}</p>
     </div>
 
     <form (ngSubmit)="onSubmit()" class="login-form">
       <div class="form-group">
-        <label for="email">Adresse e-mail</label>
+        <label for="email">{{ t("login.email_label") }}</label>
         <input
           type="email"
           id="email"
           [(ngModel)]="credentials.email"
           name="email"
-          placeholder="Votre adresse e-mail"
+          placeholder="Votre adresse e-mail" 
           required
           [disabled]="isLoading"
         />
       </div>
 
       <div class="form-group password-wrapper">
-  <label for="password">Mot de passe</label>
+  <label for="password">{{ t("login.password_label") }}</label>
 
   <input
     [type]="showPassword ? 'text' : 'password'"
@@ -63,7 +63,7 @@
 
       <!--Lien ajouté ici -->
       <div class="forgot-password">
-        <a routerLink="/forgot-password">Mot de passe oublié ?</a>
+        <a routerLink="/forgot-password">{{ t("login.forgot_password") }}</a>
       </div>
       <!--Fin ajout -->
 
@@ -83,9 +83,9 @@
         {{ errorMessage }}
       </div>
       <div class="ch">
-        <button routerLink="/accueil" class="cancel-btn">Annuler</button>
+        <button routerLink="/accueil" class="cancel-btn"> {{ t("login.button_cancel") }}</button>
         <button type="submit" class="login-btn" [disabled]="isLoading">
-          <span *ngIf="!isLoading">Se connecter</span>
+          <span *ngIf="!isLoading"> {{ t("login.button_login") }}</span>
           <span *ngIf="isLoading" class="loading">
             <svg
               class="spinner"
