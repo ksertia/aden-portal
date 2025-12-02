@@ -405,13 +405,11 @@ export class DocumentsComponent implements OnInit {
   //   }
   // }
   extractAllDocuments() {
-  console.log('🔄 Début de l\'extraction des documents');
+
   this.allDocuments = [];
   
   const processedDocumentIds = new Set<string>();
-  
   this.dossiers.forEach((dossier, dossierIndex) => {
-    console.log(`📂 Traitement du dossier ${dossierIndex}: ${dossier.numeroDossier || dossier.nodeId}`);
     
     // Liste des propriétés contenant des documents
     // const documentProperties = [
@@ -426,19 +424,12 @@ export class DocumentsComponent implements OnInit {
       const documentsContainer = dossier[propertyName];
       
       if (documentsContainer && documentsContainer.myArrayList) {
-        console.log(`📄 ${documentsContainer.myArrayList.length} documents trouvés dans ${propertyName}`);
         
         documentsContainer.myArrayList.forEach((docWrapper: any, docIndex: number) => {
           // Accéder à la propriété map qui contient les vraies données du document
           const doc = docWrapper.map || docWrapper;
-          
-          // Récupérer l'ID du document
           const docId = doc.documentNodeId || `doc-${propertyName}-${dossierIndex}-${docIndex}`;
-          
-          // Récupérer le NOM du document (c'était le problème !)
           const docName = doc.fileName || 'Document sans nom';
-          
-          // Récupérer le type
           const docType = doc.typeDocument || 'correspondence';
           
           // Récupérer la date
@@ -452,30 +443,47 @@ export class DocumentsComponent implements OnInit {
             processedDocumentIds.add(docId);
             
             const mappedType = this.mapDocumentType(docType);
-            
+
+            // Extraction de la date avec plusieurs sources possibles
+            let uploadedDate: Date;
+
+            if (doc.date) {
+              // Si la date est au format ISO (ex: "2025-10-28T13:51:24.952+0000")
+              uploadedDate = new Date(doc.date);
+            } else if (doc.description && doc.description.includes('Importé le')) {
+            // Si la date est dans la description (ex: "Importé le 05/11/2025 17:36:49 par admin")
+              const match = doc.description.match(/Importé le (\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2})/);
+              if (match) {
+                // Convertir "05/11/2025 17:36:49" en "2025/11/05 17:36:49"
+                const dateStr = match[1].replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3/$2/$1');
+                uploadedDate = new Date(dateStr);
+              } else {
+                uploadedDate = new Date();
+              }
+            } else {
+            uploadedDate = new Date();
+            }
+  
             const newDocument = {
               id: docId,
-              name: docName, // ✅ Maintenant le nom sera correct !
+              name: docName, 
               type: mappedType,
-              url: '#', // L'URL sera générée dynamiquement
-              uploadedAt: docDate,
+              url: '#',
+              uploadedAt: uploadedDate,
               uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
               caseId: dossier.nodeId,
               source: propertyName,
               fileExtension: fileExtension,
-              // Garder les données originales pour le debug
               originalData: doc
             };
             
             this.allDocuments.push(newDocument);
-            console.log(`✅ Document ajouté: "${docName}" (${mappedType}) - ID: ${docId}`);
           }
         });
       }
     });
   });
   
-  console.log(`📊 Extraction terminée: ${this.allDocuments.length} documents au total`);
   this.filteredDocuments = [...this.allDocuments];
 }
 
@@ -552,12 +560,41 @@ export class DocumentsComponent implements OnInit {
     return labels[type] || type;
   }
 
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('fr-FR', {
+  // formatDate(date: Date): string {
+  //   return new Date(date).toLocaleDateString('fr-FR', {
+  //     year: 'numeric',
+  //     month: 'long',
+  //     day: 'numeric'
+  //   });
+  // }
+  formatDate(dateInput: any): string {
+  try {
+    // Si c'est déjà un Date
+    if (dateInput instanceof Date) {
+      return dateInput.toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+    
+    // Si c'est une chaîne
+    const date = new Date(dateInput);
+    
+    // Vérifier si la date est valide
+    if (isNaN(date.getTime())) {
+      return 'Date invalide';
+    }
+    
+    return date.toLocaleDateString('fr-FR', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
+  } catch (error) {
+    console.error('Erreur de formatage de date:', error);
+    return 'Date invalide';
+  }
   }
 
   closeViewModal() {
@@ -648,7 +685,6 @@ export class DocumentsComponent implements OnInit {
     });
     return Array.from(uniqueMap.values());
   }
-
 
   // Méthode pour obtenir les types de documents pour le select
   getDocumentTypes(): { value: string; label: string }[] {
@@ -903,11 +939,6 @@ export class DocumentsComponent implements OnInit {
       typeDocument: this.newDocument.type
     });
   }
-
-
-
-
-
 
   // MÉTHODE pour UPLOADER UN DOCUMENT 
   uploadDocument(): void {

@@ -300,13 +300,42 @@ export class PartnerCasesComponent implements OnInit {
     });
   }
 
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('fr-FR', {
+  // formatDate(date: Date): string {
+  //   return new Date(date).toLocaleDateString('fr-FR', {
+  //     year: 'numeric',
+  //     month: 'long',
+  //     day: 'numeric'
+  //   });
+  // }
+  formatDate(dateInput: any): string {
+  try {
+    // Si c'est déjà un Date
+    if (dateInput instanceof Date) {
+      return dateInput.toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+    
+    // Si c'est une chaîne
+    const date = new Date(dateInput);
+    
+    // Vérifier si la date est valide
+    if (isNaN(date.getTime())) {
+      return 'Date invalide';
+    }
+    
+    return date.toLocaleDateString('fr-FR', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
+  } catch (error) {
+    console.error('Erreur de formatage de date:', error);
+    return 'Date invalide';
   }
+}
 
   getStatusLabel(status: string): string {
     const labels: { [key: string]: string } = {
@@ -420,13 +449,33 @@ export class PartnerCasesComponent implements OnInit {
           const docMap = doc.map || doc;
           
           const mappedType = this.mapDocumentType(docMap.typeDocument);
+
+          // Extraction de la date avec plusieurs sources possibles
+         let uploadedDate: Date;
+
+          if (docMap.date) {
+            // Si la date est au format ISO (ex: "2025-10-28T13:51:24.952+0000")
+            uploadedDate = new Date(docMap.date);
+          } else if (docMap.description && docMap.description.includes('Importé le')) {
+          // Si la date est dans la description (ex: "Importé le 05/11/2025 17:36:49 par admin")
+            const match = docMap.description.match(/Importé le (\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2})/);
+            if (match) {
+              // Convertir "05/11/2025 17:36:49" en "2025/11/05 17:36:49"
+              const dateStr = match[1].replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3/$2/$1');
+              uploadedDate = new Date(dateStr);
+            } else {
+              uploadedDate = new Date();
+            }
+          } else {
+          uploadedDate = new Date();
+         }
           
           this.allDocuments.push({
             id: docMap.documentNodeId || docMap.id || Date.now().toString() + Math.random(),
             name: docMap.fileName || docMap.name || 'Document sans nom',
             type: mappedType,
             url: docMap.url || docMap.downloadUrl || '#',
-            uploadedAt: new Date(docMap.date || docMap.uploadedAt || docMap.dateCreation || Date.now()),
+            uploadedAt: uploadedDate,
             uploadedBy: docMap.uploadedBy || docMap.createurUsername || dossier.createurUsername || 'Système',
             caseId: dossier.nodeId
           });
@@ -475,7 +524,7 @@ export class PartnerCasesComponent implements OnInit {
     });
   }
 
-   getLegalDocumentsCount(): number {
+  getLegalDocumentsCount(): number {
     return this.allDocuments.filter(doc => 
       doc.type === DocumentType.LEGAL_NOTICE || 
       doc.type === DocumentType.COURT_DOCUMENT
@@ -635,7 +684,7 @@ export class PartnerCasesComponent implements OnInit {
       alert('Erreur lors de l\'upload du document. Veuillez réessayer.');
     }
   });
-}
+  }
 
   // Ajoutez cette méthode pour réinitialiser les erreurs
   resetUploadErrors(): void {
@@ -680,9 +729,9 @@ export class PartnerCasesComponent implements OnInit {
       alert('Erreur lors de la suppression du document. Veuillez réessayer.');
     }
   });
-}
+  }
 
-// Methode du modal de suppression d\'un document
+  // Methode du modal de suppression d\'un document
   confirmDeleteDocument(doc: any): void {
     this.documentToDelete = doc;
     this.showDeleteConfirmation = true;
