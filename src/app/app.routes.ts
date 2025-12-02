@@ -166,6 +166,10 @@ export const routes: Routes = [
           {
             path: 'payment-tracking',
             loadComponent: () => import('./components/partner/partner-payment-tracking/partner-payment-tracking').then(c => c.PartnerPaymentTracking)
+          },
+          {
+            path: 'partner-chat',
+            loadComponent: () => import('./components/partner/partner-chat/partner-chat').then(c => c.PartnerChat)
           }
         ]
       },
