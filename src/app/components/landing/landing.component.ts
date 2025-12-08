@@ -93,6 +93,7 @@ export class LandingComponent implements OnInit {
 
     this.landingService.getFooter(locale).subscribe(data => {
       this.footer = data || undefined;
+      console.log('footer loaded:', this.footer);
     });
 
     this.landingService.getCommon(locale).subscribe(data => {

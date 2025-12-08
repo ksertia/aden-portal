@@ -75,7 +75,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ filteredDocuments.length }}</div>
-          <div class="stat-label">Documents totaux</div>
+          <div class="stat-label">{{ t("dashDocument.statistics.totalDocuments") }}</div>
         </div>
       </div>
       
@@ -89,7 +89,7 @@
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ dossiers.length }}</div>
-          <div class="stat-label">Dossiers totaux</div>
+          <div class="stat-label">{{ t("dashDocument.statistics.totalCases") }}</div>
         </div>
       </div>
     </div>
@@ -148,11 +148,11 @@
           
           <div class="document-details">
             <div class="detail-row">
-              <span class="label">Dossier :</span>
+              <span class="label">{{ t("dashDocument.filters.case") }}:</span>
               <span class="value">{{ getCaseNumber(doc.caseId) }}</span>
             </div>
             <div class="detail-row">
-              <span class="label">Ajouté le :</span>
+              <span class="label"> {{ t("dashDocument.filters.Added_on") }} :</span>
               <span class="value">{{ formatDate(doc.uploadedAt) }}</span>
             </div>
             <!-- <div class="detail-row">
@@ -168,12 +168,12 @@
         <table class="documents-table">
           <thead>
             <tr>
-              <th>Document</th>
-              <th>Type</th>
-              <th>Dossier</th>
-              <th>Ajouté le</th>
+              <th> {{ t("dashDocument.filters.Document") }}</th>
+              <th> {{ t("dashDocument.filters.Type") }}</th>
+              <th> {{ t("dashDocument.filters.case") }}</th>
+              <th> {{ t("dashDocument.filters.Added_on") }}</th>
               <!-- <th>Ajouté par</th> -->
-              <th>Actions</th>
+              <th> {{ t("dashDocument.filters.Actions") }}</th>
             </tr>
           </thead>
           <tbody>
@@ -237,16 +237,16 @@
                 <line x1="12" y1="17" x2="12.01" y2="17"/>
               </svg>
             </div>
-            <h3>Confirmer la suppression</h3>
+            <h3>{{ t("dashDocument.modals.delete.Confirm_deletion") }}</h3>
           </div>
         </div>
         <div class="modal-body">
-          <p>Êtes-vous sûr de vouloir supprimer le document "{{ documentToDelete?.name }}" ?</p>
-          <p class="warning-text">Cette action est irréversible.</p>
+          <p>{{ t("dashDocument.modals.delete.confirmationMessage") }} "{{ documentToDelete?.name }}" ?</p>
+          <p class="warning-text">{{ t("dashDocument.modals.delete.warning") }}</p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Annuler</button>
-          <button type="button" class="btn btn-danger" (click)="executeDelete()">Supprimer</button>
+          <button type="button" class="btn btn-secondary" (click)="cancelDelete()"> {{ t("dashDocument.modals.delete.Cancel") }}</button>
+          <button type="button" class="btn btn-danger" (click)="executeDelete()"> {{ t("dashDocument.modals.delete.Delete") }}</button>
         </div>
       </div>
     </div>
@@ -258,7 +258,7 @@
           <polyline points="14,2 14,8 20,8"/>
         </svg>
         <h3>{{ t("dashboard.No_files_found") }}</h3>
-        <p> {{ t("dashboard.No_files_found_Description1") }}</p>
+        <p> {{ t("dashboard.No_files_found_Description1") }}</p> 
       </div>
     </ng-template>
   </div>
@@ -267,7 +267,7 @@
   <div class="modal-overlay" *ngIf="showUploadModal">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3>Ajouter un document</h3>
+        <h3>{{ t("dashDocument.modals.upload.title") }}</h3>
         <button class="modal-close" (click)="closeUploadModal()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/>
@@ -290,28 +290,28 @@
         
         <div class="upload-form" *ngIf="!showUploadSuccess">
           <div class="form-group">
-            <label>Dossier associé</label>
+            <label>{{ t("dashDocument.modals.upload.fields.associatedCase") }}</label>
             <select 
               [(ngModel)]="newDocument.caseId" 
               [class.error]="uploadFormErrors.type"
               required>
-              <option value="">Sélectionner un dossier</option>
+              <option value=""> {{ t("dashDocument.modals.upload.fields.Select_a_case") }}</option>
               <option *ngFor="let dossier of uniqueDossiers" [value]="dossier.nodeId">
                 {{ getDisplayCaseNumber(dossier) }}
               </option>
             </select>
             <div class="error-message" *ngIf="uploadFormErrors.type">
               {{ uploadErrorMessages.type }}
-            </div>
+            </div>   
           </div>
           
           <div class="form-group">
-            <label>Type de document</label>
+            <label>{{ t("dashDocument.modals.upload.fields.documentType") }}</label>
             <select 
               [(ngModel)]="newDocument.type" 
               [class.error]="uploadFormErrors.type"
               required>
-              <option value="">Sélectionner un type</option>
+              <option value="">{{ t("dashDocument.modals.upload.fields.Select_a_type") }}</option>
               <option value="invoice">Facture</option>
               <option value="contract">Contrat</option>
               <option value="correspondence">Correspondance</option>
@@ -325,7 +325,7 @@
           </div>
           
           <div class="form-group">
-            <label>Nom du document</label>
+            <label> {{ t("dashDocument.modals.upload.fields.documentName") }}</label>
             <input
               type="text"
               [(ngModel)]="newDocument.name"
@@ -339,7 +339,7 @@
           </div>
           
           <div class="form-group">
-            <label>Fichier</label>
+            <label> {{ t("dashDocument.modals.upload.fields.file") }}</label>
             <div class="file-upload">
               <input 
                 type="file" 
@@ -364,7 +364,7 @@
       </div>
       
       <div class="modal-footer" *ngIf="!showUploadSuccess">
-        <button class="btn btn-secondary" (click)="closeUploadModal()" [disabled]="isUploading">Annuler</button>
+        <button class="btn btn-secondary" (click)="closeUploadModal()" [disabled]="isUploading"> {{ t("dashDocument.modals.upload.fields.Cancel") }}</button>
         <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="isUploading">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -372,7 +372,8 @@
             <line x1="12" y1="3" x2="12" y2="15"/>
           </svg>
           <span *ngIf="isUploading" class="spinner"></span>
-          {{ isUploading ? 'Envoi en cours...' : 'Ajouter le document' }}
+          <!-- {{ isUploading ? 'Envoi en cours...' : 'Ajouter le document' }} -->
+          {{ t("dashDocument.modals.upload.title") }}
         </button>
       </div>
     </div>

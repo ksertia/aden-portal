@@ -358,11 +358,15 @@
       "name": "Filters and search",
       "reset": "reset",
       "search_name": "To research",
+      "Document": " Document",
+      "Type": " Type",
+      "Actions": " Actions",
       "nameType": "Document type",
       "case": "cases",
       "All_types": "All types ",
       "All_case": "All case ",
       "placeholder": "Document name, case...",
+      "Added_on": "Added on ",
       "documentTypes": [
         { "value": "", "label": "All types" },
         { "value": "invoice", "label": "Invoices" },
@@ -374,8 +378,8 @@
       ]
     },
     "statistics": {
-      "totalDocuments": "Total number of filtered documents",
-      "totalCases": "Total number of cases"
+      "totalDocuments": "Total documents",
+      "totalCases": "Total cases"
     },
     "documents": [
       {
@@ -392,17 +396,19 @@
         "fields": {
           "associatedCase": "Case ID",
           "documentType": "Document type",
+          "Select_a_type": "Select a type",
+          "Select_a_case": "Select a case",
           "documentName": "Document name",
-          "file": "File information"
+          "file": "File ",
+          "Cancel": "Cancel"
         }
       },
       "delete": {
-        "confirmationMessage": "Are you sure you want to delete this document?",
-        "warning": "This action is irreversible."
-      },
-      "viewer": {
-        "title": "Document Viewer",
-        "actions": ["open", "download", "close"]
+        "Confirm_deletion": "Confirm deletion",
+        "confirmationMessage": "Are you sure you want to delete this document,",
+        "warning": "This action is irreversible.",
+        "Cancel": "Cancel",
+        "Delete": "Delete"
       }
     }
   }

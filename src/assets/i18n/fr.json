@@ -357,11 +357,15 @@
       "name": "Filtres et recherche",
       "reset": "Réinitialiser",
       "search_name": "Rechercher",
+      "Document": "Document",
+      "Type": "Type",
+      "Actions": "Actions",
       "nameType": "Type de document",
       "case": "Dossiers ",
       "All_types": "Tous les types ",
       "All_case": "Tous les dossiers ",
       "placeholder": "Nom du document, dossier...",
+      "Added_on": "Ajouté le ",
       "documentTypes": [
         { "value": "", "label": "Tous les types" },
         { "value": "invoice", "label": "Factures" },
@@ -373,8 +377,8 @@
       ]
     },
     "statistics": {
-      "totalDocuments": "Nombre total de documents filtrés",
-      "totalCases": "Nombre total de dossiers"
+      "totalDocuments": "Documents totaux",
+      "totalCases": "Dossiers totaux"
     },
     "documents": [
       {
@@ -389,19 +393,21 @@
       "upload": {
         "title": "Ajouter un document",
         "fields": {
-          "associatedCase": "ID du dossier",
+          "associatedCase": "Dossier associé",
           "documentType": "Type de document",
+          "Select_a_type": "Sélectionner un type",
+          "Select_a_case": "Sélectionner un dossier",
           "documentName": "Nom du document",
-          "file": "Informations du fichier"
+          "file": "Fichier ",
+          "Cancel": "Annuler"
         }
       },
       "delete": {
-        "confirmationMessage": "Voulez-vous supprimer ce document ?",
-        "warning": "Cette action est irréversible."
-      },
-      "viewer": {
-        "title": "Visualisation d’un document",
-        "actions": ["ouvrir", "télécharger", "fermer"]
+        "Confirm_deletion": "Confirmer la suppression",
+        "confirmationMessage": "Voulez-vous supprimer ce document,",
+        "warning": "Cette action est irréversible.",
+        "Cancel": "Annuler",
+        "Delete": "Supprimer"
       }
     }
   }

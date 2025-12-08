@@ -126,7 +126,7 @@ export interface Footer {
   cgu: string;
   copyright: string;
   name: string;
-  nameDescription: string
+  nameDescriptions: string
 }
 
 export interface Common {
