@@ -65,6 +65,18 @@
       <div class="payment-action">    
         <!-- Actions rapides -->
         <div class="quick-actions">
+           <!-- Echéance de paiement -->
+          <button class="btn btn-secondary quick-action-btn" (click)="openEcheancesDrawer()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10,9 9,9 8,9"/>
+            </svg>
+            Echéance de paiement
+          </button> 
+
           <!-- Effectuer un paiement -->
           <button 
               class="btn btn-primary large" 
@@ -89,8 +101,8 @@
             Historique de paiement
           </button>
           
-          <!-- Détails dettes -->
-          <button class="btn btn-outline quick-action-btn" (click)="openDebtDetails()">
+          <!-- Détails dettes (click)="openDebtDetails()" -->
+          <button class="btn btn-outline quick-action-btn" > 
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"/>
               <line x1="12" y1="16" x2="12" y2="12"/>
@@ -1213,6 +1225,234 @@
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- drawer pour l'écheance de paiement -->
+  
+<div class="drawer-overlay" *ngIf="showEcheancesDrawer" ></div>
+ <div class="drawer echeances-drawer" [class.open]="showEcheancesDrawer" (click)="$event.stopPropagation()">
+    <!-- Header du drawer -->
+    <div class="drawer-header">
+        <h3 class="drawer-title">
+          <i class="fas fa-calendar-alt"></i>
+          {{currentEcheanceStep === 'selectDossier' ? 'Sélectionner un dossier' : 'Échéances - ' + (selectedDossierForEcheances?.numeroDossier || 'Dossier')}}
+        </h3>
+        <button class="drawer-close" (click)="closeEcheancesDrawer()">
+          <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Étape 1 : Sélection du dossier -->
+    <div class="drawer-content" *ngIf="currentEcheanceStep === 'selectDossier'">
+      <div class="dossier-selection">
+        <h4><i class="fas fa-folder-open"></i> Vos dossiers</h4>
+        
+        <div class="dossiers-list">
+          <div *ngFor="let dossier of dossiers" class="dossier-card-select" (click)="selectDossierForEcheances(dossier.nodeId)">
+            <div class="dossier-card-header">
+              <div class="dossier-ref">
+                <i class="fas fa-file-invoice"></i>
+                {{dossier.numeroDossier || 'Dossier ' + (dossier.nodeId?.substring(0, 8) || '')}}
+              </div>
+              <div class="dossier-status" [class]="dossier.statut || dossier.stepGlobal">
+                {{getStatusLabel(dossier.statut || dossier.stepGlobal)}}
+              </div>
+            </div>
+            
+            <div class="dossier-info">
+              <div class="dossier-detail">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Total dû: {{formatCurrency(calculateTotalDue(dossier))}}</span>
+              </div>
+              <div class="dossier-detail">
+                <i class="fas fa-check-circle"></i>
+                <span>Payé: {{formatCurrency(dossier.montantPaye || 0)}}</span>
+              </div>
+              <div class="dossier-detail">
+                <i class="fas fa-balance-scale"></i>
+                <span>Reste: {{formatCurrency(calculateRemainingAmount(dossier))}}</span>
+              </div>
+            </div>
+            
+            <div class="dossier-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="getDossierPaymentPercentage(dossier)"></div>
+              </div>
+              <div class="progress-text">{{getDossierPaymentPercentage(dossier)}}% payé</div>
+            </div>
+            
+            <button class="btn-view-echeances">
+              <i class="fas fa-calendar-alt"></i>
+              Voir les échéances
+            </button>
+          </div>
+          
+          <div *ngIf="dossiers.length === 0" class="no-dossiers">
+            <i class="fas fa-folder-open"></i>
+            <p>Aucun dossier trouvé</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Étape 2 : Vue des échéances -->
+    <div class="drawer-content" *ngIf="currentEcheanceStep === 'viewEcheances'">
+      <!-- Bouton retour -->
+      <div class="back-button" (click)="backToDossierSelection()">
+        <i class="fas fa-arrow-left"></i>
+        Retour à la sélection des dossiers
+      </div>
+      
+      <!-- Résumé des échéances -->
+      <div class="echeances-summary">
+        <div class="summary-card">
+          <div class="summary-icon overdue">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <div class="summary-info">
+            <div class="summary-count">{{overdueEcheances.length}}</div>
+            <div class="summary-label">En retard</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon upcoming">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="summary-info">
+            <div class="summary-count">{{upcomingEcheances.length}}</div>
+            <div class="summary-label">À venir</div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon paid">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="summary-info">
+            <div class="summary-count">{{paidEcheances.length}}</div>
+            <div class="summary-label">Payées</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtres et recherche -->
+      <div class="echeances-filters">
+        <div class="filter-buttons">
+          <button 
+            class="filter-btn" 
+            [class.active]="echeanceFilter === 'all'"
+            (click)="echeanceFilter = 'all'; filterEcheances()">
+            Toutes
+          </button>
+          <button 
+            class="filter-btn overdue" 
+            [class.active]="echeanceFilter === 'overdue'"
+            (click)="echeanceFilter = 'overdue'; filterEcheances()">
+            En retard
+          </button>
+          <button 
+            class="filter-btn upcoming" 
+            [class.active]="echeanceFilter === 'upcoming'"
+            (click)="echeanceFilter = 'upcoming'; filterEcheances()">
+            À venir
+          </button>
+          <button 
+            class="filter-btn paid" 
+            [class.active]="echeanceFilter === 'paid'"
+            (click)="echeanceFilter = 'paid'; filterEcheances()">
+            Payées
+          </button>
+        </div>
+        
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input 
+            type="text" 
+            placeholder="Rechercher une échéance..." 
+            [(ngModel)]="searchEcheanceQuery"
+            (input)="filterEcheances()">
+        </div>
+      </div>
+
+      <!-- Liste des échéances -->
+      <div class="echeances-list">
+        <div *ngIf="filteredEcheances.length === 0" class="no-echeances">
+          <i class="fas fa-calendar-check"></i>
+          <p>Aucune échéance trouvée</p>
+        </div>
+
+        <div *ngFor="let echeance of filteredEcheances" class="echeance-item">
+          <div class="echeance-header">
+            <div class="echeance-ref">{{echeance.reference}}</div>
+            <div class="echeance-status" [class]="getEcheanceStatusClass(echeance.statut)">
+              {{getEcheanceStatusLabel(echeance.statut)}}
+              <span *ngIf="echeance.statut === 'overdue'" class="overdue-days">
+                ({{getDaysOverdue(echeance.dateEcheance)}} jours)
+              </span>
+            </div>
+          </div>
+          
+          <div class="echeance-details">
+            <div class="echeance-date">
+              <i class="far fa-calendar"></i>
+              {{formatDateDisplay(echeance.dateEcheance)}}
+              <span *ngIf="echeance.datePaiement" class="paid-date">
+                <i class="far fa-check-circle"></i>
+                Payé le {{formatDateDisplay(echeance.datePaiement)}}
+              </span>
+            </div>
+            
+            <div class="echeance-amount">
+              <span class="amount">{{echeance.montant | number:'1.0-0'}} FCFA</span>
+              <span *ngIf="echeance.penalites > 0" class="penalties">
+                + {{echeance.penalites | number:'1.0-0'}} FCFA de pénalités
+              </span>
+            </div>
+            
+            <div *ngIf="echeance.commentaire" class="echeance-comment">
+              <i class="far fa-comment"></i>
+              {{echeance.commentaire}}
+            </div>
+          </div>
+          
+          <div class="echeance-actions">
+            <button 
+              *ngIf="echeance.statut !== 'paid'" 
+              class="btn-pay-echeance"
+              (click)="payEcheance(echeance)">
+              <i class="fas fa-credit-card"></i>
+              Payer cette échéance
+            </button>
+            <button class="btn-details" *ngIf="echeance.statut === 'paid'">
+              <i class="fas fa-receipt"></i>
+              Voir le reçu
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiques détaillées -->
+      <div class="echeances-stats">
+        <h4><i class="fas fa-chart-bar"></i> Statistiques des échéances</h4>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">Total des échéances</div>
+            <div class="stat-value">{{filteredEcheances.length}}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Montant total dû</div>
+            <!-- <div class="stat-value">
+              {{filteredEcheances.reduce((sum, e) => sum + e.montant, 0) | number:'1.0-0'}} FCFA
+            </div> -->
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Pénalités totales</div>
+            <!-- <div class="stat-value">
+              {{filteredEcheances.reduce((sum, e) => sum + e.penalites, 0) | number:'1.0-0'}} FCFA
+            </div> -->
+          </div>
         </div>
       </div>
     </div>

@@ -1,0 +1,350 @@
+<div class="dashboard-container">
+  <!-- En-tête -->
+  <header class="dashboard-header">
+    <h1><i class="fas fa-chart-line"></i> Tableau de bord Partenaire </h1>
+    <!-- <div class="user-info">
+      <div class="user-avatar">PR</div>
+      <div class="user-details">
+        <div class="user-name">Partenaire Recouvrement</div>
+        <div class="user-last-login">Dernière connexion: {{ getCurrentTimestamp() }}</div>
+      </div>
+    </div> -->
+  </header>
+
+  <!-- Cartes de statistiques -->
+  <section class="stats-cards">
+    <div class="card stat-card amount-card">
+      <div class="card-header">
+        <h3>Montant total des dossiers</h3>
+        <i class="fas fa-file-invoice-dollar card-icon"></i>
+      </div>
+      <div class="card-value">{{ formatCurrency(stats.totalAmount) }}</div>
+      <div class="card-subtitle">Somme totale de tous les dossiers débiteurs</div>
+    </div>
+
+    <div class="card stat-card payments-card">
+      <div class="card-header">
+        <h3>Nombre de paiements</h3>
+        <i class="fas fa-credit-card card-icon"></i>
+      </div>
+      <div class="card-value">{{ stats.totalPayments }}</div>
+      <div class="card-subtitle">Total des paiements effectués</div>
+    </div>
+
+    <div class="card stat-card collected-card">
+      <div class="card-header">
+        <h3>Total collecté</h3>
+        <i class="fas fa-hand-holding-usd card-icon"></i>
+      </div>
+      <div class="card-value">{{ formatCurrency(stats.totalCollected) }}</div>
+      <div class="card-subtitle">Montant total des paiements effectués</div>
+    </div>
+
+    <div class="card stat-card pending-card">
+      <div class="card-header">
+        <h3>En attente de collection</h3>
+        <i class="fas fa-clock card-icon"></i>
+      </div>
+      <div class="card-value">{{ formatCurrency(stats.pendingCollection) }}</div>
+      <div class="card-subtitle">Montant restant à collecter</div>
+    </div>
+  </section>
+
+  <!-- Section des filtres -->
+  <section class="filters-section">
+    <div class="section-title">
+      <i class="fas fa-filter"></i> Filtres des paiements
+    </div>
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label for="startDate">Date de début</label>
+        <input type="date" id="startDate" [(ngModel)]="filters.startDate" (change)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label for="endDate">Date de fin</label>
+        <input type="date" id="endDate" [(ngModel)]="filters.endDate" (change)="applyFilters()">
+      </div>
+      <div class="filter-group">
+        <label for="debtorFilter">Débiteur</label>
+        <select id="debtorFilter" [(ngModel)]="filters.debtorId" (change)="applyFilters()">
+          <option value="">Tous les débiteurs</option>
+          <option *ngFor="let debtor of uniqueDebtors" [value]="debtor.id">{{ debtor.name }}</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="dossierFilter">Dossier</label>
+        <select id="dossierFilter" [(ngModel)]="filters.dossierId" (change)="applyFilters()">
+          <option value="">Tous les dossiers</option>
+          <option *ngFor="let dossier of uniqueDossiers" [value]="dossier.id">{{ dossier.number }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="search-box">
+      <input type="text" 
+             [(ngModel)]="filters.searchTerm" 
+             (keyup.enter)="applyFilters()"
+             placeholder="Rechercher par ID paiement, nom, dossier...">
+      <button class="search-btn" (click)="applyFilters()">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+    <div class="filter-actions">
+      <button class="btn btn-secondary" (click)="resetFilters()">Réinitialiser</button>
+      <button class="btn btn-primary" (click)="applyFilters()">Appliquer les filtres</button>
+    </div>
+  </section>
+
+  <!-- Tableau des paiements -->
+  <section class="table-section">
+    <div class="section-header">
+      <h2><i class="fas fa-money-check-alt"></i> Paiements collectés</h2>
+      <div class="table-controls">
+        <div class="entries-selector">
+          <label for="itemsPerPage">Afficher :</label>
+          <select id="itemsPerPage" [(ngModel)]="itemsPerPage" (change)="currentPage = 1; applyFilters()">
+            <option *ngFor="let size of pageSizes" [value]="size">{{ size }} entrées</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive" *ngIf="!isLoading && paginatedPayments.length > 0">
+      <table class="payments-table">
+        <thead>
+          <tr>
+            <th>ID Paiement</th>
+            <th>Débiteur</th>
+            <th>Dossier</th>
+            <th>Montant</th>
+            <th>Date d'échéance</th>
+            <th>Date de paiement</th>
+            <th>Moyen de paiement</th>
+            <th>Statut</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let payment of paginatedPayments">
+            <td>{{ payment.reference }}</td>
+            <td>{{ payment.debiteurName }}</td>
+            <td>{{ payment.dossierNumber }}</td>
+            <td>{{ formatCurrency(payment.amount) }}</td>
+            <td>{{ formatDate(payment.dueDate) }}</td>
+            <td>{{ formatDate(payment.paymentDate) }}</td>
+            <td>
+              <span class="payment-method">
+                <i class="fas fa-{{ getPaymentMethodIcon(payment.paymentMethod) }}"></i>
+                {{ payment.paymentMethod }}
+              </span>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(payment.status)">
+                {{ getStatusLabel(payment.status) }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-action" (click)="openPaymentDetail(payment)">Détails</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && paginatedPayments.length === 0">
+      <i class="fas fa-search"></i>
+      <h3>Aucun paiement trouvé</h3>
+      <p>Aucun paiement ne correspond à vos critères de recherche.</p>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <!-- <div class="pagination-info">
+        Affichage de {{ (currentPage - 1) * itemsPerPage + 1 }} 
+        à {{ Math.min(currentPage * itemsPerPage, totalItems) }} 
+        sur {{ totalItems }} entrées
+      </div> -->
+      <div class="pagination-controls">
+        <button class="pagination-btn" 
+                (click)="prevPage()" 
+                [disabled]="currentPage === 1">
+          Précédent
+        </button>
+        
+        <button *ngFor="let page of getPageNumbers()" 
+                class="pagination-btn" 
+                [class.active]="page === currentPage"
+                (click)="goToPage(page)">
+          {{ page }}
+        </button>
+        
+        <button class="pagination-btn" 
+                (click)="nextPage()" 
+                [disabled]="currentPage === totalPages">
+          Suivant
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Actions rapides -->
+  <section class="quick-actions">
+    <div class="action-card" (click)="openHistoryDrawer()">
+      <div class="action-icon history">
+        <i class="fas fa-history"></i>
+      </div>
+      <span>Historique des transactions</span>
+    </div>
+    
+    <div class="action-card" (click)="openPortfolioDrawer()">
+      <div class="action-icon portfolio">
+        <i class="fas fa-briefcase"></i>
+      </div>
+      <span>Portefeuille client</span>
+    </div>
+    
+    <div class="action-card" (click)="openCommissionDrawer()">
+      <div class="action-icon commission">
+        <i class="fas fa-percentage"></i>
+      </div>
+      <span>Commission</span>
+    </div>
+  </section>
+
+  <!-- Drawers -->
+  <!-- Drawer Historique -->
+  <div class="drawer-overlay" *ngIf="showHistoryDrawer" (click)="closeHistoryDrawer()"></div>
+  <div class="drawer" [class.active]="showHistoryDrawer">
+    <div class="drawer-header">
+      <h2><i class="fas fa-history"></i> Historique des transactions</h2>
+      <button class="drawer-close" (click)="closeHistoryDrawer()">&times;</button>
+    </div>
+    <div class="drawer-content">
+      <div class="drawer-item" *ngFor="let transaction of historyTransactions">
+        <div class="drawer-item-content">
+          <div class="drawer-item-title">Paiement {{ transaction.reference }}</div>
+          <div class="drawer-item-subtitle">{{ transaction.debiteurName }} - {{ formatDate(transaction.paymentDate) }}</div>
+        </div>
+        <div class="drawer-item-amount">{{ formatCurrency(transaction.amount) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer Portefeuille client -->
+  <div class="drawer-overlay" *ngIf="showPortfolioDrawer" (click)="closePortfolioDrawer()"></div>
+  <div class="drawer" [class.active]="showPortfolioDrawer">
+    <div class="drawer-header">
+      <h2><i class="fas fa-briefcase"></i> Portefeuille client</h2>
+      <button class="drawer-close" (click)="closePortfolioDrawer()">&times;</button>
+    </div>
+    <div class="drawer-content">
+      <div class="drawer-item" *ngFor="let client of portfolioData">
+        <div class="drawer-item-content">
+          <div class="drawer-item-title">{{ client.debiteurName }}</div>
+          <div class="drawer-item-subtitle">Dossier: {{ client.dossierNumber }}</div>
+        </div>
+        <div class="drawer-item-amount">
+          <div class="amount-total">{{ formatCurrency(client.totalAmount) }}</div>
+          <div class="amount-collected">{{ formatCurrency(client.collectedAmount) }} collectés</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer Commission -->
+  <div class="drawer-overlay" *ngIf="showCommissionDrawer" (click)="closeCommissionDrawer()"></div>
+  <div class="drawer" [class.active]="showCommissionDrawer">
+    <div class="drawer-header">
+      <h2><i class="fas fa-percentage"></i> Commission</h2>
+      <button class="drawer-close" (click)="closeCommissionDrawer()">&times;</button>
+    </div>
+    <div class="drawer-content">
+      <div class="commission-summary">
+        <div class="commission-total">{{ formatCurrency(stats.commissionAmount) }}</div>
+        <div class="commission-subtitle">Total commission ({{ stats.commissionRate }}% du collecté)</div>
+      </div>
+      
+      <div class="drawer-item" *ngFor="let commission of commissionData">
+        <div class="drawer-item-content">
+          <div class="drawer-item-title">Commission {{ commission.month }}</div>
+          <div class="drawer-item-subtitle">Sur collecte: {{ formatCurrency(commission.collected) }}</div>
+        </div>
+        <div class="drawer-item-amount">{{ formatCurrency(commission.commission) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Détails du paiement -->
+  <div class="modal-overlay" *ngIf="showPaymentDetailModal" (click)="closePaymentDetail()"></div>
+  <div class="modal" [class.active]="showPaymentDetailModal" *ngIf="selectedPayment">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Détails du paiement {{ selectedPayment.reference }}</h3>
+        <button class="modal-close" (click)="closePaymentDetail()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="payment-details-grid">
+          <div class="detail-item">
+            <div class="detail-label">ID Paiement</div>
+            <div class="detail-value">{{ selectedPayment.reference }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Débiteur</div>
+            <div class="detail-value">{{ selectedPayment.debiteurName }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Dossier</div>
+            <div class="detail-value">{{ selectedPayment.dossierNumber }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Montant</div>
+            <div class="detail-value">{{ formatCurrency(selectedPayment.amount) }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Date d'échéance</div>
+            <div class="detail-value">{{ formatDate(selectedPayment.dueDate) }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Date de paiement</div>
+            <div class="detail-value">{{ formatDate(selectedPayment.paymentDate) }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Moyen de paiement</div>
+            <div class="detail-value">{{ selectedPayment.paymentMethod }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Statut</div>
+            <div class="detail-value">
+              <span class="status-badge" [ngClass]="getStatusClass(selectedPayment.status)">
+                {{ getStatusLabel(selectedPayment.status) }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-item full-width">
+          <div class="detail-label">Référence transaction</div>
+          <div class="detail-value">{{ selectedPayment.transactionRef }}</div>
+        </div>
+        
+        <div class="detail-item full-width" *ngIf="selectedPayment.notes">
+          <div class="detail-label">Notes</div>
+          <div class="detail-value">{{ selectedPayment.notes }}</div>
+        </div>
+        
+        <div class="modal-actions">
+          <button class="btn btn-secondary" (click)="closePaymentDetail()">Fermer</button>
+          <button class="btn btn-primary" (click)="downloadReceipt(selectedPayment)">
+            <i class="fas fa-download"></i> Télécharger le reçu
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Chargement des données...</p>
+  </div>
+</div>    
+   
