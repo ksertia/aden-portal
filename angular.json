@@ -5,7 +5,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "demo": {
+    "aden-portal": {
       "architect": {
         "build": {
           "builder": "@angular/build:application",
@@ -24,24 +24,24 @@
             },
             "fr": {
               "aot": true,
-              "outputPath": "dist/demo/fr",
+              "outputPath": "dist/aden-portal/fr",
               "i18nMissingTranslation": "warning"
             },
             "en": {
               "aot": true,
-              "outputPath": "dist/demo/en",
+              "outputPath": "dist/aden-portal/en",
               "i18nMissingTranslation": "warning"
             },
             "fr": {
               "aot": true,
-              "outputPath": "dist/demo/fr",
+              "outputPath": "dist/aden-portal/fr",
               "i18nFile": "src/locale/messages.fr.xlf",
               "i18nFormat": "xlf",
               "i18nLocale": "fr"
             },
             "en": {
               "aot": true,
-              "outputPath": "dist/demo/en",
+              "outputPath": "dist/aden-portal/en",
               "i18nFile": "src/locale/messages.en.xlf",
               "i18nFormat": "xlf",
               "i18nLocale": "en"
@@ -68,7 +68,7 @@
             ],
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "outputPath": "dist/demo",
+            "outputPath": "dist/aden-portal",
             "polyfills": ["zone.js"],
             "scripts": [],
             "styles": ["src/global_styles.css"],
@@ -82,22 +82,22 @@
           },
           "configurations": {
             "development": {
-              "buildTarget": "demo:build:development"
+              "buildTarget": "aden-portal:build:development"
             },
             "fr": {
-              "buildTarget": "demo:build:fr"
+              "buildTarget": "aden-portal:build:fr"
             },
             "en": {
-              "buildTarget": "demo:build:en"
+              "buildTarget": "aden-portal:build:en"
             },
             "fr": {
-              "buildTarget": "demo:build:fr"
+              "buildTarget": "aden-portal:build:fr"
             },
             "en": {
-              "buildTarget": "demo:build:en"
+              "buildTarget": "aden-portal:build:en"
             },
             "production": {
-              "buildTarget": "demo:build:production"
+              "buildTarget": "aden-portal:build:production"
             }
           },
           "defaultConfiguration": "development"
