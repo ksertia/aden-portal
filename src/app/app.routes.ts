@@ -141,6 +141,10 @@ export const routes: Routes = [
           {
             path: 'dashboard',
             loadComponent: () => import('./components/creditor/creditor-dashboard/creditor-dashboard').then(c => c.CreditorDashboard)
+          },
+          {
+            path: 'payments',
+            loadComponent: () => import('./components/creditor/creditor-payments/creditor-payments').then(c => c.CreditorPayments)
           }
         ]
       },
