@@ -2,13 +2,6 @@
   <!-- En-tête -->
   <header class="dashboard-header">
     <h1><i class="fas fa-chart-line"></i> Tableau de bord Partenaire </h1>
-    <!-- <div class="user-info">
-      <div class="user-avatar">PR</div>
-      <div class="user-details">
-        <div class="user-name">Partenaire Recouvrement</div>
-        <div class="user-last-login">Dernière connexion: {{ getCurrentTimestamp() }}</div>
-      </div>
-    </div> -->
   </header>
 
   <!-- Cartes de statistiques -->
@@ -158,11 +151,6 @@
 
     <!-- Pagination -->
     <div class="pagination" *ngIf="totalPages > 1">
-      <!-- <div class="pagination-info">
-        Affichage de {{ (currentPage - 1) * itemsPerPage + 1 }} 
-        à {{ Math.min(currentPage * itemsPerPage, totalItems) }} 
-        sur {{ totalItems }} entrées
-      </div> -->
       <div class="pagination-controls">
         <button class="pagination-btn" 
                 (click)="prevPage()" 
@@ -170,12 +158,12 @@
           Précédent
         </button>
         
-        <button *ngFor="let page of getPageNumbers()" 
+        <!-- <button *ngFor="let page of getPageNumbers()" 
                 class="pagination-btn" 
                 [class.active]="page === currentPage"
                 (click)="goToPage(page)">
           {{ page }}
-        </button>
+        </button> -->
         
         <button class="pagination-btn" 
                 (click)="nextPage()" 
@@ -186,45 +174,192 @@
     </div>
   </section>
 
+
   <!-- Actions rapides -->
-  <section class="quick-actions">
-    <div class="action-card" (click)="openHistoryDrawer()">
-      <div class="action-icon history">
-        <i class="fas fa-history"></i>
-      </div>
+<!-- Actions rapides (version SVG) -->
+<section class="quick-actions">
+  <h3>Actions Rapides</h3>
+  <div class="actions-grid">
+    <div class="action-card highlight1" (click)="openTransactionHistoryDrawer()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 8v4l3 3"/>
+        <circle cx="12" cy="12" r="10"/>
+      </svg>
       <span>Historique des transactions</span>
     </div>
     
-    <div class="action-card" (click)="openPortfolioDrawer()">
-      <div class="action-icon portfolio">
-        <i class="fas fa-briefcase"></i>
-      </div>
+    <div class="action-card highlight2" (click)="openPortfolioDrawer()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+      </svg>
       <span>Portefeuille client</span>
     </div>
     
-    <div class="action-card" (click)="openCommissionDrawer()">
-      <div class="action-icon commission">
-        <i class="fas fa-percentage"></i>
-      </div>
+    <div class="action-card highlight3" (click)="openCommissionDrawer()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="1" x2="12" y2="23"/>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
       <span>Commission</span>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Drawers -->
-  <!-- Drawer Historique -->
-  <div class="drawer-overlay" *ngIf="showHistoryDrawer" (click)="closeHistoryDrawer()"></div>
-  <div class="drawer" [class.active]="showHistoryDrawer">
+  <!-- Drawer Historique des Transactions -->
+  <div class="drawer-overlay" *ngIf="showTransactionHistoryDrawer" (click)="closeTransactionHistoryDrawer()"></div>
+  <div class="drawer history-drawer" [class.active]="showTransactionHistoryDrawer">
     <div class="drawer-header">
-      <h2><i class="fas fa-history"></i> Historique des transactions</h2>
-      <button class="drawer-close" (click)="closeHistoryDrawer()">&times;</button>
+      <h2><i class="fas fa-history"></i> Historique des Transactions</h2>
+      <button class="drawer-close" (click)="closeTransactionHistoryDrawer()">&times;</button>
     </div>
+    
     <div class="drawer-content">
-      <div class="drawer-item" *ngFor="let transaction of historyTransactions">
-        <div class="drawer-item-content">
-          <div class="drawer-item-title">Paiement {{ transaction.reference }}</div>
-          <div class="drawer-item-subtitle">{{ transaction.debiteurName }} - {{ formatDate(transaction.paymentDate) }}</div>
+      <!-- Filtres -->
+      <div class="history-filters">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label for="historyReference">Référence</label>
+            <input type="text" id="historyReference" 
+                  [(ngModel)]="historyFilters.reference" 
+                  (keyup.enter)="applyHistoryFilters()"
+                  placeholder="Rechercher par référence">
+          </div>
+          <div class="filter-group">
+            <label for="historyDossier">Dossier</label>
+            <input type="text" id="historyDossier" 
+                  [(ngModel)]="historyFilters.dossier" 
+                  (keyup.enter)="applyHistoryFilters()"
+                  placeholder="Rechercher par dossier">
+          </div>
+          <div class="filter-group">
+            <label for="historyClient">Client</label>
+            <input type="text" id="historyClient" 
+                  [(ngModel)]="historyFilters.client" 
+                  (keyup.enter)="applyHistoryFilters()"
+                  placeholder="Rechercher par client">
+          </div>
+          <div class="filter-group">
+            <label for="historyStartDate">Date début</label>
+            <input type="date" id="historyStartDate" 
+                  [(ngModel)]="historyFilters.startDate" 
+                  (change)="applyHistoryFilters()">
+          </div>
+          <div class="filter-group">
+            <label for="historyEndDate">Date fin</label>
+            <input type="date" id="historyEndDate" 
+                  [(ngModel)]="historyFilters.endDate" 
+                  (change)="applyHistoryFilters()">
+          </div>
+          <div class="filter-group">
+            <label for="historyClientType">Type client</label>
+            <select id="historyClientType" 
+                    [(ngModel)]="historyFilters.clientType" 
+                    (change)="applyHistoryFilters()">
+              <option value="">Tous</option>
+              <option value="debtor">Débiteur</option>
+              <option value="creditor">Créancier</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="historyTransactionType">Type transaction</label>
+            <select id="historyTransactionType" 
+                    [(ngModel)]="historyFilters.transactionType" 
+                    (change)="applyHistoryFilters()">
+              <option value="">Tous</option>
+              <option value="payment">Paiement</option>
+              <option value="reimbursement">Reversement</option>
+            </select>
+          </div>
         </div>
-        <div class="drawer-item-amount">{{ formatCurrency(transaction.amount) }}</div>
+        <div class="filter-actions">
+          <button class="btn btn-secondary" (click)="resetHistoryFilters()">Réinitialiser</button>
+          <button class="btn btn-primary" (click)="applyHistoryFilters()">Appliquer</button>
+        </div>
+      </div>
+      
+      <!-- Tableau des transactions -->
+      <div class="table-responsive" style="margin-top: 20px;">
+        <table class="transactions-table">
+          <thead>
+            <tr>
+              <th>Référence</th>
+              <th>Dossier</th>
+              <th>Client</th>
+              <th>Montant</th>
+              <th>Date</th>
+              <th>Moyen</th>
+              <th>Statut</th>
+              <th>Type</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let transaction of paginatedHistory">
+              <td>{{ transaction.reference }}</td>
+              <td>{{ transaction.dossierNumber }}</td>
+              <td>{{ transaction.clientName }}</td>
+              <td>{{ formatCurrencyEuro(transaction.amount) }}</td>
+              <td>{{ formatDate(transaction.date) }}</td>
+              <td>{{ transaction.paymentMethod }}</td>
+              <td>
+                <span class="client-type-badge" 
+                      [class.debtor]="transaction.clientType === 'debtor'"
+                      [class.creditor]="transaction.clientType === 'creditor'">
+                  {{ getClientTypeLabel(transaction.clientType) }}
+                </span>
+              </td>
+              <td>
+                <span class="transaction-type-badge" 
+                      [class.payment]="transaction.transactionType === 'payment'"
+                      [class.reimbursement]="transaction.transactionType === 'reimbursement'">
+                  {{ getTransactionTypeLabel(transaction.transactionType) }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-action small" (click)="viewTransactionDetails(transaction)">
+                  Détails
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- État vide -->
+      <div class="empty-state" *ngIf="filteredHistory.length === 0" style="padding: 40px 20px;">
+        <i class="fas fa-search"></i>
+        <h3>Aucune transaction trouvée</h3>
+        <p>Aucune transaction ne correspond à vos critères de recherche.</p>
+      </div>
+      
+      <!-- Pagination pour l'historique -->
+      <div class="pagination" *ngIf="historyTotalPages > 1" style="margin-top: 20px;">
+        <div class="pagination-info">
+          Affichage de {{ getHistoryStartIndex() }} 
+          à {{ getHistoryEndIndex() }} 
+          sur {{ historyTotalItems }} transactions
+        </div>
+        <div class="pagination-controls">
+          <button class="pagination-btn" 
+                  (click)="prevHistoryPage()" 
+                  [disabled]="historyCurrentPage === 1">
+            Précédent
+          </button>
+          
+          <!-- <button *ngFor="let page of getHistoryPageNumbers()" 
+                  class="pagination-btn" 
+                  [class.active]="page === historyCurrentPage"
+                  (click)="goToHistoryPage(page as number)"
+                  [disabled]="page === '...'">
+            {{ page }}
+          </button> -->
+          
+          <button class="pagination-btn" 
+                  (click)="nextHistoryPage()" 
+                  [disabled]="historyCurrentPage === historyTotalPages">
+            Suivant
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -251,27 +386,328 @@
   </div>
 
   <!-- Drawer Commission -->
-  <div class="drawer-overlay" *ngIf="showCommissionDrawer" (click)="closeCommissionDrawer()"></div>
-  <div class="drawer" [class.active]="showCommissionDrawer">
-    <div class="drawer-header">
-      <h2><i class="fas fa-percentage"></i> Commission</h2>
-      <button class="drawer-close" (click)="closeCommissionDrawer()">&times;</button>
-    </div>
-    <div class="drawer-content">
-      <div class="commission-summary">
-        <div class="commission-total">{{ formatCurrency(stats.commissionAmount) }}</div>
-        <div class="commission-subtitle">Total commission ({{ stats.commissionRate }}% du collecté)</div>
+<div class="drawer-overlay" *ngIf="showCommissionDrawer" (click)="closeCommissionDrawer()"></div>
+<div class="drawer commission-drawer" [class.active]="showCommissionDrawer">
+  <div class="drawer-header">
+    <h2><i class="fas fa-percentage"></i> Commission</h2>
+    <button class="drawer-close" (click)="closeCommissionDrawer()">&times;</button>
+  </div>
+  
+  <!-- Contenu principal des commissions -->
+  <div class="drawer-content commission-content" *ngIf="!showCommissionRequestForm">
+    <div class="commission-container">
+      <!-- Statistiques dynamiques -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Taux de commission</div>
+          <div class="stat-value">{{ commissionStats.tauxCommission }}%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Commissions dues</div>
+          <div class="stat-value">{{ formatFCFA(commissionStats.commissionsDues) }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Commissions payées</div>
+          <div class="stat-value">{{ formatFCFA(commissionStats.commissionsPayees) }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Dernier reversement</div>
+          <div class="stat-value">{{ commissionStats.dernierReversement ? formatDate(commissionStats.dernierReversement) : 'Aucun' }}</div>
+        </div>
       </div>
       
-      <div class="drawer-item" *ngFor="let commission of commissionData">
-        <div class="drawer-item-content">
-          <div class="drawer-item-title">Commission {{ commission.month }}</div>
-          <div class="drawer-item-subtitle">Sur collecte: {{ formatCurrency(commission.collected) }}</div>
+      <!-- Onglets Commission -->
+      <div class="tabs">
+        <div class="tab" [class.active]="commissionActiveTab === 'history'" (click)="setCommissionTab('history')">
+          Historique des reversements
         </div>
-        <div class="drawer-item-amount">{{ formatCurrency(commission.commission) }}</div>
+        <div class="tab" [class.active]="commissionActiveTab === 'status'" (click)="setCommissionTab('status')">
+          Statut des paiements
+        </div>
+      </div>
+      
+      <!-- Historique des reversements -->
+      <div class="tab-content" [class.active]="commissionActiveTab === 'history'">
+        <table>
+          <thead>
+            <tr>
+              <th>Référence</th>
+              <th>Date de demande</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th>Date de paiement</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let commission of getCommissionsPayees()">
+              <td>{{ commission.reference }}</td>
+              <td>{{ formatDate(commission.dateDemande) }}</td>
+              <td>{{ formatFCFA(commission.montant) }}</td>
+              <td>
+                <span class="status" [ngClass]="getCommissionStatusClass(commission.statut)">
+                  {{ getCommissionStatusLabel(commission.statut) }}
+                </span>
+              </td>
+              <td>{{ commission.datePaiement ? formatDate(commission.datePaiement) : '-' }}</td>
+            </tr>
+            <tr *ngIf="getCommissionsPayees().length === 0">
+              <td colspan="5" style="text-align: center; padding: 20px;">
+                Aucun reversement effectué pour le moment
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Statut des paiements -->
+      <div class="tab-content" [class.active]="commissionActiveTab === 'status'">
+        <table>
+          <thead>
+            <tr>
+              <th>Référence</th>
+              <th>Date de demande</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let commission of getCommissionsEnAttente()">
+              <td>{{ commission.reference }}</td>
+              <td>{{ formatDate(commission.dateDemande) }}</td>
+              <td>{{ formatFCFA(commission.montant) }}</td>
+              <td>
+                <span class="status" [ngClass]="getCommissionStatusClass(commission.statut)">
+                  {{ getCommissionStatusLabel(commission.statut) }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-primary" (click)="viewCommissionDetails(commission)">
+                  Détails
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="getCommissionsEnAttente().length === 0">
+              <td colspan="5" style="text-align: center; padding: 20px;">
+                Aucune commission en attente
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div style="margin-top: 20px; text-align: center;">
+        <button class="btn btn-primary commission-request-btn" (click)="openCommissionRequestForm()">
+          Demander un reversement
+        </button>
       </div>
     </div>
   </div>
+  
+  <!-- Formulaire de demande de reversement -->
+  <div class="drawer-content commission-request-content" *ngIf="showCommissionRequestForm">
+    <div class="commission-request-container">
+      <div class="commission-request-header">
+        <h2><i class="fas fa-file-invoice-dollar"></i> Demande de reversement de commission</h2>
+        <p class="subtitle">Formulaire de demande de reversement de commission après recouvrement</p>
+      </div>
+      
+      <div class="commission-request-body">
+        <!-- Informations générales -->
+        <div class="section">
+          <h3><i class="fas fa-info-circle"></i> Informations générales</h3>
+          
+          <!-- Référence du dossier/contrat -->
+          <div class="form-group horizontal-group">
+            <div class="form-label">Référence du dossier/contrat</div>
+            <div class="form-value">
+              <input type="text" 
+                     [(ngModel)]="commissionRequestData.dossierReference" 
+                     class="form-control"
+                     placeholder="RC-2025-008">
+            </div>
+          </div>
+          
+          <div class="divider-line"></div>
+          
+          <!-- Créancier concerné -->
+          <div class="form-group horizontal-group">
+            <div class="form-label">Créancier concerné</div>
+            <div class="form-value">
+              <div class="creancier-info">
+                <div class="creancier-name">
+                  <input type="text" 
+                         [(ngModel)]="commissionRequestData.creancier" 
+                         class="form-control"
+                         placeholder="Société ABC">
+                </div>
+                <div class="creancier-number">
+                  <div class="info-label">Numéro de demande</div>
+                  <div class="info-value">{{ commissionRequestData.demandeNumber }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="divider-line"></div>
+          
+          <!-- Partenaire -->
+          <div class="form-group horizontal-group">
+            <div class="form-label">Partenaire (demandeur)</div>
+            <div class="form-value">
+              <input type="text" 
+                     [(ngModel)]="commissionRequestData.partenaire" 
+                     class="form-control"
+                     placeholder="Cabinet XYZ">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Détails de la commission -->
+        <div class="section">
+          <h3><i class="fas fa-calculator"></i> Détails de la commission demandée</h3>
+          
+          <div class="commission-details-grid">
+            <!-- Montant recouvré -->
+            <div class="form-group">
+              <div class="form-label">Montant recouvré</div>
+              <div class="form-value">
+                <div class="amount-input-group">
+                  <!-- <input type="text" 
+                         [value]="getDisplayMontantRecouvre()" 
+                         (input)="updateMontantRecouvre($event)"
+                         class="form-control numeric-input"> -->
+                  <span class="currency">FCFA</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Taux de commission -->
+            <div class="form-group">
+              <div class="form-label">Taux de commission (%)</div>
+              <div class="form-value">
+                <div class="percentage-input-group">
+                  <input type="number" 
+                         [(ngModel)]="commissionRequestData.tauxCommission" 
+                         (input)="updateCommissionAmount()"
+                         min="0" max="100" step="0.5"
+                         class="form-control">
+                  <span class="percentage">%</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Montant de la commission -->
+            <div class="form-group">
+              <div class="form-label">Montant de la commission</div>
+              <div class="form-value commission-amount-display">
+                {{ formatFCFA(commissionRequestData.montantCommission) }}
+              </div>
+            </div>
+            
+            <!-- Référence de paiement -->
+            <div class="form-group">
+              <div class="form-label">Référence de paiement du débiteur</div>
+              <div class="form-value">
+                <input type="text" 
+                       [(ngModel)]="commissionRequestData.referencePaiement" 
+                       class="form-control"
+                       placeholder="V000125AB">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Justificatifs -->
+        <div class="section">
+          <h3><i class="fas fa-paperclip"></i> Justificatifs</h3>
+          
+          <!-- Preuve de recouvrement -->
+          <div class="form-group file-upload-group">
+            <div class="form-label">Preuve de recouvrement</div>
+            <div class="form-value">
+              <div class="file-upload-box" (click)="openCommissionFileSelector('preuveRecouvrement')">
+                <div class="file-upload-content">
+                  <div class="file-upload-icon">
+                    <i class="fas fa-file-upload" *ngIf="!fileUploadStates.preuveRecouvrement"></i>
+                    <i class="fas fa-check-circle uploaded" *ngIf="fileUploadStates.preuveRecouvrement"></i>
+                  </div>
+                  <div class="file-upload-text">
+                    <div class="upload-title">
+                      <span *ngIf="!fileUploadStates.preuveRecouvrement">Ajouter des fichiers</span>
+                      <span *ngIf="fileUploadStates.preuveRecouvrement" class="uploaded-text">
+                        Fichier ajouté
+                      </span>
+                    </div>
+                    <div class="upload-subtitle" *ngIf="fileUploadStates.preuveRecouvrement">
+                      {{ commissionRequestData.fichiers.preuveRecouvrement?.name }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="divider-line"></div>
+          
+          <!-- Contrat de commission -->
+          <div class="form-group file-upload-group">
+            <div class="form-label">Contrat ou convention de commission</div>
+            <div class="form-value">
+              <div class="file-upload-box" (click)="openCommissionFileSelector('contratCommission')">
+                <div class="file-upload-content">
+                  <div class="file-upload-icon">
+                    <i class="fas fa-file-contract" *ngIf="!fileUploadStates.contratCommission"></i>
+                    <i class="fas fa-check-circle uploaded" *ngIf="fileUploadStates.contratCommission"></i>
+                  </div>
+                  <div class="file-upload-text">
+                    <div class="upload-title">
+                      <span *ngIf="!fileUploadStates.contratCommission">Ajouter des fichiers</span>
+                      <span *ngIf="fileUploadStates.contratCommission" class="uploaded-text">
+                        Fichier ajouté
+                      </span>
+                    </div>
+                    <div class="upload-subtitle" *ngIf="fileUploadStates.contratCommission">
+                      {{ commissionRequestData.fichiers.contratCommission?.name }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Informations complémentaires -->
+        <div class="section">
+          <h3><i class="fas fa-comment-dots"></i> Informations complémentaires</h3>
+          
+          <div class="form-group">
+            <div class="form-label">Commentaires / Observations</div>
+            <div class="form-value">
+              <textarea [(ngModel)]="commissionRequestData.commentaires" 
+                        placeholder="Ajoutez ici tout commentaire ou observation supplémentaire..."
+                        rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Actions du formulaire -->
+        <div class="form-actions">
+          <button class="btn btn-secondary" (click)="closeCommissionRequestForm()">
+            <i class="fas fa-times"></i> Annuler
+          </button>
+          <button class="btn btn-primary submit-btn" 
+                  (click)="submitCommissionRequest()"
+                  [disabled]="isSubmittingRequest">
+            <i class="fas fa-paper-plane" *ngIf="!isSubmittingRequest"></i>
+            <i class="fas fa-spinner fa-spin" *ngIf="isSubmittingRequest"></i>
+            {{ isSubmittingRequest ? 'Traitement en cours...' : 'Soumettre la demande' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
   <!-- Modal Détails du paiement -->
   <div class="modal-overlay" *ngIf="showPaymentDetailModal" (click)="closePaymentDetail()"></div>
@@ -346,5 +782,4 @@
     <div class="loading-spinner"></div>
     <p>Chargement des données...</p>
   </div>
-</div>    
-   
+</div>
