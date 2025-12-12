@@ -117,6 +117,22 @@ export class DebtorPaymentsComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
 
+  //----------------- Drawer des Échéances -----------------
+  showEcheancesDrawer = false;
+  currentEcheanceStep: 'selectDossier' | 'viewEcheances' = 'selectDossier';
+  selectedDossierForEcheances: any = null;
+  echeances: any[] = [];
+  filteredEcheances: any[] = [];
+  
+  // Filtres pour les échéances
+  echeanceFilter: 'all' | 'paid' | 'overdue' | 'upcoming' = 'all';
+  searchEcheanceQuery: string = '';
+  
+  // Échéances par statut
+  paidEcheances: any[] = [];
+  overdueEcheances: any[] = [];
+  upcomingEcheances: any[] = [];
+
   constructor(
     private i18nService: I18nService,
     private authService: AuthService,
@@ -169,12 +185,203 @@ export class DebtorPaymentsComponent implements OnInit {
         this.dossiers = response.data?.map((item: any) => item.map) || [];
         this.calculatePaymentTotals(this.dossiers);
         this.isLoading = false;
+        
+        // Simuler des échéances pour chaque dossier
+        this.generateEcheancesForDossiers();
       },
       error: (error) => {
         console.error('Erreur lors du chargement des données :', error);
         this.errorMessage = 'Impossible de récupérer les données de paiement.';
         this.isLoading = false;
       }
+    });
+  }
+
+  // Générer des échéances simulées pour les dossiers
+  generateEcheancesForDossiers() {
+    this.echeances = []; // Réinitialiser les échéances
+    
+    this.dossiers.forEach(dossier => {
+      // Générer 3-5 échéances par dossier
+      const numEcheances = Math.floor(Math.random() * 3) + 3;
+      const baseAmount = this.calculateRemainingAmount(dossier) / numEcheances;
+      const today = new Date();
+      
+      for (let i = 0; i < numEcheances; i++) {
+        const echeanceDate = new Date();
+        echeanceDate.setDate(today.getDate() + (i * 30)); // Échéances espacées de 30 jours
+        
+        const isPast = i === 0 && Math.random() > 0.5; // Certaines échéances passées
+        const isPaid = isPast && Math.random() > 0.3; // Certaines échéances passées sont payées
+        const isOverdue = isPast && !isPaid; // Échéances passées non payées = en retard
+        
+        let status = 'upcoming';
+        if (isPaid) status = 'paid';
+        else if (isOverdue) status = 'overdue';
+        
+        const echeance = {
+          id: `ech-${dossier.nodeId}-${i}`,
+          dossierId: dossier.nodeId,
+          dossierName: dossier.numeroDossier || `Dossier ${dossier.nodeId?.substring(0, 8)}`,
+          montant: Math.round(baseAmount * (0.8 + Math.random() * 0.4)), // Variation de ±20%
+          dateEcheance: echeanceDate.toISOString().split('T')[0],
+          statut: status,
+          datePaiement: isPaid ? new Date(echeanceDate.getTime() - 86400000).toISOString().split('T')[0] : null,
+          reference: `ECH-${dossier.nodeId?.substring(0, 4)}-${i+1}`,
+          penalites: isOverdue ? Math.round(baseAmount * 0.1) : 0,
+          commentaire: status === 'overdue' ? 'Paiement en retard' : (status === 'paid' ? 'Paiement effectué' : '')
+        };
+        
+        this.echeances.push(echeance);
+      }
+    });
+    
+    // Trier par date d'échéance
+    this.echeances.sort((a, b) => new Date(a.dateEcheance).getTime() - new Date(b.dateEcheance).getTime());
+  }
+
+  // Ouvrir le drawer des échéances (sans argument)
+  openEcheancesDrawer() {
+    this.showEcheancesDrawer = true;
+    this.currentEcheanceStep = 'selectDossier';
+    this.selectedDossierForEcheances = null;
+    this.echeanceFilter = 'all';
+    this.searchEcheanceQuery = '';
+  }
+
+  // Fermer le drawer des échéances
+  closeEcheancesDrawer() {
+    this.showEcheancesDrawer = false;
+    this.currentEcheanceStep = 'selectDossier';
+    this.selectedDossierForEcheances = null;
+    this.echeanceFilter = 'all';
+    this.searchEcheanceQuery = '';
+  }
+
+  // Sélectionner un dossier pour voir ses échéances
+  selectDossierForEcheances(dossierId: string) {
+    const dossier = this.dossiers.find(d => d.nodeId === dossierId);
+    if (dossier) {
+      this.selectedDossierForEcheances = dossier;
+      this.currentEcheanceStep = 'viewEcheances';
+      this.filterEcheancesByDossier(dossierId);
+    }
+  }
+
+  // Retour à la sélection de dossier
+  backToDossierSelection() {
+    this.currentEcheanceStep = 'selectDossier';
+    this.selectedDossierForEcheances = null;
+  }
+
+  // Filtrer les échéances par dossier
+  filterEcheancesByDossier(dossierId: string) {
+    this.filteredEcheances = this.echeances.filter(e => e.dossierId === dossierId);
+    this.categorizeEcheances();
+    this.filterEcheances();
+  }
+
+  // Catégoriser les échéances par statut
+  categorizeEcheances() {
+    this.paidEcheances = this.filteredEcheances.filter(e => e.statut === 'paid');
+    this.overdueEcheances = this.filteredEcheances.filter(e => e.statut === 'overdue');
+    this.upcomingEcheances = this.filteredEcheances.filter(e => e.statut === 'upcoming');
+  }
+
+  // Filtrer les échéances selon le filtre sélectionné
+  filterEcheances() {
+    let filtered = this.filteredEcheances;
+    
+    // Appliquer le filtre de statut
+    switch (this.echeanceFilter) {
+      case 'paid':
+        filtered = filtered.filter(e => e.statut === 'paid');
+        break;
+      case 'overdue':
+        filtered = filtered.filter(e => e.statut === 'overdue');
+        break;
+      case 'upcoming':
+        filtered = filtered.filter(e => e.statut === 'upcoming');
+        break;
+      case 'all':
+      default:
+        // Pas de filtre de statut
+        break;
+    }
+    
+    // Appliquer la recherche
+    if (this.searchEcheanceQuery) {
+      const query = this.searchEcheanceQuery.toLowerCase();
+      filtered = filtered.filter(e => 
+        e.reference.toLowerCase().includes(query) ||
+        e.commentaire.toLowerCase().includes(query)
+      );
+    }
+    
+    this.filteredEcheances = filtered;
+  }
+
+  // Payer une échéance spécifique
+  payEcheance(echeance: any) {
+    // Trouver le dossier correspondant
+    const dossier = this.dossiers.find(d => d.nodeId === echeance.dossierId);
+    if (dossier) {
+      this.selectedDossier = dossier;
+      this.selectedDossierId = dossier.nodeId;
+      
+      // Calculer le montant à payer (échéance + pénalités si en retard)
+      const amountToPay = echeance.statut === 'overdue' 
+        ? echeance.montant + echeance.penalites
+        : echeance.montant;
+      
+      // Ouvrir le drawer de paiement avec les informations pré-remplies
+      this.currentStep = 'selection';
+      this.selectedDossier = dossier;
+      this.selectedDossierId = dossier.nodeId;
+      this.paymentAmount = amountToPay;
+      this.calculateFees();
+      
+      this.closeEcheancesDrawer();
+      this.showPaymentDrawer = true;
+    }
+  }
+
+  // Obtenir le statut d'une échéance avec une classe CSS
+  getEcheanceStatusClass(status: string): string {
+    switch (status) {
+      case 'paid': return 'status-paid';
+      case 'overdue': return 'status-overdue';
+      case 'upcoming': return 'status-upcoming';
+      default: return '';
+    }
+  }
+
+  // Obtenir le libellé du statut d'une échéance
+  getEcheanceStatusLabel(status: string): string {
+    switch (status) {
+      case 'paid': return 'Payé';
+      case 'overdue': return 'En retard';
+      case 'upcoming': return 'À venir';
+      default: return status;
+    }
+  }
+
+  // Calculer le nombre de jours de retard
+  getDaysOverdue(dateEcheance: string): number {
+    const echeanceDate = new Date(dateEcheance);
+    const today = new Date();
+    const diffTime = today.getTime() - echeanceDate.getTime();
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  }
+
+  // Formater la date pour l'affichage
+  formatDateDisplay(dateStr: string): string {
+    if (!dateStr) return 'N/A';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
     });
   }
 
@@ -563,18 +770,6 @@ export class DebtorPaymentsComponent implements OnInit {
     alert('Fonctionnalité de téléchargement du reçu - À implémenter');
   }
 
-  // Ouvrir l'historique de paiement
-  // openPaymentHistory() {
-  //   console.log('Ouvrir historique de paiement');
-  //   alert('Fonctionnalité Historique de paiement - À implémenter');
-  // }
-
-  // Ouvrir les détails de la dette
-  openDebtDetails() {
-    console.log('Ouvrir détails de la dette');
-    alert('Fonctionnalité Détails dettes - À implémenter');
-  }
-
   // Formater la date
   formatDate(dateStr: string): string {
     if (!dateStr) return 'N/A';
@@ -625,10 +820,7 @@ export class DebtorPaymentsComponent implements OnInit {
     return provider?.icon || '💳';
   }
 
-
-
   //_-----------------Historique de paiement Start-----------------------------------
-
   showHistoryDrawer = false;
   selectedStatus: string = '';  // Valeur de statut sélectionné (initialement vide)
   searchQuery: string = '';  // Valeur de recherche (initialement vide)
@@ -639,8 +831,7 @@ export class DebtorPaymentsComponent implements OnInit {
     { date: '25/11/2024', amount: '1 000 €', paymentMethod: '💳 Carte Bancaire', status: 'failed', reference: 'TXN-003', invoice: '#FAC-001' },
   ];
 
-  // Copier les paiements dans filteredPayments pour éviter les modifications directes de `payments`
-  filteredPayments = [...this.payments]; // Utilisation de la déstructuration pour créer une copie indépendante
+  filteredPayments = [...this.payments];
 
   // Méthode pour ouvrir le drawer
   openPaymentHistory() {
@@ -654,16 +845,11 @@ export class DebtorPaymentsComponent implements OnInit {
 
   // Méthode de filtrage
   filterHistory() {
-    // Appliquer les filtres
     this.filteredPayments = this.payments.filter(payment => {
-      // Filtrage par statut
       const matchesStatus = this.selectedStatus ? payment.status === this.selectedStatus : true;
-      // Filtrage par référence, insensible à la casse
       const matchesQuery = payment.reference.toLowerCase().includes(this.searchQuery.toLowerCase());
-      // Retourne true si les deux filtres sont valides
       return matchesStatus && matchesQuery;
     });
   }
-  
   //_----------------------Historique de paiement End-------------------------------
 }

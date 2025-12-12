@@ -172,6 +172,10 @@ export const routes: Routes = [
             loadComponent: () => import('./components/partner/partner-payment-tracking/partner-payment-tracking').then(c => c.PartnerPaymentTracking)
           },
           {
+            path: 'payment-processor',
+            loadComponent: () => import('./components/partner/payment-processor/payment-processor').then(c => c.PaymentProcessor)
+          },
+          {
             path: 'partner-chat',
             loadComponent: () => import('./components/partner/partner-chat/partner-chat').then(c => c.PartnerChat)
           }
