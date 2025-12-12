@@ -1,0 +1,243 @@
+<!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" /> -->
+
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-lg-12">
+            <div class="card chat-app">
+                <div id="plist" class="people-list">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Search...">
+                    </div>
+                    <ul class="list-unstyled chat-list mt-2 mb-0">
+                        <li class="clearfix">
+                            <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="avatar">
+                            <div class="about">
+                                <div class="name">KAGAMBEGA Boukary</div>
+                                <div class="status"> <i class="fa fa-circle offline"></i> left 7 mins ago </div>                                            
+                            </div>
+                        </li>
+                        <li class="clearfix active">
+                            <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
+                            <div class="about">
+                                <div class="name">KAGAMBEGA Boukary</div>
+                                <div class="status"> <i class="fa fa-circle online"></i> online </div>
+                            </div>
+                        </li>
+                        <li class="clearfix">
+                            <img src="https://bootdey.com/img/Content/avatar/avatar3.png" alt="avatar">
+                            <div class="about">
+                                <div class="name">KABORE faîçal</div>
+                                <div class="status"> <i class="fa fa-circle online"></i> online </div>
+                            </div>
+                        </li>                                    
+                        <li class="clearfix">
+                            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
+                            <div class="about">
+                                <div class="name">Faril BIKIEGA</div>
+                                <div class="status"> <i class="fa fa-circle offline"></i> left 10 hours ago </div>
+                            </div>
+                        </li>
+                        <li class="clearfix">
+                            <img src="https://bootdey.com/img/Content/avatar/avatar8.png" alt="avatar">
+                            <div class="about">
+                                <div class="name">SAWADOGO Ahmad</div>
+                                <div class="status"> <i class="fa fa-circle online"></i> online </div>
+                            </div>
+                        </li>
+                        <li class="clearfix">
+                            <img src="https://bootdey.com/img/Content/avatar/avatar3.png" alt="avatar">
+                            <div class="about">
+                                <div class="name">ZONGO Ismaël</div>
+                                <div class="status"> <i class="fa fa-circle offline"></i> offline since Oct 28 </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="chat">
+                    <div class="chat-header clearfix">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
+                                </a>
+                                <div class="chat-about">
+                                    <h6 class="m-b-0">KAGAMBEGA Boukary</h6>
+                                    <small>Last seen: 2 hours ago</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 hidden-sm text-right">
+                                <!-- <a href="javascript:void(0);" class="btn btn-outline-secondary"><i class="fa fa-camera"></i></a>
+                                <a href="javascript:void(0);" class="btn btn-outline-primary"><i class="fa fa-image"></i></a>
+                                <a href="javascript:void(0);" class="btn btn-outline-info"><i class="fa fa-cogs"></i></a>
+                                <a href="javascript:void(0);" class="btn btn-outline-warning"><i class="fa fa-question"></i></a> -->
+                                <!-- Start recherche -->
+
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Rechercher un message...">
+                                    <span class="input-group-text">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-history">
+                        <ul class="m-b-0">
+                            <li class="clearfix">
+                                <div class="message-data text-right">
+                                    <span class="message-data-time">10:10 AM, Today</span>
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
+                                </div>
+                                
+                                <div class="message other-message float-right"> Hi Aiden, how are you? How is the project coming along? </div>
+                                
+                            </li>
+                            <li class="clearfix">
+                                <div class="message-data">
+                                    <span class="message-data-time">10:12 AM, Today</span>
+                                </div>
+                                <div class="message my-message">Are we meeting today?</div>
+                                <!-- Actions Message -->
+                                <div class="d-flex justify-content-end align-items-end mb-2">
+                                    <!-- Options -->
+                                    <div class="d-flex align-items-center me-2">
+                                        <!-- Menu actions -->
+                                        <div class="dropdown me-1">
+                                            <a class="text-secondary" href="#" role="button" id="dropdownMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu">
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-reply me-2"></i>Répondre</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-clipboard me-2"></i>Copier</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i>Supprimer</a></li>
+                                            </ul>
+                                        </div>
+                                        <!-- Edit button -->
+                                        <a href="#" class="text-secondary"><i class="bi bi-pencil-square"></i></a>
+                                    </div>
+
+                                    <!-- Message bubble -->
+                                    <div class="p-2 px-3 bg-primary text-white rounded-3" style="max-width: 250px;">
+                                        Good. Thank you
+                                        <div class="text-end text-light small mt-1">11:23 AM</div>
+                                    </div>
+                                </div>         
+                            </li>                               
+                            <li class="clearfix">
+                                <div class="message-data">
+                                    <span class="message-data-time">10:15 AM, Today</span>
+                                </div>
+                                <div class="message my-message">Project has been already finished and I have results to show you.</div>
+                            </li>
+                            <li class="clearfix">
+                                <!-- Actions Message -->
+                                <div class="d-flex justify-content-end align-items-end mb-2">
+                                    <!-- Options -->
+                                    <div class="d-flex align-items-center me-2">
+                                        <!-- Menu actions -->
+                                        <div class="dropdown me-1">
+                                            <a class="text-secondary" href="#" role="button" id="dropdownMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu">
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-reply me-2"></i>Répondre</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-clipboard me-2"></i>Copier</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i>Supprimer</a></li>
+                                            </ul>
+                                        </div>
+                                        <!-- Edit button -->
+                                        <a href="#" class="text-secondary"><i class="bi bi-pencil-square"></i></a>
+                                    </div>
+
+                                    <!-- Message bubble -->
+                                    <div class="p-2 px-3 bg-primary text-white rounded-3" style="max-width: 250px;">
+                                        Good. Thank you Good. Thank you Good. Thank you
+                                        <div class="text-end text-light small mt-1">11:23 AM</div>
+                                    </div>
+                                </div>         
+                            </li>
+                            <li class="clearfix">
+                                <div class="d-flex justify-content-end align-items-end mb-2">
+                                    
+                                    <!-- Menu et bouton édition -->
+                                    <div class="d-flex align-items-center me-2">
+                                        <!-- Menu actions -->
+                                        <div class="dropdown me-1">
+                                            <a class="text-secondary" href="#" role="button" id="dropdownMenu1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu1">
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-reply me-2"></i>Répondre</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="bi bi-clipboard me-2"></i>Copier</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i>Supprimer</a></li>
+                                            </ul>
+                                        </div>
+                                        <!-- Bouton édition -->
+                                        <a href="#" class="text-secondary"><i class="bi bi-pencil-square"></i></a>
+                                    </div>
+
+                                    <!-- Avatar -->
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar" class="rounded-circle me-2" style="width:40px; height:40px;">
+
+                                    <!-- Message bubble -->
+                                    <div class="p-2 px-3 bg-primary text-white rounded-3" style="max-width: 300px;">
+                                        Hi Aiden, how are you? How is the project coming along?
+                                        <div class="text-end text-light small mt-1">10:10 AM, Today</div>
+                                    </div>
+                                </div>
+                            </li>  
+                        </ul>
+                    </div>
+                    <!-- <div class="chat-message clearfix">
+                        <div class="input-group mb-0">
+                            <input type="text" class="form-control" placeholder="Enter text here...">
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fa fa-send p-button-label"></i></span>
+                            </div>                                    
+                        </div>
+
+                        <div class="col-lg-6 hidden-sm text-right">
+                            <a href="javascript:void(0);" class="btn btn-outline-secondary"><i class="fa fa-camera"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-primary"><i class="fa fa-image"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-info"><i class="fa fa-cogs"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-warning"><i class="fa fa-question"></i></a>
+                        </div>
+                    </div> -->
+
+
+                    <div class="chat-message clearfix">
+                        <div class="input-group mb-0">
+                            <!-- Champ de texte avec largeur et hauteur augmentées, bords arrondis -->
+                            <textarea class="form-control" placeholder="Ecire un nouveau message..." rows="3" style="border-radius: 20px; padding-left: 20px; resize: none;"></textarea>
+                            <div class="input-group-append">
+                                <!-- Bouton envoyer avec icône -->
+                                <button class="btn btn-primary" style="border-radius: 20px;">
+                                    <i class="fa fa-paper-plane"></i>
+                                </button>
+                            </div>                                    
+                        </div>
+
+                        <!-- <div class="col-lg-6 hidden-sm text-right">
+                            
+                            <a href="javascript:void(0);" class="btn btn-outline-secondary" style="border-radius: 50%;"><i class="fa fa-camera"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-primary" style="border-radius: 50%;"><i class="fa fa-image"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-info" style="border-radius: 50%;"><i class="fa fa-cogs"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-warning" style="border-radius: 50%;"><i class="fa fa-question"></i></a>
+                        </div> -->
+
+                        <div class="col-lg-6 hidden-sm text-right">
+                                <!-- Icônes similaires à celles dans l'image -->
+                                <a href="javascript:void(0);" class="btn btn-outline-secondary" style="border-radius: 50%;"><i class="fa fa-smile"></i></a> <!-- Emoticône -->
+                                <a href="javascript:void(0);" class="btn btn-outline-secondary" style="border-radius: 50%;"><i class="fa fa-paperclip"></i></a> <!-- Attachement -->
+                                <a href="javascript:void(0);" class="btn btn-outline-secondary" style="border-radius: 50%;"><i class="fa fa-image"></i></a> <!-- Agrandir -->
+                                <a href="javascript:void(0);" class="btn btn-outline-secondary" style="border-radius: 50%;"><i class="fa fa-microphone"></i></a> <!-- Microphone -->    
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

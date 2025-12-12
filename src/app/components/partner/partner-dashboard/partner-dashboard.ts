@@ -6,6 +6,7 @@ import { CaseService } from '../../../services/case.service';
 import { User, StrapiRole } from '../../../models/user.model';
 import { AdminService } from '../../../services/admin.service';
 import { CreditorDetail, DebtorInfo } from '../../../models/case.model';
+import { I18nService } from '../../../services/i18n.service';
 
 @Component({
   selector: 'app-partner-dashboard',
@@ -14,6 +15,8 @@ import { CreditorDetail, DebtorInfo } from '../../../models/case.model';
   styleUrl: './partner-dashboard.css'
 })
 export class PartnerDashboard implements OnInit{
+
+  translations: any = {};
 
   currentUser: User | null = null;
  
@@ -39,16 +42,48 @@ export class PartnerDashboard implements OnInit{
   selectedIndex: number | null = null;
   showCaseDetailsModal = false;
 
+  // Notifications
+  notifications: any[] = [
+    {
+      id: 1,
+      message: 'Nouveau dossier assigné - Dossier #12345',
+      timestamp: new Date(),
+      read: false
+    },
+    {
+      id: 2,
+      message: 'Paiement reçu pour le dossier #12340',
+      timestamp: new Date(Date.now() - 3600000),
+      read: true
+    }
+  ];
+
+
   constructor(
     private authService: AuthService,
     private casesService: CaseService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private i18nService: I18nService,
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
 
     this.loadDossiers();
+
+    this.loadTranslations();
+    this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+  }
+
+  private loadTranslations() {
+    const currentLocale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
   }
   
   // Chargement des dossiers
@@ -63,9 +98,6 @@ export class PartnerDashboard implements OnInit{
     }
 
     const partenaireNodeId = currentUser.nodeId;
-    console.log('partenair connecté :', currentUser);
-    console.log('partenaireNodeId envoyé :', partenaireNodeId);
-
     if (!partenaireNodeId) {
       this.errorMessage = 'Identifiant du partenaire introuvable.';
       this.isLoading = false;
@@ -79,7 +111,6 @@ export class PartnerDashboard implements OnInit{
       const allDossiers = response.data?.map((item: any) => item.map) || [];
       // Filtre uniquement les dossiers de l'avocat connecté
       this.dossiers = allDossiers.filter((d: any) => d.partenaireNodeId === partenaireNodeId);
-      console.log('Réponse API dossiers :', this.dossiers);
 
       //  mise à jour des statistiques
       this.updateCaseStatistics(); 
@@ -87,7 +118,6 @@ export class PartnerDashboard implements OnInit{
       this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des dossiers :', error);
         this.errorMessage = 'Impossible de récupérer les dossiers.';
         this.isLoading = false;
       }
@@ -123,7 +153,6 @@ export class PartnerDashboard implements OnInit{
     return this.debiteurs.find(d => String(d.nodeId).trim() === String(debiteurNodeId));
   }
 
-
   getUserRoleLabel(): string {
     if (!this.currentUser) return '';
     switch (this.currentUser.role.name) {
@@ -156,7 +185,14 @@ export class PartnerDashboard implements OnInit{
     return this.filteredDossiers.reduce((acc, d) => acc + (d.montantTotal || 0), 0);
   }
 
-   formatCurrency(amount: number): string {
+  getTotalCollected(): number {
+    if (!this.dossiers) return 0;
+    return this.dossiers.reduce((total, dossier) => {
+      return total + (dossier.montantCollecte || 0);
+    }, 0);
+  }
+
+  formatCurrency(amount: number): string {
     if (!amount) return '0 FCFA';
     return amount.toLocaleString('fr-FR', {
       style: 'currency',

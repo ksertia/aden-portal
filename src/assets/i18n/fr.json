@@ -149,7 +149,7 @@
   },
 
   "sidebar": {
-    "logo": "RecouvrePro",
+    "logo": "CrediSolve",
     "dashboard": "Tableau de bord",
     "myCases": "Mes Dossiers",
     "payments": "Paiements",
@@ -163,6 +163,8 @@
     "realTimeTracking": "Suivi Temps Réel",
     "notifications": "Notifications",
     "portfolios": "Mes Portefeuilles",
+    "Transactions": "Transactions",
+    "Messaging": "Messagerie",
     "invoices": "Suivi des Factures",
     "salesProcess": "Processus de Vente",
     "documentsProfessional": "Documents",
@@ -197,6 +199,25 @@
     "country": "Pays",
     "update": "Mettre à jour",
     "updating": "Mise à jour...",
+    "Change password": "Changer le mot de passe",
+    "Current password": "Mot de passe actuel *",
+    "New password": "Nouveau mot de passe * (min. 8 caractères)",
+    "Confirm the new password": "Confirmer le nouveau mot de passe * ",
+    "To validate": "Valider ",
+    "Change in progress": "Changement en cours... ",
+    "Cancel": "Annuler ",
+    "Password changed successfully! Redirecting": "Mot de passe changé avec succès ! Redirection... ",
+    "User List": "Liste des utilisateurs ",
+    "icone": "▶",
+    "Creditors": "Créanciers ",
+    "Debtors": "Débiteurs ",
+    "Bailiffs": "Huissiers ",
+    "Lawyers": "Avocats ",
+    "Assignors": "Cédants ",
+    "Partners": "Partenaires ",
+    "All users": "Tous les utilisateurs ",
+    "View all users": "Voir tout les utilisateurs",
+    "return": "Retour",
     "success": "Profil mis à jour avec succès",
     "roles": {
       "debtor": "débiteur",
@@ -209,13 +230,25 @@
     "title": "Tableau de Bord,",
     "welcome": "Bienvenue",
     "total_cases": "Dossiers Totaux",
+    "cases_assigned": "Dossiers assignés",
+    "total_cases_assigned": "Dossiers totaux assignés",
+    "My_portfolios": "Mes Portefeuilles",
+    "total_portfolios": "Portefeuilles totaux",
     "active_cases": "Dossiers Actifs",
+    "active_portfolios": "Portefeuilles actifs ",
     "pending_cases": "En Attente",
+    "Under_evaluation": "En cours d'évaluation",
     "total_amount": "Montant Total",
     "my_active_cases": "Mes Dossiers en cours",
+    "Total_number_of_payments": "Nombre total de paiements",
+    "Total_amount_collected": "Montant total collecté",
+    "My_Files": "Mes Dossiers",
+    "Legal_Files": "Dossiers Juridiques",
+    "See_all_files": "Voir tous les dossiers",
     "view_all_cases": "voir tous les Dossiers",
     "amount_due": "Montant Dû",
     "paid": "Payé",
+    "recovered": "recouvré",
     "quick_actions": "Actions Rapides",
     "make_payment": "Effectuer un Paiement",
     "propose_schedule": "Proposer échéancier",
@@ -223,10 +256,25 @@
     "assigned_cases": "Dossiers Assignés",
     "manage_cases": "Gérer les Dossiers",
     "debtor": "Débiteur",
+    "Creditors": "Créancier",
     "amount": "Montant",
+    "myCredits": "Mes Créances",
+    "View_all_receivables": "Voir toutes les créances",
     "new_legal_action": "Nouvelle Action Légale",
     "generate_report": "Générer un Rapport",
-    "manage_documents": "Gestion Documents"
+    "Review_a_file": "Réviser un dossier",
+    "manage_documents": "Gestion Documents",
+    "Real-time_Tracking": "Suivis temps réel",
+    "Invoice_tracking": "Suivi des factures",
+    "Sales_process": "Processus de vente",
+    "Activity_report": "Rapport d'activité",
+    "Notifications": "Notifications",
+    "New_consultation": "Nouvelle consultation",
+    "No_files_found": "Aucun dossier trouvé",
+    "No_files_found_Description": "Vous n'avez actuellement aucun dossier de recouvrement.",
+    "No_files_found_Description1": "Aucun document ne correspond aux critères sélectionnés.",
+    "No_portfolios_found": "Aucun portefeuille  trouvé",
+    "No_portfolios_found_Description": "Vous n'avez actuellement aucun portefeuille de recouvrement."
   },
 
   "cases": {
@@ -299,9 +347,120 @@
       "title": "Contester le dossier",
       "caseInfo": "Informations du dossier"
     }
+  },
+
+  "dashDocument": {
+    "title": "Gestion des Documents",
+    "description": "Gérez tous les documents liés aux dossiers de recouvrement",
+    "filters": {
+      "name": "Filtres et recherche",
+      "reset": "Réinitialiser",
+      "search_name": "Rechercher",
+      "Document": "Document",
+      "Type": "Type",
+      "Actions": "Actions",
+      "nameType": "Type de document",
+      "case": "Dossiers ",
+      "All_types": "Tous les types ",
+      "All_case": "Tous les dossiers ",
+      "placeholder": "Nom du document, dossier...",
+      "Added_on": "Ajouté le ",
+      "documentTypes": [
+        { "value": "", "label": "Tous les types" },
+        { "value": "invoice", "label": "Factures" },
+        { "value": "contract", "label": "Contrats" },
+        { "value": "correspondence", "label": "Correspondances" },
+        { "value": "legal_notice", "label": "Mises en demeure" },
+        { "value": "payment_proof", "label": "Preuves de paiement" },
+        { "value": "court_document", "label": "Documents judiciaires" }
+      ]
+    },
+    "statistics": {
+      "totalDocuments": "Documents totaux",
+      "totalCases": "Dossiers totaux"
+    },
+    "documents": [
+      {
+        "id": "DOCUMENT_ID",
+        "name": "Nom du document",
+        "type": "invoice",
+        "caseId": "NODE_ID_DOSSIER",
+        "uploadedAt": "2025-01-01T12:30:00Z"
+      }
+    ],
+    "modals": {
+      "upload": {
+        "title": "Ajouter un document",
+        "fields": {
+          "associatedCase": "Dossier associé",
+          "documentType": "Type de document",
+          "Select_a_type": "Sélectionner un type",
+          "Select_a_case": "Sélectionner un dossier",
+          "documentName": "Nom du document",
+          "file": "Fichier ",
+          "Cancel": "Annuler"
+        }
+      },
+      "delete": {
+        "Confirm_deletion": "Confirmer la suppression",
+        "confirmationMessage": "Voulez-vous supprimer ce document,",
+        "warning": "Cette action est irréversible.",
+        "Cancel": "Annuler",
+        "Delete": "Supprimer"
+      }
+    }
+  },
+
+  "login": {
+    "title": "CrediSolve",
+    "subtitle": "Connexion à votre espace personnel",
+
+    "email_label": "Adresse e-mail",
+    "email_placeholder": "Votre adresse e-mail",
+
+    "password_label": "Mot de passe",
+    "password_placeholder": "Votre mot de passe",
+
+    "forgot_password": "Mot de passe oublié ?",
+
+    "button_cancel": "Annuler",
+    "button_login": "Se connecter",
+    "button_loading": "Connexion...",
+
+    "error": "Une erreur est survenue"
+  },
+
+  "register": {
+    "title": "CrediSolve",
+    "subtitle": "Créer un nouveau compte",
+
+    "last_name_label": "Nom",
+    "last_name_placeholder": "Votre nom",
+
+    "first_name_label": "Prénom",
+    "first_name_placeholder": "Votre prénom",
+
+    "phone_label": "Téléphone",
+    "phone_placeholder": "Votre numéro de téléphone",
+
+    "email_label": "Adresse e-mail",
+    "email_placeholder": "Votre adresse e-mail",
+
+    "role_label": "Profil",
+    "role_placeholder": "-- Sélectionnez votre profil --",
+
+    "password_label": "Mot de passe",
+    "password_placeholder": "Votre mot de passe",
+
+    "confirm_password_label": "Confirmer le mot de passe",
+    "confirm_password_placeholder": "Confirmez votre mot de passe",
+
+    "error": "Une erreur est survenue",
+
+    "button_login": "Déjà inscrit ? Se connecter",
+    "button_register": "S’inscrire",
+    "button_loading": "Enregistrement..."
   }
-
-
 
 
 

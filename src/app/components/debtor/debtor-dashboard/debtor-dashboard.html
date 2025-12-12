@@ -1,8 +1,8 @@
 <div class="dashboard-container">
   <div class="dashboard-header fade-in-up">
-    <h1>Tableau de Bord</h1>
+    <h1>{{ t("dashboard.title") }}</h1>
     <p *ngIf="currentUser">
-      Bienvenue, {{ getUserRoleLabel() }} {{ currentUser.firstname }} {{ currentUser.lastname }}
+      {{ t("dashboard.welcome") }}, {{ getUserRoleLabel() }} {{ currentUser.firstname }} {{ currentUser.lastname }}
     </p>
   </div>
 
@@ -17,7 +17,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ dossiers.length }}</div>
-        <div class="stat-label">Dossiers totaux</div>
+        <div class="stat-label">{{ t("dashboard.total_cases") }}</div>
       </div>
     </div>
 
@@ -30,7 +30,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ activeCount }}</div>
-        <div class="stat-label">Dossiers actifs </div>
+        <div class="stat-label">{{ t("dashboard.active_cases") }} </div>
       </div>
     </div>
 
@@ -44,7 +44,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{pendingCount }}</div>
-        <div class="stat-label">En attente</div>
+        <div class="stat-label">{{ t("dashboard.pending_cases") }}</div>
       </div>
     </div>
 
@@ -57,7 +57,7 @@
       </div>
       <div class="stat-content">
           <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div> 
-          <div class="stat-label">Montant total</div>
+          <div class="stat-label">{{ t("dashboard.total_amount") }}</div>
       </div>
     </div>
   </div>
@@ -66,8 +66,8 @@
   <div class="role-content fade-in-up">
     <div  class="debtor-dashboard" *ngIf="dossiers.length > 0; else noCases">
       <div class="section-header">
-        <h2>Mes Dossiers en Cours</h2>
-        <a routerLink="/debtor/cases" class="btn btn-primary">Voir tous les dossiers</a>
+        <h2>{{ t("dashboard.my_active_cases") }}</h2>
+        <a routerLink="/debtor/cases" class="btn btn-primary">{{ t("dashboard.See_all_files") }}</a>
       </div>
       <!--Affichage des dossiers (trois afficher grace à .slice(0, 3)) -->
       <div class="cases-grid" *ngIf="dossiers.length > 0">
@@ -80,18 +80,18 @@
           </div>
           <div class="case-details">
             <div class="case-info">
-              <span class="label">Créancier :</span>
+              <span class="label">{{ t("dashboard.Creditors") }} :</span>
               <span>{{ getCreancierForDossier(dossier)?.contactPrincipal }}</span>
             </div>
             <div class="case-amount">
-              <span class="label">Montant dû :</span>
+              <span class="label">{{ t("dashboard.amount_due") }} :</span>
               <span class="amount">{{ formatCurrency(dossier.montantTotal) }}</span>
             </div>
             <div class="case-progress">
               <div class="progress-bar">
                 <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
               </div>
-              <span class="progress-text">{{ getPaymentPercentage(dossier) }}% payé</span>
+              <span class="progress-text">{{ getPaymentPercentage(dossier) }}% {{ t("dashboard.paid") }}</span>
             </div>
          </div>
         </div>
@@ -103,35 +103,35 @@
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14,2 14,8 20,8"/>
         </svg>
-        <h3>Aucun dossier trouvé</h3>
-        <p>Vous n'avez actuellement aucun dossier de recouvrement.</p>
+        <h3>{{ t("dashboard.No_files_found") }}</h3>
+        <p>{{ t("dashboard.No_files_found_Description") }}</p>
       </div>
    </ng-template>
   </div>
 
   <!-- Pour les actions rapides -->
   <div class="quick-actions">
-    <h3>Actions Rapides</h3>
+    <h3>{{ t("dashboard.quick_actions") }}</h3>
     <div class="actions-grid">
       <a routerLink="/debtor/payments" class="action-card highlight1">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
           <line x1="1" y1="10" x2="23" y2="10"/>
         </svg>
-        <span>Effectuer un paiement</span>
+        <span>{{ t("dashboard.make_payment") }}</span>
       </a>
       <a routerLink="/debtor/payments" class="action-card highlight2">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
         </svg>
-        <span>Proposer échéancier</span>
+        <span>{{ t("dashboard.propose_schedule") }}</span>
       </a>
-      <a routerLink="/debtor/documents" class="action-card highlight3">
+      <a routerLink="/professional/documents" class="action-card highlight3">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14,2 14,8 20,8"/>
         </svg>
-        <span>Mes documents</span>
+        <span>{{ t("dashboard.my_documents") }}</span>
       </a>
     </div>
   </div>

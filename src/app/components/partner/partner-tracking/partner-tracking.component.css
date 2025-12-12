@@ -1,8 +1,15 @@
  .tracking-container {
-      padding: 32px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+    padding: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+  }
 
     .tracking-header {
       margin-bottom: 32px;

@@ -1,8 +1,8 @@
 <div class="dashboard-container">
   <div class="dashboard-header fade-in-up">
-    <h1>Tableau de Bord</h1>
+    <h1>{{ t("dashboard.title") }}</h1> 
     <p *ngIf="currentUser">
-      Bienvenue, {{ getUserRoleLabel() }} {{ currentUser.firstname }} {{ currentUser.lastname }}
+      {{ t("dashboard.welcome") }}, {{ getUserRoleLabel() }} {{ currentUser.firstname }} {{ currentUser.lastname }}
     </p>
   </div>
 
@@ -17,7 +17,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ dossiers.length }}</div>
-        <div class="stat-label">Dossiers totaux</div>
+        <div class="stat-label">{{ t("dashboard.total_cases") }}</div>
       </div>
     </div>
 
@@ -30,7 +30,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ activeCount }}</div>
-        <div class="stat-label">Dossiers actifs</div>
+        <div class="stat-label">{{ t("dashboard.active_cases") }}</div>
       </div>
     </div>
 
@@ -44,7 +44,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ pendingCount }}</div>
-        <div class="stat-label">En attente</div>
+        <div class="stat-label">{{ t("dashboard.pending_cases") }}</div>
       </div>
     </div>
 
@@ -57,7 +57,7 @@
       </div>
       <div class="stat-content">
             <div class="stat-value">{{ formatCurrency(getTotalDebt()) }}</div>
-            <div class="stat-label">Montant total</div>
+            <div class="stat-label">{{ t("dashboard.total_amount") }}</div>
       </div>
     </div>
   </div>
@@ -66,8 +66,8 @@
   <div class="role-content fade-in-up">
     <div  class="debtor-dashboard">
       <div class="section-header" *ngIf="dossiers.length > 0">
-        <h2>Mes Créances</h2>
-        <a routerLink="/creditor/cases" class="btn btn-primary">Voir toutes les créances</a>
+        <h2>{{ t("dashboard.myCredits") }}</h2>
+        <a routerLink="/creditor/cases" class="btn btn-primary">{{ t("dashboard.View_all_receivables") }}</a>
       </div>
           
       <!--Affichage des dossiers(le nombre qu'on veut avec .slice) -->
@@ -82,11 +82,11 @@
           </div>
           <div class="case-details">
             <div class="case-info">
-              <span class="label">Débiteur :</span>
+              <span class="label"> {{ t("dashboard.debtor") }} :</span>
               <span>{{ getDebiteurForDossier(dossier)?.firstName }} {{ getDebiteurForDossier(dossier)?.lastName }}</span>
             </div>
             <div class="case-amount">
-              <span class="label">Montant:</span>
+              <span class="label">{{ t("dashboard.amount") }}:</span>
               <span class="amount">{{ formatCurrency(dossier.montantTotal) }}</span>
               <!-- <span class="amount">{{ dossier.montantTotal | currency:'EUR' }}</span> -->
             </div>
@@ -94,39 +94,40 @@
               <div class="progress-bar">
                 <div class="progress-fill" [style.width.%]="getPaymentPercentage(dossier)"></div>
               </div>
-              <span class="progress-text">{{ getPaymentPercentage(dossier) }}% recouvré</span>
+              <span class="progress-text">{{ getPaymentPercentage(dossier) }}% {{ t("dashboard.recovered") }}</span>
             </div>
           </div>
         </div>
-      </div>
+    </div>
+  </div>
+  </div>
 
-      <div class="quick-actions">
-        <h3>Actions Rapides</h3>
-        <div class="actions-grid">
-          <a routerLink="/creditor/tracking" class="action-card highlight1">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12,6 12,12 16,14"/>
-            </svg>
-            <span>Suivis temps réel </span>
-          </a>
-          <a routerLink="/professional/reports" class="action-card highlight2">
-           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 2v6l3-3 3 3-3 3v6"/>
-                <path d="M15 8h6"/>
-                <path d="M15 16h6"/>
-            </svg>
-            <span>Rapport d'activités</span>
-          </a>
-          <a routerLink="/creditor/notifications" class="action-card highlight3">
-             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-            <span>Notifications</span>
-          </a>
-        </div>
-      </div>
+  <!-- Pour les actions rapides -->
+  <div class="quick-actions">
+    <h3>{{ t("dashboard.quick_actions") }}</h3>
+    <div class="actions-grid">
+      <a routerLink="/creditor/tracking" class="action-card highlight1">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12,6 12,12 16,14"/>
+        </svg>
+        <span>{{ t("dashboard.Real-time_Tracking") }}</span>
+      </a>
+      <a routerLink="/professional/reports" class="action-card highlight2">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 2v6l3-3 3 3-3 3v6"/>
+          <path d="M15 8h6"/>
+          <path d="M15 16h6"/>
+        </svg>
+        <span>{{ t("dashboard.Activity_report") }}</span>
+      </a>
+      <a routerLink="/creditor/notifications" class="action-card highlight3">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span>{{ t("dashboard.Notifications") }}</span>
+      </a>
     </div>
   </div>
 

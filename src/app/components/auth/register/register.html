@@ -8,8 +8,9 @@
           <path d="m8 14 4 4 4-4"/>
         </svg>
       </div>
-      <h1>RecouvrePro</h1>
-      <p>Créer un nouveau compte</p>
+      <!-- <h1>RecouvrePro</h1> -->
+      <h1> {{ t("register.title") }}</h1>
+      <p>{{ t("register.subtitle") }}</p>
     </div>
 
     <form #registerForm="ngForm" (ngSubmit)="onSubmit()" class="register-form">
@@ -17,31 +18,31 @@
       <!-- Nom + Prénom -->
       <div class="form-row">
         <div class="form-group half">
-          <label for="lastName">Nom <span class="required">*</span></label>
+          <label for="lastName"> {{ t("register.last_name_label") }}<span class="required">*</span></label>
           <input type="text" id="lastName" name="lastName" [(ngModel)]="user.nom" placeholder="Votre nom" required #nom="ngModel" [ngClass]="{'invalid': nom.invalid && nom.touched, 'valid': nom.valid}" [disabled]="isLoading">
         </div>
 
         <div class="form-group half">
-          <label for="firstName">Prénom <span class="required">*</span></label>
+          <label for="firstName"> {{ t("register.first_name_label") }}<span class="required">*</span></label>
           <input type="text" id="firstName" name="firstName" [(ngModel)]="user.prenom" placeholder="Votre prénom" required #prenom="ngModel" [ngClass]="{'invalid': prenom.invalid && prenom.touched, 'valid': prenom.valid}" [disabled]="isLoading">
         </div>
       </div>
 
       <!-- Téléphone -->
       <div class="form-group">
-        <label for="telephone">Téléphone <span class="required">*</span></label>
+        <label for="telephone"> {{ t("register.phone_label") }}<span class="required">*</span></label>
         <input type="tel" id="telephone" name="telephone" [(ngModel)]="user.telephone" placeholder="Votre numéro de téléphone" required #telephone="ngModel" [ngClass]="{'invalid': telephone.invalid && telephone.touched, 'valid': telephone.valid}" [disabled]="isLoading">
       </div>
 
       <!-- Email -->
       <div class="form-group">
-        <label for="email">Adresse e-mail <span class="required">*</span></label>
+        <label for="email">{{ t("register.email_label") }}<span class="required">*</span></label>
         <input type="email" id="email" name="email" [(ngModel)]="user.email" placeholder="Votre adresse e-mail" required email #email="ngModel" [ngClass]="{'invalid': email.invalid && email.touched, 'valid': email.valid}" [disabled]="isLoading">
       </div>
 
   <!-- Profil -->
 <div class="form-group">
-  <label for="role">Profil <span class="required">*</span></label>
+  <label for="role">Profil {{ t("register.role_label") }}<span class="required">*</span></label>
   <select
     id="role"
     name="role"
@@ -51,20 +52,20 @@
     [ngClass]="{'invalid': roleField.invalid && roleField.touched, 'valid': roleField.valid}"
     [disabled]="isLoading"
   >
-    <option value="" disabled selected>-- Sélectionnez votre profil --</option>
+    <option value="" disabled selected>{{ t("register.role_placeholder") }}</option>
     <option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</option>
   </select>
 </div>
 
       <!-- Mot de passe -->
       <div class="form-group">
-        <label for="password">Mot de passe <span class="required">*</span></label>
+        <label for="password">{{ t("register.password_label") }}<span class="required">*</span></label>
         <input type="password" id="password" name="password" [(ngModel)]="user.password" placeholder="Votre mot de passe" required minlength="6" #password="ngModel" [ngClass]="{'invalid': password.invalid && password.touched, 'valid': password.valid}" [disabled]="isLoading">
       </div>
 
       <!-- Confirmation mot de passe -->
       <div class="form-group">
-        <label for="confirmPassword">Confirmer le mot de passe <span class="required">*</span></label>
+        <label for="confirmPassword">{{ t("register.confirm_password_label") }}<span class="required">*</span></label>
         <input type="password" id="confirmPassword" name="confirmPassword" [(ngModel)]="confirmPassword" placeholder="Confirmez votre mot de passe" required #confirmPasswordField="ngModel" [ngClass]="{'invalid': confirmPasswordField.touched && confirmPassword !== user.password,'valid': confirmPasswordField.touched && confirmPassword === user.password}" [disabled]="isLoading">
       </div>
 
@@ -73,9 +74,9 @@
 
       <!-- Boutons -->
       <div class="ch">
-        <button routerLink="/login" class="cancel-btn">Déjà inscrit ? Se connecter</button>
+        <button routerLink="/login" class="cancel-btn"> {{ t("register.button_login") }}</button>
         <button type="submit" class="register-btn" [disabled]="isLoading || registerForm.invalid">
-          <span *ngIf="!isLoading">S’inscrire</span>
+          <span *ngIf="!isLoading"> {{ t("register.button_register") }}</span>
           <span *ngIf="isLoading" class="loading">
             <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 2v4m6 2-4 4m4 6-4-4m-6 4v-4m-6-2 4-4m-4-6 4 4"/>

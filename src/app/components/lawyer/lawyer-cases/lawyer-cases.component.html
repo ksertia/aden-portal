@@ -185,6 +185,13 @@
                 </svg>
                 Réviser
               </button>
+              <button class="btn btn-primary small" (click)="viewCaseDetails(i)" title="Voir détails">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Détails
+                </button>
             </div>
           </div>
         </div>
@@ -206,7 +213,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let dossier of filteredDossiers; let i = index" class="case-row">
+              <tr *ngFor="let dossier of filteredDossiers; let i = index" class="case-row"> 
                 <td>
                   <div class="case-cell">
                     <div class="case-number">{{ dossier.numeroDossier }}</div>
@@ -251,6 +258,12 @@
                       </svg>
                       Réviser
                     </button>
+                    <button class="btn btn-primary small" (click)="viewCaseDetails(i)" title="Voir détails">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -271,6 +284,469 @@
       </div>
     </ng-template>
   </div>
+
+
+
+
+
+
+  <!-- Draver de détails du dossier -->
+  <div class="drawer-overlay" *ngIf="showDrawer">
+      <div class="drawer" [class.open]="showDrawer" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Détails du dossier {{ dossiers[selectedIndex!]?.numeroDossier }}</h3>
+          <button class="modal-close" (click)="closeDrawer()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="drawer-content" *ngIf="selectedIndex !== null">
+          <div class="case-details">
+            <!-- Informations générales -->
+            <div class="details-section">
+              <h4>Informations générales</h4>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="detail-label">Numéro de dossier</span>
+                  <span class="detail-value">{{ dossiers[selectedIndex!].numeroDossier }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Date de création</span>
+                  <span class="detail-value">{{ formatDate(dossiers[selectedIndex!].dateCreation) }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Échéance</span>
+                  <span class="detail-value">{{ formatDate(dossiers[selectedIndex!].dateEcheance) }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Statut</span>
+                  <span class="status-badge"  [ngClass]="'status-' + dossiers[selectedIndex!].stepGlobal">
+                    {{ getStatusLabel(dossiers[selectedIndex!].stepGlobal) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          <!-- Informations débiteur -->
+          <div class="details-section">
+              <h4>Débiteur</h4>
+              <div class="debtor-profile">
+                <div class="debtor-avatar">
+                  {{ selectedDebtor?.firstName?.charAt(0) }}{{ selectedDebtor?.lastName?.charAt(0) }}
+                </div>
+                <div class="debtor-info">
+                  <div class="debtor-name">{{ selectedDebtor?.firstName }} {{ selectedDebtor?.lastName }}
+                  <div class="debtor-details">
+                    <div class="detail-row">
+                      <span class="label">Email :</span>
+                      <span class="value">{{ selectedDebtor?.email }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="label">Téléphone :</span>
+                      <span class="value">{{ selectedDebtor?.phone || '---' }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="label">Type :</span>
+                      <span class="value">{{ selectedDebtor?.type}}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="label">Nom de l'entreprise :</span>
+                      <span class="value">{{ selectedDebtor?.companyName }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Analyse financière -->
+            <div class="details-section">
+              <h4>Analyse financière</h4>
+              <div class="financial-cards">
+                <div class="financial-card total">
+                  <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960"
+                      width="25" fill="#FFFFFF"><path 
+                      d="M275-99v-128h-88v-91h88v-544h460v92H366v244h329v91H366v117h160v91H366v128h-91Z"/>
+                    </svg>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-value">{{ formatCurrency(dossiers[selectedIndex!].montantTotal) }}</div> 
+                    <div class="card-label">Montant total</div>
+                  </div>
+                </div>
+                <div class="financial-card recovered">
+                  <div class="card-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M9 12l2 2 4-4"/>
+                      <circle cx="12" cy="12" r="9"/>
+                    </svg>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-value">{{ formatCurrency(getTotalPaid()) }}</div>
+                    <div class="card-label">Montant recouvré</div> 
+                  </div>
+                </div>
+                <div class="financial-card remaining">
+                  <div class="card-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="12"/>
+                      <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-value">{{ getFormattedRemainingAmount(dossiers[selectedIndex!]) }}</div>
+                    <div class="card-label">Reste à recouvrer</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="progress-section">
+                <div class="progress-header">
+                  <span class="progress-title">Progression du recouvrement</span>
+                  <span class="progress-percentage">{{ getPaymentPercentage(dossiers[selectedIndex!]) }}%</span>
+                </div>
+                <div class="progress-bar-large">
+                  <div class="progress-fill"  [style.width.%]="getPaymentPercentage(dossiers[selectedIndex!])"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeDrawer()">Fermer</button>
+            <button class="btn btn-primary" (click)="openDocumentsModal()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+              </svg>
+              Acceder aux documents ({{ getDocumentsCount(selectedDetailCase) }})
+            </button>
+        </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- Tiroir document -->
+  <div class="drawer-overlay-document" *ngIf="showDocumentsModal" >
+    <div class="drawer-document" [class.open]="showDocumentsModal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Documents ({{ filteredDocuments.length }})</h3>
+        <button class="modal-close" (click)="closeDocumentsModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- MESSAGE DE SUCCÈS POUR LA SUPPRESSION -->
+        <div *ngIf="showDeleteSuccess" class="delete-success-message">
+          <div class="success-content">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4"/>
+              <circle cx="12" cy="12" r="9"/>
+            </svg>
+            <span>{{ deleteSuccessMessage }}</span>
+          </div>
+        </div>
+
+        <div class="documents-list">
+          <div class="documents-content" *ngIf="filteredDocuments.length > 0; else noDocuments">
+
+            <!-- Vue tableau -->
+            <div class="documents-table-container" *ngIf="currentViews === 'table'"> 
+              <table class="documents-table">
+                <thead>
+                  <tr>
+                    <th>Document</th>
+                    <th>Type</th>
+                    <th>Ajouté le</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let doc of filteredDocuments" class="document-row">
+                    <td>
+                          <div class="document-cell">
+                          <div class="document-icon-small" [ngClass]="'icon-' + doc.type">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                              <polyline points="14,2 14,8 20,8"/>
+                              </svg>
+                          </div>
+                          <div class="document-name" title="{{ doc.name }}">{{ doc.name }}</div>
+                          </div>
+                    </td>
+                    <td>
+                        <span class="document-type-badge" [ngClass]="'type-' + doc.type">
+                          {{ getDocumentTypeLabel(doc.type) }}
+                        </span>
+                    </td>
+                    <td>
+                      <div class="date-cell">{{ formatDate(doc.uploadedAt) }}</div>
+                    </td>
+                    <td>
+                      <div class="table-actions">
+                        <button class="btn btn-primary small" (click)="viewDocument(doc)" title="Voir">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                          </svg>
+                        </button>
+                        <button class="btn btn-danger small" (click)="confirmDeleteDocument(doc)" title="Supprimer">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3,6 5,6 21,6"/>
+                            <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Modale de confirmation de suppression -->
+          <div class="confirmation-overlay"  *ngIf="showDeleteConfirmation"> 
+            <div class="confirmation-modal">
+              <div class="modal-header">
+                <div class="header-with-icon">
+                  <div class="danger-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                  </div>
+                  <h3>Confirmer la suppression</h3>
+                </div>
+              </div>
+              <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer le document "{{ documentToDelete?.name }}" ?</p>
+                <p class="warning-text">Cette action est irréversible.</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Annuler</button>
+                <button type="button" class="btn btn-danger" (click)="executeDelete()">Supprimer</button>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noDocuments>
+            <div class="no-documents">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+              </svg>
+              <h3>Aucun document trouvé</h3>
+              <p>Aucun document ne correspond aux critères sélectionnés.</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeDocumentsModal()">Fermer</button>
+        <button class="btn btn-primary" (click)="showUploadModal = true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17,8 12,3 7,8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Ajouter un document
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- tiroir d'upload -->
+<div class="drawer-overlay-upload" *ngIf="showUploadModal">
+  <div class="drawer-upload" [class.open]="showUploadModal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Ajouter un document</h3>
+      <button class="modal-close" (click)="closeUploadModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- MESSAGE DE SUCCÈS -->
+      <div *ngIf="showUploadSuccess" class="upload-success-message">
+        <div class="success-content">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4"/>
+            <circle cx="12" cy="12" r="9"/>
+          </svg>
+          <span>{{ uploadSuccessMessage }}</span>
+        </div>
+      </div>
+      
+      <div class="upload-form" *ngIf="!showUploadSuccess">
+        <div class="form-group">
+          <label>Type de document</label>
+          <select [(ngModel)]="newDocument.type" [class.error]="uploadFormErrors.type" required>
+            <option value="">Sélectionner un type</option>
+            <option value="invoice">Facture</option>
+            <option value="contract">Contrat</option>
+            <option value="correspondence">Correspondance</option>
+            <option value="legal_notice">Mise en demeure</option>
+            <option value="payment_proof">Preuve de paiement</option>
+            <option value="court_document">Document judiciaire</option>
+          </select>
+
+          <div class="error-message" *ngIf="uploadFormErrors.type">
+             {{ uploadErrorMessages.type }}
+          </div>
+        </div>
+          
+        <div class="form-group">
+          <label>Nom du document</label>
+          <input
+            type="text"
+            [(ngModel)]="newDocument.name"
+            placeholder="Nom du fichier"
+            [class.error]="uploadFormErrors.name"
+            required  
+          >
+
+          <div class="error-message" *ngIf="uploadFormErrors.name">
+            {{ uploadErrorMessages.name }}
+        </div>
+        </div>
+          
+        <div class="form-group">
+          <label>Fichier</label>
+          <div class="file-upload">
+            <input type="file" id="fileInput" (change)="onFileSelected($event); validateField('file')" accept=".pdf,.doc,.docx,.jpg,.png" [class.error]="uploadFormErrors.file">
+            <label for="fileInput" class="file-upload-label" [class.error]="uploadFormErrors.file">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17,8 12,3 7,8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <span>{{ selectedFile ? selectedFile.name : 'Choisir un fichier' }}</span>
+            </label>
+          </div>
+
+          <div class="error-message" *ngIf="uploadFormErrors.file">
+            {{ uploadErrorMessages.file }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer" *ngIf="!showUploadSuccess">
+      <button class="btn btn-secondary" (click)="closeUploadModal()" [disabled]="isLoading">Annuler</button>
+      <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="isLoading">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17,8 12,3 7,8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <span *ngIf="isLoading" class="spinner"></span>
+        {{ isLoading ? 'Envoi en cours...' : 'Ajouter le document' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modale de visualisation de document -->
+<div class="document-viewer-overlay" *ngIf="showDocumentViewer" >
+  <div class="document-viewer-modal" (click)="$event.stopPropagation()">
+    <!-- En-tête -->
+    <div class="document-viewer-header">
+      <div class="document-viewer-info">
+        <h3>{{ currentDocument?.name }}</h3>
+        <p class="document-meta">
+          <span class="document-type-badge" [ngClass]="'type-' + currentDocument?.type">
+            {{ getDocumentTypeLabel(currentDocument?.type) }}
+          </span>
+          <span class="document-size" *ngIf="currentDocument?.size">  
+            • {{ formatFileSize(currentDocument.size) }}
+          </span>
+        </p>
+      </div>
+      <div class="document-viewer-actions">
+        <button class="btn-icon" (click)="openInNewTab()" title="Ouvrir dans un nouvel onglet">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15,3 21,3 21,9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </button>
+        <button class="btn-icon" (click)="downloadDocument(currentDocument)" title="Télécharger">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+        <button class="btn-icon close-btn" (click)="closeDocumentViewer()" title="Fermer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenu du document -->
+    <div class="document-viewer-content">
+      <!-- Chargement -->
+      <div class="document-loading" *ngIf="isLoadingDocument">
+        <div class="spinner"></div>
+        <p>Chargement du document...</p>
+      </div>
+
+      <!-- Affichage PDF -->
+      <iframe 
+        *ngIf="!isLoadingDocument && isDocumentPDF() && currentDocumentUrl"
+        [src]="currentDocumentUrl"
+        class="document-iframe"
+        width="100%"
+        height="600"
+        frameborder="0">
+      </iframe>
+
+      <!-- Affichage Image -->
+      <div class="document-image-container" *ngIf="!isLoadingDocument && isDocumentImage() && currentDocumentUrl">
+        <img [src]="currentDocumentUrl" [alt]="currentDocument?.name" class="document-image">
+      </div>
+
+      <!-- Autres types de documents -->
+      <div class="document-unsupported" *ngIf="!isLoadingDocument && !isDocumentPDF() && !isDocumentImage()">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+        <h3>Aperçu non disponible</h3>
+        <p>Ce type de fichier ne peut pas être visualisé directement dans le navigateur.</p>
+        <button class="btn btn-primary" (click)="downloadDocument(currentDocument)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Télécharger le document
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 
 

@@ -8,6 +8,8 @@ import { DebtCase, CaseDocument, DocumentType } from '../../../models/case.model
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { forkJoin } from 'rxjs';
 import { Router } from '@angular/router';
+import { AdminService } from '../../../services/admin.service';
+import { I18nService } from '../../../services/i18n.service';
 
 @Component({
   selector: 'app-documents',
@@ -17,6 +19,9 @@ import { Router } from '@angular/router';
   styleUrls: ['./documents.component.css']
 })
 export class DocumentsComponent implements OnInit {
+
+  translations: any = {};
+
   showUploadModal = false;
 
   // RECUPERATION DES DOCUMENTS
@@ -26,6 +31,8 @@ export class DocumentsComponent implements OnInit {
   filteredDocuments: (CaseDocument & { caseId: string; source: string })[] = [];
 
   currentView: 'grid' | 'table' = 'table';
+
+  selectedDetailCase: any;
 
   searchTerm = '';
   selectedDocumentType = '';
@@ -45,6 +52,29 @@ export class DocumentsComponent implements OnInit {
   isLoadingDocument = false;
   safePdfUrl: SafeResourceUrl | null = null;
 
+  // Propriétés pour les messages temporaires ( ajout ou suppression reussi ou achouer d'un document)
+  showUploadSuccess = false;
+  uploadSuccessMessage = '';
+  showDeleteSuccess = false;
+  deleteSuccessMessage = '';
+
+  // Methode du modal de suppression d\'un document
+  showDeleteConfirmation = false;
+  documentToDelete: any = null;
+
+  // Propriétés pour la validation des champs avec mise en évidence rouge et messages d'erreur
+  uploadFormErrors = {
+    type: false,
+    name: false,
+    file: false
+  };
+
+  uploadErrorMessages = {
+    type: '',
+    name: '',
+    file: ''
+  };
+
   newDocument: any = {
     name: '',
     type: '',
@@ -57,14 +87,31 @@ export class DocumentsComponent implements OnInit {
   constructor(
     private caseService: CaseService,
     private authService: AuthService,
+    private adminService: AdminService,
     private sanitizer: DomSanitizer,
     private router: Router,
-     private ngZone: NgZone,
-     private cdr: ChangeDetectorRef, 
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+    private i18nService: I18nService,
   ) {}
 
   ngOnInit() {
+
+    this.loadTranslations();
+    this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+
     this.loadData();
+  }
+
+  private loadTranslations() {
+    const currentLocale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
   }
 
   getLegalDocumentsCount(): number {
@@ -75,14 +122,6 @@ export class DocumentsComponent implements OnInit {
 
   getPaymentProofsCount(): number {
     return this.allDocuments.filter(doc => doc.type === 'payment_proof').length;
-  }
-
-  deleteDocument(doc: CaseDocument) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
-      this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
-      this.filterDocuments();
-      console.log('Document supprimé:', doc.name);
-    }
   }
 
   // Charger les données depuis l'API selon le rôle de l'utilisateur
@@ -98,12 +137,6 @@ export class DocumentsComponent implements OnInit {
 
     const userNodeId = currentUser.nodeId;
     const userRole = currentUser.role;
-
-    console.log('Utilisateur connecté:', {
-      nodeId: userNodeId,
-      role: userRole,
-      username: currentUser.username
-    });
 
     if (!userNodeId) {
       this.errorMessage = 'Identifiant utilisateur introuvable.';
@@ -125,55 +158,45 @@ export class DocumentsComponent implements OnInit {
       roleType = (role.type || role.name || '').toUpperCase();
     }
 
-    console.log('Type de rôle détecté:', roleType);
-
     let serviceCall;
 
     switch (roleType) {
       case 'AVOCAT':
       case 'LAWYER':
-        console.log('Chargement des dossiers de l\'avocat:', nodeId);
         serviceCall = this.caseService.getDossiersAvocat(siteName, nodeId);
         break;
 
       case 'DEBITEUR':
       case 'DEBTOR':
-        console.log('Chargement des dossiers du débiteur:', nodeId);
         serviceCall = this.caseService.getDossiersDebiteur(siteName, nodeId);
         break;
 
       case 'CREANCIER':
       case 'CREDITOR':
-        console.log('Chargement des dossiers du créancier:', nodeId);
         serviceCall = this.caseService.getDossiersCreancier(siteName, nodeId);
         break;
 
       case 'CEDANT':
       case 'ASSYGNOR':
-        console.log('Chargement des dossiers du cédant:', nodeId);
         serviceCall = this.caseService.getDossiersCedant(siteName, nodeId);
         break;
 
       case 'HUISSIER':
       case 'BAILIFF':
-        console.log('Chargement des dossiers de l\'huissier:', nodeId);
         serviceCall = this.caseService.getDossiersHuissier(siteName, nodeId);
         break;
 
       case 'PARTENAIRE':
       case 'PARTNER':
-        console.log('Chargement des dossiers du partenaire:', nodeId);
         serviceCall = this.caseService.getDossiersPartenaire(siteName, nodeId);
         break;
 
       default:
-        console.warn('Rôle non reconnu:', roleType, 'tentative avec avocat par défaut');
         serviceCall = this.caseService.getDossiersAvocat(siteName, nodeId);
     }
 
     serviceCall.subscribe({
       next: (response) => {
-        console.log('Réponse API dossiers utilisateur:', response);
         
         // S'assurer que nous avons un tableau de dossiers
         let dossiersArray = [];
@@ -184,15 +207,10 @@ export class DocumentsComponent implements OnInit {
           dossiersArray = response.map((item: any) => item.map || item);
         }
         
-        console.log('Dossiers bruts reçus:', dossiersArray);
-        
         // Filtrer les dossiers pour ne garder que ceux où l'utilisateur est vraiment impliqué
         this.dossiers = this.filterUserDossiers(dossiersArray, nodeId, roleType);
         
-        console.log(`Dossiers après filtrage: ${this.dossiers.length}`, this.dossiers);
-        
         if (this.dossiers.length === 0) {
-          console.warn('Aucun dossier trouvé pour cet utilisateur');
           this.errorMessage = 'Aucun dossier trouvé pour votre compte.';
         } else {
           this.extractAllDocuments();
@@ -201,7 +219,6 @@ export class DocumentsComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des dossiers:', error);
         this.errorMessage = 'Impossible de récupérer les documents.';
         this.isLoading = false;
       }
@@ -210,10 +227,8 @@ export class DocumentsComponent implements OnInit {
 
   // Filtrer les dossiers pour ne garder que ceux où l'utilisateur est impliqué
   filterUserDossiers(dossiers: any[], userNodeId: string, userRole: string): any[] {
-    console.log(`Filtrage des dossiers pour l'utilisateur ${userNodeId} avec le rôle ${userRole}`);
     
     const filteredDossiers = dossiers.filter(dossier => {
-      console.log('Vérification du dossier:', dossier);
       
       // Vérifier selon le rôle de l'utilisateur
       switch (userRole) {
@@ -223,7 +238,6 @@ export class DocumentsComponent implements OnInit {
           const isAvocat = dossier.avocatNodeId === userNodeId || 
           dossier.idAvocat === userNodeId ||
           (dossier.avocat && (dossier.avocat.nodeId === userNodeId || dossier.avocat.id === userNodeId));
-          console.log(`Dossier ${dossier.numeroDossier || dossier.nodeId} - Avocat correspond:`, isAvocat);
           return isAvocat;
 
         case 'DEBITEUR':
@@ -232,7 +246,6 @@ export class DocumentsComponent implements OnInit {
           const isDebiteur = dossier.debiteurNodeId === userNodeId || 
           dossier.idDebiteur === userNodeId ||
           (dossier.debiteur && (dossier.debiteur.nodeId === userNodeId || dossier.debiteur.id === userNodeId));
-          console.log(`Dossier ${dossier.numeroDossier || dossier.nodeId} - Débiteur correspond:`, isDebiteur);
           return isDebiteur;
 
         case 'CREANCIER':
@@ -241,7 +254,6 @@ export class DocumentsComponent implements OnInit {
           const isCreancier = dossier.creancierNodeId === userNodeId || 
           dossier.idCreancier === userNodeId ||
           (dossier.creancier && (dossier.creancier.nodeId === userNodeId || dossier.creancier.id === userNodeId));
-          console.log(`Dossier ${dossier.numeroDossier || dossier.nodeId} - Créancier correspond:`, isCreancier);
           return isCreancier;
 
         case 'CEDANT':
@@ -250,7 +262,6 @@ export class DocumentsComponent implements OnInit {
           const isCedant = dossier.cedantNodeId === userNodeId || 
           dossier.idCedant === userNodeId ||
           (dossier.cedant && (dossier.cedant.nodeId === userNodeId || dossier.cedant.id === userNodeId));
-          console.log(`Dossier ${dossier.numeroDossier || dossier.nodeId} - Cédant correspond:`, isCedant);
           return isCedant;
 
         case 'HUISSIER':
@@ -259,7 +270,6 @@ export class DocumentsComponent implements OnInit {
           const isHuissier = dossier.huissierNodeId === userNodeId || 
           dossier.idHuissier === userNodeId ||
           (dossier.huissier && (dossier.huissier.nodeId === userNodeId || dossier.huissier.id === userNodeId));
-          console.log(`Dossier ${dossier.numeroDossier || dossier.nodeId} - Huissier correspond:`, isHuissier);
           return isHuissier;
 
         case 'PARTENAIRE':
@@ -268,18 +278,14 @@ export class DocumentsComponent implements OnInit {
           const ispartenaire = dossier.partenaireNodeId === userNodeId || 
           dossier.idPartenaire === userNodeId ||
           (dossier.partenaire && (dossier.partenaire.nodeId === userNodeId || dossier.partenaire.id === userNodeId));
-          console.log(`Dossier ${dossier.numeroDossier || dossier.nodeId} - Partenaire correspond:`, ispartenaire);
           return ispartenaire;
 
         default:
           // Vérification générique
           const isInDossier = this.checkUserInDossier(dossier, userNodeId);
-          console.log(`Dossier ${dossier.numeroDossier || dossier.nodeId} - Présence générique:`, isInDossier);
           return isInDossier;
       }
     });
-
-    console.log(`Dossiers filtrés: ${filteredDossiers.length}`);
     return filteredDossiers;
   }
 
@@ -319,99 +325,167 @@ export class DocumentsComponent implements OnInit {
   }
 
   // Extraire TOUS les documents de TOUTES les sources SANS DOUBLONS
+  // extractAllDocuments() {
+  //   this.allDocuments = [];
+    
+  //   const processedDocumentIds = new Set<string>();
+  //   const currentUser = this.authService.getCurrentUser();
+    
+  //   if (!currentUser) {
+  //     this.filteredDocuments = [];
+  //     return;
+  //   }
+
+  //   // DEBUG: Afficher la structure complète des dossiers
+  //   console.log('📂 Structure des dossiers:', this.dossiers);
+    
+  //   // Liste de toutes les sources de documents possibles
+  //   // const documentSources = [
+  //   //   { key: 'documentsDebiteur', label: 'Débiteur' },
+  //   //   { key: 'documentsCreancier', label: 'Créancier' },
+  //   //   { key: 'documentsAvocat', label: 'Avocat' },
+  //   //   { key: 'documentsHuissier', label: 'Huissier' },
+  //   //   { key: 'documentsPartage', label: 'Partagé' },
+  //   //   { key: 'documentsPartenaire', label: 'Partenaire' },
+  //   //   { key: 'documentsCedant', label: 'Cédant' }
+  //   // ];
+  //   const documentSources = [
+  //     { key: 'documentsPartage', label: 'Partage' },
+  //   ];
+    
+  //   // Parcourir tous les dossiers (déjà filtrés pour l'utilisateur)
+  //   this.dossiers.forEach((dossier, index) => {
+      
+  //     let documentsTrouves = 0;
+      
+  //     // Pour chaque source de documents
+  //     documentSources.forEach(source => {
+  //       const documentsContainer = dossier[source.key];
+        
+  //       // Vérifier si le conteneur de documents existe et contient un tableau
+  //       if (documentsContainer?.myArrayList && Array.isArray(documentsContainer.myArrayList)) {
+          
+  //         // Extraire chaque document
+  //         documentsContainer.myArrayList.forEach((doc: any, docIndex: number) => {
+            
+  //           // Créer un identifiant unique pour le document
+  //           const docId = doc.documentNodeId || doc.id || 
+  //             `${doc.fileName}_${doc.date}_${source.key}`;
+            
+  //           // Vérifier si le document a déjà été traité
+  //           if (!processedDocumentIds.has(docId)) {
+  //             processedDocumentIds.add(docId);
+              
+  //             const mappedType = this.mapDocumentType(doc.typeDocument);
+              
+  //             this.allDocuments.push({
+  //               id: docId,
+  //               name: doc.fileName || doc.name || 'Document sans nom',
+  //               type: mappedType,
+  //               url: doc.url || doc.downloadUrl || '#',
+  //               uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
+  //               uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+  //               caseId: dossier.nodeId,
+  //               source: source.label
+  //             });
+              
+  //             documentsTrouves++;
+  //           } else {
+  //           }
+  //         });
+  //       } else {
+  //       }
+  //     });
+  //   });
+    
+  //   this.filteredDocuments = [...this.allDocuments];
+    
+  //   // Log de débogage
+  //   if (this.allDocuments.length === 0) {
+  //   }
+  // }
   extractAllDocuments() {
-    this.allDocuments = [];
+
+  this.allDocuments = [];
+  
+  const processedDocumentIds = new Set<string>();
+  this.dossiers.forEach((dossier, dossierIndex) => {
     
-    console.log(' EXTRACTION DES DOCUMENTS');
-    console.log('Nombre de dossiers à traiter:', this.dossiers.length);
-    
-    const processedDocumentIds = new Set<string>();
-    const currentUser = this.authService.getCurrentUser();
-    
-    if (!currentUser) {
-      console.error('Utilisateur non connecté lors de l\'extraction des documents');
-      this.filteredDocuments = [];
-      return;
-    }
-    
-    // Liste de toutes les sources de documents possibles
-    // const documentSources = [
-    //   { key: 'documentsDebiteur', label: 'Débiteur' },
-    //   { key: 'documentsCreancier', label: 'Créancier' },
-    //   { key: 'documentsAvocat', label: 'Avocat' },
-    //   { key: 'documentsHuissier', label: 'Huissier' },
-    //   { key: 'documentsPartage', label: 'Partagé' },
-    //   { key: 'documentsPartenaire', label: 'Partenaire' },
-    //   { key: 'documentsCedant', label: 'Cédant' }
+    // Liste des propriétés contenant des documents
+    // const documentProperties = [
+    //   'documentsPartage', 'documentsDebiteur', 'documentsCreancier',
+    //   'documentsAvocat', 'documentsHuissier', 'documentsPartenaire', 'documentsCedant'
     // ];
-    const documentSources = [
-      { key: 'documentsPartage', label: 'Partage' }
+    const documentProperties = [
+      'documentsPartage'
     ];
     
-    // Parcourir tous les dossiers (déjà filtrés pour l'utilisateur)
-    this.dossiers.forEach((dossier, index) => {
-      console.log(`\n--- Dossier ${index + 1}/${this.dossiers.length}: ${dossier.numeroDossier || dossier.nodeId} ---`);
-      console.log('Structure du dossier:', dossier);
+    documentProperties.forEach(propertyName => {
+      const documentsContainer = dossier[propertyName];
       
-      let documentsTrouves = 0;
-      
-      // Pour chaque source de documents
-      documentSources.forEach(source => {
-        const documentsContainer = dossier[source.key];
-        console.log(`Source ${source.key}:`, documentsContainer);
+      if (documentsContainer && documentsContainer.myArrayList) {
         
-        // Vérifier si le conteneur de documents existe et contient un tableau
-        if (documentsContainer?.myArrayList && Array.isArray(documentsContainer.myArrayList)) {
-          console.log(`${source.label}: ${documentsContainer.myArrayList.length} document(s)`);
+        documentsContainer.myArrayList.forEach((docWrapper: any, docIndex: number) => {
+          // Accéder à la propriété map qui contient les vraies données du document
+          const doc = docWrapper.map || docWrapper;
+          const docId = doc.documentNodeId || `doc-${propertyName}-${dossierIndex}-${docIndex}`;
+          const docName = doc.fileName || 'Document sans nom';
+          const docType = doc.typeDocument || 'correspondence';
           
-          // Extraire chaque document
-          documentsContainer.myArrayList.forEach((doc: any, docIndex: number) => {
-            console.log(`Document ${docIndex + 1}:`, doc);
+          // Récupérer la date
+          let docDate = new Date();
+          if (doc.date) docDate = new Date(doc.date);
+          
+          // Récupérer l'extension
+          const fileExtension = doc.fileExtension || '';
+          
+          if (!processedDocumentIds.has(docId)) {
+            processedDocumentIds.add(docId);
             
-            // Créer un identifiant unique pour le document
-            const docId = doc.documentNodeId || doc.id || 
-              `${doc.fileName}_${doc.date}_${source.key}`;
-            
-            // Vérifier si le document a déjà été traité
-            if (!processedDocumentIds.has(docId)) {
-              processedDocumentIds.add(docId);
-              
-              const mappedType = this.mapDocumentType(doc.typeDocument);
-              
-              this.allDocuments.push({
-                id: docId,
-                name: doc.fileName || doc.name || 'Document sans nom',
-                type: mappedType,
-                url: doc.url || doc.downloadUrl || '#',
-                uploadedAt: new Date(doc.date || doc.uploadedAt || doc.dateCreation || Date.now()),
-                uploadedBy: doc.uploadedBy || source.label || 'Système',
-                caseId: dossier.nodeId,
-                source: source.label
-              });
-              
-              documentsTrouves++;
+            const mappedType = this.mapDocumentType(docType);
+
+            // Extraction de la date avec plusieurs sources possibles
+            let uploadedDate: Date;
+
+            if (doc.date) {
+              // Si la date est au format ISO (ex: "2025-10-28T13:51:24.952+0000")
+              uploadedDate = new Date(doc.date);
+            } else if (doc.description && doc.description.includes('Importé le')) {
+            // Si la date est dans la description (ex: "Importé le 05/11/2025 17:36:49 par admin")
+              const match = doc.description.match(/Importé le (\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2})/);
+              if (match) {
+                // Convertir "05/11/2025 17:36:49" en "2025/11/05 17:36:49"
+                const dateStr = match[1].replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3/$2/$1');
+                uploadedDate = new Date(dateStr);
+              } else {
+                uploadedDate = new Date();
+              }
             } else {
-              console.log(`Document déjà traité: ${docId}`);
+            uploadedDate = new Date();
             }
-          });
-        } else {
-          console.log(` ${source.label}: aucun document`);
-        }
-      });
-      
-      console.log(`Total documents trouvés dans ce dossier: ${documentsTrouves}`);
+  
+            const newDocument = {
+              id: docId,
+              name: docName, 
+              type: mappedType,
+              url: '#',
+              uploadedAt: uploadedDate,
+              uploadedBy: doc.uploadedBy || dossier.createurUsername || 'Système',
+              caseId: dossier.nodeId,
+              source: propertyName,
+              fileExtension: fileExtension,
+              originalData: doc
+            };
+            
+            this.allDocuments.push(newDocument);
+          }
+        });
+      }
     });
-    
-    this.filteredDocuments = [...this.allDocuments];
-    console.log('\n RÉSULTAT FINAL ');
-    console.log('Total documents extraits (sans doublons):', this.allDocuments.length);
-    console.log('Documents par source:', this.getDocumentsBySource());
-    
-    // Log de débogage
-    if (this.allDocuments.length === 0) {
-      console.warn('AUCUN DOCUMENT TROUVÉ - Vérifiez la structure des dossiers');
-    }
-  }
+  });
+  
+  this.filteredDocuments = [...this.allDocuments];
+}
 
   getDocumentsBySource(): { [key: string]: number } {
     const distribution: { [key: string]: number } = {};
@@ -456,8 +530,6 @@ export class DocumentsComponent implements OnInit {
       
       return matchesSearch && matchesType && matchesCase;
     });
-    
-    console.log('Documents filtrés:', this.filteredDocuments.length);
   }
 
   applyFilters() {
@@ -469,7 +541,6 @@ export class DocumentsComponent implements OnInit {
     this.selectedDocumentType = '';
     this.selectedCaseId = '';
     this.filteredDocuments = [...this.allDocuments];
-    console.log('Filtres réinitialisés. Affichage de tous les documents:', this.allDocuments.length);
   }
 
   getCaseNumber(caseId: string): string {
@@ -489,12 +560,41 @@ export class DocumentsComponent implements OnInit {
     return labels[type] || type;
   }
 
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('fr-FR', {
+  // formatDate(date: Date): string {
+  //   return new Date(date).toLocaleDateString('fr-FR', {
+  //     year: 'numeric',
+  //     month: 'long',
+  //     day: 'numeric'
+  //   });
+  // }
+  formatDate(dateInput: any): string {
+  try {
+    // Si c'est déjà un Date
+    if (dateInput instanceof Date) {
+      return dateInput.toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+    
+    // Si c'est une chaîne
+    const date = new Date(dateInput);
+    
+    // Vérifier si la date est valide
+    if (isNaN(date.getTime())) {
+      return 'Date invalide';
+    }
+    
+    return date.toLocaleDateString('fr-FR', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
+  } catch (error) {
+    console.error('Erreur de formatage de date:', error);
+    return 'Date invalide';
+  }
   }
 
   closeViewModal() {
@@ -503,7 +603,6 @@ export class DocumentsComponent implements OnInit {
   }
 
   viewDocument(doc: any) {
-    console.log('Visualisation du document:', doc);
 
     const documentIdentifier = doc.id || doc.nodeId;
     
@@ -522,11 +621,9 @@ export class DocumentsComponent implements OnInit {
         this.currentDocumentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
         this.documentContentType = blob.type;
         this.showDocumentViewer = true;
-        console.log('Document chargé avec succès. Type:', blob.type);
       },
       error: (error) => {
         this.isLoadingDocument = false;
-        console.error('Erreur lors du chargement du document:', error);
         alert('Impossible de charger le document. Veuillez réessayer.');
       }
     });
@@ -546,7 +643,6 @@ export class DocumentsComponent implements OnInit {
   }
 
   downloadDocument(doc: any) {
-    console.log('Téléchargement du document:', doc);
     const documentId = doc.id || doc.nodeId;
     if (!documentId) {
       alert('Identifiant du document manquant');
@@ -589,47 +685,6 @@ export class DocumentsComponent implements OnInit {
     });
     return Array.from(uniqueMap.values());
   }
-
-  // Gestion de la sélection de fichier
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-      // Optionnel: pré-remplir le nom du document avec le nom du fichier
-      if (!this.newDocument.name) {
-        this.newDocument.name = file.name.split('.')[0]; // Enlève l'extension
-      }
-    }
-  }
-
-  // Ouvrir le modal d'upload
-  openUploadModal(): void {
-    console.log('Ouverture modal upload');
-    this.showUploadModal = true;
-    // Réinitialiser le formulaire
-    this.newDocument = {
-      name: '',
-      type: '',
-      caseId: ''
-    };
-    this.selectedFile = null;
-    this.isUploading = false;
-
-    console.log('newDocument après reset:', this.newDocument);
-  }
-
-  // Fermer le modal d'upload
-  closeUploadModal(): void {
-    this.showUploadModal = false;
-    this.newDocument = {
-      name: '',
-      type: '',
-      caseId: ''
-    };
-    this.selectedFile = null;
-    this.isUploading = false;
-  }
-
 
   // Méthode pour obtenir les types de documents pour le select
   getDocumentTypes(): { value: string; label: string }[] {
@@ -711,90 +766,129 @@ export class DocumentsComponent implements OnInit {
     }
   }
 
-  // Méthode pour uploader le document
-  // uploadDocument(): void {
-  //   // Validation des champs
-  //   if (!this.validateUploadForm()) {
-  //     return;
-  //   }
-
-  //   this.isUploading = true;
-
-  //   const formData = new FormData();
-  //   formData.append('file', this.selectedFile!);
-
-  //   const params = {
-  //     objetNodeId: this.newDocument.caseId,
-  //     fieldName: 'documentsPartage',
-  //     typeDocument: this.newDocument.type
-  //   };
-
-  //   console.log('📤 Début upload avec params:', params);
-
-  //   this.caseService.uploadDocument(formData, params).subscribe({
-  //     next: (response) => {
-  //       this.handleUploadSuccess(response);
-  //     },
-  //     error: (error) => {
-  //       this.handleUploadError(error);
-  //     }
-  //   });
-  // }
-
-  // Méthode pour uploader le document - VERSION DEBUG
-uploadDocument(): void {
-  console.log('🚀 === DÉBUT UPLOAD ===');
-  
-  // Appeler le debug avant tout
-  this.debugUploadParams();
-
-  // Validation
-  if (!this.validateUploadForm()) {
-    console.log('❌ Validation échouée');
-    return;
+  // Méthode améliorée pour la validation
+  isUploadValid(): boolean {
+    return !!(
+      this.selectedDetailCase?.nodeId && 
+      this.newDocument.type && 
+      this.newDocument.name && 
+      this.selectedFile
+    );
   }
 
-  // Vérification supplémentaire du dossier
-  if (!this.newDocument.caseId) {
-    console.error('❌ ERREUR: caseId est null/undefined');
-    alert('Erreur: Aucun dossier sélectionné');
-    return;
-  }
-
-  this.isUploading = true;
-
-  // Créer FormData
-  const formData = new FormData();
-  formData.append('file', this.selectedFile!);
-
-  const params = {
-    objetNodeId: this.newDocument.caseId,
-    fieldName: 'documentsPartage',
-    typeDocument: this.newDocument.type
-  };
-
-  console.log('📤 Envoi vers backend avec params:', params);
-  // console.log('🔗 URL complète:', `${environment.baseUrl}/documents/upload?objetNodeId=${this.newDocument.caseId}&fieldName=documentsPartage&typeDocument=${this.newDocument.type}`);
-
-  this.caseService.uploadDocument(formData, params).subscribe({
-    next: (response) => {
-      console.log('✅ Réponse backend reçue:', response);
-      this.handleUploadSuccess(response);
-    },
-    error: (error) => {
-      console.error('❌ Erreur backend:', error);
-      console.error('❌ Détails erreur:', {
-        status: error.status,
-        message: error.message,
-        error: error.error
-      });
-      this.handleUploadError(error);
-    },
-    complete: () => {
-      console.log('🏁 Upload complet');
+  // Méthode pour s'assurer qu'un dossier est sélectionné
+  ensureCaseSelected(): boolean {
+    if (!this.selectedDetailCase) {
+      return false;
     }
-  });
-}
+    return true;
+  }
+
+//   uploadDocument() {
+
+//   // Réinitialiser les erreurs
+//   this.resetUploadErrors();
+
+//   // Valider les champs
+//   let isValid = true;
+
+//   if (!this.newDocument.type) {
+//     this.uploadFormErrors.type = true;
+//     this.uploadErrorMessages.type = 'Veuillez sélectionner un type de document';
+//     isValid = false;
+//   }
+
+//   if (!this.newDocument.name || this.newDocument.name.trim() === '') {
+//     this.uploadFormErrors.name = true;
+//     this.uploadErrorMessages.name = 'Veuillez saisir un nom pour le document';
+//     isValid = false;
+//     console.log('Erreur name');
+//   }
+
+//   if (!this.selectedFile) {
+//     this.uploadFormErrors.file = true;
+//     this.uploadErrorMessages.file = 'Veuillez sélectionner un fichier';
+//     isValid = false;
+//     console.log('Erreur file');
+//   }
+
+//   console.log('Validation résultat:', isValid, 'isLoading:', this.isLoading); 
+
+//   if (!isValid || this.isLoading) {
+//     console.log('Arrêt: validation échouée ou en cours de chargement');
+//     return;
+//   }
+
+//   this.isLoading = true;
+//   console.log('Début de l\'upload...');
+
+//   const formData = new FormData();
+//   formData.append('filedata', this.selectedFile!);
+
+//   const params = {
+//     objetNodeId: this.selectedDetailCase.nodeId,
+//     fieldName: 'documentsPartage', 
+//     typeDocument: this.newDocument.type
+//   };
+
+//   // SAUVEGARDER le nom original AVANT l'upload
+//   const originalFileName = this.selectedFile!.name;
+
+//   this.caseService.uploadDocument(formData, params).subscribe({
+//     next: (response) => {
+//       this.isLoading = false;
+//       console.log('Document uploadé:', response);
+
+//       const uploadedFile = response.files[0];
+      
+//       // FORCER le nom original peu importe ce que retourne Alfresco
+//       const newDoc: CaseDocument & { caseId: string } = {
+//         id: uploadedFile.documentNodeId,
+//         name: originalFileName, 
+//         type: this.mapDocumentType(uploadedFile.typeDocument),
+//         url: '#',
+//         uploadedAt: new Date(),
+//         uploadedBy: 'Utilisateur actuel',
+//         caseId: this.selectedDetailCase.nodeId,
+//       };
+
+//       // this.allDocuments.push(newDoc);
+//       // this.filteredDocuments.push(newDoc);
+
+
+//       // AFFICHER LE MESSAGE DE SUCCÈS DANS LA MODALE
+//       this.showUploadSuccess = true;
+//       this.uploadSuccessMessage = 'Document ajouté avec succès!';
+      
+//       // Fermer la modale d'upload après 3 secondes
+//       setTimeout(() => {
+//         this.showUploadSuccess = false;
+//         this.uploadSuccessMessage = '';
+//         this.closeUploadModal();
+//         this.filterDocuments();
+//       }, 3000);
+//     },
+//     error: (error) => {
+//       this.isLoading = false;
+//       console.error('Erreur lors de l\'upload:', error);
+//       alert('Erreur lors de l\'upload du document. Veuillez réessayer.');
+//     }
+//   });
+// }
+
+  // Ajoutez cette méthode pour réinitialiser les erreurs
+  // resetUploadErrors(): void {
+  //   this.uploadFormErrors = {
+  //     type: false,
+  //     name: false,
+  //     file: false
+  //   };
+  //   this.uploadErrorMessages = {
+  //     type: '',
+  //     name: '',
+  //     file: ''
+  //   };
+  // }
 
   // Validation du formulaire d'upload
   validateUploadForm(): boolean {
@@ -819,87 +913,6 @@ uploadDocument(): void {
     }
 
     return true;
-  }
-
-// Gestion du succès de l'upload - VERSION CORRIGÉE
-handleUploadSuccess(response: any): void {
-  console.log('✅ Upload réussi - Réponse complète:', response);
-  
-  // Utiliser NgZone pour exécuter dans le contexte Angular
-  this.ngZone.run(() => {
-    this.isUploading = false;
-
-    try {
-      // Vérifier la structure de la réponse
-      if (!response || !response.entry) {
-        console.error('❌ Structure de réponse invalide:', response);
-        alert('Erreur: structure de réponse invalide');
-        this.closeUploadModal();
-        return;
-      }
-
-      const alfrescoEntry = response.entry;
-      console.log('📄 Données Alfresco:', alfrescoEntry);
-
-      const currentUser = this.authService.getCurrentUser();
-      const userName = currentUser?.username || 'Utilisateur';
-
-      // Créer le nouveau document avec les données Alfresco
-      const newDoc: CaseDocument & { caseId: string; source: string } = {
-        id: alfrescoEntry.id, // Utiliser l'ID Alfresco
-        name: this.newDocument.name || alfrescoEntry.name, // Nom saisi ou nom du fichier
-        type: this.newDocument.type as DocumentType,
-        url: '#',
-        uploadedAt: new Date(alfrescoEntry.createdAt || Date.now()),
-        uploadedBy: userName,
-        caseId: this.newDocument.caseId,
-        source: 'Partage'
-      };
-
-      console.log('📝 Nouveau document créé:', newDoc);
-
-      // Mettre à jour les tableaux de manière immuable
-      this.allDocuments = [...this.allDocuments, newDoc];
-      this.filteredDocuments = [...this.allDocuments];
-
-      console.log('📊 Total documents après ajout:', this.allDocuments.length);
-
-      // Fermer le modal
-      this.closeUploadModal();
-
-      // Forcer la détection des changements
-      this.cdr.detectChanges();
-
-      // Message de succès
-      setTimeout(() => {
-        alert('Document uploadé avec succès !');
-      }, 100);
-
-    } catch (error) {
-      console.error('❌ Erreur lors du traitement de la réponse:', error);
-      this.isUploading = false;
-      this.closeUploadModal();
-      alert('Document uploadé mais erreur lors de l\'affichage. Actualisez la page.');
-    }
-  });
-}
-
-  // Gestion des erreurs d'upload
-  handleUploadError(error: any): void {
-    console.error('❌ Erreur upload:', error);
-    this.isUploading = false;
-    
-    let errorMessage = 'Erreur lors de l\'upload du document.';
-    
-    if (error.error?.message) {
-      errorMessage += `\nDétails: ${error.error.message}`;
-    }
-    
-    if (error.error?.details) {
-      console.error('Détails techniques:', error.error.details);
-    }
-    
-    alert(errorMessage);
   }
 
   // Méthode de debug pour vérifier TOUS les paramètres
@@ -927,5 +940,377 @@ handleUploadSuccess(response: any): void {
     });
   }
 
+  // MÉTHODE pour UPLOADER UN DOCUMENT 
+  uploadDocument(): void {
+    
+    // Réinitialiser les erreurs
+    this.resetUploadErrors();
+
+    // Validation des champs
+    let isValid = true;
+
+    if (!this.newDocument.caseId) {
+      this.uploadFormErrors.type = true;
+      this.uploadErrorMessages.type = 'Veuillez sélectionner un dossier';
+      isValid = false;
+    }
+
+    if (!this.newDocument.type) {
+      this.uploadFormErrors.type = true;
+      this.uploadErrorMessages.type = 'Veuillez sélectionner un type de document';
+      isValid = false;
+    }
+
+    if (!this.newDocument.name || this.newDocument.name.trim() === '') {
+      this.uploadFormErrors.name = true;
+      this.uploadErrorMessages.name = 'Veuillez saisir un nom pour le document';
+      isValid = false;
+    }
+
+    if (!this.selectedFile) {
+      this.uploadFormErrors.file = true;
+      this.uploadErrorMessages.file = 'Veuillez sélectionner un fichier';
+      isValid = false;
+    }
+
+    if (!isValid) {
+      return;
+    }
+
+    if (this.isUploading) {
+      return;
+    }
+
+    this.isUploading = true;
+
+    // Créer FormData
+    const formData = new FormData();
+    formData.append('filedata', this.selectedFile!);
+
+    // Déterminer le fieldName selon le rôle de l'utilisateur
+    const currentUser = this.authService.getCurrentUser();
+    let userFieldName = 'documentsPartage'; 
+    
+    if (currentUser?.role) {
+      const role = typeof currentUser.role === 'string' ? currentUser.role : currentUser.role.type;
+      switch(role.toUpperCase()) {
+        case 'PARTENAIRE':
+        case 'PARTNER':
+          userFieldName = 'documentsPartenaire';
+          break;
+        case 'AVOCAT':
+        case 'LAWYER':
+          userFieldName = 'documentsAvocat';
+          break;
+        case 'HUISSIER':
+        case 'BAILIFF':
+          userFieldName = 'documentsHuissier';
+          break;
+        case 'CEDANT':
+        case 'CéDANT':
+          userFieldName = 'documentsCedant';
+          break;
+        case 'CREANCIER':
+        case 'CREDITOR':
+          userFieldName = 'documentsCreancier';
+          break;
+        case 'DEBITEUR':
+        case 'DEBTOR':
+          userFieldName = 'documentsDebiteur';
+          break;
+      }
+    }
+
+    // Sauvegarder le nom original
+    const originalFileName = this.selectedFile!.name;
+
+    // PREMIER UPLOAD : Dans le dossier spécifique à l'utilisateur
+    const userParams = {
+      objetNodeId: this.newDocument.caseId,
+      fieldName: userFieldName,
+      typeDocument: this.newDocument.type
+    };
+
+    // DEUXIÈME UPLOAD : Dans documentsPartage
+    const sharedParams = {
+      objetNodeId: this.newDocument.caseId,
+      fieldName: 'documentsPartage',
+      typeDocument: this.newDocument.type
+    };
+
+    // STRATÉGIE AMÉLIORÉE : Upload séquentiel avec gestion d'erreur granulaire
+    this.executeSequentialUploads(userParams, sharedParams, originalFileName);
+  }
+
+  // NOUVELLE MÉTHODE POUR UPLOADS SÉQUENTIELS
+  executeSequentialUploads(userParams: any, sharedParams: any, originalFileName: string): void {
+    let userUploadSuccess = false;
+    let sharedUploadSuccess = false;
+    let userResponse: any = null;
+    
+    // 1. D'abord l'upload utilisateur (le plus important)
+    this.caseService.uploadDocument(this.createFormData(), userParams).subscribe({
+      next: (response) => {
+        userUploadSuccess = true;
+        userResponse = response;
+
+        // 2. Ensuite l'upload partage (secondaire)
+        this.caseService.uploadDocument(this.createFormData(), sharedParams).subscribe({
+          next: (sharedResponse) => {
+            sharedUploadSuccess = true;
+            this.isUploading = false;
+            
+            // Les deux ont réussi
+            this.handleUploadSuccess(userResponse, originalFileName, true, true);
+          },
+          error: (sharedError) => {
+            sharedUploadSuccess = false;
+            this.isUploading = false;
+            
+            // Seul l'upload utilisateur a réussi
+            this.handleUploadSuccess(userResponse, originalFileName, true, false);
+          }
+        });
+      },
+
+
+      error: (userError) => {
+        userUploadSuccess = false;
+        
+        // Essayer quand même l'upload partage au cas où
+        this.caseService.uploadDocument(this.createFormData(), sharedParams).subscribe({
+          next: (sharedResponse) => {
+            sharedUploadSuccess = true;
+            this.isUploading = false;
+            
+            // Seul l'upload partage a réussi
+            this.handleUploadSuccess(sharedResponse, originalFileName, false, true);
+          },
+          error: (sharedError) => {
+            sharedUploadSuccess = false;
+            this.isUploading = false;
+            
+            // Les deux ont échoué
+            this.handleUploadError('Tous les uploads ont échoué. Veuillez réessayer.');
+          }
+        });
+      }
+    });
+  }
+
+  // MÉTHODE UTILITAIRE POUR CRÉER FORMDATA
+  createFormData(): FormData {
+    const formData = new FormData();
+    if (this.selectedFile) {
+      formData.append('filedata', this.selectedFile);
+    }
+    return formData;
+  }
+
+  // Gestion du succès de l'upload - VERSION AVEC DOUBLE ENREGISTREMENT
+  handleUploadSuccess(response: any, originalFileName: string, userSuccess: boolean, sharedSuccess: boolean): void {
+    try {
+
+      // Vérifier la structure de la réponse
+      let uploadedFile;
+      
+      if (response.files && response.files.length > 0) {
+        // Structure avec tableau files
+        uploadedFile = response.files[0];
+      } else if (response.entry) {
+        // Structure Alfresco directe
+        uploadedFile = response.entry;
+      } else {
+        // Structure inconnue - utiliser les données disponibles
+        uploadedFile = response;
+      }
+
+      // Récupérer l'utilisateur courant
+      const currentUser = this.authService.getCurrentUser();
+      const userName = currentUser?.username || 'Utilisateur actuel';
+
+      // Déterminer la source et le message
+      let source = '';
+      let successMessage = '';
+
+      if (userSuccess && sharedSuccess) {
+        source = 'Upload (Partagé)';
+        successMessage = 'Document ajouté avec succès et partagé!';
+      } else if (userSuccess && !sharedSuccess) {
+        source = 'Upload (Utilisateur uniquement)';
+        successMessage = 'Document ajouté (erreur lors du partage)';
+      } else if (!userSuccess && sharedSuccess) {
+        source = 'Upload (Partage uniquement)';
+        successMessage = 'Document partagé (erreur lors de l\'enregistrement utilisateur)';
+      }
+
+      // Créer le nouveau document
+      const newDoc: CaseDocument & { caseId: string; source: string } = {
+        id: uploadedFile.documentNodeId || uploadedFile.id || `doc-${Date.now()}`,
+        name: originalFileName, // Toujours utiliser le nom original
+        type: this.mapDocumentType(uploadedFile.typeDocument || this.newDocument.type),
+        url: uploadedFile.url || uploadedFile.downloadUrl || '#',
+        uploadedAt: new Date(),
+        uploadedBy: userName,
+        caseId: this.newDocument.caseId,
+        source: source 
+      };
+
+
+      // Mettre à jour les listes de documents
+      if (userSuccess || sharedSuccess) {
+        this.allDocuments = [...this.allDocuments, newDoc];
+        this.filteredDocuments = [...this.allDocuments];
+
+        // Afficher le message de succès adapté
+        this.showUploadSuccess = true;
+        this.uploadSuccessMessage = successMessage;
+
+        // Fermer la modale et rafraîchir après délai
+        setTimeout(() => {
+          this.showUploadSuccess = false;
+          this.uploadSuccessMessage = '';
+          this.closeUploadModal();
+          this.filterDocuments(); // Rafraîchir les filtres
+          
+          // Forcer la détection des changements
+          this.cdr.detectChanges();
+        }, 3000);
+      }
+
+    } catch (error) {
+      
+      let errorMsg = 'Erreur lors du traitement. ';
+      if (userSuccess && sharedSuccess) {
+        errorMsg += 'Le document a été uploadé et partagé.';
+      } else if (userSuccess) {
+        errorMsg += 'Le document a été uploadé (sans partage).';
+      } else if (sharedSuccess) {
+        errorMsg += 'Le document a été partagé (sans enregistrement utilisateur).';
+      }
+      
+      alert(errorMsg);
+      this.closeUploadModal();
+    }
+  }
+
+  // Gestion des erreurs d'upload - VERSION AMÉLIORÉE
+  handleUploadError(errorMessage: string): void {
+    alert(errorMessage);
+    this.isUploading = false;
+  }
+
+  // Ouvrir le modal d'upload
+  openUploadModal(): void {
+    this.showUploadModal = true;
+    // Réinitialiser le formulaire
+    this.newDocument = {
+      name: '',
+      type: '',
+      caseId: ''
+    };
+    this.selectedFile = null;
+    this.isUploading = false;
+    this.showUploadSuccess = false;
+    this.resetUploadErrors();
+  }
+
+  // Fermer le modal d'upload
+  closeUploadModal(): void {
+    this.showUploadModal = false;
+    this.newDocument = {
+      name: '',
+      type: '',
+      caseId: ''
+    };
+    this.selectedFile = null;
+    this.isUploading = false;
+    this.showUploadSuccess = false;
+    this.resetUploadErrors();
+  }
+
+  // Gestion de la sélection de fichier
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      
+      if (!this.newDocument.name) {
+        this.newDocument.name = file.name;
+      }
+
+      // Réinitialiser l'erreur du fichier si un fichier est sélectionné
+      this.uploadFormErrors.file = false;
+      this.uploadErrorMessages.file = '';
+    } else {
+      // Marquer comme erreur si aucun fichier n'est sélectionné
+      this.uploadFormErrors.file = true;
+      this.uploadErrorMessages.file = 'Veuillez sélectionner un fichier';
+    }
+  }
+
+  // Ajoutez cette méthode pour réinitialiser les erreurs
+  resetUploadErrors(): void {
+    this.uploadFormErrors = {
+      type: false,
+      name: false,
+      file: false
+    };
+    this.uploadErrorMessages = {
+      type: '',
+      name: '',
+      file: ''
+    };
+  }
+
+  // Les autres méthodes restent inchangées...
+  deleteDocument(doc: CaseDocument & { caseId: string }) {
+    // Vérifier que le document a un ID
+    if (!doc.id) {
+      return;
+    }
+
+    // Appel du service pour supprimer le document
+    this.caseService.deleteDocument(doc.id).subscribe({
+      next: (response) => {
+        // Supprimer le document des tableaux locaux
+        this.allDocuments = this.allDocuments.filter(d => d.id !== doc.id);
+        this.filteredDocuments = this.filteredDocuments.filter(d => d.id !== doc.id);
+
+        // AFFICHER LE MESSAGE DE SUCCÈS POUR LA SUPPRESSION
+        this.showDeleteSuccess = true;
+        this.deleteSuccessMessage = 'Document supprimé avec succès!';
+
+        // Cacher le message après 3 secondes
+        setTimeout(() => {
+          this.showDeleteSuccess = false;
+          this.deleteSuccessMessage = '';
+          this.filterDocuments();
+        }, 3000);
+      },
+      error: (error) => {
+        alert('Erreur lors de la suppression du document. Veuillez réessayer.');
+      }
+    });
+  }
+
+  // Methode du modal de suppression d\'un document
+  confirmDeleteDocument(doc: any): void {
+    this.documentToDelete = doc;
+    this.showDeleteConfirmation = true;
+  }
+
+  executeDelete(): void {
+    if (this.documentToDelete) {
+      this.deleteDocument(this.documentToDelete);
+      this.showDeleteConfirmation = false;
+      this.documentToDelete = null;
+    }
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirmation = false;
+    this.documentToDelete = null;
+  }
 
 }

@@ -6,6 +6,7 @@ import { CaseService } from '../../../services/case.service';
 import { User, StrapiRole } from '../../../models/user.model';
 import { AdminService } from '../../../services/admin.service';
 import { CreditorDetail } from '../../../models/case.model';
+import { I18nService } from '../../../services/i18n.service';
 
 @Component({
   selector: 'app-debtor-dashboard',
@@ -15,6 +16,8 @@ import { CreditorDetail } from '../../../models/case.model';
   styleUrls: ['./debtor-dashboard.css']
 })
 export class DebtorDashboard implements OnInit {
+
+  translations: any = {};
 
   currentUser: User | null = null;
  
@@ -39,13 +42,28 @@ export class DebtorDashboard implements OnInit {
   constructor(
     private authService: AuthService,
     private casesService: CaseService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private i18nService: I18nService,
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
 
+    this.loadTranslations();
+    this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+
     this.loadDossiers();
+  }
+
+  private loadTranslations() {
+    const currentLocale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
   }
   
   // Chargement des dossiers
@@ -60,9 +78,6 @@ export class DebtorDashboard implements OnInit {
     }
 
     const debiteurNodeId = currentUser.nodeId;
-    console.log('Débiteur connecté :', currentUser);
-    console.log('debiteurNodeId envoyé :', debiteurNodeId);
-
     if (!debiteurNodeId) {
       this.errorMessage = 'Identifiant du débiteur introuvable.';
       this.isLoading = false;
@@ -71,7 +86,6 @@ export class DebtorDashboard implements OnInit {
 
     this.casesService.getDossiersDebiteur(siteName, debiteurNodeId).subscribe({
       next: (response) => {
-        console.log('Réponse API dossiers :', response);
         this.dossiers = response.data?.map((item: any) => item.map) || [];
 
         //  mise à jour des statistiques
@@ -80,7 +94,6 @@ export class DebtorDashboard implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des dossiers :', error);
         this.errorMessage = 'Impossible de récupérer les dossiers.';
         this.isLoading = false;
       }
@@ -98,7 +111,7 @@ export class DebtorDashboard implements OnInit {
 
    // Ici on compare le debiteurNodeId avec nodeId du dossier qui correspond au debiteur 
     getCreancierForDossier(dossier: any): CreditorDetail | undefined {
-        return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
+      return this.creditors.find(d => d.nodeId === dossier.creancierNodeId);
     }
 
   getUserRoleLabel(): string {

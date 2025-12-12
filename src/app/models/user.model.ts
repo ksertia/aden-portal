@@ -41,7 +41,7 @@ allUser: any;
   role: Role;  // Le rôle est un objet qui contient toutes les informations du rôle
   statut: string;
   avatar?: string;
-  phone?: string;
+  Phone?: string;
   companyName?: string;
   licenseNumber?: string;
   address?: Address;
@@ -59,6 +59,7 @@ allUser: any;
   typePartenaire: string;
   debiteurNodeId?: string;
   nodeId: string;
+  profil:string;
 }
 
 export interface Debiteurs {
@@ -80,7 +81,7 @@ export interface LoginRequest {
 // Interface pour la réponse de connexion, contenant l'utilisateur et le token JWT
 export interface LoginResponse {
   user: User;
-  token: string;
+  jwt: string;
 }
 
 // Fonction pour mapper un rôle de Strapi en une valeur de l'énumération StrapiRole

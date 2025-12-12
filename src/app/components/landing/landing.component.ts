@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { LanguageSwitcherComponent } from '../shared/language-switcher/language-switcher.component';
 import { I18nService } from '../../services/i18n.service';
-import { Nav, Hero, Services, Benefits, Statistiques, CTA, Contact, Footer, Common } from '../../models/landing.model';
+import { Nav, Hero, Services, Benefits, Statistiques, CTA, Contact, Footer, Common, Header } from '../../models/landing.model';
 import { LandingService } from '../../services/landing.service';
 
 @Component({
@@ -19,6 +19,7 @@ export class LandingComponent implements OnInit {
   // Données depuis Strapi (labels, textes, traductions)
   nav?: Nav;
   hero?: Hero;
+  header?: Header;
   services?: Services;
   benefits?: Benefits;
   stats?: Statistiques;
@@ -62,6 +63,11 @@ export class LandingComponent implements OnInit {
       this.hero = data || undefined;
     });
 
+    this.landingService.getHeader(locale).subscribe(data => {
+      this.header = data || undefined;
+       console.log('Header loaded:', this.header);
+    });
+
     this.landingService.getServices(locale).subscribe(data => {
       this.services = data || undefined;
       console.log('Services loaded:', this.services);
@@ -87,13 +93,13 @@ export class LandingComponent implements OnInit {
 
     this.landingService.getFooter(locale).subscribe(data => {
       this.footer = data || undefined;
+      console.log('footer loaded:', this.footer);
     });
 
     this.landingService.getCommon(locale).subscribe(data => {
       this.common = data || undefined;
     });
   }
-
   /**
    * Retourne la classe CSS pour l'icône du service en fonction de l'index
    */

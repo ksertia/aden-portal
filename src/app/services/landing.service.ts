@@ -5,7 +5,8 @@ import { map } from "rxjs/operators";
 import { environment } from "../../environment/environment";
 import { 
   Hero, Nav, Services, ServiceItem, Benefits, BenefitItem, 
-  Statistiques, CTA, Contact, Footer, Common, Sidebar 
+  Statistiques, CTA, Contact, Footer, Common, Sidebar, 
+  Header
 } from "../models/landing.model";
 
 interface StrapiResponse<T> {
@@ -51,6 +52,127 @@ export class LandingService {
             })
         );
     }
+    
+    getHeader(locale: string): Observable<Header | null> {
+        return this.http.get<StrapiResponse<Header>>(
+            `${this.apiUrl}/headers?locale=${locale}&populate=*`
+        ).pipe(
+            map(res => {
+                if (res.data.length > 0) {
+                    return res.data[0].attributes || res.data[0] as any;
+                }
+                return null;
+            })
+        );
+    }
+    // getHeader(locale: string): Observable<Header | null> {
+    //     return this.http.get<any>(
+    //         `${this.apiUrl}/headers?locale=${locale}&populate=*`
+    //     ).pipe(
+    //         map(res => {
+    //             console.log('Header API Response:', res); // Pour debug
+    //             if (!res || res.data.length === 0) return null;
+
+    //             const item = res.data[0];
+    //             const attributes = item.attributes || item; // Support Strapi v4
+                
+    //             // Construction correcte de l'URL du logo
+    //             const logoUrl = attributes.logo?.data?.attributes?.url 
+    //                 ? `${environment.apiUrl.replace('/api', '')}${attributes.logo.data.attributes.url}`
+    //                 : attributes.logo?.url 
+    //                 ? `${environment.apiUrl.replace('/api', '')}${attributes.logo.url}`
+    //                 : null;
+
+    //             return {
+    //                 id: item.id,
+    //                 documentId: item.documentId,
+    //                 logo: logoUrl,
+    //                 logoText: attributes.logoText,
+    //                 navServices: attributes.navServices,
+    //                 navAdvantages: attributes.navAdvantages,
+    //                 navContact: attributes.navContact,
+    //                 navLogin: attributes.navLogin,
+    //                 createdAt: attributes.createdAt,
+    //                 updatedAt: attributes.updatedAt,
+    //                 publishedAt: attributes.publishedAt,
+    //                 locale: attributes.locale
+    //             };
+    //         })
+    //     );
+    // }
+//         getHeader(locale: string): Observable<Header | null> {
+//     return this.http.get<any>(
+//         `${this.apiUrl}/headers?locale=${locale}`
+//     ).pipe(
+//         map(res => {
+//             console.log('🔍 BASIC Header API Response:', res);
+            
+//             if (!res || res.data.length === 0) return null;
+
+//             const item = res.data[0];
+//             const attributes = item.attributes || item;
+
+//             console.log('📋 All attributes:', Object.keys(attributes));
+//             console.log('🖼️ Logo attribute:', attributes.logo);
+//             console.log('📝 LogoText attribute:', attributes.logoText);
+
+//             // Vérifiez si le champ logo existe et sa structure
+//             let logoUrl: string | null = null;
+            
+//             if (attributes.logo) {
+//                 console.log('🔎 Logo structure analysis:', {
+//                     type: typeof attributes.logo,
+//                     isObject: typeof attributes.logo === 'object',
+//                     keys: attributes.logo ? Object.keys(attributes.logo) : 'null',
+//                     value: attributes.logo
+//                 });
+
+//                 // Si c'est déjà une URL string
+//                 if (typeof attributes.logo === 'string') {
+//                     logoUrl = attributes.logo.startsWith('http') ? 
+//                         attributes.logo : 
+//                         `${environment.apiUrl.replace('/api', '')}${attributes.logo}`;
+//                 }
+//                 // Si c'est un objet avec une propriété url
+//                 else if (attributes.logo.url) {
+//                     logoUrl = attributes.logo.url.startsWith('http') ?
+//                         attributes.logo.url :
+//                         `${environment.apiUrl.replace('/api', '')}${attributes.logo.url}`;
+//                 }
+//                 // Si c'est un objet avec data (structure Strapi)
+//                 else if (attributes.logo.data) {
+//                     const logoData = attributes.logo.data.attributes || attributes.logo.data;
+//                     if (logoData?.url) {
+//                         logoUrl = logoData.url.startsWith('http') ?
+//                             logoData.url :
+//                             `${environment.apiUrl.replace('/api', '')}${logoData.url}`;
+//                     }
+//                 }
+//             }
+
+//             console.log('🌐 Final logo URL:', logoUrl);
+
+//             const header: Header = {
+//                 id: item.id,
+//                 documentId: item.documentId,
+//                 logoTextPhoto: logoUrl, 
+//                 logoText: attributes.logoText,
+//                 navServices: attributes.navServices,
+//                 navAdvantages: attributes.navAdvantages,
+//                 navContact: attributes.navContact,
+//                 navLogin: attributes.navLogin,
+//                 createdAt: attributes.createdAt,
+//                 updatedAt: attributes.updatedAt,
+//                 publishedAt: attributes.publishedAt,
+//                 locale: attributes.locale
+//             };
+
+//             return header;
+//         })
+//     );
+// }
+
+
 
     getServices(locale: string): Observable<Services | null> {
         return forkJoin({

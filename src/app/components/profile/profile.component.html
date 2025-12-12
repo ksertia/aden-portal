@@ -1,100 +1,189 @@
 <div class="profile-container">
-  <div class="profile-header fade-in-up">
-    <h1>{{ t('profile.title') }}</h1>
-    <p>{{ t('profile.subtitle') }}</p>
+  <div class="ph1">
+    <button class="btn btn-secondary" (click)="goBackToDashboard()">{{ t("profile.return") }}</button>
   </div>
-
+  
   <div class="profile-content fade-in-up" *ngIf="user">
     <div class="profile-card">
+      <!-- Avatar avec bouton d'édition -->
       <div class="profile-avatar">
-        <div class="avatar-circle">
-          {{ user.firstname.charAt(0) }}{{ user.lastname.charAt(0) }}
+        <div class="avatar-wrapper">
+          <!-- Avatar sans photo -->
+          <div class="avatar-circle" *ngIf="!avatarPreviewUrl">
+            {{ user.firstname.charAt(0) }}{{ user.lastname.charAt(0) }}
+          </div>
+          
+          <!-- Avatar avec photo -->
+          <div class="avatar-circle" *ngIf="avatarPreviewUrl">
+            <img [src]="avatarPreviewUrl" alt="avatar" class="avatar-img" />
+          </div>
+
+          <!-- Bouton d'édition (crayon) -->
+          <button 
+            class="avatar-edit-btn" 
+            (click)="triggerFileInput()"
+            [disabled]="isUploadingAvatar"
+            type="button"
+            title="Changer la photo de profil"
+          >
+            <svg 
+              *ngIf="!isUploadingAvatar" 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="14" 
+              height="14" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              stroke-width="2" 
+              stroke-linecap="round" 
+              stroke-linejoin="round"
+            >
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            <!-- Spinner pendant l'upload -->
+            <span *ngIf="isUploadingAvatar" class="spinner-small"></span>
+          </button>
+
+          <!-- Input file caché -->
+          <input 
+            #fileInput
+            type="file" 
+            accept="image/*" 
+            (change)="onFileSelected($event)"
+            style="display: none"
+          />
         </div>
+
         <div class="avatar-info">
           <h2>{{ user.firstname }} {{ user.lastname }}</h2>
           <p class="role">{{ getUserRoleLabel() }}</p>
         </div>
       </div>
 
-      <form (ngSubmit)="updateProfile()" class="profile-form">
+      <!-- Formulaire de profil -->
+      <form (ngSubmit)="onSubmitProfile()" class="profile-form" #profileForm="ngForm" novalidate>
         <div class="form-section">
-          <h3>{{ t('profile.personal_info') }}</h3>
+          <h3>{{ t("profile.personal_info") }}</h3>
+          
           <div class="form-row">
             <div class="form-group">
-              <label for="firstName">{{ t('profile.first_name') }}</label>
-              <input type="text" id="firstName" [(ngModel)]="user.firstname" name="firstName" required>
+              <label for="firstName">{{ t("profile.first_name") }}</label>
+              <input type="text" id="firstName" [(ngModel)]="user.firstname" name="firstName" required />
             </div>
             <div class="form-group">
-              <label for="lastName">{{ t('profile.last_name') }}</label>
-              <input type="text" id="lastName" [(ngModel)]="user.lastname" name="lastName" required>
+              <label for="lastName">{{ t("profile.last_name") }}</label>
+              <input type="text" id="lastName" [(ngModel)]="user.lastname" name="lastName" required />
             </div>
           </div>
 
           <div class="form-group">
-            <label for="email">{{ t('profile.email') }}</label>
-            <input type="email" id="email" [(ngModel)]="user.email" name="email" required disabled>
+            <label for="email">{{ t("profile.email") }}</label>
+            <input type="email" id="email" [(ngModel)]="user.email" name="email" required />
           </div>
 
           <div class="form-group">
-            <label for="phone">{{ t('profile.phone') }}</label>
-            <input type="tel" id="phone" [(ngModel)]="user.phone" name="phone">
+            <label for="phone">{{ t("profile.phone") }}</label>
+            <input type="tel" id="phone" [(ngModel)]="user.Phone" name="phone" required />
           </div>
         </div>
 
-        <div class="form-section" *ngIf="user.companyName || user.licenseNumber">
-          <h3>{{ t('profile.professional_info') }}</h3>
-
-          <div class="form-group" *ngIf="user.companyName">
-            <label for="companyName">{{ t('profile.company_name') }}</label>
-            <input type="text" id="companyName" [(ngModel)]="user.companyName" name="companyName">
-          </div>
-
-          <div class="form-group" *ngIf="user.licenseNumber">
-            <label for="licenseNumber">{{ t('profile.license_number') }}</label>
-            <input type="text" id="licenseNumber" [(ngModel)]="user.licenseNumber" name="licenseNumber">
-          </div>
-        </div>
-
-        <div class="form-section" *ngIf="user.address">
-          <h3>{{ t('profile.address') }}</h3>
-
-          <div class="form-group">
-            <label for="street">{{ t('profile.street') }}</label>
-            <input type="text" id="street" [(ngModel)]="user.address.street" name="street">
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="city">{{ t('profile.city') }}</label>
-              <input type="text" id="city" [(ngModel)]="user.address.city" name="city">
-            </div>
-            <div class="form-group">
-              <label for="postalCode">{{ t('profile.postal_code') }}</label>
-              <input type="text" id="postalCode" [(ngModel)]="user.address.postalCode" name="postalCode">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="country">{{ t('profile.country') }}</label>
-            <input type="text" id="country" [(ngModel)]="user.address.country" name="country">
-          </div>
-        </div>
-
-        <div class="form-actions">
+        <div class="form-actions" style="gap: 12px; align-items: center">
           <button type="submit" class="btn btn-primary" [disabled]="isUpdating">
-            <span *ngIf="!isUpdating">{{ t('profile.update') }}</span>
-            <span *ngIf="isUpdating">{{ t('profile.updating') }}</span>
+            <span *ngIf="!isUpdating">{{ t("profile.update") }}</span>
+            <span *ngIf="isUpdating">{{ t("profile.updating") }}</span>
+          </button>
+          
+          <button type="button" class="btn btn-outline" (click)="togglePasswordForm()">
+            <!-- {{ showPasswordForm ? 'Masquer le formulaire' : 'Changer le mot de passe' }} -->
+            {{ t("profile.Change password") }}
           </button>
         </div>
       </form>
+
+      <!-- FORMULAIRE CHANGEMENT MOT DE PASSE -->
+      <div class="password-change-section" *ngIf="showPasswordForm">
+        <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e7eb;">
+        
+        <form (ngSubmit)="onSubmitPasswordChange()" #passwordForm="ngForm" novalidate>
+          <h3 style="margin-bottom: 16px; color: #1f2937;">{{ t("profile.Change password") }}</h3>
+          
+          <div class="form-group">
+            <label for="currentPassword">{{ t("profile.Current password") }}</label> 
+            <input 
+              type="password" 
+              id="currentPassword" 
+              [(ngModel)]="passwordData.currentPassword" 
+              name="currentPassword" 
+              required 
+              autocomplete="current-password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">{{ t("profile.New password") }}</label>
+            <input 
+              type="password" 
+              id="newPassword" 
+              [(ngModel)]="passwordData.newPassword" 
+              name="newPassword" 
+              required 
+              minlength="8"
+              autocomplete="new-password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="passwordConfirmation">{{ t("profile.Confirm the new password") }}</label>
+            <input 
+              type="password" 
+              id="passwordConfirmation" 
+              [(ngModel)]="passwordData.passwordConfirmation" 
+              name="passwordConfirmation" 
+              required 
+              autocomplete="new-password"
+            />
+          </div>
+
+          <div class="form-actions" style="gap: 12px; margin-top: 16px;">
+            <button 
+              type="submit" 
+              class="btn btn-primary" 
+              [disabled]="isChangingPassword"
+            >
+              <span *ngIf="!isChangingPassword">{{ t("profile.To validate") }}</span>
+              <span *ngIf="isChangingPassword">{{ t("profile.Change in progress") }}</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              (click)="cancelPasswordChange()"
+              [disabled]="isChangingPassword"
+            >
+             {{ t("profile.Cancel") }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
+  <!-- Message de succès (profil) -->
   <div class="success-message" *ngIf="updateSuccess">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M9 12l2 2 4-4"/>
-      <circle cx="12" cy="12" r="9"/>
+      <path d="M9 12l2 2 4-4" />
+      <circle cx="12" cy="12" r="9" />
     </svg>
-    {{ t('profile.success') }}
+    {{ t("profile.success") }}
+  </div>
+
+  <!-- Message de succès (mot de passe changé) -->
+  <div class="success-message" *ngIf="passwordChangeSuccess">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 12l2 2 4-4" />
+      <circle cx="12" cy="12" r="9" />
+    </svg>
+    {{ t("profile.Password changed successfully! Redirecting") }}
   </div>
 </div>

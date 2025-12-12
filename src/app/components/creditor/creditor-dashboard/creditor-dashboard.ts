@@ -4,9 +4,9 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { CaseService } from '../../../services/case.service';
 import { User, StrapiRole } from '../../../models/user.model';
-import { DebtCase } from '../../../models/case.model';
 import { AdminService } from '../../../services/admin.service';
 import { DebtorInfo } from '../../../models/case.model';
+import { I18nService } from '../../../services/i18n.service';
 
 @Component({
   selector: 'app-creditor-dashboard',
@@ -15,6 +15,8 @@ import { DebtorInfo } from '../../../models/case.model';
   styleUrl: './creditor-dashboard.css'
 })
 export class CreditorDashboard implements OnInit{
+
+  translations: any = {};
 
   currentUser: User | null = null;
   selectedIndex: number | null = null;
@@ -36,13 +38,28 @@ export class CreditorDashboard implements OnInit{
   constructor(
     private authService: AuthService,
     private casesService: CaseService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private i18nService: I18nService,
   ) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
 
+    this.loadTranslations();
+    this.i18nService.currentLocale$.subscribe(() => this.loadTranslations());
+
     this.loadDossiers();
+  }
+
+  private loadTranslations() {
+    const currentLocale = this.i18nService.getCurrentLocale();
+    this.i18nService.loadTranslations(currentLocale).subscribe(translations => {
+      this.translations = translations;
+    });
+  }
+
+  t(key: string): string {
+    return this.i18nService.translate(key, this.translations);
   }
 
   // Chargement des dossiers
@@ -58,9 +75,6 @@ export class CreditorDashboard implements OnInit{
     }
 
     const creancierNodeId = currentUser.nodeId;
-    console.log('Créancier connecté :', currentUser);
-    console.log('creancierNodeId envoyé :', creancierNodeId);
-
     // Verification si l'utilisateur connecté à un NodeId
     if (!creancierNodeId) {
       this.errorMessage = 'Identifiant du créancier introuvable.';
@@ -71,7 +85,6 @@ export class CreditorDashboard implements OnInit{
     // Appel du web service pour la recuperation des dossiers du creanciers
     this.casesService.getDossiersCreancier(siteName, creancierNodeId).subscribe({
       next: (response) => {
-        console.log('Réponse API dossiers :', response);
 
         // Étape 1 : extraction correcte du tableau de dossiers
         const dossiers = response.data?.map((item: any) => item.map) || [];
@@ -80,7 +93,6 @@ export class CreditorDashboard implements OnInit{
         this.dossiers = dossiers.filter(
           (d: any) => d.creancierNodeId === creancierNodeId
         );
-        console.log('Dossiers filtrés pour ce créancier :', this.dossiers);
 
         // Étape 3 : mise à jour des statistiques
         this.updateCaseStatistics(); 
@@ -88,7 +100,6 @@ export class CreditorDashboard implements OnInit{
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des dossiers :', error);
         this.errorMessage = 'Impossible de récupérer les dossiers.';
         this.isLoading = false;
       }
