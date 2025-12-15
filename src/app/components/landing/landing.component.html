@@ -1,33 +1,28 @@
 <div class="landing-container">
   <!-- Header -->
-  <header class="landing-header">
-    <nav class="navbar">
-      <div class="nav-container">
+  <header class="custom-landing-header">
+  <nav class="custom-navbar">
+    <div class="custom-nav-container">
 
-        <div class="logo">
-          <!-- <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2v6l3-3 3 3"/>
-            <path d="M12 8v8"/>
-            <path d="m8 14 4 4 4-4"/>
-          </svg> -->
-          <!-- <span>{{ header?.logoTextPhoto }}</span> -->
-          <!-- <span>RecouvrePro</span> -->
-          <span>{{ header?.logoText }}</span>
-        </div>
+      <div class="custom-logo">
+        <span>{{ header?.logoText }}</span>
+      </div>
 
-        <div class="nav-links" *ngIf="nav">
-          <a (click)="scrollToSection('services')">{{ nav?.services }}</a> 
-          <a (click)="scrollToSection('advantages')">{{ nav?.advantages }}</a>
-          <a (click)="scrollToSection('contact')">{{ nav?.contact }}</a>
-          <app-language-switcher></app-language-switcher>
-          <div class="auth">
-            <a routerLink="/login" class="btn btn-primary">{{ nav?.login }}</a>
-            <a routerLink="/register" class="btn btn-secondary">{{ nav?.register }}</a>
-          </div>
+      <div class="custom-nav-links" *ngIf="nav">
+        <a (click)="scrollToSection('services')">{{ nav.services }}</a> 
+        <a (click)="scrollToSection('advantages')">{{ nav.advantages }}</a>
+        <a (click)="scrollToSection('contact')">{{ nav.contact }}</a>
+        <app-language-switcher></app-language-switcher>
+        <div class="custom-auth">
+          <a routerLink="/login" class="btn btn-primary">{{ nav.login }}</a>
+          <a routerLink="/register" class="btn btn-secondary">{{ nav.register }}</a>
         </div>
       </div>
-    </nav>
-  </header>
+      
+    </div>
+  </nav>
+</header>
+
 
   <!-- Hero Section -->
   <section class="hero-section" *ngIf="hero">
@@ -271,7 +266,7 @@
           </div>
         </div>
         
-        <div class="contact-form fade-in-up" *ngIf="contact?.form">
+        <div class="contact-form fade-in-up" *ngIf="contact.form">
         <form class="form" (ngSubmit)="submitContactForm()">
         <!-- Ligne Prénom / Nom -->
         <div class="form-row">
@@ -281,7 +276,7 @@
               type="text"
               [(ngModel)]="contactForm.firstName"
               name="firstName"
-              [placeholder]="contact?.form?.placeholder?.firstNamePlaceholder"
+              [placeholder]="contact.form.placeholder.firstNamePlaceholder"
               required
             />
           </div>

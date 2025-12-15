@@ -6,6 +6,7 @@ export interface Nav {
   contact: string;
   login: string;
   register: string
+  benefits?: string;
 }
 
 export interface Hero {
